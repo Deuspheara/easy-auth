@@ -108,7 +108,13 @@ pub struct User {
 }
 
 /// Non-secret, purpose-specific delivery work. Never exposed through the HTTP API.
-pub struct PasswordResetNotice {
+pub enum SecurityNoticeKind {
+    PasswordReset,
+    EmailChanged,
+    AccountDeleted,
+}
+pub struct SecurityNotice {
+    pub kind: SecurityNoticeKind,
     pub id: Uuid,
     pub lease: Uuid,
     pub recipient: String,
@@ -173,14 +179,43 @@ pub trait Repository: Send + Sync {
         browser: Verifier,
         hash: &str,
     ) -> Result<()>;
-    async fn claim_password_reset_notice(&self, realm: Uuid)
-    -> Result<Option<PasswordResetNotice>>;
-    async fn complete_password_reset_notice(
+    async fn claim_security_notice(&self, realm: Uuid) -> Result<Option<SecurityNotice>>;
+    async fn complete_security_notice(
         &self,
         realm: Uuid,
         id: Uuid,
         lease: Uuid,
         delivered: bool,
+    ) -> Result<()>;
+    async fn begin_email_change(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        email: &str,
+        old: Verifier,
+        new: Verifier,
+        browser: Verifier,
+    ) -> Result<String>;
+    async fn confirm_email_change(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<bool>;
+    async fn begin_account_deletion(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<String>;
+    async fn finish_account_deletion(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
     ) -> Result<()>;
     async fn ready(&self) -> Result<()>;
 }
@@ -189,6 +224,10 @@ pub trait EmailDelivery: Send + Sync {
     async fn sign_in(&self, email: &str, token: &Secret) -> Result<()>;
     async fn password_reset(&self, email: &str, token: &Secret) -> Result<()>;
     async fn password_changed(&self, email: &str) -> Result<()>;
+    async fn email_change(&self, email: &str, token: &Secret) -> Result<()>;
+    async fn account_deletion(&self, email: &str, token: &Secret) -> Result<()>;
+    async fn email_changed(&self, email: &str) -> Result<()>;
+    async fn account_deleted(&self, email: &str) -> Result<()>;
 }
 
 #[derive(Clone)]
@@ -302,24 +341,115 @@ impl Auth {
     }
     /// Deliver at most one leased non-secret notice. SMTP errors leave durable retry work.
     /// Call repeatedly from a bounded worker in both embedded and standalone compositions.
-    pub async fn deliver_password_reset_notice(&self) -> Result<bool> {
-        let Some(notice) = self
-            .repository
-            .claim_password_reset_notice(self.realm)
-            .await?
-        else {
+    pub async fn deliver_security_notice(&self) -> Result<bool> {
+        let Some(notice) = self.repository.claim_security_notice(self.realm).await? else {
             return Ok(false);
         };
-        let delivery = tokio::time::timeout(
-            std::time::Duration::from_secs(10),
-            self.email.password_changed(&notice.recipient),
-        )
+        let delivery = tokio::time::timeout(std::time::Duration::from_secs(10), async {
+            match notice.kind {
+                SecurityNoticeKind::PasswordReset => {
+                    self.email.password_changed(&notice.recipient).await
+                }
+                SecurityNoticeKind::EmailChanged => {
+                    self.email.email_changed(&notice.recipient).await
+                }
+                SecurityNoticeKind::AccountDeleted => {
+                    self.email.account_deleted(&notice.recipient).await
+                }
+            }
+        })
         .await
         .unwrap_or(Err(Error::Unavailable));
         self.repository
-            .complete_password_reset_notice(self.realm, notice.id, notice.lease, delivery.is_ok())
+            .complete_security_notice(self.realm, notice.id, notice.lease, delivery.is_ok())
             .await?;
         delivery.map(|_| true)
+    }
+    async fn admit_account_action(&self, current: &Secret, source: &str) -> Result<()> {
+        let user = self.authenticate(current).await?;
+        self.repository
+            .admit_password(
+                self.realm,
+                &user.email,
+                Sha256::digest(source.as_bytes()).into(),
+            )
+            .await
+    }
+    pub async fn start_email_change(
+        &self,
+        current: &Secret,
+        email: &str,
+        source: &str,
+    ) -> Result<Secret> {
+        self.admit_account_action(current, source).await?;
+        let email = normalize_email(email)?;
+        let old = Secret::generate()?;
+        let new = Secret::generate()?;
+        let browser = Secret::generate()?;
+        let previous = self
+            .repository
+            .begin_email_change(
+                self.realm,
+                current.verifier(),
+                &email,
+                old.verifier(),
+                new.verifier(),
+                browser.verifier(),
+            )
+            .await?;
+        self.email.email_change(&previous, &old).await?;
+        self.email.email_change(&email, &new).await?;
+        Ok(browser)
+    }
+    pub async fn confirm_email_change(
+        &self,
+        current: &Secret,
+        token: Secret,
+        browser: Secret,
+        source: &str,
+    ) -> Result<bool> {
+        self.admit_account_action(current, source).await?;
+        self.repository
+            .confirm_email_change(
+                self.realm,
+                current.verifier(),
+                token.verifier(),
+                browser.verifier(),
+            )
+            .await
+    }
+    pub async fn start_account_deletion(&self, current: &Secret, source: &str) -> Result<Secret> {
+        self.admit_account_action(current, source).await?;
+        let token = Secret::generate()?;
+        let browser = Secret::generate()?;
+        let email = self
+            .repository
+            .begin_account_deletion(
+                self.realm,
+                current.verifier(),
+                token.verifier(),
+                browser.verifier(),
+            )
+            .await?;
+        self.email.account_deletion(&email, &token).await?;
+        Ok(browser)
+    }
+    pub async fn finish_account_deletion(
+        &self,
+        current: &Secret,
+        token: Secret,
+        browser: Secret,
+        source: &str,
+    ) -> Result<()> {
+        self.admit_account_action(current, source).await?;
+        self.repository
+            .finish_account_deletion(
+                self.realm,
+                current.verifier(),
+                token.verifier(),
+                browser.verifier(),
+            )
+            .await
     }
     pub async fn start_email(&self, email: &str, source: &str) -> Result<Secret> {
         let email = normalize_email(email)?;

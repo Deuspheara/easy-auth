@@ -64,6 +64,20 @@ impl BrowserConfig {
             "auth-reset"
         }
     }
+    fn change_name(&self) -> &'static str {
+        if self.secure {
+            "__Host-auth-email-change"
+        } else {
+            "auth-email-change"
+        }
+    }
+    fn deletion_name(&self) -> &'static str {
+        if self.secure {
+            "__Host-auth-delete"
+        } else {
+            "auth-delete"
+        }
+    }
     fn cookie(&self, name: &str, secret: Option<&Secret>, max_age: u32) -> HeaderValue {
         let value = format!(
             "{name}={}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{}",
@@ -110,6 +124,27 @@ pub fn router(auth: Auth, browser: BrowserConfig) -> Router {
                 (
                     [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
                     include_str!("reset.js"),
+                )
+            }),
+        )
+        .route("/v1/account/email/start", post(start_email_change))
+        .route("/v1/account/email/confirm", post(confirm_email_change))
+        .route("/v1/account/delete/start", post(start_account_deletion))
+        .route("/v1/account/delete/finish", post(finish_account_deletion))
+        .route(
+            "/email-change",
+            get(|| async { Html(include_str!("email-change.html")) }),
+        )
+        .route(
+            "/account-delete",
+            get(|| async { Html(include_str!("account-delete.html")) }),
+        )
+        .route(
+            "/account-action.js",
+            get(|| async {
+                (
+                    [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
+                    include_str!("account-action.js"),
                 )
             }),
         )
@@ -420,6 +455,134 @@ async fn finish_password_reset(
     }
     Ok(response)
 }
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+struct DeleteInput {
+    confirmation: String,
+}
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+struct DeleteFinishInput {
+    token: String,
+    confirmation: String,
+}
+fn clear_account_cookies(state: &AppState) -> Response {
+    let mut response = StatusCode::NO_CONTENT.into_response();
+    for name in [
+        state.browser.session_name(),
+        state.browser.browser_name(),
+        state.browser.reset_name(),
+        state.browser.change_name(),
+        state.browser.deletion_name(),
+    ] {
+        response
+            .headers_mut()
+            .append(header::SET_COOKIE, state.browser.cookie(name, None, 0));
+    }
+    response
+}
+#[utoipa::path(post, path="/v1/account/email/start",request_body=EmailInput,params(("Origin"=String,Header),("Cookie"=String,Header)),
+    responses((status=202,body=Accepted,description="Proofs sent to both addresses; sets change binding cookie"),(status=400,body=ErrorResponse),(status=401,body=ErrorResponse),(status=403,body=ErrorResponse),(status=413,body=ErrorResponse),(status=415,body=ErrorResponse),(status=429,body=ErrorResponse),(status=503,body=ErrorResponse),(status=504,body=ErrorResponse)))]
+async fn start_email_change(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<EmailInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    let current = read_cookie(&headers, state.browser.session_name())?;
+    let browser = state
+        .auth
+        .start_email_change(&current, &input.email, &source_key(source))
+        .await?;
+    let mut response =
+        (StatusCode::ACCEPTED, Json(Accepted { status: "accepted" })).into_response();
+    response.headers_mut().append(
+        header::SET_COOKIE,
+        state
+            .browser
+            .cookie(state.browser.change_name(), Some(&browser), 300),
+    );
+    Ok(response)
+}
+#[utoipa::path(post, path="/v1/account/email/confirm",request_body=FinishInput,params(("Origin"=String,Header),("Cookie"=String,Header)),
+    responses((status=202,body=Accepted,description="One address confirmed; confirm the other proof"),(status=204,description="Both addresses confirmed; email changed; sessions/proofs revoked; login required"),(status=400,body=ErrorResponse),(status=401,body=ErrorResponse),(status=403,body=ErrorResponse),(status=413,body=ErrorResponse),(status=415,body=ErrorResponse),(status=429,body=ErrorResponse),(status=503,body=ErrorResponse),(status=504,body=ErrorResponse)))]
+async fn confirm_email_change(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<FinishInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    let current = read_cookie(&headers, state.browser.session_name())?;
+    let browser = read_cookie(&headers, state.browser.change_name())?;
+    let complete = state
+        .auth
+        .confirm_email_change(
+            &current,
+            Secret::parse(input.token)?,
+            browser,
+            &source_key(source),
+        )
+        .await?;
+    Ok(if complete {
+        clear_account_cookies(&state)
+    } else {
+        (StatusCode::ACCEPTED, Json(Accepted { status: "accepted" })).into_response()
+    })
+}
+#[utoipa::path(post, path="/v1/account/delete/start",request_body=DeleteInput,params(("Origin"=String,Header),("Cookie"=String,Header)),
+    responses((status=202,body=Accepted,description="Deletion proof sent to current address; no account deleted yet"),(status=400,body=ErrorResponse),(status=401,body=ErrorResponse),(status=403,body=ErrorResponse),(status=413,body=ErrorResponse),(status=415,body=ErrorResponse),(status=429,body=ErrorResponse),(status=503,body=ErrorResponse),(status=504,body=ErrorResponse)))]
+async fn start_account_deletion(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<DeleteInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    if input.confirmation != "delete my account" {
+        return Err(Error::InvalidInput.into());
+    }
+    let current = read_cookie(&headers, state.browser.session_name())?;
+    let browser = state
+        .auth
+        .start_account_deletion(&current, &source_key(source))
+        .await?;
+    let mut response =
+        (StatusCode::ACCEPTED, Json(Accepted { status: "accepted" })).into_response();
+    response.headers_mut().append(
+        header::SET_COOKIE,
+        state
+            .browser
+            .cookie(state.browser.deletion_name(), Some(&browser), 300),
+    );
+    Ok(response)
+}
+#[utoipa::path(post, path="/v1/account/delete/finish",request_body=DeleteFinishInput,params(("Origin"=String,Header),("Cookie"=String,Header)),
+    responses((status=204,description="Authentication account deleted; cookies cleared; audit subject removed"),(status=400,body=ErrorResponse),(status=401,body=ErrorResponse),(status=403,body=ErrorResponse),(status=413,body=ErrorResponse),(status=415,body=ErrorResponse),(status=429,body=ErrorResponse),(status=503,body=ErrorResponse),(status=504,body=ErrorResponse)))]
+async fn finish_account_deletion(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<DeleteFinishInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    if input.confirmation != "delete my account" {
+        return Err(Error::InvalidInput.into());
+    }
+    let current = read_cookie(&headers, state.browser.session_name())?;
+    let browser = read_cookie(&headers, state.browser.deletion_name())?;
+    state
+        .auth
+        .finish_account_deletion(
+            &current,
+            Secret::parse(input.token)?,
+            browser,
+            &source_key(source),
+        )
+        .await?;
+    Ok(clear_account_cookies(&state))
+}
 #[utoipa::path(get, path = "/v1/session", params(("Cookie" = String, Header, description = "Session cookie")),
     responses((status = 200, body = UserResponse), (status = 401, body = ErrorResponse), (status = 503, body = ErrorResponse), (status = 504, body = ErrorResponse)))]
 async fn session(State(state): State<AppState>, headers: HeaderMap) -> Result<Response, ApiError> {
@@ -540,6 +703,10 @@ async fn health() -> StatusCode {
         finish,
         enroll_password,
         password_login,
+        start_email_change,
+        confirm_email_change,
+        start_account_deletion,
+        finish_account_deletion,
         start_password_reset,
         finish_password_reset,
         session,
@@ -551,6 +718,8 @@ async fn health() -> StatusCode {
         PasswordEnrollmentInput,
         PasswordLoginInput,
         PasswordResetInput,
+        DeleteInput,
+        DeleteFinishInput,
         ErrorResponse,
         Accepted,
         UserResponse

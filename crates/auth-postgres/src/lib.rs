@@ -1,6 +1,6 @@
 //! PostgreSQL transactions for the shared core. SQL row shapes are private.
 use async_trait::async_trait;
-use auth_core::{Error, PasswordResetNotice, Repository, Result, User, Verifier};
+use auth_core::{Error, Repository, Result, SecurityNotice, SecurityNoticeKind, User, Verifier};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
@@ -30,6 +30,10 @@ impl Postgres {
             .map_err(unavailable)?;
         Ok(())
     }
+    async fn current_email(&self, realm: Uuid, current: Verifier) -> Result<String> {
+        sqlx::query_scalar("SELECT u.email FROM auth_users u JOIN auth_sessions s ON s.realm_id=u.realm_id AND s.user_id=u.id WHERE s.realm_id=$1 AND s.token_hash=$2")
+            .bind(realm).bind(current.as_slice()).fetch_optional(&self.pool).await.map_err(unavailable)?.ok_or(Error::Unauthorized)
+    }
 }
 // Serialize email proof issuance/consumption and reset, including account-creation races.
 // The PostgreSQL hash is a lock key, not a credential/cryptographic verifier.
@@ -47,6 +51,37 @@ async fn lock_email(
     .await
     .map_err(unavailable)?;
     Ok(())
+}
+async fn lock_emails(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    realm: Uuid,
+    old: &str,
+    new: &str,
+) -> Result<()> {
+    let (first, second) = if old < new { (old, new) } else { (new, old) };
+    lock_email(tx, realm, first).await?;
+    if first != second {
+        lock_email(tx, realm, second).await?;
+    }
+    Ok(())
+}
+async fn fresh_account(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    realm: Uuid,
+    current: Verifier,
+    email: &str,
+) -> Result<(Uuid, Uuid)> {
+    let user: Uuid =
+        sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 FOR UPDATE")
+            .bind(realm)
+            .bind(email)
+            .fetch_optional(&mut **tx)
+            .await
+            .map_err(unavailable)?
+            .ok_or(Error::Unauthorized)?;
+    let session: Uuid=sqlx::query_scalar("SELECT id FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND token_hash=$3 AND revoked_at IS NULL AND expires_at>clock_timestamp() AND last_seen_at>clock_timestamp()-interval '30 minutes' AND authenticated_at>clock_timestamp()-interval '5 minutes' AND authenticated_at<=clock_timestamp() FOR UPDATE")
+        .bind(realm).bind(user).bind(current.as_slice()).fetch_optional(&mut **tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
+    Ok((user, session))
 }
 #[async_trait]
 impl Repository for Postgres {
@@ -164,7 +199,7 @@ impl Repository for Postgres {
         let user: Option<Uuid> = sqlx::query_scalar("SELECT u.id FROM auth_users u JOIN auth_sessions s ON s.realm_id=u.realm_id AND s.user_id=u.id WHERE s.realm_id=$1 AND s.token_hash=$2 FOR UPDATE OF u")
             .bind(realm).bind(current.as_slice()).fetch_optional(&mut *tx).await.map_err(unavailable)?;
         let user = user.ok_or(Error::Unauthorized)?;
-        let active: Option<Uuid> = sqlx::query_scalar("SELECT id FROM auth_sessions WHERE realm_id=$1 AND token_hash=$2 AND revoked_at IS NULL AND created_at > clock_timestamp()-interval '5 minutes' AND expires_at > clock_timestamp() AND last_seen_at > clock_timestamp()-interval '30 minutes' FOR UPDATE")
+        let active: Option<Uuid> = sqlx::query_scalar("SELECT id FROM auth_sessions WHERE realm_id=$1 AND token_hash=$2 AND revoked_at IS NULL AND authenticated_at > clock_timestamp()-interval '5 minutes' AND authenticated_at <= clock_timestamp() AND expires_at > clock_timestamp() AND last_seen_at > clock_timestamp()-interval '30 minutes' FOR UPDATE")
             .bind(realm).bind(current.as_slice()).fetch_optional(&mut *tx).await.map_err(unavailable)?;
         active.ok_or(Error::Unauthorized)?;
         let inserted = sqlx::query("INSERT INTO auth_password_credentials(realm_id,user_id,password_hash) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING")
@@ -175,12 +210,12 @@ impl Repository for Postgres {
         sqlx::query("UPDATE auth_sessions SET revoked_at=clock_timestamp() WHERE realm_id=$1 AND user_id=$2 AND revoked_at IS NULL")
             .bind(realm).bind(user).execute(&mut *tx).await.map_err(unavailable)?;
         sqlx::query(
-            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash) VALUES ($1,$2,$3,$4)",
+            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authenticated_at) SELECT $1,$2,$3,$4,authenticated_at FROM auth_sessions WHERE realm_id=$1 AND token_hash=$5",
         )
         .bind(realm)
         .bind(Uuid::new_v4())
         .bind(user)
-        .bind(replacement.as_slice())
+        .bind(replacement.as_slice()).bind(current.as_slice())
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
@@ -299,6 +334,18 @@ impl Repository for Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        sqlx::query("DELETE FROM auth_email_changes WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        sqlx::query("DELETE FROM auth_account_deletions WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
         sqlx::query(
             "INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,$2,'password_reset')",
         )
@@ -307,24 +354,31 @@ impl Repository for Postgres {
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
-        sqlx::query("INSERT INTO auth_password_reset_notifications(realm_id,id,user_id,recipient) VALUES ($1,$2,$3,$4)")
+        sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient) VALUES ($1,$2,$3,$4)")
             .bind(realm).bind(Uuid::new_v4()).bind(user).bind(&email).execute(&mut *tx).await.map_err(unavailable)?;
         tx.commit().await.map_err(unavailable)
     }
-    async fn claim_password_reset_notice(
-        &self,
-        realm: Uuid,
-    ) -> Result<Option<PasswordResetNotice>> {
+    async fn claim_security_notice(&self, realm: Uuid) -> Result<Option<SecurityNotice>> {
         let lease = Uuid::new_v4();
-        let row = sqlx::query("WITH due AS (SELECT id FROM auth_password_reset_notifications WHERE realm_id=$1 AND attempts<8 AND next_attempt_at<=clock_timestamp() AND (lease_until IS NULL OR lease_until<=clock_timestamp()) ORDER BY next_attempt_at,id FOR UPDATE SKIP LOCKED LIMIT 1) UPDATE auth_password_reset_notifications n SET attempts=n.attempts+1,lease_id=$2,lease_until=clock_timestamp()+interval '30 seconds' FROM due WHERE n.realm_id=$1 AND n.id=due.id RETURNING n.id,n.recipient")
+        let row = sqlx::query("WITH due AS (SELECT id FROM auth_security_notifications WHERE realm_id=$1 AND attempts<8 AND next_attempt_at<=clock_timestamp() AND (lease_until IS NULL OR lease_until<=clock_timestamp()) ORDER BY next_attempt_at,id FOR UPDATE SKIP LOCKED LIMIT 1) UPDATE auth_security_notifications n SET attempts=n.attempts+1,lease_id=$2,lease_until=clock_timestamp()+interval '30 seconds' FROM due WHERE n.realm_id=$1 AND n.id=due.id RETURNING n.id,n.recipient,n.kind")
             .bind(realm).bind(lease).fetch_optional(&self.pool).await.map_err(unavailable)?;
-        Ok(row.map(|row| PasswordResetNotice {
-            id: row.get("id"),
-            lease,
-            recipient: row.get("recipient"),
-        }))
+        row.map(|row| {
+            let kind = match row.get::<String, _>("kind").as_str() {
+                "password_reset" => SecurityNoticeKind::PasswordReset,
+                "email_changed" => SecurityNoticeKind::EmailChanged,
+                "account_deleted" => SecurityNoticeKind::AccountDeleted,
+                _ => return Err(Error::Unavailable),
+            };
+            Ok(SecurityNotice {
+                id: row.get("id"),
+                lease,
+                recipient: row.get("recipient"),
+                kind,
+            })
+        })
+        .transpose()
     }
-    async fn complete_password_reset_notice(
+    async fn complete_security_notice(
         &self,
         realm: Uuid,
         id: Uuid,
@@ -332,13 +386,193 @@ impl Repository for Postgres {
         delivered: bool,
     ) -> Result<()> {
         if delivered {
-            sqlx::query("DELETE FROM auth_password_reset_notifications WHERE realm_id=$1 AND id=$2 AND lease_id=$3")
+            sqlx::query("DELETE FROM auth_security_notifications WHERE realm_id=$1 AND id=$2 AND lease_id=$3")
                 .bind(realm).bind(id).bind(lease).execute(&self.pool).await.map_err(unavailable)?;
         } else {
-            sqlx::query("UPDATE auth_password_reset_notifications SET lease_id=NULL,lease_until=NULL,next_attempt_at=clock_timestamp()+make_interval(secs=>30*power(2,least(attempts-1,7))) WHERE realm_id=$1 AND id=$2 AND lease_id=$3")
+            sqlx::query("UPDATE auth_security_notifications SET lease_id=NULL,lease_until=NULL,next_attempt_at=clock_timestamp()+make_interval(secs=>30*power(2,least(attempts-1,7))) WHERE realm_id=$1 AND id=$2 AND lease_id=$3")
                 .bind(realm).bind(id).bind(lease).execute(&self.pool).await.map_err(unavailable)?;
         }
         Ok(())
+    }
+    async fn begin_email_change(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        email: &str,
+        old: Verifier,
+        new: Verifier,
+        browser: Verifier,
+    ) -> Result<String> {
+        let previous = self.current_email(realm, current).await?;
+        if previous == email {
+            return Err(Error::InvalidInput);
+        }
+        let mut tx = self.pool.begin().await.map_err(unavailable)?;
+        lock_emails(&mut tx, realm, &previous, email).await?;
+        let (user, session) = fresh_account(&mut tx, realm, current, &previous).await?;
+        sqlx::query("INSERT INTO auth_email_changes(realm_id,id,user_id,session_id,old_email,new_email,old_hash,new_hash,browser_hash) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)")
+            .bind(realm).bind(Uuid::new_v4()).bind(user).bind(session).bind(&previous).bind(email).bind(old.as_slice()).bind(new.as_slice()).bind(browser.as_slice()).execute(&mut *tx).await.map_err(unavailable)?;
+        tx.commit().await.map_err(unavailable)?;
+        Ok(previous)
+    }
+    async fn confirm_email_change(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<bool> {
+        let pending=sqlx::query("SELECT old_email,new_email FROM auth_email_changes WHERE realm_id=$1 AND browser_hash=$2 AND (old_hash=$3 OR new_hash=$3)")
+            .bind(realm).bind(browser.as_slice()).bind(token.as_slice()).fetch_optional(&self.pool).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
+        let old: String = pending.get("old_email");
+        let new: String = pending.get("new_email");
+        let mut tx = self.pool.begin().await.map_err(unavailable)?;
+        lock_emails(&mut tx, realm, &old, &new).await?;
+        let (user, session) = fresh_account(&mut tx, realm, current, &old).await?;
+        let proof=sqlx::query("SELECT id,old_hash=$5 AS is_old,old_confirmed,new_confirmed FROM auth_email_changes WHERE realm_id=$1 AND user_id=$2 AND session_id=$3 AND browser_hash=$4 AND (old_hash=$5 OR new_hash=$5) AND expires_at>clock_timestamp() FOR UPDATE")
+            .bind(realm).bind(user).bind(session).bind(browser.as_slice()).bind(token.as_slice()).fetch_optional(&mut *tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
+        let is_old: bool = proof.get("is_old");
+        let old_done: bool = proof.get("old_confirmed");
+        let new_done: bool = proof.get("new_confirmed");
+        if (is_old && old_done) || (!is_old && new_done) {
+            return Err(Error::Unauthorized);
+        }
+        let complete = if is_old { new_done } else { old_done };
+        if complete {
+            let occupied: bool = sqlx::query_scalar(
+                "SELECT EXISTS(SELECT 1 FROM auth_users WHERE realm_id=$1 AND email=$2 AND id<>$3)",
+            )
+            .bind(realm)
+            .bind(&new)
+            .bind(user)
+            .fetch_one(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+            if occupied {
+                return Err(Error::Unauthorized);
+            }
+        }
+        sqlx::query("UPDATE auth_email_changes SET old_confirmed=old_confirmed OR $3,new_confirmed=new_confirmed OR NOT $3 WHERE realm_id=$1 AND id=$2")
+            .bind(realm).bind(proof.get::<Uuid,_>("id")).bind(is_old).execute(&mut *tx).await.map_err(unavailable)?;
+        if !complete {
+            tx.commit().await.map_err(unavailable)?;
+            return Ok(false);
+        }
+        sqlx::query("UPDATE auth_users SET email=$3,email_verified_at=clock_timestamp() WHERE realm_id=$1 AND id=$2")
+            .bind(realm).bind(user).bind(&new).execute(&mut *tx).await.map_err(unavailable)?;
+        sqlx::query(
+            "UPDATE auth_password_credentials SET version=$3 WHERE realm_id=$1 AND user_id=$2",
+        )
+        .bind(realm)
+        .bind(user)
+        .bind(Uuid::new_v4())
+        .execute(&mut *tx)
+        .await
+        .map_err(unavailable)?;
+        sqlx::query("UPDATE auth_sessions SET revoked_at=clock_timestamp() WHERE realm_id=$1 AND user_id=$2 AND revoked_at IS NULL")
+            .bind(realm).bind(user).execute(&mut *tx).await.map_err(unavailable)?;
+        for table in ["auth_email_challenges", "auth_password_resets"] {
+            // Identifiers are a fixed internal allowlist, never request data.
+            sqlx::query(&format!(
+                "DELETE FROM {table} WHERE realm_id=$1 AND email IN ($2,$3)"
+            ))
+            .bind(realm)
+            .bind(&old)
+            .bind(&new)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        }
+        sqlx::query("DELETE FROM auth_email_changes WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        sqlx::query("DELETE FROM auth_account_deletions WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        sqlx::query("INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,$2,'email_changed')")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) VALUES ($1,$2,$3,$4,'email_changed')")
+            .bind(realm).bind(Uuid::new_v4()).bind(user).bind(&old).execute(&mut *tx).await.map_err(unavailable)?;
+        tx.commit().await.map_err(unavailable)?;
+        Ok(true)
+    }
+    async fn begin_account_deletion(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<String> {
+        let email = self.current_email(realm, current).await?;
+        let mut tx = self.pool.begin().await.map_err(unavailable)?;
+        lock_email(&mut tx, realm, &email).await?;
+        let (user, session) = fresh_account(&mut tx, realm, current, &email).await?;
+        sqlx::query("INSERT INTO auth_account_deletions(realm_id,user_id,session_id,email,token_hash,browser_hash) VALUES ($1,$2,$3,$4,$5,$6)")
+            .bind(realm).bind(user).bind(session).bind(&email).bind(token.as_slice()).bind(browser.as_slice()).execute(&mut *tx).await.map_err(unavailable)?;
+        tx.commit().await.map_err(unavailable)?;
+        Ok(email)
+    }
+    async fn finish_account_deletion(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<()> {
+        let email:String=sqlx::query_scalar("SELECT email FROM auth_account_deletions WHERE realm_id=$1 AND token_hash=$2 AND browser_hash=$3")
+            .bind(realm).bind(token.as_slice()).bind(browser.as_slice()).fetch_optional(&self.pool).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
+        let mut tx = self.pool.begin().await.map_err(unavailable)?;
+        lock_email(&mut tx, realm, &email).await?;
+        let (user, session) = fresh_account(&mut tx, realm, current, &email).await?;
+        let consumed=sqlx::query("DELETE FROM auth_account_deletions WHERE realm_id=$1 AND token_hash=$2 AND browser_hash=$3 AND user_id=$4 AND session_id=$5 AND expires_at>clock_timestamp()")
+            .bind(realm).bind(token.as_slice()).bind(browser.as_slice()).bind(user).bind(session).execute(&mut *tx).await.map_err(unavailable)?;
+        if consumed.rows_affected() != 1 {
+            return Err(Error::Unauthorized);
+        }
+        for table in ["auth_email_challenges", "auth_password_resets"] {
+            sqlx::query(&format!(
+                "DELETE FROM {table} WHERE realm_id=$1 AND email=$2"
+            ))
+            .bind(realm)
+            .bind(&email)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        }
+        sqlx::query("DELETE FROM auth_rate_buckets WHERE realm_id=$1 AND dimension IN ('email','password_email') AND key_hash=sha256($2)")
+            .bind(realm).bind(email.as_bytes()).execute(&mut *tx).await.map_err(unavailable)?;
+        sqlx::query("UPDATE auth_audit SET user_id=NULL WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        sqlx::query("DELETE FROM auth_users WHERE realm_id=$1 AND id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
+        sqlx::query(
+            "INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,NULL,'account_deleted')",
+        )
+        .bind(realm)
+        .execute(&mut *tx)
+        .await
+        .map_err(unavailable)?;
+        sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) VALUES ($1,$2,NULL,$3,'account_deleted')")
+            .bind(realm).bind(Uuid::new_v4()).bind(&email).execute(&mut *tx).await.map_err(unavailable)?;
+        tx.commit().await.map_err(unavailable)
     }
     async fn ready(&self) -> Result<()> {
         sqlx::query("SELECT 1")

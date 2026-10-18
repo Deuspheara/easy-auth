@@ -40,7 +40,7 @@ try:
     raise AssertionError('proof replay accepted')
 except urllib.error.HTTPError as error:
     assert error.code == 401
-if '--password' in sys.argv or '--recovery' in sys.argv:
+if '--password' in sys.argv or '--recovery' in sys.argv or '--lifecycle' in sys.argv:
     # Synthetic per-run password; never print or persist it outside the test account.
     import secrets
     password = secrets.token_urlsafe(32)
@@ -89,6 +89,50 @@ if '--recovery' in sys.argv:
     notice = json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/message/'+notice_id, timeout=5))
     assert password not in notice['Text'] and new_password not in notice['Text'] and reset_token not in notice['Text']
     print('PASS: purpose-bound recovery, old password/session rejection, new login and non-secret SMTP notification')
+if '--lifecycle' in sys.argv:
+    def mail_with(subject, address):
+        messages = json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/messages', timeout=5))['messages']
+        found = next((m['ID'] for m in messages if m['Subject'] == subject and any(a['Address'] == address for a in m['To'])), None)
+        return json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/message/'+found, timeout=5)) if found else None
+    def wait_notice(subject, address):
+        deadline = time.monotonic()+20
+        while time.monotonic() < deadline:
+            notice = mail_with(subject, address)
+            if notice: return notice
+            time.sleep(0.1)
+        raise AssertionError('notification worker did not deliver')
+    previous_email = email
+    previous_cookie = '; '.join(c.name+'='+c.value for c in jar)
+    new_email = 'changed-'+str(time.time_ns())+'@example.test'
+    assert request('/v1/account/email/start', {'email':new_email}).status == 202
+    old_proof = re.search(r'#token=([A-Za-z0-9_-]{43})', mail_with('Confirm email change', email)['Text']).group(1)
+    new_proof = re.search(r'#token=([A-Za-z0-9_-]{43})', mail_with('Confirm email change', new_email)['Text']).group(1)
+    assert request('/v1/account/email/confirm', {'token':old_proof}).status == 202
+    assert request('/v1/account/email/confirm', {'token':new_proof}).status == 204
+    try:
+        urllib.request.urlopen(urllib.request.Request(base+'/v1/session', headers={'Cookie':previous_cookie}), timeout=5)
+        raise AssertionError('pre-change session accepted')
+    except urllib.error.HTTPError as error:
+        assert error.code == 401
+    change_notice = wait_notice('Your sign-in email changed', previous_email)
+    assert old_proof not in change_notice['Text'] and new_proof not in change_notice['Text']
+    if '--recovery' in sys.argv: password = new_password
+    assert request('/v1/password/login', {'email':new_email,'password':password}).status == 204
+    changed = json.load(request('/v1/session'))
+    assert changed['id'] == user['id'] and changed['email'] == new_email
+    if '--embedded' in sys.argv: assert json.load(request('/private')) == changed
+    email = new_email
+    assert request('/v1/account/delete/start', {'confirmation':'delete my account'}).status == 202
+    deletion = re.search(r'#token=([A-Za-z0-9_-]{43})', mail_with('Confirm account deletion', email)['Text']).group(1)
+    assert request('/v1/account/delete/finish', {'token':deletion,'confirmation':'delete my account'}).status == 204
+    try:
+        request('/v1/password/login', {'email':email,'password':password})
+        raise AssertionError('deleted account authenticated')
+    except urllib.error.HTTPError as error:
+        assert error.code == 401
+    deleted_notice = wait_notice('Your authentication account was deleted', email)
+    assert deletion not in deleted_notice['Text'] and password not in deleted_notice['Text']
+    print('PASS: both-address email change, stable identity, old-session rejection, confirmed account deletion and safe notices')
 assert request('/v1/logout', {}).status == 204
 try:
     request('/v1/session')

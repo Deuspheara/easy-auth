@@ -32,6 +32,18 @@ impl Smtp {
 }
 #[async_trait]
 impl EmailDelivery for Smtp {
+    async fn email_change(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
+        self.send(email,"Confirm email change",format!("An email change was requested for your authentication account. Confirm the separate links sent to both the current and proposed addresses in the requesting browser. Complete them promptly after signing in; each link expires within five minutes.\n\n{}/email-change#token={}\n\nIf you did not request this, do not confirm it and secure your account.",self.origin,token.expose())).await
+    }
+    async fn account_deletion(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
+        self.send(email,"Confirm account deletion",format!("Deletion of your authentication account was requested. This removes its authentication credentials and sessions; consuming applications manage their own data. Only continue if you requested deletion. The link works only in the requesting browser within the fresh sign-in window.\n\n{}/account-delete#token={}\n\nIf you did not request this, ignore this message and secure your account.",self.origin,token.expose())).await
+    }
+    async fn email_changed(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email,"Your sign-in email changed","Your authentication account's email was changed after confirmation of both addresses. Existing sessions and pending proofs were invalidated. If this was not you, secure your mailbox and contact the service operator through a trusted channel.".to_owned()).await
+    }
+    async fn account_deleted(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email,"Your authentication account was deleted","Your authentication account, credentials and sessions were deleted. Consuming applications manage their own data. If this was not you, secure your mailbox and contact the service operator through a trusted channel. This notice contains no credential or sign-in link.".to_owned()).await
+    }
     async fn password_reset(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
         self.send(email,"Password reset request",format!("A password reset was requested. If this mailbox has a password credential, open this link in the browser that requested it. The link expires in ten minutes and works once.\n\n{}/reset#token={}\n\nIf you did not request this, ignore this email. No account changes have been made.",self.origin,token.expose())).await
     }
@@ -149,11 +161,11 @@ pub async fn configured_auth()
 pub fn notification_worker(auth: Auth) -> tokio::task::JoinHandle<()> {
     tokio::spawn(async move {
         loop {
-            match auth.deliver_password_reset_notice().await {
+            match auth.deliver_security_notice().await {
                 Ok(true) => (),
                 Ok(false) => tokio::time::sleep(Duration::from_secs(1)).await,
                 Err(_) => {
-                    tracing::warn!("password_reset_notification_delivery_failed");
+                    tracing::warn!("security_notification_delivery_failed");
                     tokio::time::sleep(Duration::from_secs(1)).await;
                 }
             }

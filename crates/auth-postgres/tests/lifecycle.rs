@@ -276,7 +276,7 @@ async fn password_enrollment_is_fresh_atomic_and_single_use(pool: PgPool) {
             .is_err()
     );
     sqlx::query(
-        "UPDATE auth_sessions SET created_at=now()-interval '6 minutes' WHERE token_hash=$1",
+        "UPDATE auth_sessions SET authenticated_at=now()-interval '6 minutes' WHERE token_hash=$1",
     )
     .bind(current.verifier().as_slice())
     .execute(&pool)
@@ -288,7 +288,7 @@ async fn password_enrollment_is_fresh_atomic_and_single_use(pool: PgPool) {
             .await,
         Err(Error::Unauthorized)
     ));
-    sqlx::query("UPDATE auth_sessions SET created_at=now() WHERE token_hash=$1")
+    sqlx::query("UPDATE auth_sessions SET authenticated_at=now() WHERE token_hash=$1")
         .bind(current.verifier().as_slice())
         .execute(&pool)
         .await
@@ -537,11 +537,7 @@ async fn reset_is_bound_expiring_single_use_and_revokes_every_session(pool: PgPo
         .await
         .unwrap();
     assert!(store.authenticate(realm, [6; 32]).await.is_ok());
-    let notice = store
-        .claim_password_reset_notice(realm)
-        .await
-        .unwrap()
-        .unwrap();
+    let notice = store.claim_security_notice(realm).await.unwrap().unwrap();
     assert_eq!(notice.recipient, "alice@example.com");
     let count: i64 =
         sqlx::query_scalar("SELECT count(*) FROM auth_audit WHERE kind='password_reset'")
@@ -578,7 +574,7 @@ async fn concurrent_resets_and_stale_versions_cannot_replace_credentials(pool: P
         store.finish_password_reset(realm, b.verifier(), bb.verifier(), "second-hash")
     );
     assert_eq!(usize::from(first.is_ok()) + usize::from(second.is_ok()), 1);
-    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_password_reset_notifications")
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_security_notifications")
         .fetch_one(&pool)
         .await
         .unwrap();
@@ -604,7 +600,12 @@ async fn reset_notification_failure_rolls_back_credential_sessions_and_proof(poo
         .await
         .unwrap();
     let (token, browser) = reset_proof(&store, realm, "alice@example.com").await;
-    sqlx::query("ALTER TABLE auth_password_reset_notifications ADD CONSTRAINT injected_failure CHECK (false)").execute(&pool).await.unwrap();
+    sqlx::query(
+        "ALTER TABLE auth_security_notifications ADD CONSTRAINT injected_failure CHECK (false)",
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
     assert!(matches!(
         store
             .finish_password_reset(realm, token.verifier(), browser.verifier(), "new-hash")
@@ -632,7 +633,7 @@ async fn reset_notification_failure_rolls_back_credential_sessions_and_proof(poo
             .await
             .unwrap();
     assert_eq!(count, 0);
-    sqlx::query("ALTER TABLE auth_password_reset_notifications DROP CONSTRAINT injected_failure")
+    sqlx::query("ALTER TABLE auth_security_notifications DROP CONSTRAINT injected_failure")
         .execute(&pool)
         .await
         .unwrap();
@@ -656,106 +657,594 @@ async fn notification_leases_retry_without_cross_realm_or_stale_ack(pool: PgPool
         .unwrap();
     let other = Uuid::new_v4();
     store.ensure_realm(other).await.unwrap();
-    assert!(
-        store
-            .claim_password_reset_notice(other)
-            .await
-            .unwrap()
-            .is_none()
-    );
+    assert!(store.claim_security_notice(other).await.unwrap().is_none());
     let (a, b) = tokio::join!(
-        store.claim_password_reset_notice(realm),
-        store.claim_password_reset_notice(realm)
+        store.claim_security_notice(realm),
+        store.claim_security_notice(realm)
     );
     let (a, b) = (a.unwrap(), b.unwrap());
     assert_eq!(usize::from(a.is_some()) + usize::from(b.is_some()), 1);
     let first = a.or(b).unwrap();
-    assert!(
-        store
-            .claim_password_reset_notice(realm)
-            .await
-            .unwrap()
-            .is_none()
-    );
+    assert!(store.claim_security_notice(realm).await.unwrap().is_none());
     store
-        .complete_password_reset_notice(realm, first.id, first.lease, false)
+        .complete_security_notice(realm, first.id, first.lease, false)
         .await
         .unwrap();
-    assert!(
-        store
-            .claim_password_reset_notice(realm)
-            .await
-            .unwrap()
-            .is_none()
-    );
-    sqlx::query("UPDATE auth_password_reset_notifications SET next_attempt_at=clock_timestamp()-interval '1 second'").execute(&pool).await.unwrap();
-    let second = store
-        .claim_password_reset_notice(realm)
-        .await
-        .unwrap()
-        .unwrap();
+    assert!(store.claim_security_notice(realm).await.unwrap().is_none());
+    sqlx::query("UPDATE auth_security_notifications SET next_attempt_at=clock_timestamp()-interval '1 second'").execute(&pool).await.unwrap();
+    let second = store.claim_security_notice(realm).await.unwrap().unwrap();
     assert_ne!(first.lease, second.lease);
     store
-        .complete_password_reset_notice(realm, first.id, first.lease, true)
+        .complete_security_notice(realm, first.id, first.lease, true)
         .await
         .unwrap();
-    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_password_reset_notifications")
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_security_notifications")
         .fetch_one(&pool)
         .await
         .unwrap();
     assert_eq!(count, 1);
     // Simulate worker cancellation: the lease expires and another worker recovers it.
-    sqlx::query("UPDATE auth_password_reset_notifications SET lease_until=clock_timestamp()-interval '1 second'").execute(&pool).await.unwrap();
-    let third = store
-        .claim_password_reset_notice(realm)
-        .await
-        .unwrap()
-        .unwrap();
+    sqlx::query(
+        "UPDATE auth_security_notifications SET lease_until=clock_timestamp()-interval '1 second'",
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+    let third = store.claim_security_notice(realm).await.unwrap().unwrap();
     store
-        .complete_password_reset_notice(other, third.id, third.lease, true)
+        .complete_security_notice(other, third.id, third.lease, true)
         .await
         .unwrap();
-    let remaining: i64 =
-        sqlx::query_scalar("SELECT count(*) FROM auth_password_reset_notifications")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
+    let remaining: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_security_notifications")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
     assert_eq!(remaining, 1, "another realm cannot acknowledge this notice");
     store
-        .complete_password_reset_notice(realm, third.id, third.lease, true)
+        .complete_security_notice(realm, third.id, third.lease, true)
         .await
         .unwrap();
-    assert!(
-        store
-            .claim_password_reset_notice(realm)
-            .await
-            .unwrap()
-            .is_none()
-    );
+    assert!(store.claim_security_notice(realm).await.unwrap().is_none());
     let (token, browser) = reset_proof(&store, realm, "alice@example.com").await;
     store
         .finish_password_reset(realm, token.verifier(), browser.verifier(), "third-hash")
         .await
         .unwrap();
-    sqlx::query("UPDATE auth_password_reset_notifications SET attempts=8")
+    sqlx::query("UPDATE auth_security_notifications SET attempts=8")
+        .execute(&pool)
+        .await
+        .unwrap();
+    assert!(store.claim_security_notice(realm).await.unwrap().is_none());
+    let failed: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM auth_security_notifications WHERE attempts=8")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(
+        failed, 1,
+        "exhausted notices remain visible for operator redrive"
+    );
+}
+
+async fn change_proofs(
+    store: &Postgres,
+    realm: Uuid,
+    current: [u8; 32],
+    email: &str,
+) -> (Secret, Secret, Secret) {
+    let old = Secret::generate().unwrap();
+    let new = Secret::generate().unwrap();
+    let browser = Secret::generate().unwrap();
+    store
+        .begin_email_change(
+            realm,
+            current,
+            email,
+            old.verifier(),
+            new.verifier(),
+            browser.verifier(),
+        )
+        .await
+        .unwrap();
+    (old, new, browser)
+}
+async fn deletion_proof(store: &Postgres, realm: Uuid, current: [u8; 32]) -> (Secret, Secret) {
+    let token = Secret::generate().unwrap();
+    let browser = Secret::generate().unwrap();
+    store
+        .begin_account_deletion(realm, current, token.verifier(), browser.verifier())
+        .await
+        .unwrap();
+    (token, browser)
+}
+#[sqlx::test(migrations = "./migrations")]
+async fn email_change_requires_both_mailboxes_and_same_fresh_session(pool: PgPool) {
+    let (store, realm) = realm(pool.clone()).await;
+    let current = signed_in(&store, realm, "alice@example.com").await;
+    let other_session = signed_in(&store, realm, "alice@example.com").await;
+    let user = store.authenticate(realm, current.verifier()).await.unwrap();
+    let (old, new, browser) =
+        change_proofs(&store, realm, current.verifier(), "new@example.com").await;
+    assert!(
+        store
+            .confirm_email_change(
+                realm,
+                other_session.verifier(),
+                old.verifier(),
+                browser.verifier()
+            )
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .confirm_email_change(realm, current.verifier(), old.verifier(), [0; 32])
+            .await
+            .is_err()
+    );
+    let other = Uuid::new_v4();
+    store.ensure_realm(other).await.unwrap();
+    assert!(
+        store
+            .confirm_email_change(
+                other,
+                current.verifier(),
+                old.verifier(),
+                browser.verifier()
+            )
+            .await
+            .is_err()
+    );
+    assert!(
+        !store
+            .confirm_email_change(
+                realm,
+                current.verifier(),
+                new.verifier(),
+                browser.verifier()
+            )
+            .await
+            .unwrap()
+    );
+    assert_eq!(
+        store
+            .authenticate(realm, current.verifier())
+            .await
+            .unwrap()
+            .email,
+        "alice@example.com"
+    );
+    assert!(
+        store
+            .confirm_email_change(
+                realm,
+                current.verifier(),
+                new.verifier(),
+                browser.verifier()
+            )
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .confirm_email_change(
+                realm,
+                current.verifier(),
+                old.verifier(),
+                browser.verifier()
+            )
+            .await
+            .unwrap()
+    );
+    assert!(store.authenticate(realm, current.verifier()).await.is_err());
+    assert!(
+        store
+            .authenticate(realm, other_session.verifier())
+            .await
+            .is_err()
+    );
+    let signed = signed_in(&store, realm, "new@example.com").await;
+    let changed = store.authenticate(realm, signed.verifier()).await.unwrap();
+    assert_eq!(changed.id, user.id);
+    assert!(
+        store
+            .confirm_email_change(realm, signed.verifier(), old.verifier(), browser.verifier())
+            .await
+            .is_err()
+    );
+    let notice = store.claim_security_notice(realm).await.unwrap().unwrap();
+    assert_eq!(notice.recipient, "alice@example.com");
+    // Session creation and last-seen do not extend the authentication freshness window.
+    sqlx::query("UPDATE auth_sessions SET authenticated_at=clock_timestamp()-interval '6 minutes',created_at=clock_timestamp(),last_seen_at=clock_timestamp() WHERE token_hash=$1").bind(signed.verifier().as_slice()).execute(&pool).await.unwrap();
+    assert!(
+        store
+            .begin_email_change(
+                realm,
+                signed.verifier(),
+                "next@example.com",
+                [1; 32],
+                [2; 32],
+                [3; 32]
+            )
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .begin_account_deletion(realm, signed.verifier(), [1; 32], [2; 32])
+            .await
+            .is_err()
+    );
+}
+#[sqlx::test(migrations = "./migrations")]
+async fn email_uniqueness_race_never_merges_accounts(pool: PgPool) {
+    let (store, realm) = realm(pool.clone()).await;
+    let a = signed_in(&store, realm, "a@example.com").await;
+    let b = signed_in(&store, realm, "b@example.com").await;
+    let ua = store.authenticate(realm, a.verifier()).await.unwrap();
+    let ub = store.authenticate(realm, b.verifier()).await.unwrap();
+    let (oa, na, ba) = change_proofs(&store, realm, a.verifier(), "target@example.com").await;
+    let (ob, nb, bb) = change_proofs(&store, realm, b.verifier(), "target@example.com").await;
+    assert!(
+        !store
+            .confirm_email_change(realm, a.verifier(), oa.verifier(), ba.verifier())
+            .await
+            .unwrap()
+    );
+    assert!(
+        !store
+            .confirm_email_change(realm, b.verifier(), ob.verifier(), bb.verifier())
+            .await
+            .unwrap()
+    );
+    let (ra, rb) = tokio::join!(
+        store.confirm_email_change(realm, a.verifier(), na.verifier(), ba.verifier()),
+        store.confirm_email_change(realm, b.verifier(), nb.verifier(), bb.verifier())
+    );
+    assert_eq!(
+        usize::from(matches!(ra, Ok(true))) + usize::from(matches!(rb, Ok(true))),
+        1
+    );
+    let target: Uuid = sqlx::query_scalar(
+        "SELECT id FROM auth_users WHERE realm_id=$1 AND email='target@example.com'",
+    )
+    .bind(realm)
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert!(target == ua.id || target == ub.id);
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_users WHERE realm_id=$1")
+        .bind(realm)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(count, 2);
+}
+#[sqlx::test(migrations = "./migrations")]
+async fn account_deletion_cleans_only_owned_realm_and_removes_audit_subject(pool: PgPool) {
+    let (store, realm) = realm(pool.clone()).await;
+    let original = signed_in(&store, realm, "alice@example.com").await;
+    store
+        .enroll_password(realm, original.verifier(), "old-hash", [1; 32])
+        .await
+        .unwrap();
+    let (reset, reset_browser) = reset_proof(&store, realm, "alice@example.com").await;
+    store
+        .finish_password_reset(
+            realm,
+            reset.verifier(),
+            reset_browser.verifier(),
+            "new-hash",
+        )
+        .await
+        .unwrap();
+    let current = signed_in(&store, realm, "alice@example.com").await;
+    let user = store.authenticate(realm, current.verifier()).await.unwrap();
+    let other = Uuid::new_v4();
+    store.ensure_realm(other).await.unwrap();
+    let foreign = signed_in(&store, other, "alice@example.com").await;
+    let foreign_user = store.authenticate(other, foreign.verifier()).await.unwrap();
+    let (pending, bind) = challenge(&store, realm, "alice@example.com").await;
+    reset_proof(&store, realm, "alice@example.com").await;
+    change_proofs(&store, realm, current.verifier(), "new@example.com").await;
+    let (token, browser) = deletion_proof(&store, realm, current.verifier()).await;
+    assert!(
+        store
+            .finish_account_deletion(
+                other,
+                current.verifier(),
+                token.verifier(),
+                browser.verifier()
+            )
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .finish_account_deletion(realm, current.verifier(), token.verifier(), [0; 32])
+            .await
+            .is_err()
+    );
+    store
+        .finish_account_deletion(
+            realm,
+            current.verifier(),
+            token.verifier(),
+            browser.verifier(),
+        )
+        .await
+        .unwrap();
+    assert!(store.authenticate(realm, current.verifier()).await.is_err());
+    assert!(
+        store
+            .finish_email(realm, pending.verifier(), bind.verifier(), [9; 32])
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .password_hash(realm, "alice@example.com")
+            .await
+            .unwrap()
+            .is_none()
+    );
+    assert_eq!(
+        store.authenticate(other, foreign.verifier()).await.unwrap(),
+        foreign_user
+    );
+    for table in [
+        "auth_sessions",
+        "auth_password_credentials",
+        "auth_email_changes",
+        "auth_account_deletions",
+    ] {
+        let count: i64 = sqlx::query_scalar(&format!(
+            "SELECT count(*) FROM {table} WHERE realm_id=$1 AND user_id=$2"
+        ))
+        .bind(realm)
+        .bind(user.id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        assert_eq!(count, 0, "{table}");
+    }
+    let linked: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM auth_audit WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user.id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(linked, 0);
+    let remaining: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM auth_security_notifications WHERE realm_id=$1")
+            .bind(realm)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(remaining, 1);
+    let notice = store.claim_security_notice(realm).await.unwrap().unwrap();
+    assert!(matches!(
+        notice.kind,
+        auth_core::SecurityNoticeKind::AccountDeleted
+    ));
+    assert_eq!(notice.recipient, "alice@example.com");
+}
+#[sqlx::test(migrations = "./migrations")]
+async fn lifecycle_notice_failure_rolls_back_all_changes(pool: PgPool) {
+    let (store, realm) = realm(pool.clone()).await;
+    let current = signed_in(&store, realm, "alice@example.com").await;
+    let (old, new, browser) =
+        change_proofs(&store, realm, current.verifier(), "new@example.com").await;
+    assert!(
+        !store
+            .confirm_email_change(
+                realm,
+                current.verifier(),
+                old.verifier(),
+                browser.verifier()
+            )
+            .await
+            .unwrap()
+    );
+    sqlx::query("ALTER TABLE auth_security_notifications ADD CONSTRAINT injected_change_failure CHECK (kind<>'email_changed')").execute(&pool).await.unwrap();
+    assert!(matches!(
+        store
+            .confirm_email_change(
+                realm,
+                current.verifier(),
+                new.verifier(),
+                browser.verifier()
+            )
+            .await,
+        Err(Error::Unavailable)
+    ));
+    assert_eq!(
+        store
+            .authenticate(realm, current.verifier())
+            .await
+            .unwrap()
+            .email,
+        "alice@example.com"
+    );
+    sqlx::query("ALTER TABLE auth_security_notifications DROP CONSTRAINT injected_change_failure")
         .execute(&pool)
         .await
         .unwrap();
     assert!(
         store
-            .claim_password_reset_notice(realm)
+            .confirm_email_change(
+                realm,
+                current.verifier(),
+                new.verifier(),
+                browser.verifier()
+            )
             .await
             .unwrap()
-            .is_none()
     );
-    let failed: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM auth_password_reset_notifications WHERE attempts=8",
+    let current = signed_in(&store, realm, "new@example.com").await;
+    let user = store.authenticate(realm, current.verifier()).await.unwrap();
+    let (token, browser) = deletion_proof(&store, realm, current.verifier()).await;
+    sqlx::query("ALTER TABLE auth_security_notifications ADD CONSTRAINT injected_delete_failure CHECK (kind<>'account_deleted')").execute(&pool).await.unwrap();
+    assert!(matches!(
+        store
+            .finish_account_deletion(
+                realm,
+                current.verifier(),
+                token.verifier(),
+                browser.verifier()
+            )
+            .await,
+        Err(Error::Unavailable)
+    ));
+    assert_eq!(
+        store.authenticate(realm, current.verifier()).await.unwrap(),
+        user
+    );
+    let linked: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM auth_audit WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user.id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert!(linked > 0);
+    sqlx::query("ALTER TABLE auth_security_notifications DROP CONSTRAINT injected_delete_failure")
+        .execute(&pool)
+        .await
+        .unwrap();
+    store
+        .finish_account_deletion(
+            realm,
+            current.verifier(),
+            token.verifier(),
+            browser.verifier(),
+        )
+        .await
+        .unwrap();
+}
+#[sqlx::test(migrations = "./migrations")]
+async fn password_enrollment_rotation_preserves_authentication_time(pool: PgPool) {
+    let (store, realm) = realm(pool.clone()).await;
+    let current = signed_in(&store, realm, "alice@example.com").await;
+    sqlx::query("UPDATE auth_sessions SET authenticated_at=clock_timestamp()-interval '4 minutes' WHERE token_hash=$1").bind(current.verifier().as_slice()).execute(&pool).await.unwrap();
+    store
+        .enroll_password(realm, current.verifier(), "hash", [1; 32])
+        .await
+        .unwrap();
+    let preserved:bool=sqlx::query_scalar("SELECT authenticated_at<clock_timestamp()-interval '3 minutes' FROM auth_sessions WHERE realm_id=$1 AND token_hash=$2").bind(realm).bind([1u8;32].as_slice()).fetch_one(&pool).await.unwrap();
+    assert!(preserved);
+}
+
+#[sqlx::test(migrations = "./migrations")]
+async fn lifecycle_rejects_expiry_cross_user_and_wrong_purpose(pool: PgPool) {
+    let (store, realm) = realm(pool.clone()).await;
+    let a = signed_in(&store, realm, "alice@example.com").await;
+    let b = signed_in(&store, realm, "bob@example.com").await;
+    let (old, new, browser) = change_proofs(&store, realm, a.verifier(), "new@example.com").await;
+    let (deleted, dbrowser) = deletion_proof(&store, realm, a.verifier()).await;
+    assert!(
+        store
+            .confirm_email_change(realm, b.verifier(), old.verifier(), browser.verifier())
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .finish_account_deletion(realm, b.verifier(), deleted.verifier(), dbrowser.verifier())
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .confirm_email_change(realm, a.verifier(), deleted.verifier(), dbrowser.verifier())
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .finish_account_deletion(realm, a.verifier(), old.verifier(), browser.verifier())
+            .await
+            .is_err()
+    );
+    sqlx::query("UPDATE auth_email_changes SET expires_at=clock_timestamp()-interval '1 second'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    sqlx::query(
+        "UPDATE auth_account_deletions SET expires_at=clock_timestamp()-interval '1 second'",
     )
-    .fetch_one(&pool)
+    .execute(&pool)
     .await
     .unwrap();
-    assert_eq!(
-        failed, 1,
-        "exhausted notices remain visible for operator redrive"
+    assert!(
+        store
+            .confirm_email_change(realm, a.verifier(), new.verifier(), browser.verifier())
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .finish_account_deletion(realm, a.verifier(), deleted.verifier(), dbrowser.verifier())
+            .await
+            .is_err()
+    );
+    let (new_delete, new_browser) = deletion_proof(&store, realm, a.verifier()).await;
+    sqlx::query("UPDATE auth_sessions SET authenticated_at=clock_timestamp()-interval '6 minutes' WHERE token_hash=$1").bind(a.verifier().as_slice()).execute(&pool).await.unwrap();
+    assert!(
+        store
+            .finish_account_deletion(
+                realm,
+                a.verifier(),
+                new_delete.verifier(),
+                new_browser.verifier()
+            )
+            .await
+            .is_err()
+    );
+    assert!(store.authenticate(realm, a.verifier()).await.is_ok());
+}
+
+#[sqlx::test(migrations = false)]
+async fn lifecycle_migration_requires_reauthentication_for_legacy_sessions(pool: PgPool) {
+    for source in [
+        include_str!("../migrations/0001_email_sessions.sql"),
+        include_str!("../migrations/0002_password_credentials.sql"),
+        include_str!("../migrations/0003_password_recovery.sql"),
+    ] {
+        sqlx::raw_sql(source).execute(&pool).await.unwrap();
+    }
+    let (store, realm) = realm(pool.clone()).await;
+    let legacy = signed_in(&store, realm, "alice@example.com").await;
+    sqlx::raw_sql(include_str!("../migrations/0004_account_lifecycle.sql"))
+        .execute(&pool)
+        .await
+        .unwrap();
+    assert!(store.authenticate(realm, legacy.verifier()).await.is_ok());
+    assert!(
+        store
+            .begin_account_deletion(realm, legacy.verifier(), [1; 32], [2; 32])
+            .await
+            .is_err()
+    );
+    assert!(
+        store
+            .begin_email_change(
+                realm,
+                legacy.verifier(),
+                "new@example.com",
+                [1; 32],
+                [2; 32],
+                [3; 32]
+            )
+            .await
+            .is_err()
+    );
+    let fresh = signed_in(&store, realm, "alice@example.com").await;
+    assert!(
+        store
+            .begin_account_deletion(realm, fresh.verifier(), [1; 32], [2; 32])
+            .await
+            .is_ok()
     );
 }

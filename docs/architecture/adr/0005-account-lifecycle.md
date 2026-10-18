@@ -1,0 +1,15 @@
+# ADR 0005: Confirmed account lifecycle and authentication-time provenance
+
+Status: accepted for alpha, AUTH-14, 2026-10-18.
+
+Email changes require a session authenticated within five minutes plus separate, one-time proofs from both the current and proposed addresses. Proofs bind the realm, user, initiating session and independent browser secret. Each confirmation is a POST; neither GET nor a single mailbox proof changes the address. The final transaction preserves the opaque user ID, changes the verified email, rotates credential version, invalidates old sessions/proofs, records an audit event and queues an old-address notice. Occupied addresses are rejected; accounts are never merged.
+
+Acquire old/new email advisory locks in deterministic lexical order, then user/session locks. This serializes competing changes, signup, reset and deletion without exchanging one account's credentials or authorization for another. Recheck freshness, binding, expiry and uniqueness after locks. Failed final persistence rolls back the second proof and all identity/session changes; an earlier first-address confirmation stays confirmed until expiry.
+
+Deletion requires a fresh initiating session, a separate current-mailbox proof and an explicit HTTP confirmation phrase. Its transaction removes the user, credentials, sessions, account-action proofs, email/reset proofs, owned email admission buckets and queued subject-linked notices. It nulls the subject on this user's live audit history and inserts a subject-free deletion event and notice. Source admission counters remain independent abuse metadata. No arbitrary user ID or realm is accepted from the client.
+
+Session creation time cannot prove fresh authentication after rotation. Migration 0004 adds a separate authenticated_at: legacy sessions receive negative infinity and require a new login for sensitive actions; normal verification/logout still works. New genuine logins use database time, and password-enrollment rotation preserves the original authentication time. This prevents sensitive operations from extending their own reauthentication window.
+
+The existing notice queue becomes auth_security_notifications with three fixed kinds: password_reset, email_changed, account_deleted. Delivery remains leased, bounded and at least once. A deletion notice has no retained user ID but temporarily keeps the established recipient until delivered or explicitly cleared/redriven. This is a deliberate notification/privacy tradeoff, not a claim of total erasure across backups, mailboxes or consuming applications. In-flight SMTP cannot be recalled. Operational retention and mixed-version rolling migration remain release gates; all replicas must be upgraded together for this alpha schema/API change.
+
+Future passkeys/provider identities need explicit assurance/recovery policies before enabling these lifecycle methods. These flows currently operate at the alpha's mailbox/password assurance level; they do not change consuming-application permissions or delete application business data. See the lifecycle guide and threat model.
