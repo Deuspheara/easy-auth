@@ -1,5 +1,5 @@
 //! Same-origin browser transport, shared by embedding and the standalone service.
-use auth_core::{Auth, Error, Secret};
+use auth_core::{Auth, Error, Password, Secret};
 use axum::{
     Extension, Json, Router,
     extract::{ConnectInfo, DefaultBodyLimit, Request, State},
@@ -92,6 +92,8 @@ pub fn router(auth: Auth, browser: BrowserConfig) -> Router {
         .route("/readyz", get(ready))
         .route("/v1/email/start", post(start))
         .route("/v1/email/finish", post(finish))
+        .route("/v1/password/enroll", post(enroll_password))
+        .route("/v1/password/login", post(password_login))
         .route("/v1/session", get(session))
         .route("/v1/logout", post(logout))
         .route("/", get(|| async { Html(include_str!("client.html")) }))
@@ -271,6 +273,73 @@ async fn finish(
     );
     Ok(response)
 }
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+struct PasswordEnrollmentInput {
+    /// NFC normalized; 15–256 Unicode code points, at most 1024 UTF-8 bytes.
+    password: String,
+}
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+struct PasswordLoginInput {
+    email: String,
+    password: String,
+}
+fn source_key(source: Option<Extension<ConnectInfo<SocketAddr>>>) -> String {
+    source
+        .map(|Extension(ConnectInfo(addr))| addr.ip().to_string())
+        .unwrap_or_else(|| "embedded".to_owned())
+}
+fn session_response(state: &AppState, session: &Secret) -> Response {
+    let mut response = StatusCode::NO_CONTENT.into_response();
+    response.headers_mut().append(
+        header::SET_COOKIE,
+        state
+            .browser
+            .cookie(state.browser.session_name(), Some(session), 604800),
+    );
+    response
+}
+#[utoipa::path(post, path = "/v1/password/enroll", request_body = PasswordEnrollmentInput,
+    params(("Origin" = String, Header), ("Cookie" = String, Header)),
+    responses((status = 204, description = "Enrolled once; previous sessions revoked; sets replacement session cookie"),
+    (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse),
+    (status = 413, body = ErrorResponse), (status = 415, body = ErrorResponse), (status = 429, body = ErrorResponse),
+    (status = 503, body = ErrorResponse), (status = 504, body = ErrorResponse)))]
+async fn enroll_password(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<PasswordEnrollmentInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    let current = read_cookie(&headers, state.browser.session_name())?;
+    let password = Password::parse(input.password)?;
+    let session = state
+        .auth
+        .enroll_password(&current, password, &source_key(source))
+        .await?;
+    Ok(session_response(&state, &session))
+}
+#[utoipa::path(post, path = "/v1/password/login", request_body = PasswordLoginInput,
+    params(("Origin" = String, Header)),
+    responses((status = 204, description = "Sets fresh session cookie"), (status = 400, body = ErrorResponse),
+    (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 413, body = ErrorResponse),
+    (status = 415, body = ErrorResponse), (status = 429, body = ErrorResponse), (status = 503, body = ErrorResponse),
+    (status = 504, body = ErrorResponse)))]
+async fn password_login(
+    State(state): State<AppState>,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<PasswordLoginInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    let password = Password::parse(input.password).map_err(|_| Error::Unauthorized)?;
+    let session = state
+        .auth
+        .password_login(&input.email, password, &source_key(source))
+        .await?;
+    Ok(session_response(&state, &session))
+}
 #[utoipa::path(get, path = "/v1/session", params(("Cookie" = String, Header, description = "Session cookie")),
     responses((status = 200, body = UserResponse), (status = 401, body = ErrorResponse), (status = 503, body = ErrorResponse), (status = 504, body = ErrorResponse)))]
 async fn session(State(state): State<AppState>, headers: HeaderMap) -> Result<Response, ApiError> {
@@ -384,8 +453,25 @@ async fn health() -> StatusCode {
         title = "easy-auth",
         description = "Experimental same-origin browser API; not an OIDC issuer. POST requests require the exact configured Origin. HTTPS production cookies use __Host- prefix, Secure, HttpOnly, SameSite=Lax, Path=/ and no Domain. Development loopback cookies omit the prefix and Secure. Auth responses are no-store."
     ),
-    paths(health, ready, start, finish, session, logout),
-    components(schemas(EmailInput, FinishInput, ErrorResponse, Accepted, UserResponse))
+    paths(
+        health,
+        ready,
+        start,
+        finish,
+        enroll_password,
+        password_login,
+        session,
+        logout
+    ),
+    components(schemas(
+        EmailInput,
+        FinishInput,
+        PasswordEnrollmentInput,
+        PasswordLoginInput,
+        ErrorResponse,
+        Accepted,
+        UserResponse
+    ))
 )]
 struct ApiDoc;
 /// Generated from the implemented HTTP handlers and transport DTOs.

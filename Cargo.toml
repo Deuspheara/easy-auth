@@ -14,6 +14,7 @@ auth-core = { package = "easy-auth-core", path = "crates/auth-core" }
 auth-postgres = { package = "easy-auth-postgres", path = "crates/auth-postgres" }
 auth-axum = { package = "easy-auth-axum", path = "crates/auth-axum" }
 async-trait = "0.1"
+argon2 = { version = "0.5.3", features = ["zeroize"] }
 axum = "0.8"
 base64 = "0.22"
 rand = "0.8"
@@ -26,6 +27,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal
 tracing = "0.1"
 uuid = { version = "1", features = ["v4", "serde"] }
 url = "2"
+unicode-normalization = "0.1.24"
 zeroize = "1"
 
 [workspace.lints.rust]

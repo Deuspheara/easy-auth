@@ -4,13 +4,16 @@ Never prints authentication secrets or raw email contents.
 """
 import http.cookiejar
 import json
+import os
 import re
 import time
 import sys
 import urllib.error
 import urllib.request
 
-base = 'http://127.0.0.1:58417'
+base = os.environ.get('AUTH_SMOKE_URL', 'http://127.0.0.1:58417')
+from urllib.parse import urlsplit
+assert urlsplit(base).hostname == '127.0.0.1', 'smoke only supports loopback development'
 jar = http.cookiejar.CookieJar()
 client = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
 def request(path, data=None):
@@ -37,6 +40,23 @@ try:
     raise AssertionError('proof replay accepted')
 except urllib.error.HTTPError as error:
     assert error.code == 401
+if '--password' in sys.argv:
+    # Synthetic per-run password; never print or persist it outside the test account.
+    import secrets
+    password = secrets.token_urlsafe(32)
+    assert request('/v1/password/enroll', {'password': password}).status == 204
+    assert json.load(request('/v1/session')) == user
+    assert request('/v1/logout', {}).status == 204
+    for address in [email, 'missing-'+str(time.time_ns())+'@example.test']:
+        try:
+            request('/v1/password/login', {'email': address, 'password': 'incorrect synthetic password'})
+            raise AssertionError('invalid password accepted')
+        except urllib.error.HTTPError as error:
+            assert error.code == 401
+            assert json.load(error) == {'code':'authentication_required'}
+    assert request('/v1/password/login', {'email': email, 'password': password}).status == 204
+    assert json.load(request('/v1/session')) == user
+    print('PASS: password enrollment, generic rejection, password login and shared session identity')
 assert request('/v1/logout', {}).status == 204
 try:
     request('/v1/session')

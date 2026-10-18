@@ -1,6 +1,8 @@
 //! Shared authentication use cases. HTTP and SQL implementations live outside this crate.
+mod password;
 use async_trait::async_trait;
 use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
+pub use password::{Password, PasswordService};
 use rand::{RngCore, rngs::OsRng};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
@@ -126,6 +128,24 @@ pub trait Repository: Send + Sync {
     ) -> Result<User>;
     async fn authenticate(&self, realm: Uuid, session: Verifier) -> Result<User>;
     async fn revoke(&self, realm: Uuid, session: Verifier) -> Result<()>;
+    async fn admit_password(&self, realm: Uuid, email: &str, source: Verifier) -> Result<()>;
+    async fn password_hash(&self, realm: Uuid, email: &str) -> Result<Option<String>>;
+    /// Validate fresh session, insert credential once, revoke previous sessions and issue replacement atomically.
+    async fn enroll_password(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        hash: &str,
+        replacement: Verifier,
+    ) -> Result<()>;
+    /// Recheck the exact credential verified outside the transaction before issuing a session.
+    async fn password_login(
+        &self,
+        realm: Uuid,
+        email: &str,
+        hash: &str,
+        session: Verifier,
+    ) -> Result<()>;
     async fn ready(&self) -> Result<()>;
 }
 #[async_trait]
@@ -138,6 +158,7 @@ pub struct Auth {
     realm: Uuid,
     repository: Arc<dyn Repository>,
     email: Arc<dyn EmailDelivery>,
+    passwords: Option<Arc<PasswordService>>,
 }
 impl Auth {
     pub fn new(
@@ -149,7 +170,62 @@ impl Auth {
             realm,
             repository,
             email,
+            passwords: None,
         }
+    }
+    /// Enable passwords with an explicitly supplied compromised-password policy.
+    pub fn with_passwords(mut self, passwords: Arc<PasswordService>) -> Self {
+        self.passwords = Some(passwords);
+        self
+    }
+    pub async fn enroll_password(
+        &self,
+        current: &Secret,
+        password: Password,
+        source: &str,
+    ) -> Result<Secret> {
+        let policy = self.passwords.as_ref().ok_or(Error::Unavailable)?;
+        let user = self.authenticate(current).await?;
+        self.repository
+            .admit_password(
+                self.realm,
+                &user.email,
+                Sha256::digest(source.as_bytes()).into(),
+            )
+            .await?;
+        let hash = policy.enroll(password).await?;
+        let replacement = Secret::generate()?;
+        self.repository
+            .enroll_password(
+                self.realm,
+                current.verifier(),
+                &hash,
+                replacement.verifier(),
+            )
+            .await?;
+        Ok(replacement)
+    }
+    pub async fn password_login(
+        &self,
+        email: &str,
+        password: Password,
+        source: &str,
+    ) -> Result<Secret> {
+        let policy = self.passwords.as_ref().ok_or(Error::Unavailable)?;
+        let email = normalize_email(email).map_err(|_| Error::Unauthorized)?;
+        self.repository
+            .admit_password(self.realm, &email, Sha256::digest(source.as_bytes()).into())
+            .await?;
+        let stored = self.repository.password_hash(self.realm, &email).await?;
+        if !policy.verify(password, stored.clone()).await? {
+            return Err(Error::Unauthorized);
+        }
+        let stored = zeroize::Zeroizing::new(stored.ok_or(Error::Unauthorized)?);
+        let session = Secret::generate()?;
+        self.repository
+            .password_login(self.realm, &email, &stored, session.verifier())
+            .await?;
+        Ok(session)
     }
     pub async fn start_email(&self, email: &str, source: &str) -> Result<Secret> {
         let email = normalize_email(email)?;

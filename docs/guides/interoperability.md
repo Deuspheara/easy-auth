@@ -3,6 +3,7 @@
 | Feature | Automated evidence | Manual/external evidence | State |
 |---|---|---|---|
 | Email proof and sessions | Real PostgreSQL, Axum HTTP, concurrent consumption, rollback, expiry, tenant isolation and logout tests | Local SMTP through Mailpit smoke script | Alpha slice implemented |
+| Password enrollment/sign-in | Argon2/profile/Unicode/corpus/capacity tests; real PostgreSQL enrollment race, rollback, stale credential and realm tests; HTTP generic rejection and disabled configuration | Real SMTP email-to-password smoke in standalone and embedded protected-route example | Opt-in headless alpha; reset/change incomplete |
 | Embedded vs standalone | Same Auth use cases/router; compiled custom protected-route example | Fresh contributor walkthrough pending | Implemented shared composition |
 | Passkeys | None yet | None | M03 required; unavailable |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |

@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+zeroize.workspace = true
 auth-core.workspace = true
 auth-postgres.workspace = true
 auth-axum.workspace = true
