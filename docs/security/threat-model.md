@@ -1,0 +1,25 @@
+# Threat model — alpha design, before credential flows
+
+Created 2026-10-18. Not a security audit. Assets: user identity, credential verifiers, active sessions, provider secrets/signing keys, email delivery and audit integrity. Actors: unauthenticated remote attacker, malicious browser origin, malicious configured/unconfigured IdP, compromised mailbox, compromised application/tenant, operator and stolen database/backup. Trust boundaries: browser/HTTP, core/persistence, outbound provider network, SMTP, configuration and application authorization.
+
+| Threat | Required control | Evidence/release gate |
+|---|---|---|
+| Email account takeover / enumeration | Browser-bound single-use high-entropy proof; generic start response; no email auto-link; email compromise acknowledged | Expiry, mismatch, enumeration-shape and replay tests; stronger methods later |
+| Login CSRF, CSRF, fixation | Exact Origin on every browser POST, HttpOnly host cookies, deliberate SameSite, fresh secret per authentication | Missing/null/wrong Origin, old cookie and duplicate-cookie tests |
+| Session theft/replay | Only verifier in DB, idle+absolute expiry, DB validation, logout/revoke-all; TLS | DB expiry and immediate subsequent-request revocation tests; active bearer theft remains usable until revoked |
+| Refresh theft | Atomic rotation and family reuse detection; secure native storage | Native release blocked pending replay tests |
+| OAuth code injection/mix-up/state or nonce reuse | Connection+client+browser-bound expiring transaction, S256, issuer/nonce/audience/signature checks; atomic consume | M04/M05 wrong-state/nonce/issuer/audience/provider/replay corpus |
+| Open redirect | Exact registered redirect allowlist; never redirect to arbitrary user input | M07 invalid redirect tests |
+| Discovery/metadata SSRF | Explicit admin connections; HTTPS; DNS/IP/port allowlists, no redirects, bounded response, block private/link-local/metadata addresses unless explicit local test policy | M05 DNS rebinding/redirect/private-network tests |
+| SAML signature wrapping/XXE/replay | Reviewed XML/signature engine; use only verified content; reject DTD/external entities/duplicate IDs, pinned certs, correlation and all conditions | Hard M06 blocker until signed fixture and attack corpus passes |
+| RP/origin manipulation | Server-owned RP/origin allowlist, high-level webauthn-rs, UV, server-persisted challenges | M03 browser virtual authenticator + real devices |
+| Unsafe linking / recovery downgrade | Fresh proof of both identities; no matching-email merge; last-credential and recovery policies; notifications/audit | M02/M03/M04 negative linking tests |
+| Tenant isolation / privilege escalation | Realm on every query/constraint; trusted router realm; no app membership/permissions in auth core | Cross-realm FK/query tests; app independently authorizes actions |
+| Brute force / spraying / mail abuse | Shared admission by realm+email and source IP; overall resource bounds; no trusted forwarded IP by default | Concurrent rate tests and load/retention plan |
+| Secret leakage / compromised config | Redacted errors/logging, secret types, bounded audit events, least-privilege roles, protected keys, no query tokens | Log review/secret scan; M09 rotation and incident drills |
+| Resource exhaustion | 8 KiB initial request bound, timeouts, bounded DB pool/SMTP and challenge admission | Oversize/timeout tests; M09 load evidence |
+| Malicious connection disable/rollover race | Recheck connection status at commit; issuer/key binding; cert/key overlap policies | M05/M06/M07 concurrency and rollover tests |
+
+A database writer or compromised server can mint/change identities; verifier hashing protects against read-only database theft, not a compromised verifier. Mailbox-only authentication has limited assurance and must not serve as an invisible bypass for stronger credentials. A stolen live cookie is a bearer credential. In-flight requests may finish after revocation; critical application actions require domain-level authorization/transaction policies.
+
+Initial slice intentionally excludes passwords (thus no incomplete password policy), linking, native tokens, external callbacks and issuer routes. Full initial release remains blocked on their milestones. Baselines and external normative references are in ../research/protocol-dependencies.md. Every implementation ticket must state tests and residual risks; update this document when boundaries change.

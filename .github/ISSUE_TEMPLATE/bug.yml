@@ -1,0 +1,10 @@
+name: Bug report
+description: Report a non-sensitive functional problem. Use SECURITY.md for vulnerabilities.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and minimal reproduction
+      description: Include version, deployment mode, expected/actual behavior, and redacted test evidence. Never include secrets.
+    validations:
+      required: true

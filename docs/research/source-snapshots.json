@@ -1,0 +1,51 @@
+[
+  {
+    "repository": "better-auth/better-auth",
+    "sha": "d0ca6d538db47547b0a842cfa44ca92a8ea9bba0",
+    "commit_date": "2026-10-17T18:44:22+09:00",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  },
+  {
+    "repository": "better-auth-rs/better-auth-rs",
+    "sha": "9f91cd7fdb8a5f73a9c69d5c56d363468a7dc281",
+    "commit_date": "2026-09-30T23:31:11+08:00",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  },
+  {
+    "repository": "salasebas/rustauth",
+    "sha": "b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e",
+    "commit_date": "2026-09-27T23:20:37-06:00",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  },
+  {
+    "repository": "lucid-softworks/auth",
+    "sha": "d16c16bfa2050e5ac08cf7e18521576f41a214f0",
+    "commit_date": "2026-09-01T00:56:17+01:00",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  },
+  {
+    "repository": "sebadob/rauthy",
+    "sha": "ea587538b35c886ea602ab918853d8500d3b92bd",
+    "commit_date": "2026-10-15T14:40:45+02:00",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  },
+  {
+    "repository": "kanidm/kanidm",
+    "sha": "f76b7ee9fdd28f123bb57d26351afef1515857d6",
+    "commit_date": "2026-10-13T08:28:29+10:00",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  },
+  {
+    "repository": "ory/kratos",
+    "sha": "b86338da04a040247a07f46100a86dcfb3875909",
+    "commit_date": "2026-07-29T09:30:36Z",
+    "retrieved": "2026-10-18",
+    "method": "shallow clone; targeted source review; upstream tests not executed"
+  }
+]

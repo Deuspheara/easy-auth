@@ -1,0 +1,9 @@
+name: Feature proposal
+description: Describe a focused authentication use case for maintainer triage.
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Problem, expected behavior and acceptance criteria
+    validations:
+      required: true

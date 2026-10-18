@@ -1,0 +1,24 @@
+name: easy-auth-dev
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: auth-development-only
+      POSTGRES_DB: auth
+    ports:
+      - "127.0.0.1:59473:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth -d auth"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+volumes:
+  postgres_data:

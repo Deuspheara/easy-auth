@@ -1,0 +1,720 @@
+{
+  "schema_version": 1,
+  "tracker": "Huly AUTH",
+  "planning_note": "Huly is authoritative; this seed/export records synchronized IDs and acceptance criteria. Milestone dates are provisional planning placeholders, not delivery commitments.",
+  "milestones": [
+    {
+      "key": "M00",
+      "name": "Research and architecture",
+      "definition_of_done": "Pinned source comparison, build decision, threat model, domain/API/deployment ADRs, measured build-vs-contribute checkpoint and SAML feasibility reviewed.",
+      "huly": {
+        "id": "6ad52190814e779e238afc44",
+        "label": "M00 — Research and architecture"
+      },
+      "parent": {
+        "identifier": "AUTH-1",
+        "issueId": "6ad521ae814e779e238afc58"
+      }
+    },
+    {
+      "key": "M01",
+      "name": "Rust foundation",
+      "definition_of_done": "Shared-core workspace builds; migrations and real DB/SMTP integration run; embedded and standalone use identical router; CI gates pass.",
+      "huly": {
+        "id": "6ad52191814e779e238afc46",
+        "label": "M01 — Rust foundation"
+      },
+      "parent": {
+        "identifier": "AUTH-6",
+        "issueId": "6ad521c2814e779e238afc6c"
+      }
+    },
+    {
+      "key": "M02",
+      "name": "Accounts and sessions",
+      "definition_of_done": "Password, email verification/change/reset/magic-link flows and session/account lifecycle pass real DB negative tests.",
+      "huly": {
+        "id": "6ad52193814e779e238afc48",
+        "label": "M02 — Accounts and sessions"
+      },
+      "parent": {
+        "identifier": "AUTH-11",
+        "issueId": "6ad521d5814e779e238afc80"
+      }
+    },
+    {
+      "key": "M03",
+      "name": "Passkeys",
+      "definition_of_done": "Registration/login/discoverable credentials, multiple credential management and reviewed recovery work in browser and real-device matrix.",
+      "huly": {
+        "id": "6ad5219a814e779e238afc4a",
+        "label": "M03 — Passkeys"
+      },
+      "parent": {
+        "identifier": "AUTH-17",
+        "issueId": "6ad521ec814e779e238afc98"
+      }
+    },
+    {
+      "key": "M04",
+      "name": "Social providers",
+      "definition_of_done": "Google and Apple web/native code flows and explicit account linking pass offline protocol tests and documented real-provider checks.",
+      "huly": {
+        "id": "6ad5219c814e779e238afc4c",
+        "label": "M04 — Social providers"
+      },
+      "parent": {
+        "identifier": "AUTH-21",
+        "issueId": "6ad521fc814e779e238afca8"
+      }
+    },
+    {
+      "key": "M05",
+      "name": "Enterprise OIDC",
+      "definition_of_done": "Explicit tenant connections, safe discovery/JWKS rotation and policy-driven JIT/claims pass local IdP and adversarial tests.",
+      "huly": {
+        "id": "6ad5219d814e779e238afc4e",
+        "label": "M05 — Enterprise OIDC"
+      },
+      "parent": {
+        "identifier": "AUTH-27",
+        "issueId": "6ad52213814e779e238afcc0"
+      }
+    },
+    {
+      "key": "M06",
+      "name": "Enterprise SAML",
+      "definition_of_done": "Pinned reviewed SP validator passes signed attack corpus and local IdP interoperability; otherwise first release remains blocked.",
+      "huly": {
+        "id": "6ad5219f814e779e238afc50",
+        "label": "M06 — Enterprise SAML"
+      },
+      "parent": {
+        "identifier": "AUTH-31",
+        "issueId": "6ad52223814e779e238afcd0"
+      }
+    },
+    {
+      "key": "M07",
+      "name": "Standalone interoperability",
+      "definition_of_done": "Outbound issuer independently tested for OIDC code+PKCE, signing/rotation and client isolation; no compliance claim before evidence.",
+      "huly": {
+        "id": "6ad521a0814e779e238afc52",
+        "label": "M07 — Standalone interoperability"
+      },
+      "parent": {
+        "identifier": "AUTH-36",
+        "issueId": "6ad52238814e779e238afce4"
+      }
+    },
+    {
+      "key": "M08",
+      "name": "Developer experience",
+      "definition_of_done": "Runnable protected-route examples, reference UI, OpenAPI and deployment/provider guides reflect only implemented features.",
+      "huly": {
+        "id": "6ad521a2814e779e238afc54",
+        "label": "M08 — Developer experience"
+      },
+      "parent": {
+        "identifier": "AUTH-42",
+        "issueId": "6ad52250814e779e238afcfc"
+      }
+    },
+    {
+      "key": "M09",
+      "name": "Hardening and first release",
+      "definition_of_done": "All required methods and issuer gates pass; security review, restore/rotation evidence, honest interoperability matrix and release workflow complete.",
+      "huly": {
+        "id": "6ad521a4814e779e238afc56",
+        "label": "M09 — Hardening and first release"
+      },
+      "parent": {
+        "identifier": "AUTH-46",
+        "issueId": "6ad52262814e779e238afd0c"
+      }
+    }
+  ],
+  "issues": [
+    {
+      "key": "M00-01",
+      "milestone": "M00",
+      "title": "Review pinned competitor source and justify independent scope",
+      "priority": "high",
+      "description": "## Context / problem\nPublish comparison matrix with code paths, license/activity evidence and five build-vs-contribute answers.\n\n## Objective and expected behavior\nSnapshot all seven revisions; distinguish observed code from verified conformance; document contribution alternative.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Snapshot all seven revisions; distinguish observed code from verified conformance; document contribution alternative.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nsource review and link validation. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [],
+      "huly": {
+        "identifier": "AUTH-2",
+        "issueId": "6ad521b2814e779e238afc5c"
+      }
+    },
+    {
+      "key": "M00-02",
+      "milestone": "M00",
+      "title": "Review protocol dependencies and SAML signed-content feasibility",
+      "priority": "high",
+      "description": "## Context / problem\nChoose or explicitly block a pinned SAML verifier after hostile XML and signature corpus evaluation.\n\n## Objective and expected behavior\nEvaluate samael+xmlsec, samlet/bergshamra and opensaml-rs; record audit/license/native dependencies and advisory reachability.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Evaluate samael+xmlsec, samlet/bergshamra and opensaml-rs; record audit/license/native dependencies and advisory reachability.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nsigned-node binding, XXE, duplicate-ID and wrapping fixture plan. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M00-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-3",
+        "issueId": "6ad521b7814e779e238afc60"
+      }
+    },
+    {
+      "key": "M00-03",
+      "milestone": "M00",
+      "title": "Specify trust boundaries and versioned domain/API contracts",
+      "priority": "high",
+      "description": "## Context / problem\nReview architecture and threat model before credential behavior.\n\n## Objective and expected behavior\nSeparate inbound federation/outbound issuer, realm/business org, provider/user, credentials/session/token; map each threat to test.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Separate inbound federation/outbound issuer, realm/business org, provider/user, credentials/session/token; map each threat to test.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\narchitecture consistency review. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M00-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-4",
+        "issueId": "6ad521bb814e779e238afc64"
+      }
+    },
+    {
+      "key": "M00-04",
+      "milestone": "M00",
+      "title": "Compare minimal RustAuth and lucid-auth integrations with proposed core",
+      "priority": "high",
+      "description": "## Context / problem\nValidate independent product differentiation with measurements.\n\n## Objective and expected behavior\nRecord setup steps, resolved feature dependencies, release binary/RSS and revocation semantics under comparable PostgreSQL load.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Record setup steps, resolved feature dependencies, release binary/RSS and revocation semantics under comparable PostgreSQL load.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nreproducible benchmark and integration scripts. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M00-03"
+      ],
+      "huly": {
+        "identifier": "AUTH-5",
+        "issueId": "6ad521be814e779e238afc68"
+      }
+    },
+    {
+      "key": "M01-01",
+      "milestone": "M01",
+      "title": "Create licensed Cargo workspace and contributor security policies",
+      "priority": "high",
+      "description": "## Context / problem\nInitialize focused core, PostgreSQL, Axum and server crates.\n\n## Objective and expected behavior\nDual MIT/Apache, policies, CI, dependency/secret checks and honest quick start.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Dual MIT/Apache, policies, CI, dependency/secret checks and honest quick start.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nfmt, clippy, unit tests and license inventory. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M00-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-7",
+        "issueId": "6ad521c6814e779e238afc70"
+      }
+    },
+    {
+      "key": "M01-02",
+      "milestone": "M01",
+      "title": "Persist browser-bound email proof and opaque session atomically",
+      "priority": "high",
+      "description": "## Context / problem\nDeliver first complete email authentication slice.\n\n## Objective and expected behavior\nSQLx migration, SMTP, atomic consume+user+session, Origin/cookie defenses, expiry, protected route and logout.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- SQLx migration, SMTP, atomic consume+user+session, Origin/cookie defenses, expiry, protected route and logout.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nreal PostgreSQL concurrency/tenant/expiry tests, Mailpit delivery, HTTP full flow. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M01-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-8",
+        "issueId": "6ad521c9814e779e238afc74"
+      }
+    },
+    {
+      "key": "M01-03",
+      "milestone": "M01",
+      "title": "Provide typed startup configuration and local container deployment",
+      "priority": "high",
+      "description": "## Context / problem\nMake first slice reproducible and fail closed.\n\n## Objective and expected behavior\nValidate public URL/TLS/dev mode, bounded DB/SMTP, health/readiness and graceful shutdown; embedded example.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Validate public URL/TLS/dev mode, bounded DB/SMTP, health/readiness and graceful shutdown; embedded example.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nunsafe config rejection, compose health and fresh install smoke. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M01-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-9",
+        "issueId": "6ad521cd814e779e238afc78"
+      }
+    },
+    {
+      "key": "M01-04",
+      "milestone": "M01",
+      "title": "Generate and verify v1 OpenAPI against router behavior",
+      "priority": "high",
+      "description": "## Context / problem\nPublish a concrete versioned contract.\n\n## Objective and expected behavior\nTyped input/output/errors/cookie security and docs examples for implemented endpoints only.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Typed input/output/errors/cookie security and docs examples for implemented endpoints only.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nschema validation and HTTP status/body contract. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M01-03"
+      ],
+      "huly": {
+        "identifier": "AUTH-10",
+        "issueId": "6ad521d2814e779e238afc7c"
+      }
+    },
+    {
+      "key": "M02-01",
+      "milestone": "M02",
+      "title": "Add Argon2id password enrollment with compromised-password policy",
+      "priority": "medium",
+      "description": "## Context / problem\nAdd verified email/password credentials.\n\n## Objective and expected behavior\n15 character single-factor minimum, long Unicode input, blocklist, tuned bounded hashing and generic errors.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- 15 character single-factor minimum, long Unicode input, blocklist, tuned bounded hashing and generic errors.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nhash parameter, compromised corpus, enumeration and concurrent enrollment tests. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M01-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-12",
+        "issueId": "6ad521d8814e779e238afc84"
+      }
+    },
+    {
+      "key": "M02-02",
+      "milestone": "M02",
+      "title": "Implement one-time password recovery with session invalidation",
+      "priority": "medium",
+      "description": "## Context / problem\nRecover credentials without leaving old sessions usable.\n\n## Objective and expected behavior\nPurpose-bound expiring proof, transactional replacement and revoke-all, safe notifications.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Purpose-bound expiring proof, transactional replacement and revoke-all, safe notifications.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nreplay, expiry, wrong-purpose and concurrent reset tests. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M02-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-13",
+        "issueId": "6ad521dd814e779e238afc88"
+      }
+    },
+    {
+      "key": "M02-03",
+      "milestone": "M02",
+      "title": "Implement verified email change and transactional account deletion",
+      "priority": "medium",
+      "description": "## Context / problem\nMaintain lifecycle integrity across credentials and sessions.\n\n## Objective and expected behavior\nFresh reauthentication, new email proof; deletion cleanup and deidentified audit policy.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Fresh reauthentication, new email proof; deletion cleanup and deidentified audit policy.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nuniqueness races, cross-tenant cleanup and old-session rejection. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M02-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-14",
+        "issueId": "6ad521e1814e779e238afc8c"
+      }
+    },
+    {
+      "key": "M02-04",
+      "milestone": "M02",
+      "title": "List and individually revoke sessions and revoke all devices",
+      "priority": "medium",
+      "description": "## Context / problem\nGive users control of active sessions.\n\n## Objective and expected behavior\nPublic session IDs, realm/user ownership; idle/absolute expiry; fresh auth for sensitive operations.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Public session IDs, realm/user ownership; idle/absolute expiry; fresh auth for sensitive operations.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\ncross-user denial, revoke-all concurrency and expiry boundaries. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M02-03"
+      ],
+      "huly": {
+        "identifier": "AUTH-15",
+        "issueId": "6ad521e5814e779e238afc90"
+      }
+    },
+    {
+      "key": "M02-05",
+      "milestone": "M02",
+      "title": "Record safe credential recovery and linking audit events",
+      "priority": "medium",
+      "description": "## Context / problem\nProvide attributable lifecycle evidence without secrets.\n\n## Objective and expected behavior\nBounded audit schema and event kinds; explicit two-identity proof policy; no matching-email merge.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Bounded audit schema and event kinds; explicit two-identity proof policy; no matching-email merge.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nredaction, ownership and transaction rollback tests. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M02-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-16",
+        "issueId": "6ad521e9814e779e238afc94"
+      }
+    },
+    {
+      "key": "M03-01",
+      "milestone": "M03",
+      "title": "Persist WebAuthn enrollment challenges and reject invalid RP or origin",
+      "priority": "medium",
+      "description": "## Context / problem\nRegister passkeys under fresh authenticated or reviewed passkey-first enrollment.\n\n## Objective and expected behavior\nHigh-level webauthn-rs, expiring private server state, UV, credential metadata and atomic consume.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- High-level webauthn-rs, expiring private server state, UV, credential metadata and atomic consume.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nwrong RP/origin/challenge/UV/signature, replay and concurrent registration. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M02-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-18",
+        "issueId": "6ad521f0814e779e238afc9c"
+      }
+    },
+    {
+      "key": "M03-02",
+      "milestone": "M03",
+      "title": "Authenticate discoverable and account-bound WebAuthn credentials",
+      "priority": "medium",
+      "description": "## Context / problem\nIssue sessions only after verified authenticator proof.\n\n## Objective and expected behavior\nCredential state/counter/backup policy and transaction-to-user binding.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Credential state/counter/backup policy and transaction-to-user binding.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nvirtual platform/roaming authenticator and cross-realm negatives. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M03-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-19",
+        "issueId": "6ad521f4814e779e238afca0"
+      }
+    },
+    {
+      "key": "M03-03",
+      "milestone": "M03",
+      "title": "Manage multiple passkeys and reviewed passkey recovery",
+      "priority": "medium",
+      "description": "## Context / problem\nRename/remove without silent security downgrade.\n\n## Objective and expected behavior\nFresh auth, last-credential policy, recovery notifications/delay and audit.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Fresh auth, last-credential policy, recovery notifications/delay and audit.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nownership, last-key removal, recovery downgrade denial and real devices. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M03-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-20",
+        "issueId": "6ad521f9814e779e238afca4"
+      }
+    },
+    {
+      "key": "M04-01",
+      "milestone": "M04",
+      "title": "Persist and atomically consume browser-bound OAuth state transactions",
+      "priority": "medium",
+      "description": "## Context / problem\nShare transaction infrastructure while retaining protocol-specific checks.\n\n## Objective and expected behavior\nConnection/client/browser/purpose/issuer/nonce/PKCE binding, expiry and cancellation.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Connection/client/browser/purpose/issuer/nonce/PKCE binding, expiry and cancellation.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nstate replay, wrong provider/client, login CSRF and mix-up tests. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M03-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-22",
+        "issueId": "6ad52200814e779e238afcac"
+      }
+    },
+    {
+      "key": "M04-02",
+      "milestone": "M04",
+      "title": "Validate Google code exchange and ID token claims",
+      "priority": "medium",
+      "description": "## Context / problem\nSupport Google web and native system-browser flow.\n\n## Objective and expected behavior\nS256, trusted sub, issuer/audience/azp/nonce/signature/email_verified and provider errors.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- S256, trusted sub, issuer/audience/azp/nonce/signature/email_verified and provider errors.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\noffline signed JWKS, wrong claims/signature, cancellation; manual provider matrix. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M04-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-23",
+        "issueId": "6ad52204814e779e238afcb0"
+      }
+    },
+    {
+      "key": "M04-03",
+      "milestone": "M04",
+      "title": "Generate Apple client secrets and validate web/native code results",
+      "priority": "medium",
+      "description": "## Context / problem\nSupport App IDs/Services IDs with protected ES256 keys.\n\n## Objective and expected behavior\nKey rotation, Apple token verification, initial-only profile, relay email and native nonce/audience binding.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Key rotation, Apple token verification, initial-only profile, relay email and native nonce/audience binding.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nfixed-key JWT tests, signed token negatives and manual Apple web/native. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M04-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-24",
+        "issueId": "6ad52207814e779e238afcb4"
+      }
+    },
+    {
+      "key": "M04-04",
+      "milestone": "M04",
+      "title": "Link and unlink social identities with proof of both accounts",
+      "priority": "medium",
+      "description": "## Context / problem\nPrevent email-based takeover during provider linking.\n\n## Objective and expected behavior\nFresh local authentication, purpose-bound provider proof, uniqueness and last-credential policy.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Fresh local authentication, purpose-bound provider proof, uniqueness and last-credential policy.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nmatching-email denial, stale session, conflict races and unlink ownership. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M04-03"
+      ],
+      "huly": {
+        "identifier": "AUTH-25",
+        "issueId": "6ad5220b814e779e238afcb8"
+      }
+    },
+    {
+      "key": "M04-05",
+      "milestone": "M04",
+      "title": "Revoke Apple provider grants on account disconnect where applicable",
+      "priority": "medium",
+      "description": "## Context / problem\nRespect provider lifecycle requirements.\n\n## Objective and expected behavior\nProtected token storage/rotation and retry-safe provider revocation semantics.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Protected token storage/rotation and retry-safe provider revocation semantics.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\noffline provider errors, retry and local session isolation. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M04-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-26",
+        "issueId": "6ad5220f814e779e238afcbc"
+      }
+    },
+    {
+      "key": "M05-01",
+      "milestone": "M05",
+      "title": "Constrain OIDC discovery and JWKS network egress",
+      "priority": "medium",
+      "description": "## Context / problem\nPrevent metadata SSRF and issuer confusion.\n\n## Objective and expected behavior\nExplicit HTTPS connections, DNS/IP/port policy, no redirects, bounded fetch/cache and exact issuer.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Explicit HTTPS connections, DNS/IP/port policy, no redirects, bounded fetch/cache and exact issuer.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nprivate/link-local/IPv6/rebinding/redirect and oversized metadata negatives. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M04-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-28",
+        "issueId": "6ad52217814e779e238afcc4"
+      }
+    },
+    {
+      "key": "M05-02",
+      "milestone": "M05",
+      "title": "Verify external OIDC tokens across signing-key rotation",
+      "priority": "medium",
+      "description": "## Context / problem\nAuthenticate with established typed verification.\n\n## Objective and expected behavior\nCode+S256, issuer/audience/nonce/azp algorithms and bounded unknown-kid refresh.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Code+S256, issuer/audience/nonce/azp algorithms and bounded unknown-kid refresh.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nlocal Keycloak plus invalid signature/claims, key rotation and replay. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M05-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-29",
+        "issueId": "6ad5221b814e779e238afcc8"
+      }
+    },
+    {
+      "key": "M05-03",
+      "milestone": "M05",
+      "title": "Apply realm-scoped claim mapping and explicit JIT policies",
+      "priority": "medium",
+      "description": "## Context / problem\nProvision only allowed external subjects.\n\n## Objective and expected behavior\nConfigurable scoped mapping, multi-tenant issuer allowlists, connection disable checks and no email merge.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Configurable scoped mapping, multi-tenant issuer allowlists, connection disable checks and no email merge.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\ncross-tenant claims, disabled callback races and JIT deny policy. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M05-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-30",
+        "issueId": "6ad5221f814e779e238afccc"
+      }
+    },
+    {
+      "key": "M06-01",
+      "milestone": "M06",
+      "title": "Gate SAML dependency on verified signed-node and parser behavior",
+      "priority": "high",
+      "description": "## Context / problem\nSelect a defensible XML signature stack.\n\n## Objective and expected behavior\nPin exact source, trusted cert-only verification, no attacker KeyInfo, DTD/XXE/duplicate-ID/wrapping protection.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Pin exact source, trusted cert-only verification, no attacker KeyInfo, DTD/XXE/duplicate-ID/wrapping protection.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nhostile XML corpus and independent security review. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M05-01",
+        "M00-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-32",
+        "issueId": "6ad52228814e779e238afcd4"
+      }
+    },
+    {
+      "key": "M06-02",
+      "milestone": "M06",
+      "title": "Publish SP metadata and persist correlated AuthnRequests",
+      "priority": "high",
+      "description": "## Context / problem\nSupport SP-initiated login only.\n\n## Objective and expected behavior\nTenant entity/ACS IDs, explicit IdP metadata/certs and safe browser RelayState binding.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Tenant entity/ACS IDs, explicit IdP metadata/certs and safe browser RelayState binding.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nmetadata roundtrip, bounded parsing and exact endpoint tests. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M06-01",
+        "M00-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-33",
+        "issueId": "6ad5222b814e779e238afcd8"
+      }
+    },
+    {
+      "key": "M06-03",
+      "milestone": "M06",
+      "title": "Validate SAML ACS conditions and atomically reject replay",
+      "priority": "high",
+      "description": "## Context / problem\nCreate identities only from verified signed assertions.\n\n## Objective and expected behavior\nIssuer/audience/destination/recipient/subject/time/InResponseTo and replay uniqueness.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Issuer/audience/destination/recipient/subject/time/InResponseTo and replay uniqueness.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nwrong every condition, unsigned/wrapped/expired assertions and concurrent replay. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M06-02",
+        "M00-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-34",
+        "issueId": "6ad52230814e779e238afcdc"
+      }
+    },
+    {
+      "key": "M06-04",
+      "milestone": "M06",
+      "title": "Support certificate rollover and policy-driven SAML attributes",
+      "priority": "high",
+      "description": "## Context / problem\nOperate tenant enterprise connections safely.\n\n## Objective and expected behavior\nPinned overlap windows, NameID/attribute policy, connection disable and explicit JIT.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Pinned overlap windows, NameID/attribute policy, connection disable and explicit JIT.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nKeycloak rollover, cross-tenant mapping, disabled connections; document Entra/Okta integration. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M06-03",
+        "M00-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-35",
+        "issueId": "6ad52234814e779e238afce0"
+      }
+    },
+    {
+      "key": "M07-01",
+      "milestone": "M07",
+      "title": "Register clients with exact redirects and isolated subjects",
+      "priority": "medium",
+      "description": "## Context / problem\nDefine application trust separately from inbound federation.\n\n## Objective and expected behavior\nPublic/confidential clients, exact callbacks, consent policy, pairwise/public subject decision.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Public/confidential clients, exact callbacks, consent policy, pairwise/public subject decision.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nredirect attacks, cross-client audience and client-auth negatives. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M06-01",
+        "M02-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-37",
+        "issueId": "6ad5223d814e779e238afce8"
+      }
+    },
+    {
+      "key": "M07-02",
+      "milestone": "M07",
+      "title": "Issue one-time authorization codes bound to S256 and clients",
+      "priority": "medium",
+      "description": "## Context / problem\nBuild outbound authorization/token exchange.\n\n## Objective and expected behavior\nFresh auth, exact redirect, short-lived one-time code, verifier and transactional redemption.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Fresh auth, exact redirect, short-lived one-time code, verifier and transactional redemption.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\ncode injection, wrong client/verifier/redirect and concurrent redemption. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M07-01",
+        "M02-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-38",
+        "issueId": "6ad52241814e779e238afcec"
+      }
+    },
+    {
+      "key": "M07-03",
+      "milestone": "M07",
+      "title": "Publish discovery and JWKS with rotated signed ID tokens",
+      "priority": "medium",
+      "description": "## Context / problem\nProvide interoperable identity metadata and tokens.\n\n## Objective and expected behavior\nReviewed JOSE, issuer/aud/sub/nonce/iat/exp, protected keys and overlapping public keys.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Reviewed JOSE, issuer/aud/sub/nonce/iat/exp, protected keys and overlapping public keys.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nOIDC RP integration, invalid claims/algorithms and rollover conformance. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M07-02",
+        "M02-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-39",
+        "issueId": "6ad52245814e779e238afcf0"
+      }
+    },
+    {
+      "key": "M07-04",
+      "milestone": "M07",
+      "title": "Rotate native refresh families and implement revocation/introspection",
+      "priority": "medium",
+      "description": "## Context / problem\nProvide bounded trusted application/native credentials.\n\n## Objective and expected behavior\nShort access life, reuse-detected refresh rotation, audience isolation and secure client storage docs.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Short access life, reuse-detected refresh rotation, audience isolation and secure client storage docs.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nfamily theft/replay, revoke races and native system-browser integration. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M07-03",
+        "M02-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-40",
+        "issueId": "6ad52248814e779e238afcf4"
+      }
+    },
+    {
+      "key": "M07-05",
+      "milestone": "M07",
+      "title": "Provide Rust SDK and prove standalone OIDC interoperability",
+      "priority": "medium",
+      "description": "## Context / problem\nIntegrate an independent client without cookie sharing.\n\n## Objective and expected behavior\nTyped SDK/error handling, real client discovery and token verification.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Typed SDK/error handling, real client discovery and token verification.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nlocal standards client suite and embedded/standalone user behavior parity. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M07-04",
+        "M02-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-41",
+        "issueId": "6ad5224d814e779e238afcf8"
+      }
+    },
+    {
+      "key": "M08-01",
+      "milestone": "M08",
+      "title": "Build accessible compact reference authentication UI",
+      "priority": "medium",
+      "description": "## Context / problem\nDemonstrate all required methods and account controls.\n\n## Objective and expected behavior\nResponsive light/dark, keyboard/autocomplete, loading/errors, linked providers/passkeys/sessions and recovery.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Responsive light/dark, keyboard/autocomplete, loading/errors, linked providers/passkeys/sessions and recovery.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nbrowser accessibility, keyboard, responsive and flow tests. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M07-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-43",
+        "issueId": "6ad52255814e779e238afd00"
+      }
+    },
+    {
+      "key": "M08-02",
+      "milestone": "M08",
+      "title": "Add CLI setup diagnostics and provider/native integration guides",
+      "priority": "medium",
+      "description": "## Context / problem\nMake configuration failures actionable.\n\n## Objective and expected behavior\nApple Developer capabilities, Google/native clients, OIDC/SAML metadata, custom UI and RP boundaries.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Apple Developer capabilities, Google/native clients, OIDC/SAML metadata, custom UI and RP boundaries.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nfresh contributor walkthrough and misconfiguration fixtures. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M08-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-44",
+        "issueId": "6ad52259814e779e238afd04"
+      }
+    },
+    {
+      "key": "M08-03",
+      "milestone": "M08",
+      "title": "Document containers, backups and minimal Rust/TypeScript clients",
+      "priority": "medium",
+      "description": "## Context / problem\nMake embedding and self-hosting reproducible.\n\n## Objective and expected behavior\nDocumented public APIs and SDKs, no mandatory frontend runtime.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Documented public APIs and SDKs, no mandatory frontend runtime.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nclean Docker deploy and independent example client smoke. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M08-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-45",
+        "issueId": "6ad5225e814e779e238afd08"
+      }
+    },
+    {
+      "key": "M09-01",
+      "milestone": "M09",
+      "title": "Run full protocol conformance and adversarial security suite",
+      "priority": "high",
+      "description": "## Context / problem\nVerify every required method with offline CI and real interoperability evidence.\n\n## Objective and expected behavior\nWebAuthn browser, Google/Apple manual, Keycloak OIDC/SAML, issuer client matrix and threat-model review.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- WebAuthn browser, Google/Apple manual, Keycloak OIDC/SAML, issuer client matrix and threat-model review.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nall negative corpus, concurrency and tenant boundaries. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M08-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-47",
+        "issueId": "6ad52266814e779e238afd10"
+      }
+    },
+    {
+      "key": "M09-02",
+      "milestone": "M09",
+      "title": "Review resolved dependency licenses and advisories",
+      "priority": "high",
+      "description": "## Context / problem\nRelease only with explicit dependency risk decisions.\n\n## Objective and expected behavior\nLockfile, cargo audit/deny, native XML libraries, supply-chain provenance and secret scanning.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Lockfile, cargo audit/deny, native XML libraries, supply-chain provenance and secret scanning.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nclean or documented reviewed advisories; SBOM/license evidence. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M09-01"
+      ],
+      "huly": {
+        "identifier": "AUTH-48",
+        "issueId": "6ad5226b814e779e238afd14"
+      }
+    },
+    {
+      "key": "M09-03",
+      "milestone": "M09",
+      "title": "Test backup restoration, migration recovery and key rotation",
+      "priority": "high",
+      "description": "## Context / problem\nProve operational recovery.\n\n## Objective and expected behavior\nSeparate DB roles, retention cleanup, encrypted backups, rolling upgrades and incident session/key revocation.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Separate DB roles, retention cleanup, encrypted backups, rolling upgrades and incident session/key revocation.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nrestore drill, failed migration recovery and stale key/token rejection. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M09-02"
+      ],
+      "huly": {
+        "identifier": "AUTH-49",
+        "issueId": "6ad52270814e779e238afd18"
+      }
+    },
+    {
+      "key": "M09-04",
+      "milestone": "M09",
+      "title": "Benchmark bounded authentication and schedule external security review",
+      "priority": "high",
+      "description": "## Context / problem\nEstablish honest capacity and review limits.\n\n## Objective and expected behavior\nSession/DB/Argon2 benchmarks, abuse limits, safe metrics/request IDs and independent audit plan.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Session/DB/Argon2 benchmarks, abuse limits, safe metrics/request IDs and independent audit plan.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nreproducible latency/RSS/load results and documented unresolved findings. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M09-03"
+      ],
+      "huly": {
+        "identifier": "AUTH-50",
+        "issueId": "6ad52274814e779e238afd1c"
+      }
+    },
+    {
+      "key": "M09-05",
+      "milestone": "M09",
+      "title": "Publish versioned crates and first release with evidence",
+      "priority": "high",
+      "description": "## Context / problem\nShip only once required gates pass.\n\n## Objective and expected behavior\nChangelog/version/release automation, signed provenance and private advisory reporting.\n\n## Technical scope / API and data\nUse the shared domain and explicit migrations; implement only the named boundary. Update docs/architecture/api-contract.md and the relevant domain entities if changed. Architecture: docs/architecture/overview.md; security: docs/security/threat-model.md; dependencies: docs/research/protocol-dependencies.md.\n\n## Security considerations\nFail closed, tenant-isolate all reads/writes, keep secrets out of errors/logs, and prohibit email-based automatic identity linking. Protocol-specific rejection cases listed below are mandatory.\n\n## Dependencies\nSee exported dependency keys and native Huly blocker relations. Milestone prerequisites must pass; unfinished dependency assessment is a release blocker, never an insecure fallback.\n\n## Acceptance criteria\n- Changelog/version/release automation, signed provenance and private advisory reporting.\n- Required tests pass with recorded commands and evidence.\n- Public docs state implemented behavior and residual limitations.\n- No unrelated protocol/API or speculative abstraction introduced.\n\n## Required tests\nclean install, release artifact smoke and all milestone acceptance. Use real PostgreSQL for persistence/atomicity; external production credentials must not be required in default CI.\n\n## Documentation impact\nUpdate relevant architecture/guide, API schemas and interoperability evidence. Link implementation commit/PR in Huly.\n\n## Explicit non-goals\nUnrelated roadmap features, proprietary enterprise gates, custom cryptographic primitives, application business permissions and unsupported production-readiness claims.",
+      "depends_on": [
+        "M09-04"
+      ],
+      "huly": {
+        "identifier": "AUTH-51",
+        "issueId": "6ad52278814e779e238afd20"
+      }
+    }
+  ]
+}

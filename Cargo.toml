@@ -1,0 +1,36 @@
+[workspace]
+members = ["crates/auth-core", "crates/auth-postgres", "crates/auth-axum", "apps/auth-server"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0-alpha.1"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+auth-core = { package = "easy-auth-core", path = "crates/auth-core" }
+auth-postgres = { package = "easy-auth-postgres", path = "crates/auth-postgres" }
+auth-axum = { package = "easy-auth-axum", path = "crates/auth-axum" }
+async-trait = "0.1"
+axum = "0.8"
+base64 = "0.22"
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "uuid", "migrate", "macros"] }
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "time"] }
+tracing = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+url = "2"
+zeroize = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[profile.release]
+lto = "thin"
+strip = true
