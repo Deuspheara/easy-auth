@@ -1,4 +1,5 @@
 //! Shared authentication use cases. HTTP and SQL implementations live outside this crate.
+mod audit;
 mod auth;
 mod email;
 mod error;
@@ -9,6 +10,7 @@ mod ports;
 mod secret;
 mod sessions;
 
+pub use audit::AuditEvent;
 pub use auth::Auth;
 pub use email::normalize_email;
 pub use error::{Error, Result};

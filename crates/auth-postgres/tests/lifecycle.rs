@@ -14,3 +14,6 @@ mod passwords;
 mod recovery;
 #[path = "lifecycle/sessions/mod.rs"]
 mod sessions;
+
+#[path = "lifecycle/audit/mod.rs"]
+mod audit;

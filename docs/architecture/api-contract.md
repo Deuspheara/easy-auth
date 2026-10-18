@@ -39,3 +39,5 @@ Recovery proofs, version binding and notification lifecycle: [guide](../guides/p
 Lifecycle policy, proof ordering, freshness and privacy scope: [guide](../guides/account-lifecycle.md), [ADR 0005](adr/0005-account-lifecycle.md).
 
 Session inventory fields, freshness, pagination, cookie effects and concurrent-login semantics: [guide](../guides/sessions.md), [ADR 0006](adr/0006-session-management.md).
+
+Audit facts are transaction-internal with no public append/read route. HTTP/OpenAPI remain unchanged by AUTH-16. [Audit schema, attribution and linking policy](../guides/audit-events.md), [ADR 0007](adr/0007-safe-audit-and-linking.md).

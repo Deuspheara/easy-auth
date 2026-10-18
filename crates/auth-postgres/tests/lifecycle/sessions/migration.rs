@@ -1,5 +1,5 @@
 use super::session;
-use crate::support::{realm, signed_in};
+use crate::support::{legacy, realm};
 use auth_core::Repository;
 use sqlx::PgPool;
 
@@ -14,15 +14,26 @@ async fn session_management_upgrade_preserves_existing_sessions_and_audit(pool: 
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }
     let (store, realm) = realm(pool.clone()).await;
-    let current = signed_in(&store, realm, "alice@example.com").await;
-    let user = store.authenticate(realm, current.verifier()).await.unwrap();
-    let (other, _) = session(&pool, realm, user.id).await;
+    let fixture = legacy::seed_session(&pool, realm, "alice@example.com").await;
+    let current = fixture.secret;
+    let (other, _) = session(&pool, realm, fixture.user_id).await;
     sqlx::raw_sql(include_str!(
         "../../../migrations/0005_session_management.sql"
     ))
     .execute(&pool)
     .await
     .unwrap();
+    let existing_sessions: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM auth_sessions WHERE realm_id=$1")
+            .bind(realm)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(existing_sessions, 2);
+    sqlx::raw_sql(include_str!("../../../migrations/0006_safe_audit.sql"))
+        .execute(&pool)
+        .await
+        .unwrap();
     assert_eq!(
         store
             .list_sessions(realm, current.verifier(), None)

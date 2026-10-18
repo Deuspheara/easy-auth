@@ -1,3 +1,5 @@
+pub(crate) mod legacy;
+
 use auth_core::{Repository, Secret};
 use easy_auth_postgres::Postgres;
 use sqlx::PgPool;

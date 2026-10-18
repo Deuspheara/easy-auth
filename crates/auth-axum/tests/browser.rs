@@ -15,3 +15,6 @@ mod recovery;
 
 #[path = "browser/sessions/mod.rs"]
 mod sessions;
+
+#[path = "browser/audit.rs"]
+mod audit;

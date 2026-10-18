@@ -1,5 +1,7 @@
+use crate::audit;
 use crate::locking::lock_email;
 use crate::{Postgres, unavailable};
+use auth_core::AuditEvent;
 use auth_core::User;
 use auth_core::{Error, Result, Verifier};
 use sqlx::Row;
@@ -121,24 +123,26 @@ impl Postgres {
             realm_id: realm,
             email,
         };
+        let session_id = Uuid::new_v4();
         sqlx::query(
             "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash) VALUES ($1,$2,$3,$4)",
         )
         .bind(realm)
-        .bind(Uuid::new_v4())
+        .bind(session_id)
         .bind(user.id)
         .bind(session.as_slice())
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
-        sqlx::query(
-            "INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,$2,'email_authenticated')",
+        audit::record(
+            &mut tx,
+            realm,
+            AuditEvent::EmailAuthenticated {
+                user_id: user.id,
+                session_id,
+            },
         )
-        .bind(realm)
-        .bind(user.id)
-        .execute(&mut *tx)
-        .await
-        .map_err(unavailable)?;
+        .await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(user)
     }

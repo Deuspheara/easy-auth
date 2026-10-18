@@ -12,11 +12,18 @@ async fn lifecycle_migration_requires_reauthentication_for_legacy_sessions(pool:
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }
     let (store, realm) = realm(pool.clone()).await;
-    let legacy = signed_in(&store, realm, "alice@example.com").await;
+    let fixture = legacy::seed_session(&pool, realm, "alice@example.com").await;
+    let legacy = fixture.secret;
     sqlx::raw_sql(include_str!("../../migrations/0004_account_lifecycle.sql"))
         .execute(&pool)
         .await
         .unwrap();
+    for source in [
+        include_str!("../../migrations/0005_session_management.sql"),
+        include_str!("../../migrations/0006_safe_audit.sql"),
+    ] {
+        sqlx::raw_sql(source).execute(&pool).await.unwrap();
+    }
     assert!(store.authenticate(realm, legacy.verifier()).await.is_ok());
     assert!(
         store

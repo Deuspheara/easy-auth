@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Typed lifecycle audit facts with owned actor/session attribution, historical provenance, transactional deletion redaction and an explicit two-identity linking policy; logout lock order aligned with audit ownership checks (AUTH-16).
+
 - Bounded owned-session inventory and fresh-authenticated individual/all-session revocation, including pending-proof cancellation and concurrent-login ordering guarantees (AUTH-15).
 
 - Maintainability rules and feature-organized core, PostgreSQL, HTTP, server and integration-test modules, preserving existing authentication behavior and contracts (AUTH-52).

@@ -41,3 +41,5 @@ python3 scripts/smoke.py --embedded --lifecycle
 ```
 
 The script creates only disposable synthetic accounts, checks actual SMTP confirmations/notices, stable identity across email change, old-session rejection, password continuity and confirmed deletion. PostgreSQL tests cover competing address changes, scope/binding/expiry, rollback, cleanup, audit deidentification and migration from the prior schema. See [ADR 0005](../architecture/adr/0005-account-lifecycle.md) and the [OWASP authentication baseline](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#changing-a-users-registered-email-address).
+
+Audit deidentification also removes actor/affected-session references introduced by migration 0006. User/session/audit mutations and the deletion notice remain one transaction; [audit semantics](audit-events.md).

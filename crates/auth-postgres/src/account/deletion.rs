@@ -1,5 +1,7 @@
+use crate::audit;
 use crate::locking::{fresh_account, lock_email};
 use crate::{Postgres, unavailable};
+use auth_core::AuditEvent;
 use auth_core::{Error, Result, Verifier};
 use uuid::Uuid;
 
@@ -90,25 +92,14 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
-        sqlx::query("UPDATE auth_audit SET user_id=NULL WHERE realm_id=$1 AND user_id=$2")
-            .bind(realm)
-            .bind(user)
-            .execute(&mut *tx)
-            .await
-            .map_err(unavailable)?;
+        audit::erase_subject(&mut tx, realm, user).await?;
         sqlx::query("DELETE FROM auth_users WHERE realm_id=$1 AND id=$2")
             .bind(realm)
             .bind(user)
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
-        sqlx::query(
-            "INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,NULL,'account_deleted')",
-        )
-        .bind(realm)
-        .execute(&mut *tx)
-        .await
-        .map_err(unavailable)?;
+        audit::record(&mut tx, realm, AuditEvent::AccountDeleted).await?;
         sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) VALUES ($1,$2,NULL,$3,'account_deleted')")
             .bind(realm)
             .bind(Uuid::new_v4())

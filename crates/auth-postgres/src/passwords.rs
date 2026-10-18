@@ -1,4 +1,6 @@
+use crate::audit;
 use crate::{Postgres, unavailable};
+use auth_core::AuditEvent;
 use auth_core::{Error, Result, Verifier};
 use uuid::Uuid;
 
@@ -103,7 +105,7 @@ impl Postgres {
         .fetch_optional(&mut *tx)
         .await
         .map_err(unavailable)?;
-        active.ok_or(Error::Unauthorized)?;
+        let actor_session_id = active.ok_or(Error::Unauthorized)?;
         let inserted = sqlx::query("INSERT INTO auth_password_credentials(realm_id,user_id,password_hash) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING")
             .bind(realm)
             .bind(user)
@@ -120,25 +122,28 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        let session_id = Uuid::new_v4();
         sqlx::query(
             "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authenticated_at) SELECT $1,$2,$3,$4,authenticated_at FROM auth_sessions WHERE realm_id=$1 AND token_hash=$5",
         )
         .bind(realm)
-        .bind(Uuid::new_v4())
+        .bind(session_id)
         .bind(user)
         .bind(replacement.as_slice())
         .bind(current.as_slice())
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
-        sqlx::query(
-            "INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,$2,'password_enrolled')",
+        audit::record(
+            &mut tx,
+            realm,
+            AuditEvent::PasswordEnrolled {
+                user_id: user,
+                actor_session_id,
+                session_id,
+            },
         )
-        .bind(realm)
-        .bind(user)
-        .execute(&mut *tx)
-        .await
-        .map_err(unavailable)?;
+        .await?;
         tx.commit().await.map_err(unavailable)
     }
     pub(crate) async fn password_login(
@@ -168,24 +173,26 @@ impl Postgres {
         if !valid {
             return Err(Error::Unauthorized);
         }
+        let session_id = Uuid::new_v4();
         sqlx::query(
             "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash) VALUES ($1,$2,$3,$4)",
         )
         .bind(realm)
-        .bind(Uuid::new_v4())
+        .bind(session_id)
         .bind(user)
         .bind(session.as_slice())
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
-        sqlx::query(
-            "INSERT INTO auth_audit(realm_id,user_id,kind) VALUES ($1,$2,'password_authenticated')",
+        audit::record(
+            &mut tx,
+            realm,
+            AuditEvent::PasswordAuthenticated {
+                user_id: user,
+                session_id,
+            },
         )
-        .bind(realm)
-        .bind(user)
-        .execute(&mut *tx)
-        .await
-        .map_err(unavailable)?;
+        .await?;
         tx.commit().await.map_err(unavailable)
     }
 }
