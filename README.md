@@ -4,7 +4,7 @@ Experimental Rust-first authentication for developers embedding Axum and teams s
 
 **Alpha: not suitable for production identity infrastructure. No independent security audit or OIDC/SAML conformance claim.**
 
-Available: same-browser email magic-link sign-in, verified email identity creation, opaque revocable sessions, a protected session endpoint, logout, PostgreSQL migrations, local SMTP and a minimal reference client. Opt-in headless password enrollment/sign-in and recovery use an explicit compromised-password corpus; see the [password guide](docs/guides/passwords.md). Tested negative cases include replay, cross-realm use, misbound browser proof and expiry. There is no Better Auth compatibility promise.
+Available: same-browser email magic-link sign-in, verified email identity creation, opaque revocable sessions, a protected session endpoint, bounded session inventory, individual/all-session revocation, logout, PostgreSQL migrations, local SMTP and a minimal reference client. Opt-in headless password enrollment/sign-in and recovery use an explicit compromised-password corpus; see the [password guide](docs/guides/passwords.md). Tested negative cases include replay, cross-realm use, misbound browser proof and expiry. There is no Better Auth compatibility promise.
 
 Planned and required before the first feature-complete release: passkeys, Apple, Google, enterprise OIDC, SAML SP, outbound OIDC issuer, account/credential management and native integration. See the [Huly backlog export](docs/planning/backlog.json). Verified email changes and confirmed account deletion are available through the [lifecycle API](docs/guides/account-lifecycle.md). SAML validator review and issuer interoperability are release blockers. Password recovery and notification operations are documented in the [recovery guide](docs/guides/password-recovery.md).
 
@@ -25,7 +25,7 @@ cargo run -p easy-auth-server --bin easy-auth
 
 Open http://127.0.0.1:58417, submit a test email, then open http://127.0.0.1:8025 and follow the email link **in the browser that requested it**. No external email account is needed. The link expires after ten minutes; requesting another link replaces that browser's pending binding. A GET never consumes a link. The page removes the fragment before posting the token.
 
-Sessions expire after 30 minutes idle or seven days absolute. Logout revokes the server-side record immediately for subsequent validations. Authentication secrets are 256 random bits; only SHA-256 verifiers are stored. Mailbox compromise can compromise email-only authentication. Case-insensitive conservative ASCII email policy is documented in the [domain model](docs/architecture/domain-model.md).
+Sessions expire after 30 minutes idle or seven days absolute. Logout revokes the server-side record immediately for subsequent validations. [Session management](docs/guides/sessions.md) lists owned sessions and supports fresh-authenticated individual/all-session revocation. Authentication secrets are 256 random bits; only SHA-256 verifiers are stored. Mailbox compromise can compromise email-only authentication. Case-insensitive conservative ASCII email policy is documented in the [domain model](docs/architecture/domain-model.md).
 
 The local SMTP endpoint is intentionally unencrypted and is permitted only in explicit loopback development mode. Production startup requires HTTPS and TLS SMTP credentials, but the alpha has further operational/security release gates. See [deployment](docs/architecture/deployment.md).
 

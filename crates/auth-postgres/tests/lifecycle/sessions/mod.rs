@@ -1,3 +1,8 @@
+mod concurrency;
+mod inventory;
+mod migration;
+mod revocation;
+
 use crate::support::*;
 use auth_core::{Repository, Secret};
 use sqlx::PgPool;
@@ -70,4 +75,19 @@ async fn password_enrollment_rotation_preserves_authentication_time(pool: PgPool
         .unwrap();
     let preserved:bool=sqlx::query_scalar("SELECT authenticated_at<clock_timestamp()-interval '3 minutes' FROM auth_sessions WHERE realm_id=$1 AND token_hash=$2").bind(realm).bind([1u8;32].as_slice()).fetch_one(&pool).await.unwrap();
     assert!(preserved);
+}
+
+// Seed additional issued sessions without exercising unrelated mail-admission limits.
+pub(super) async fn session(pool: &PgPool, realm: Uuid, user: Uuid) -> (Secret, Uuid) {
+    let secret = Secret::generate().unwrap();
+    let id = Uuid::new_v4();
+    sqlx::query("INSERT INTO auth_sessions(realm_id,id,user_id,token_hash) VALUES ($1,$2,$3,$4)")
+        .bind(realm)
+        .bind(id)
+        .bind(user)
+        .bind(secret.verifier().as_slice())
+        .execute(pool)
+        .await
+        .unwrap();
+    (secret, id)
 }

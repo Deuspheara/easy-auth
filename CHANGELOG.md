@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Bounded owned-session inventory and fresh-authenticated individual/all-session revocation, including pending-proof cancellation and concurrent-login ordering guarantees (AUTH-15).
+
 - Maintainability rules and feature-organized core, PostgreSQL, HTTP, server and integration-test modules, preserving existing authentication behavior and contracts (AUTH-52).
 - Initial research, architecture and threat model.
 - Shared Rust email/session alpha slice, generated OpenAPI, SMTP and embedded/standalone examples; 13 automated tests plus local SMTP/browser checks.

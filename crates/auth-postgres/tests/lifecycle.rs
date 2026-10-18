@@ -12,5 +12,5 @@ mod notifications;
 mod passwords;
 #[path = "lifecycle/recovery.rs"]
 mod recovery;
-#[path = "lifecycle/sessions.rs"]
+#[path = "lifecycle/sessions/mod.rs"]
 mod sessions;

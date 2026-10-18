@@ -1,3 +1,6 @@
+mod listing;
+mod revocation;
+
 use crate::{Postgres, unavailable};
 use auth_core::User;
 use auth_core::{Error, Result, Verifier};

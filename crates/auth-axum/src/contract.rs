@@ -11,6 +11,12 @@ use crate::handlers::passwords::{__path_enroll_password, __path_password_login};
 use crate::handlers::passwords::{PasswordEnrollmentInput, PasswordLoginInput};
 use crate::handlers::recovery::PasswordResetInput;
 use crate::handlers::recovery::{__path_finish_password_reset, __path_start_password_reset};
+use crate::handlers::sessions::listing::{
+    __path_list_sessions, SessionListResponse, SessionResponse,
+};
+use crate::handlers::sessions::revocation::{
+    __path_revoke_all_sessions, __path_revoke_session, RevokeAllInput, RevokeSessionInput,
+};
 use crate::handlers::sessions::{__path_logout, __path_session};
 use crate::handlers::{Accepted, EmailInput, FinishInput, UserResponse};
 use utoipa::OpenApi;
@@ -35,7 +41,10 @@ use utoipa::OpenApi;
         start_password_reset,
         finish_password_reset,
         session,
-        logout
+        logout,
+        list_sessions,
+        revoke_session,
+        revoke_all_sessions
     ),
     components(schemas(
         EmailInput,
@@ -47,7 +56,11 @@ use utoipa::OpenApi;
         DeleteFinishInput,
         ErrorResponse,
         Accepted,
-        UserResponse
+        UserResponse,
+        SessionResponse,
+        SessionListResponse,
+        RevokeSessionInput,
+        RevokeAllInput
     ))
 )]
 struct ApiDoc;

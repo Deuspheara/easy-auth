@@ -48,12 +48,13 @@ crates/auth-core/src/
   ports.rs                  # Repository and delivery contracts
   password.rs               # Bounded hashing and password policy
   email.rs, secret.rs       # Input and secret policies, with unit tests
-  error.rs, identity.rs, notifications.rs
+  error.rs, identity.rs, notifications.rs, sessions.rs
 crates/auth-postgres/src/
   lib.rs                    # Adapter construction and startup provisioning
   repository.rs             # Explicit core-port delegation
   locking.rs                # Email lock order and fresh-account locking
-  email.rs, passwords.rs, recovery.rs, sessions.rs, notifications.rs
+  email.rs, passwords.rs, recovery.rs, notifications.rs
+  sessions/                 # Validation, inventory and revocation transactions
   account/                  # Email-change and deletion transactions
 crates/auth-axum/src/
   lib.rs                    # Public facade
@@ -74,6 +75,6 @@ Rust permits one implementation of a trait for a type. PostgreSQL's `repository.
 
 ## Reviewed size exceptions
 
-The PostgreSQL `finish_email`, `enroll_password`, `finish_password_reset`, `confirm_email_change` and `finish_account_deletion` functions exceed the approximate 50-line review trigger. Each keeps its lock acquisition, proof revalidation, identity/credential mutation, session invalidation, audit/notice write and commit in a single visible transaction. SQL and bind chains are laid out explicitly. Splitting these functions into arbitrary steps would hide ordering and rollback invariants; add a helper only for a meaningful operation whose dependencies remain clear.
+The PostgreSQL `finish_email`, `enroll_password`, `finish_password_reset`, `confirm_email_change` and `finish_account_deletion`, `list_sessions` and `revoke_all_sessions` functions exceed the approximate 50-line review trigger. Each keeps its lock acquisition, proof revalidation, identity/credential mutation, session invalidation, audit/notice write and commit in a single visible transaction. SQL and bind chains are laid out explicitly. Splitting these functions into arbitrary steps would hide ordering and rollback invariants; add a helper only for a meaningful operation whose dependencies remain clear.
 
 `configured_auth` likewise keeps the ordered, fail-closed startup composition together. Longer integration scenarios keep their arrange/action/assert sequence together to prove complete state transitions, isolation and rollback. They are now grouped by feature rather than collected in one large suite file. These are reasons for the current exceptions, not exemptions from reviewing future growth.

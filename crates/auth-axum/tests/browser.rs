@@ -12,3 +12,6 @@ mod email;
 mod passwords;
 #[path = "browser/recovery.rs"]
 mod recovery;
+
+#[path = "browser/sessions/mod.rs"]
+mod sessions;

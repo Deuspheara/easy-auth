@@ -1,6 +1,11 @@
-use super::UserResponse;
+pub(crate) mod listing;
+pub(crate) mod revocation;
+pub(crate) use listing::list_sessions;
+pub(crate) use revocation::{revoke_all_sessions, revoke_session};
+
 use crate::browser::read_cookie;
 use crate::error::{ApiError, ErrorResponse};
+use crate::handlers::UserResponse;
 use crate::router::AppState;
 use crate::{Auth, BrowserConfig};
 use auth_core::Secret;

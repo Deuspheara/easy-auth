@@ -1,4 +1,4 @@
-use crate::{Result, Secret, SecurityNotice, User, Verifier};
+use crate::{Result, Secret, SecurityNotice, SessionPage, User, Verifier};
 use async_trait::async_trait;
 use uuid::Uuid;
 
@@ -23,6 +23,17 @@ pub trait Repository: Send + Sync {
     ) -> Result<User>;
     async fn authenticate(&self, realm: Uuid, session: Verifier) -> Result<User>;
     async fn revoke(&self, realm: Uuid, session: Verifier) -> Result<()>;
+    /// Validate/touch the caller, then list at most one bounded page of its active sessions.
+    async fn list_sessions(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        after: Option<Uuid>,
+    ) -> Result<SessionPage>;
+    /// Revalidate fresh authentication under user/session locks. True means caller was revoked.
+    async fn revoke_session(&self, realm: Uuid, current: Verifier, target: Uuid) -> Result<bool>;
+    /// Revoke all sessions and outstanding proofs atomically, including the initiating session.
+    async fn revoke_all_sessions(&self, realm: Uuid, current: Verifier) -> Result<()>;
     async fn admit_password(&self, realm: Uuid, email: &str, source: Verifier) -> Result<()>;
     async fn password_hash(&self, realm: Uuid, email: &str) -> Result<Option<String>>;
     /// Validate fresh session, insert credential once, revoke previous sessions and issue replacement atomically.

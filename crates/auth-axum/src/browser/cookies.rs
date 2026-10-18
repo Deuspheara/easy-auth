@@ -1,5 +1,10 @@
+use super::BrowserConfig;
 use auth_core::{Error, Secret};
 use axum::http::{HeaderMap, header};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 
 pub(crate) fn read_cookie(headers: &HeaderMap, name: &str) -> auth_core::Result<Secret> {
     let mut value = None;
@@ -17,4 +22,20 @@ pub(crate) fn read_cookie(headers: &HeaderMap, name: &str) -> auth_core::Result<
         }
     }
     Secret::parse(value.ok_or(Error::Unauthorized)?)
+}
+
+pub(crate) fn clear_auth_cookies(browser: &BrowserConfig) -> Response {
+    let mut response = StatusCode::NO_CONTENT.into_response();
+    for name in [
+        browser.session_name(),
+        browser.browser_name(),
+        browser.reset_name(),
+        browser.change_name(),
+        browser.deletion_name(),
+    ] {
+        response
+            .headers_mut()
+            .append(header::SET_COOKIE, browser.cookie(name, None, 0));
+    }
+    response
 }

@@ -1,5 +1,5 @@
 use super::{Accepted, EmailInput, FinishInput, source_key};
-use crate::browser::read_cookie;
+use crate::browser::{clear_auth_cookies, read_cookie};
 use crate::error::{ApiError, ErrorResponse};
 use crate::router::AppState;
 use auth_core::{Error, Secret};
@@ -23,21 +23,6 @@ pub(crate) struct DeleteInput {
 pub(crate) struct DeleteFinishInput {
     token: String,
     confirmation: String,
-}
-fn clear_account_cookies(state: &AppState) -> Response {
-    let mut response = StatusCode::NO_CONTENT.into_response();
-    for name in [
-        state.browser.session_name(),
-        state.browser.browser_name(),
-        state.browser.reset_name(),
-        state.browser.change_name(),
-        state.browser.deletion_name(),
-    ] {
-        response
-            .headers_mut()
-            .append(header::SET_COOKIE, state.browser.cookie(name, None, 0));
-    }
-    response
 }
 #[utoipa::path(post, path="/v1/account/email/start",request_body=EmailInput,params(("Origin"=String,Header),("Cookie"=String,Header)),
     responses((status=202,body=Accepted,description="Proofs sent to both addresses; sets change binding cookie"),(status=400,body=ErrorResponse),(status=401,body=ErrorResponse),(status=403,body=ErrorResponse),(status=413,body=ErrorResponse),(status=415,body=ErrorResponse),(status=429,body=ErrorResponse),(status=503,body=ErrorResponse),(status=504,body=ErrorResponse)))]
@@ -84,7 +69,7 @@ pub(crate) async fn confirm_email_change(
         )
         .await?;
     Ok(if complete {
-        clear_account_cookies(&state)
+        clear_auth_cookies(&state.browser)
     } else {
         (StatusCode::ACCEPTED, Json(Accepted { status: "accepted" })).into_response()
     })
@@ -139,5 +124,5 @@ pub(crate) async fn finish_account_deletion(
             &source_key(source),
         )
         .await?;
-    Ok(clear_account_cookies(&state))
+    Ok(clear_auth_cookies(&state.browser))
 }

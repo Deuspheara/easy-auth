@@ -1,7 +1,7 @@
 //! The core port delegates to feature-owned transactions; no policy lives here.
 use crate::{Postgres, unavailable};
 use async_trait::async_trait;
-use auth_core::{Repository, Result, SecurityNotice, User, Verifier};
+use auth_core::{Repository, Result, SecurityNotice, SessionPage, User, Verifier};
 use uuid::Uuid;
 
 #[async_trait]
@@ -30,6 +30,20 @@ impl Repository for Postgres {
     }
     async fn revoke(&self, realm: Uuid, session: Verifier) -> Result<()> {
         Postgres::revoke(self, realm, session).await
+    }
+    async fn list_sessions(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        after: Option<Uuid>,
+    ) -> Result<SessionPage> {
+        Postgres::list_sessions(self, realm, current, after).await
+    }
+    async fn revoke_session(&self, realm: Uuid, current: Verifier, target: Uuid) -> Result<bool> {
+        Postgres::revoke_session(self, realm, current, target).await
+    }
+    async fn revoke_all_sessions(&self, realm: Uuid, current: Verifier) -> Result<()> {
+        Postgres::revoke_all_sessions(self, realm, current).await
     }
     async fn admit_password(&self, realm: Uuid, email: &str, source: Verifier) -> Result<()> {
         Postgres::admit_password(self, realm, email, source).await

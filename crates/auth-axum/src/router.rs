@@ -63,6 +63,9 @@ pub fn router(auth: Auth, browser: BrowserConfig) -> Router {
             }),
         )
         .route("/v1/session", get(session))
+        .route("/v1/sessions", get(list_sessions))
+        .route("/v1/sessions/revoke", post(revoke_session))
+        .route("/v1/sessions/revoke-all", post(revoke_all_sessions))
         .route("/v1/logout", post(logout))
         .route(
             "/",

@@ -89,6 +89,49 @@ if '--recovery' in sys.argv:
     notice = json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/message/'+notice_id, timeout=5))
     assert password not in notice['Text'] and new_password not in notice['Text'] and reset_token not in notice['Text']
     print('PASS: purpose-bound recovery, old password/session rejection, new login and non-secret SMTP notification')
+if '--sessions' in sys.argv:
+    # Keep scenarios within the real per-account admission budget; never relax or clear counters.
+    primary_state = (email, user, jar, client)
+    email = f'sessions-{time.time_ns()}@example.test'
+    jar = http.cookiejar.CookieJar()
+    client = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    def email_sign_in():
+        assert request('/v1/email/start', {'email':email}).status == 202
+        messages = json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/messages', timeout=5))['messages']
+        message_id = next(m['ID'] for m in messages if m['Subject'] == 'Your sign-in link' and any(a['Address'] == email for a in m['To']))
+        message = json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/message/'+message_id, timeout=5))
+        proof = re.search(r'#token=([A-Za-z0-9_-]{43})', message['Text']).group(1)
+        assert request('/v1/email/finish', {'token':proof}).status == 204
+        return json.load(request('/v1/session'))
+    def reject_cookie(value):
+        try:
+            urllib.request.urlopen(urllib.request.Request(base+'/v1/session', headers={'Cookie':value}), timeout=5)
+            raise AssertionError('revoked session cookie accepted')
+        except urllib.error.HTTPError as error:
+            assert error.code == 401
+    user = email_sign_in()
+    first_cookie = '; '.join(c.name+'='+c.value for c in jar)
+    original = json.load(request('/v1/sessions'))
+    first_id = next(item['id'] for item in original['sessions'] if item['current'])
+    assert email_sign_in() == user
+    inventory = json.load(request('/v1/sessions'))
+    assert inventory['next'] is None and len(inventory['sessions']) == 2
+    assert sum(item['current'] for item in inventory['sessions']) == 1
+    for item in inventory['sessions']:
+        assert set(item) == {'id','current','created_at_ms','last_seen_at_ms','expires_at_ms','idle_expires_at_ms','authenticated_at_ms'}
+    assert request('/v1/sessions/revoke', {'id':first_id}).status == 204
+    reject_cookie(first_cookie)
+    second_cookie = '; '.join(c.name+'='+c.value for c in jar)
+    assert request('/v1/sessions/revoke-all', {}).status == 204
+    reject_cookie(second_cookie)
+    assert not list(jar), 'revocation must clear authentication/action cookies'
+    assert email_sign_in() == user
+    assert len(json.load(request('/v1/sessions'))['sessions']) == 1
+    if '--embedded' in sys.argv: assert json.load(request('/private')) == user
+    assert request('/v1/logout', {}).status == 204
+    email, user, jar, client = primary_state
+    assert json.load(request('/v1/session')) == user
+    print('PASS: public session inventory, individual/all revocation, old-cookie rejection and new login after revocation')
 if '--lifecycle' in sys.argv:
     def mail_with(subject, address):
         messages = json.load(urllib.request.urlopen('http://127.0.0.1:8025/api/v1/messages', timeout=5))['messages']

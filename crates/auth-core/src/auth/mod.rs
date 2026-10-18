@@ -1,4 +1,5 @@
 mod account;
+mod admission;
 mod email;
 mod notifications;
 mod passwords;

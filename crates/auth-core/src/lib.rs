@@ -7,6 +7,7 @@ mod notifications;
 mod password;
 mod ports;
 mod secret;
+mod sessions;
 
 pub use auth::Auth;
 pub use email::normalize_email;
@@ -16,3 +17,4 @@ pub use notifications::{SecurityNotice, SecurityNoticeKind};
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};
 pub use secret::{Secret, Verifier};
+pub use sessions::{SessionInfo, SessionPage};
