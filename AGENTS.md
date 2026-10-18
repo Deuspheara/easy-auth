@@ -1,5 +1,7 @@
 # Agent instructions
 
+Use `feat/` as the branch prefix. Do not use `codex/` in branch names.
+
 Huly project AUTH is the primary development tracker. Inspect actual Huly tools/statuses; never invent IDs or mark acceptance criteria complete without evidence. Work one scoped ticket at a time, link commits/PRs, and keep ticket status current. docs/planning is a synchronization/export record, not a competing roadmap.
 
 Read docs/architecture/overview.md, relevant ADRs, docs/research/protocol-dependencies.md and docs/security/threat-model.md before behavior changes. Dependencies point into auth-core. Protocol handlers contain no persistence rules. Keep users/provider identities/credentials/sessions/tokens and application authorization separate. Scope all storage to realm. No matching-email account linking.
