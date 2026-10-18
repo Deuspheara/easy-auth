@@ -4,6 +4,8 @@ Project name: easy-auth (selected by the project owner). Rust stable, Tokio, Axu
 
 The first workspace has auth-core (use cases, repository/email ports and domain DTOs), auth-postgres (SQL transactions/migrations), auth-axum (HTTP/cookie boundary) and auth-server (composition/config). Protocol modules are added only as implemented; no empty protocol crates. An SDK is introduced with a real remote use case. Domain authorization remains in the consuming application.
 
+Follow the [code organization guide](code-organization.md) for feature ownership, folder layout and maintainability review. Crate entry files expose deliberate APIs; feature implementation and tests live in focused modules within these boundaries.
+
 ```mermaid
 flowchart LR
   embeddedApp["Embedded Axum application"] --> httpAdapter["auth-axum"]

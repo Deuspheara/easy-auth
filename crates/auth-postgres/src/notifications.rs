@@ -1,0 +1,87 @@
+use crate::{Postgres, unavailable};
+use auth_core::{Error, Result};
+use auth_core::{SecurityNotice, SecurityNoticeKind};
+use sqlx::Row;
+use uuid::Uuid;
+
+impl Postgres {
+    pub(crate) async fn claim_security_notice(
+        &self,
+        realm: Uuid,
+    ) -> Result<Option<SecurityNotice>> {
+        let lease = Uuid::new_v4();
+        let row = sqlx::query(
+            r#"
+            WITH due AS (SELECT id
+            FROM auth_security_notifications
+            WHERE realm_id=$1
+            AND attempts<8
+            AND next_attempt_at<=clock_timestamp()
+            AND (lease_until IS NULL
+            OR lease_until<=clock_timestamp())
+            ORDER BY next_attempt_at,id
+            FOR
+            UPDATE SKIP LOCKED
+            LIMIT 1)
+            UPDATE auth_security_notifications n
+            SET attempts=n.attempts+1,lease_id=$2,lease_until=clock_timestamp()+interval '30 seconds'
+            FROM due
+            WHERE n.realm_id=$1
+            AND n.id=due.id
+            RETURNING n.id,n.recipient,n.kind
+            "#,
+        )
+        .bind(realm)
+        .bind(lease)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(unavailable)?;
+        row.map(|row| {
+            let kind = match row.get::<String, _>("kind").as_str() {
+                "password_reset" => SecurityNoticeKind::PasswordReset,
+                "email_changed" => SecurityNoticeKind::EmailChanged,
+                "account_deleted" => SecurityNoticeKind::AccountDeleted,
+                _ => return Err(Error::Unavailable),
+            };
+            Ok(SecurityNotice {
+                id: row.get("id"),
+                lease,
+                recipient: row.get("recipient"),
+                kind,
+            })
+        })
+        .transpose()
+    }
+    pub(crate) async fn complete_security_notice(
+        &self,
+        realm: Uuid,
+        id: Uuid,
+        lease: Uuid,
+        delivered: bool,
+    ) -> Result<()> {
+        if delivered {
+            sqlx::query("DELETE FROM auth_security_notifications WHERE realm_id=$1 AND id=$2 AND lease_id=$3")
+                .bind(realm)
+                .bind(id)
+                .bind(lease)
+                .execute(&self.pool)
+                .await
+                .map_err(unavailable)?;
+        } else {
+            sqlx::query(r#"
+    UPDATE auth_security_notifications
+    SET lease_id=NULL,lease_until=NULL,next_attempt_at=clock_timestamp()+make_interval(secs=>30*power(2,least(attempts-1,7)))
+    WHERE realm_id=$1
+    AND id=$2
+    AND lease_id=$3
+"#)
+                .bind(realm)
+                .bind(id)
+                .bind(lease)
+                .execute(&self.pool)
+                .await
+                .map_err(unavailable)?;
+        }
+        Ok(())
+    }
+}

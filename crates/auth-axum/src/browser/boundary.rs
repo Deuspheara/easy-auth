@@ -1,0 +1,66 @@
+use crate::router::AppState;
+use axum::{
+    Json,
+    extract::{Request, State},
+    http::{HeaderValue, Method, StatusCode, header},
+    middleware::Next,
+    response::{IntoResponse, Response},
+};
+use serde_json::json;
+use std::time::Duration;
+use uuid::Uuid;
+
+pub(crate) async fn boundary(
+    State(state): State<AppState>,
+    request: Request,
+    next: Next,
+) -> Response {
+    let request_id = Uuid::new_v4().to_string();
+    let mut response = if request.method() == Method::POST
+        && (request.headers().get_all(header::ORIGIN).iter().count() != 1
+            || request
+                .headers()
+                .get(header::ORIGIN)
+                .and_then(|v| v.to_str().ok())
+                != Some(state.browser.origin()))
+    {
+        (
+            StatusCode::FORBIDDEN,
+            Json(json!({"code":"origin_rejected"})),
+        )
+            .into_response()
+    } else {
+        match tokio::time::timeout(Duration::from_secs(15), next.run(request)).await {
+            Ok(response) => response,
+            Err(_) => (
+                StatusCode::GATEWAY_TIMEOUT,
+                Json(json!({"code":"temporarily_unavailable"})),
+            )
+                .into_response(),
+        }
+    };
+    let headers = response.headers_mut();
+    headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+    headers.insert("referrer-policy", HeaderValue::from_static("no-referrer"));
+    headers.insert(
+        "x-content-type-options",
+        HeaderValue::from_static("nosniff"),
+    );
+    headers.insert("content-security-policy", HeaderValue::from_static("default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"));
+    if state.browser.secure {
+        headers.insert(
+            "strict-transport-security",
+            HeaderValue::from_static("max-age=31536000"),
+        );
+    }
+    headers.insert(
+        "x-request-id",
+        HeaderValue::from_str(&request_id).expect("UUID is header-safe"),
+    );
+    tracing::info!(
+        request_id,
+        status = response.status().as_u16(),
+        "http_request_completed"
+    );
+    response
+}
