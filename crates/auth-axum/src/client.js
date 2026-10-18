@@ -38,3 +38,15 @@ async function completeSignIn() {
 }
 window.addEventListener("hashchange", () => { void completeSignIn(); });
 void completeSignIn();
+
+const resetRequest = document.getElementById("reset-request");
+resetRequest.addEventListener("click", async () => {
+  const email = document.getElementById("email");
+  if (!email.reportValidity()) return;
+  resetRequest.disabled = true; status.textContent = "Sending…";
+  try {
+    await post("/v1/password/reset/start", {email:email.value});
+    status.textContent = "Check your email. If this mailbox has a password, open the reset link in this browser within ten minutes.";
+  } catch (error) { status.textContent = error.message; }
+  finally { resetRequest.disabled = false; }
+});

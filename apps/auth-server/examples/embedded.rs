@@ -28,6 +28,7 @@ async fn private(
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (auth, browser, bind) = easy_auth_server::configured_auth().await?;
+    let notifications = easy_auth_server::notification_worker(auth.clone());
     let application = Router::new()
         .route("/private", get(private))
         .with_state(Application {
@@ -41,5 +42,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         application.into_make_service_with_connect_info::<SocketAddr>(),
     )
     .await?;
+    notifications.abort();
     Ok(())
 }

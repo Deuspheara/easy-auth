@@ -4,9 +4,9 @@ Experimental Rust-first authentication for developers embedding Axum and teams s
 
 **Alpha: not suitable for production identity infrastructure. No independent security audit or OIDC/SAML conformance claim.**
 
-Available: same-browser email magic-link sign-in, verified email identity creation, opaque revocable sessions, a protected session endpoint, logout, PostgreSQL migrations, local SMTP and a minimal reference client. Opt-in headless password enrollment/sign-in uses an explicit compromised-password corpus; see the [password guide](docs/guides/passwords.md). Tested negative cases include replay, cross-realm use, misbound browser proof and expiry. There is no Better Auth compatibility promise.
+Available: same-browser email magic-link sign-in, verified email identity creation, opaque revocable sessions, a protected session endpoint, logout, PostgreSQL migrations, local SMTP and a minimal reference client. Opt-in headless password enrollment/sign-in and recovery use an explicit compromised-password corpus; see the [password guide](docs/guides/passwords.md). Tested negative cases include replay, cross-realm use, misbound browser proof and expiry. There is no Better Auth compatibility promise.
 
-Planned and required before the first feature-complete release: password reset/email change, passkeys, Apple, Google, enterprise OIDC, SAML SP, outbound OIDC issuer, account/credential management and native integration. See the [Huly backlog export](docs/planning/backlog.json). SAML validator review and issuer interoperability are release blockers.
+Planned and required before the first feature-complete release: verified email change, passkeys, Apple, Google, enterprise OIDC, SAML SP, outbound OIDC issuer, account/credential management and native integration. See the [Huly backlog export](docs/planning/backlog.json). SAML validator review and issuer interoperability are release blockers. Password recovery and notification operations are documented in the [recovery guide](docs/guides/password-recovery.md).
 
 ## Run locally
 

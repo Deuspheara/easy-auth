@@ -6,6 +6,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .init();
     let (auth, browser, bind) = easy_auth_server::configured_auth().await?;
     let listener = tokio::net::TcpListener::bind(bind).await?;
+    let notifications = easy_auth_server::notification_worker(auth.clone());
     tracing::info!("auth_server_started");
     axum::serve(
         listener,
@@ -13,6 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .with_graceful_shutdown(async { shutdown_signal().await })
     .await?;
+    notifications.abort();
     Ok(())
 }
 async fn shutdown_signal() {

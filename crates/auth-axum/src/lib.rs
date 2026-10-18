@@ -57,6 +57,13 @@ impl BrowserConfig {
             "auth-browser"
         }
     }
+    fn reset_name(&self) -> &'static str {
+        if self.secure {
+            "__Host-auth-reset"
+        } else {
+            "auth-reset"
+        }
+    }
     fn cookie(&self, name: &str, secret: Option<&Secret>, max_age: u32) -> HeaderValue {
         let value = format!(
             "{name}={}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{}",
@@ -94,6 +101,18 @@ pub fn router(auth: Auth, browser: BrowserConfig) -> Router {
         .route("/v1/email/finish", post(finish))
         .route("/v1/password/enroll", post(enroll_password))
         .route("/v1/password/login", post(password_login))
+        .route("/v1/password/reset/start", post(start_password_reset))
+        .route("/v1/password/reset/finish", post(finish_password_reset))
+        .route("/reset", get(|| async { Html(include_str!("reset.html")) }))
+        .route(
+            "/reset.js",
+            get(|| async {
+                (
+                    [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
+                    include_str!("reset.js"),
+                )
+            }),
+        )
         .route("/v1/session", get(session))
         .route("/v1/logout", post(logout))
         .route("/", get(|| async { Html(include_str!("client.html")) }))
@@ -340,6 +359,67 @@ async fn password_login(
         .await?;
     Ok(session_response(&state, &session))
 }
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+struct PasswordResetInput {
+    token: String,
+    password: String,
+}
+#[utoipa::path(post, path = "/v1/password/reset/start", request_body = EmailInput,
+    params(("Origin" = String, Header)), responses((status = 202, body = Accepted, description = "Generic response; sets reset binding cookie; same delivery path for every email"),
+    (status = 400, body = ErrorResponse), (status = 403, body = ErrorResponse), (status = 413, body = ErrorResponse),
+    (status = 415, body = ErrorResponse), (status = 429, body = ErrorResponse), (status = 503, body = ErrorResponse), (status = 504, body = ErrorResponse)))]
+async fn start_password_reset(
+    State(state): State<AppState>,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<EmailInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    let browser = state
+        .auth
+        .start_password_reset(&input.email, &source_key(source))
+        .await?;
+    let mut response =
+        (StatusCode::ACCEPTED, Json(Accepted { status: "accepted" })).into_response();
+    response.headers_mut().append(
+        header::SET_COOKIE,
+        state
+            .browser
+            .cookie(state.browser.reset_name(), Some(&browser), 600),
+    );
+    Ok(response)
+}
+#[utoipa::path(post, path = "/v1/password/reset/finish", request_body = PasswordResetInput,
+    params(("Origin" = String, Header), ("Cookie" = String, Header, description = "Reset binding cookie")),
+    responses((status = 204, description = "Password replaced; all sessions and outstanding proofs invalidated; clears reset/session cookies; login required"),
+    (status = 400, body = ErrorResponse), (status = 401, body = ErrorResponse), (status = 403, body = ErrorResponse),
+    (status = 413, body = ErrorResponse), (status = 415, body = ErrorResponse), (status = 429, body = ErrorResponse),
+    (status = 503, body = ErrorResponse), (status = 504, body = ErrorResponse)))]
+async fn finish_password_reset(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    source: Option<Extension<ConnectInfo<SocketAddr>>>,
+    input: Result<Json<PasswordResetInput>, axum::extract::rejection::JsonRejection>,
+) -> Result<Response, ApiError> {
+    let Json(input) = input.map_err(ApiError::from)?;
+    let browser = read_cookie(&headers, state.browser.reset_name())?;
+    state
+        .auth
+        .finish_password_reset(
+            Secret::parse(input.token)?,
+            browser,
+            Password::parse(input.password)?,
+            &source_key(source),
+        )
+        .await?;
+    let mut response = StatusCode::NO_CONTENT.into_response();
+    for name in [state.browser.reset_name(), state.browser.session_name()] {
+        response
+            .headers_mut()
+            .append(header::SET_COOKIE, state.browser.cookie(name, None, 0));
+    }
+    Ok(response)
+}
 #[utoipa::path(get, path = "/v1/session", params(("Cookie" = String, Header, description = "Session cookie")),
     responses((status = 200, body = UserResponse), (status = 401, body = ErrorResponse), (status = 503, body = ErrorResponse), (status = 504, body = ErrorResponse)))]
 async fn session(State(state): State<AppState>, headers: HeaderMap) -> Result<Response, ApiError> {
@@ -460,6 +540,8 @@ async fn health() -> StatusCode {
         finish,
         enroll_password,
         password_login,
+        start_password_reset,
+        finish_password_reset,
         session,
         logout
     ),
@@ -468,6 +550,7 @@ async fn health() -> StatusCode {
         FinishInput,
         PasswordEnrollmentInput,
         PasswordLoginInput,
+        PasswordResetInput,
         ErrorResponse,
         Accepted,
         UserResponse

@@ -107,6 +107,13 @@ pub struct User {
     pub email: String,
 }
 
+/// Non-secret, purpose-specific delivery work. Never exposed through the HTTP API.
+pub struct PasswordResetNotice {
+    pub id: Uuid,
+    pub lease: Uuid,
+    pub recipient: String,
+}
+
 #[async_trait]
 pub trait Repository: Send + Sync {
     /// Rate admission and challenge persistence must be atomic. Clock is database-owned.
@@ -146,11 +153,42 @@ pub trait Repository: Send + Sync {
         hash: &str,
         session: Verifier,
     ) -> Result<()>;
+    async fn begin_password_reset(
+        &self,
+        realm: Uuid,
+        email: &str,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<()>;
+    async fn password_reset_email(
+        &self,
+        realm: Uuid,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<String>;
+    async fn finish_password_reset(
+        &self,
+        realm: Uuid,
+        token: Verifier,
+        browser: Verifier,
+        hash: &str,
+    ) -> Result<()>;
+    async fn claim_password_reset_notice(&self, realm: Uuid)
+    -> Result<Option<PasswordResetNotice>>;
+    async fn complete_password_reset_notice(
+        &self,
+        realm: Uuid,
+        id: Uuid,
+        lease: Uuid,
+        delivered: bool,
+    ) -> Result<()>;
     async fn ready(&self) -> Result<()>;
 }
 #[async_trait]
 pub trait EmailDelivery: Send + Sync {
     async fn sign_in(&self, email: &str, token: &Secret) -> Result<()>;
+    async fn password_reset(&self, email: &str, token: &Secret) -> Result<()>;
+    async fn password_changed(&self, email: &str) -> Result<()>;
 }
 
 #[derive(Clone)]
@@ -226,6 +264,62 @@ impl Auth {
             .password_login(self.realm, &email, &stored, session.verifier())
             .await?;
         Ok(session)
+    }
+    pub async fn start_password_reset(&self, email: &str, source: &str) -> Result<Secret> {
+        self.passwords.as_ref().ok_or(Error::Unavailable)?;
+        let email = normalize_email(email)?;
+        self.repository
+            .admit_password(self.realm, &email, Sha256::digest(source.as_bytes()).into())
+            .await?;
+        let token = Secret::generate()?;
+        let browser = Secret::generate()?;
+        self.repository
+            .begin_password_reset(self.realm, &email, token.verifier(), browser.verifier())
+            .await?;
+        // Same delivery path whether or not this mailbox has a password credential.
+        self.email.password_reset(&email, &token).await?;
+        Ok(browser)
+    }
+    pub async fn finish_password_reset(
+        &self,
+        token: Secret,
+        browser: Secret,
+        password: Password,
+        source: &str,
+    ) -> Result<()> {
+        let policy = self.passwords.as_ref().ok_or(Error::Unavailable)?;
+        let email = self
+            .repository
+            .password_reset_email(self.realm, token.verifier(), browser.verifier())
+            .await?;
+        self.repository
+            .admit_password(self.realm, &email, Sha256::digest(source.as_bytes()).into())
+            .await?;
+        let hash = policy.enroll(password).await?;
+        self.repository
+            .finish_password_reset(self.realm, token.verifier(), browser.verifier(), &hash)
+            .await
+    }
+    /// Deliver at most one leased non-secret notice. SMTP errors leave durable retry work.
+    /// Call repeatedly from a bounded worker in both embedded and standalone compositions.
+    pub async fn deliver_password_reset_notice(&self) -> Result<bool> {
+        let Some(notice) = self
+            .repository
+            .claim_password_reset_notice(self.realm)
+            .await?
+        else {
+            return Ok(false);
+        };
+        let delivery = tokio::time::timeout(
+            std::time::Duration::from_secs(10),
+            self.email.password_changed(&notice.recipient),
+        )
+        .await
+        .unwrap_or(Err(Error::Unavailable));
+        self.repository
+            .complete_password_reset_notice(self.realm, notice.id, notice.lease, delivery.is_ok())
+            .await?;
+        delivery.map(|_| true)
     }
     pub async fn start_email(&self, email: &str, source: &str) -> Result<Secret> {
         let email = normalize_email(email)?;
