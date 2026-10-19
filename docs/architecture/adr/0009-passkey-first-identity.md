@@ -4,8 +4,8 @@ Status: accepted for AUTH-53, 2026-10-19. Optional-mailbox model/migration,
 nullable user contract, initial policy enforcement and the optional core/PostgreSQL
 two-stage signup are implemented. Explicit experimental HTTP signup now has native
 Chromium platform/roaming resident signup and later login evidence. Verified-mailbox
-attachment now has core/PostgreSQL and experimental HTTP tests; actual SMTP/native
-attachment evidence remains required. See the [signup guide](../../guides/passkey-signup.md).
+attachment now has core/PostgreSQL and experimental HTTP tests, plus native
+Chromium platform/USB signup-to-SMTP confirmation and later login evidence. See the [signup guide](../../guides/passkey-signup.md).
 AUTH-19's experimental sign-in is verified at `84d11a9`. AUTH-53 remains
 In Progress. This decision does not enable ordinary passkey composition or
 complete AUTH-20's credential-management and recovery requirements.

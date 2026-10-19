@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Native platform/USB passkey signup through real SMTP contact confirmation,
+  preserved identity/provenance, rotated sessions and subsequent passkey login;
+  separate owned-database/Mailpit browser suite also runs in CI (AUTH-53).
+
 - Experimental verified contact attachment for email-free passkey-required accounts:
   independent mailbox proof plus fresh passkey session, preserved identity/policy,
   atomic session rotation and typed audit, with PostgreSQL race/rollback/expiry and

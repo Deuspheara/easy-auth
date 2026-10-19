@@ -57,8 +57,8 @@ Passkey-required accounts reject weak-method sessions, email/password login and
 password recovery; mail-only lifecycle operations are unavailable pending
 AUTH-20. Fresh passkey session controls work without email. The optional core/PostgreSQL signup use case now requires a separate verified
 assertion before creating the account/session. Explicit signup HTTP/native browser
-evidence now exists; verified contact attachment has experimental core/HTTP tests,
-with SMTP/native attachment evidence still pending. See the
+evidence now exists; verified contact attachment has experimental core/HTTP tests
+and native Chromium/SMTP confirmation evidence. See the
 [model/migration guide](../guides/optional-mailbox.md).
 
 ## Explicit experimental passkey enrollment
@@ -147,5 +147,5 @@ POST `/v1/account/email/attachment/start` (`{email}`, 202) and `/finish` (`{toke
 204 rotated session). They require an existing fresh passkey session, exact Origin,
 JSON and an independent attachment binding, with an 8 KiB body bound. GET
 `/email-attach` consumes nothing. See the [contact attachment contract](../guides/email-attachment.md).
-SMTP/native attachment evidence and AUTH-20 recovery/management remain required
-before ordinary activation.
+Native Chromium platform/USB cases verify real SMTP confirmation and later passkey
+login; AUTH-20 recovery/management remains required before ordinary activation.

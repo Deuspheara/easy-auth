@@ -59,8 +59,8 @@ Embedded RP is the application's domain; centralized RP belongs to the authentic
 The optional shared core/PostgreSQL flow below is implemented, with explicit
 experimental HTTP and native anonymous platform/roaming Chromium evidence. This
 does not enable ordinary server composition. Contact attachment has experimental
-core/HTTP tests; SMTP/native attachment evidence and full stronger-account
-management/recovery remain required. See the [signup guide](../guides/passkey-signup.md).
+core/HTTP and native Chromium/SMTP evidence; full stronger-account management/
+recovery remains required. See the [signup guide](../guides/passkey-signup.md).
 
 ```mermaid
 sequenceDiagram

@@ -44,6 +44,6 @@ now verifies anonymous platform/roaming enrollment, assertion and later account-
 discoverable login. Migration 0011 adds one pending contact attachment per owner,
 bound to the initiating session, realm and independent browser proof. Verified
 completion preserves UUID, stronger policy and authentication provenance, with
-transactional session/proof invalidation and a typed audit fact. SMTP/native
-attachment evidence remains required. AUTH-20 still owns full stronger-account
+transactional session/proof invalidation and a typed audit fact. Native platform/USB
+signup-to-SMTP confirmation and later passkey login now have separate evidence. AUTH-20 still owns full stronger-account
 management and recovery closure.

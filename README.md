@@ -14,8 +14,8 @@ disabled in normal server composition. Optional [core/PostgreSQL passkey sign-in
 now verifies proof and atomically issues sessions through an explicit
 [experimental HTTP API](docs/guides/passkey-authentication.md), with native platform/USB
 assertions and resident discovery checks. Reviewed stronger-account management,
-recovery remain unfinished. Contact attachment has experimental core/HTTP tests;
-actual SMTP/native attachment evidence remains open. See the
+recovery remain unfinished. Contact attachment has experimental core/HTTP tests
+and native platform/USB signup-to-SMTP confirmation evidence. See the
 [reproducible browser checks](tests/browser/passkeys/README.md); virtual tests are
 separate from real-device/provider interoperability.
 
@@ -25,7 +25,7 @@ policy without weaker login/reset fallback. [Experimental anonymous signup](docs
 now has core/PostgreSQL, explicit HTTP and native Chromium resident platform/USB
 evidence; it creates an account/session only after registration and verified assertion.
 [Verified contact attachment](docs/guides/email-attachment.md) now has core/PostgreSQL
-and experimental HTTP tests; SMTP/native attachment verification remains in progress.
+and experimental HTTP tests plus native Chromium/SMTP confirmation evidence.
 Ordinary passkey composition stays gated.
 
 ## Run locally

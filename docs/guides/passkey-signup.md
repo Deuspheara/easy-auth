@@ -5,9 +5,9 @@ only after registration **and** an independently verified assertion. Explicit
 experimental Axum composition now exposes this flow, with real Chromium platform/
 roaming virtual-authenticator signup and subsequent account-bound/discoverable login.
 Verified contact attachment now has shared-core/PostgreSQL and experimental HTTP
-implementation with database and captured-mail tests. Actual SMTP/native attachment
-evidence and AUTH-20's stronger-account management/recovery remain required before
-ordinary standalone/server activation. No real-device or
+implementation with database and captured-mail tests, plus native Chromium
+platform/USB signup-to-SMTP confirmation evidence. AUTH-20's stronger-account
+management/recovery remains required before ordinary standalone/server activation. No real-device or
 production claim.
 
 ## HTTP composition and contract
@@ -135,6 +135,8 @@ are part of the 31-case [browser suite](../../tests/browser/passkeys/README.md).
 
 The [contact attachment API](email-attachment.md) requires fresh passkey control
 plus a separate verified target-mailbox proof without weakening account policy.
-Its PostgreSQL/HTTP tests currently use controlled storage sessions and captured
-mail; they do not establish native signup-to-SMTP attachment interoperability. General lifecycle/recovery,
+Its PostgreSQL/HTTP tests use controlled storage sessions and captured mail. A
+separate [native SMTP suite](../../tests/browser/passkeys/attachment/README.md) now
+proves anonymous platform/USB signup, real SMTP confirmation, preserved account
+identity/policy and later passkey login. General lifecycle/recovery,
 other browsers and real devices remain open. See [ADR 0009](../architecture/adr/0009-passkey-first-identity.md).

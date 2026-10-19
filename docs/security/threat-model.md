@@ -36,7 +36,11 @@ serialize mailbox signup and competing attachments. Tests cover both race orderi
 occupied-address denial, exact session/browser/realm binding, rollback and expiry
 during observed waits. UUID, passkey-required policy and original method/time are
 preserved; preissued mailbox proofs are canceled and weaker fallback stays denied.
-HTTP tests capture proof delivery; actual SMTP/native attachment evidence is pending. Ordinary composition stays gated through AUTH-20 and remaining M03 evidence.
+HTTP tests capture proof delivery. Separate native platform/USB tests now use the
+real configured SMTP adapter with owned local Mailpit recipients, proving explicit
+confirmation, independent binding rejection, fragment removal/no GET mutation,
+rotation/revocation and later passkey login. Database facts verify unchanged
+authentication method/time and stronger policy. Ordinary composition stays gated through AUTH-20 and remaining M03 evidence.
 
 AUTH-18's optional enrollment boundary now rechecks fresh session/browser/realm
 binding and exact verified state under locks, then atomically consumes the ceremony,

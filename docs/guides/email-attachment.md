@@ -2,8 +2,8 @@
 
 An email-free `passkey_required` account can attach a verified contact address.
 This preserves its opaque ID, credentials and stronger authentication policy.
-Core/PostgreSQL and experimental HTTP tests pass; actual SMTP/native attachment
-interoperability is still pending. Ordinary server activation and stronger-account
+Core/PostgreSQL and experimental HTTP tests pass. A separate native Chromium
+platform/USB suite now proves signup through real SMTP confirmation and later login. Ordinary server activation and stronger-account
 management/recovery remain gated through AUTH-20.
 
 ## Composition and HTTP
@@ -90,5 +90,13 @@ during observed row/audit waits. Three HTTP cases cover captured-mail completion
 rotation, generic initiation, opt-in routes, boundary guards and delivery failure.
 These storage fixtures deliberately arrange passkey-method sessions; they do not
 claim native private-key proof or actual SMTP delivery. Existing native signup and
-sign-in evidence is documented separately. SMTP/native attachment, other browsers,
-physical devices and full stronger-account lifecycle/recovery remain open.
+sign-in evidence is documented separately. The [native SMTP suite](../../tests/browser/passkeys/attachment/README.md)
+now proves original resident/UV anonymous platform/USB signup, actual configured
+SMTP delivery, independent binding rejection, explicit reference-page confirmation,
+fragment removal/no GET mutation, preserved owner, old-session revocation, replay
+denial, occupied-target rejection, weaker-path denial and later bound/discoverable
+passkey login. Aggregate database facts verify preserved method/time and policy.
+See its [canonical evidence](../../tests/browser/passkeys/results/2026-10-19/chromium-email-attachment.json).
+Owned database and three recipient messages are removed; no raw proofs or cookies
+are persisted. Other browsers, physical devices and full stronger-account
+lifecycle/recovery remain open.

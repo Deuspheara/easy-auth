@@ -4,8 +4,8 @@ AUTH-53's identity/storage boundary supports users without email. Optional
 [core/PostgreSQL passkey signup](passkey-signup.md) now requires verified assertion
 before account/session creation, now with explicit experimental HTTP and native
 Chromium resident signup/login. [Contact attachment](email-attachment.md) has
-core/PostgreSQL and experimental HTTP tests; actual SMTP/native attachment evidence
-remains pending. Ordinary passkey composition stays disabled. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
+core/PostgreSQL and experimental HTTP tests, plus native Chromium platform/USB
+signup-to-SMTP confirmation evidence. Ordinary passkey composition stays disabled. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
 
 ## User contract
 
@@ -73,5 +73,6 @@ no-email session controls and NULL-to-email snapshot races. An HTTP/storage
 fixture verifies exact null serialization and route rejection. Separately, eleven
 native anonymous-signup cases now prove resident registration, genuine assertion
 and later bound/discoverable login without email. Attachment storage/captured-mail
-HTTP tests preserve policy after verification; actual SMTP/native attachment and
-other-browser/real-device gates remain AUTH-53/M03 acceptance work.
+HTTP tests preserve policy after verification; separate native platform/USB tests
+now use real SMTP confirmation and prove later passkey login. Other-browser and
+real-device evidence remain M03 release work.

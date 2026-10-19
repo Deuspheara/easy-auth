@@ -418,3 +418,52 @@ artifacts remain unchanged. See [the contact attachment guide](../guides/email-a
 for exact limits and residual scope. Hosted signup-evidence runs 39256989158 and
 39256989794 at 6d0df66 both passed Rust and secrets, including the existing 31 native
 cases. AUTH-53 remains In Progress; ordinary activation stays gated through AUTH-20.
+
+## AUTH-53 native SMTP contact acceptance — 2026-10-19
+
+The separate [canonical attachment record](../../tests/browser/passkeys/results/2026-10-19/chromium-email-attachment.json)
+resolves the preceding checkpoint's pending SMTP/native evidence. Its immutable
+producer is `c13d7dedd4b526049dd5d3b392cedddfdfca9a24`; all **268** recorded source
+hashes were independently checked with `git show producer:path`, and its executable
+hash matches the freshly built binary. Versions: Chromium156.0.8078.4,
+Playwright1.64.1, PostgreSQL17.11 and Mailpit1.27.11; Node/platform details are in
+the record. Previous native artifacts remain unchanged.
+
+Two additional cases use anonymous native platform/internal and roaming/USB resident
+registration and genuine required-UV assertions, with original production options.
+They start without seeded identities/sessions or credential metadata changes. The
+server example calls actual `configured_auth` with the private production SMTP
+adapter and explicitly composes the experimental signup router. The ordinary
+server binary and older constructors acquire no new routes. No capture/no-op mail,
+fixture HTTP mutation or synthetic proof bypass participates.
+
+The cases prove real SMTP delivery, identical occupied-address initiation/delivery,
+occupied completion rejection without merge, independent browser-binding rejection,
+no GET/page-load consumption, fragment removal before explicit confirmation,
+no-store/CSP headers, preserved owner/display label and normalized verified email,
+rotated session and old-cookie revocation, replay denial, weaker password/lifecycle
+rejection, and later account-bound plus modal discoverable passkey login.
+
+Aggregate facts: two users, credentials, verified stronger users, signup facts and
+attachment facts; four later authentication facts; zero weak sessions, changed
+attachment method/time, pending signup or attachment rows. The source query checks
+initiating/replacement owner/method/time and initiating revocation. The owned random
+DB is reported removed and independently confirmed by zero matching DBs in the
+PostgreSQL catalog. Exactly three owned test messages are removed; recipient-scoped
+search verifies their absence. Cleanup never submits an empty IDs list/delete-all.
+Neither the artifact nor logs contain proof tokens, cookie values, addresses, raw
+mail bodies, virtual private keys or browser storage.
+
+Final sequential Rust suites remain **84 default** and **152 all-feature** cases;
+strict all-target/all-feature Clippy, fmt, JS syntax and diff checks pass. The
+fixture adds only an already-locked serde_json dev-dependency edge, with no package
+version change; the explicit server experimental feature forwards existing passkey
+features and does not alter ordinary composition. Compiled-advisory/cargo-deny
+checks pass with the inactive MySQL/RSA finding still visible. CI now runs the
+existing31-case suite and this separate2-case real-SMTP suite, with Mailpit and no
+external provider credentials. Exact-head hosted status is recorded in Huly.
+
+AUTH-53 remains In Progress pending the final hosted acceptance audit. Stronger-
+account management/recovery/last-key policy, physical devices, other browsers and
+ordinary activation remain AUTH-20/M03 work. Full initial-release provider/native/
+issuer/security scope remains unfinished; no production or conformance claim.
