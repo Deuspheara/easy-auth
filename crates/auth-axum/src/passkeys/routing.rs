@@ -20,6 +20,15 @@ pub fn experimental_passkey_enrollment_router(
     browser: BrowserConfig,
     enrollment: Arc<PasskeyEnrollment>,
 ) -> Result<Router> {
+    let routes = enrollment_routes(&auth, &browser, enrollment)?;
+    Ok(configured_router(auth, browser, passkey_enrollment_openapi()).merge(routes))
+}
+
+pub(super) fn enrollment_routes(
+    auth: &Auth,
+    browser: &BrowserConfig,
+    enrollment: Arc<PasskeyEnrollment>,
+) -> Result<Router> {
     if auth.realm() != enrollment.realm()
         || Url::parse(browser.origin())
             .map_err(|_| Error::InvalidInput)?
@@ -36,11 +45,10 @@ pub fn experimental_passkey_enrollment_router(
         enrollment,
         browser: browser.clone(),
     };
-    let enrollment_routes = Router::new()
+    Ok(Router::new()
         .route("/v1/passkeys/enrollment/start", post(handlers::start))
         .route("/v1/passkeys/enrollment/finish", post(handlers::finish))
         .layer(DefaultBodyLimit::max(32 * 1024))
         .layer(middleware::from_fn_with_state(boundary_state, boundary))
-        .with_state(state);
-    Ok(configured_router(auth, browser, passkey_enrollment_openapi()).merge(enrollment_routes))
+        .with_state(state))
 }
