@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+# This exact value is the verified SHA-256 of the public RustAuth probe source,
+# recorded as measurement provenance. Keep other values and files fully scanned.
+[[allowlists]]
+description = "Exact public probe source checksum, not an API credential"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(^|/)benchmarks/adoption/results/2026-10-19/environment\.json$''']
+regexTarget = "line"
+regexes = ['''^\s*"src/rustauth\.rs": "0a8bd5cf18a1b5757cd3759654e08220325bd5eb246f4851ed06de3ffb884aa3"\s*,?\s*$''']

@@ -1,0 +1,65 @@
+{
+  "other_user_still_valid": true,
+  "phase": "result",
+  "pool_max": 10,
+  "post_revoke_rejections": 64,
+  "project": "easy-auth",
+  "revoke_ms": 2.24575,
+  "session_count": 8,
+  "trials": [
+    {
+      "p50_ms": 0.6655829999999999,
+      "p95_ms": 0.8131250000000001,
+      "requests": 512,
+      "requests_per_second": 1455.0335645693326,
+      "seconds": 0.351881917,
+      "workers": 1
+    },
+    {
+      "p50_ms": 0.658333,
+      "p95_ms": 0.8261670000000001,
+      "requests": 512,
+      "requests_per_second": 1458.9438718988922,
+      "seconds": 0.350938792,
+      "workers": 1
+    },
+    {
+      "p50_ms": 0.639583,
+      "p95_ms": 0.818333,
+      "requests": 512,
+      "requests_per_second": 1502.0418351860305,
+      "seconds": 0.340869334,
+      "workers": 1
+    },
+    {
+      "p50_ms": 1.667834,
+      "p95_ms": 2.824417,
+      "requests": 512,
+      "requests_per_second": 4089.737270804573,
+      "seconds": 0.125191416,
+      "workers": 8
+    },
+    {
+      "p50_ms": 1.643,
+      "p95_ms": 2.155333,
+      "requests": 512,
+      "requests_per_second": 4741.4139337153665,
+      "seconds": 0.107984666,
+      "workers": 8
+    },
+    {
+      "p50_ms": 1.608792,
+      "p95_ms": 2.088875,
+      "requests": 512,
+      "requests_per_second": 4814.167945821805,
+      "seconds": 0.10635275,
+      "workers": 8
+    }
+  ],
+  "sampled_setup_peak_rss_kib": 74688,
+  "sampled_session_peak_rss_kib": 75168,
+  "sampled_session_min_rss_kib": 74720,
+  "session_rss_sample_count": 19,
+  "repetition": 1,
+  "binary_bytes": 4854304
+}

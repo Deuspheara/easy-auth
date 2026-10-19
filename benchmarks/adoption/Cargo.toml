@@ -1,0 +1,48 @@
+[workspace]
+
+[package]
+name = "easy-auth-adoption-probes"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[features]
+easy = ["dep:auth-core", "dep:auth-postgres"]
+rustauth = ["dep:rustauth-core", "dep:rustauth-sqlx"]
+lucid = ["dep:lucid-auth"]
+
+[dependencies]
+async-trait = "0.1"
+serde_json = "1"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "uuid", "macros", "migrate"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+uuid = { version = "1", features = ["v4"] }
+auth-core = { package = "easy-auth-core", path = "../../crates/auth-core", optional = true }
+auth-postgres = { package = "easy-auth-postgres", path = "../../crates/auth-postgres", optional = true }
+rustauth-core = { git = "https://github.com/salasebas/rustauth", rev = "b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e", default-features = false, optional = true }
+rustauth-sqlx = { git = "https://github.com/salasebas/rustauth", rev = "b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e", default-features = false, features = ["postgres"], optional = true }
+lucid-auth = { git = "https://github.com/lucid-softworks/auth", rev = "d16c16bfa2050e5ac08cf7e18521576f41a214f0", default-features = false, features = ["postgres"], optional = true }
+
+[[bin]]
+name = "probe-easy"
+path = "src/easy.rs"
+required-features = ["easy"]
+
+[[bin]]
+name = "probe-rustauth"
+path = "src/rustauth.rs"
+required-features = ["rustauth"]
+
+[[bin]]
+name = "probe-lucid"
+path = "src/lucid.rs"
+required-features = ["lucid"]
+
+[profile.release]
+lto = "thin"
+strip = true
+
+# macOS rejects the stripped SQLx proc-macro dylib's LINKEDIT pool. This does
+# not change deployed binary stripping or optimization for any probe.
+[profile.release.build-override]
+strip = "none"

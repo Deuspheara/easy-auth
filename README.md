@@ -62,4 +62,6 @@ Validation details: [initial evidence](docs/security/verification.md), [interope
 
 Architecture: [overview](docs/architecture/overview.md), [API contract](docs/architecture/api-contract.md), [flows](docs/architecture/auth-flows.md), [research](docs/research/ecosystem.md), [build decision](docs/architecture/adr/0001-build-versus-contribute.md). Read [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before contributing. Huly AUTH is the development tracker; the exported backlog records IDs, not a separate roadmap.
 
+The [native adoption comparison](docs/research/adoption-comparison.md) provides reproducible RustAuth/lucid-auth integrations and raw measurements. It tests a small session workload; it does not establish a general memory, security or full-server performance advantage.
+
 Committed lifecycle operations produce [typed, owned audit facts](docs/guides/audit-events.md) without free-form secret-bearing payloads. Provider account linking remains a separately gated future flow; matching email never merges accounts.

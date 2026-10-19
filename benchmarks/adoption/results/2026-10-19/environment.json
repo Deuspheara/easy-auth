@@ -1,0 +1,21 @@
+{
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14) (Homebrew)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.3\n",
+  "platform": "Darwin",
+  "release": "27.2.0",
+  "architecture": "arm64",
+  "host_logical_cpus": 10,
+  "docker_vm_cpu_and_memory_bytes": "10 8214851584",
+  "postgres": "PostgreSQL 17.11 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "source_revision": "ffe0b3dc1ae95803a4f93fb40e2450d2e6145f6a",
+  "memory_sampling_interval_seconds": 0.1,
+  "order_seed": 20261019,
+  "harness_sha256": {
+    "Cargo.toml": "e7bef19003dc24d018eb029d9a2e998ec42a7a276afb27c48bffe455d907db4d",
+    "Cargo.lock": "13c86ef28448fcebf2126c93f4b3e6c38036b39a8cd609a843d6d5562e67101c",
+    "run.py": "734f9da99f160c42bd0a5d6f322d0ad6aa6fb611b7103122758c290bb7104405",
+    "src/easy.rs": "6182d51ad9871135432e224b93364f65465aa0b1486aff834946b468433db184",
+    "src/lib.rs": "b477e01061c124d233c588bf862f1d7aa94b38acf7c87e5676869ca53ab652a9",
+    "src/lucid.rs": "b4f74135d71e5289c03373e34af5c0dc7a0ea189ed40d49934fb5a0afc842c6a",
+    "src/rustauth.rs": "0a8bd5cf18a1b5757cd3759654e08220325bd5eb246f4851ed06de3ffb884aa3"
+  }
+}

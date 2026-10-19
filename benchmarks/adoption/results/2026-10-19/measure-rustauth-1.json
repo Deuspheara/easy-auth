@@ -1,0 +1,65 @@
+{
+  "other_user_still_valid": true,
+  "phase": "result",
+  "pool_max": 10,
+  "post_revoke_rejections": 64,
+  "project": "rustauth-core-sqlx",
+  "revoke_ms": 2.399792,
+  "session_count": 8,
+  "trials": [
+    {
+      "p50_ms": 1.248958,
+      "p95_ms": 1.408,
+      "requests": 512,
+      "requests_per_second": 790.985749660985,
+      "seconds": 0.647293583,
+      "workers": 1
+    },
+    {
+      "p50_ms": 1.2237500000000001,
+      "p95_ms": 1.384209,
+      "requests": 512,
+      "requests_per_second": 799.8866298182747,
+      "seconds": 0.640090709,
+      "workers": 1
+    },
+    {
+      "p50_ms": 1.146209,
+      "p95_ms": 1.325083,
+      "requests": 512,
+      "requests_per_second": 878.6279965736528,
+      "seconds": 0.582726708,
+      "workers": 1
+    },
+    {
+      "p50_ms": 2.812042,
+      "p95_ms": 3.919833,
+      "requests": 512,
+      "requests_per_second": 2622.9581026807973,
+      "seconds": 0.195199458,
+      "workers": 8
+    },
+    {
+      "p50_ms": 2.81175,
+      "p95_ms": 3.580625,
+      "requests": 512,
+      "requests_per_second": 2764.729356188436,
+      "seconds": 0.185189917,
+      "workers": 8
+    },
+    {
+      "p50_ms": 2.6944999999999997,
+      "p95_ms": 3.457083,
+      "requests": 512,
+      "requests_per_second": 2837.010421142727,
+      "seconds": 0.180471667,
+      "workers": 8
+    }
+  ],
+  "sampled_setup_peak_rss_kib": 42640,
+  "sampled_session_peak_rss_kib": 42912,
+  "sampled_session_min_rss_kib": 10144,
+  "session_rss_sample_count": 30,
+  "repetition": 1,
+  "binary_bytes": 5510640
+}
