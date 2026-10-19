@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Reproducible native PostgreSQL adoption probes with pinned RustAuth/lucid-auth sources, resolved feature graphs, binary/RSS measurements and post-return revocation checks; corrected RustAuth's maintenance status in the research and build decision (AUTH-5).
+- Reproducible native PostgreSQL adoption probes with pinned RustAuth/lucid-auth sources, resolved feature graphs, binary/RSS measurements and post-return revocation checks under sustained other-user load; corrected RustAuth's maintenance status in the research and build decision (AUTH-5).
 
 - Typed lifecycle audit facts with owned actor/session attribution, historical provenance, transactional deletion redaction and an explicit two-identity linking policy; logout lock order aligned with audit ownership checks (AUTH-16).
 

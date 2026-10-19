@@ -15,6 +15,12 @@ def summarize(directory):
             raise SystemExit(f"No measurements for {project}")
         if not all(report["post_revoke_rejections"] == 64 and report["other_user_still_valid"] for report in reports):
             raise SystemExit(f"Revocation acceptance failed for {project}")
+        for report in reports:
+            if "background_workers" in report and not (
+                report["background_workers"] == 7 and report["background_load_sustained"]
+                and report["background_validations"] >= 7
+            ):
+                raise SystemExit(f"Sustained revocation load acceptance failed for {project}")
         dependencies = json.loads((directory / f"dependencies-{project}.json").read_text())
         trials = [trial for report in reports for trial in report["trials"]]
         rates = [statistics.median(trial["requests_per_second"] for trial in trials if trial["workers"] == workers)

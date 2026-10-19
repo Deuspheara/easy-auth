@@ -18,21 +18,23 @@ The initial ecosystem review missed [RustAuth's maintenance notice](https://gith
 
 ## Results and limitations
 
-The [raw results, feature graphs, environment and advisory record](../../benchmarks/adoption/results/2026-10-19) contain three fresh processes per project, each with three trials at each concurrency. Medians below aggregate nine trials per concurrency; RSS is the median of the three sampled post-provisioning process peaks. Binary sizes are stripped executable file sizes. The common measurement harness and normal/build dependencies are included in package counts; multiple feature variants of a package count once.
+The [sustained-load results, feature graphs, environment and advisory record](../../benchmarks/adoption/results/2026-10-19-under-load) contain three fresh processes per project, each with three trials at each concurrency. Producer commit `34ed2e9e9e2255f6b32b25bf18db99b0cca94565` exactly matches every recorded measurement source hash. Medians below aggregate nine trials per concurrency; RSS is the median of the three sampled post-provisioning process peaks. Binary sizes are stripped executable file sizes. The common measurement harness and normal/build dependencies are included in package counts; multiple feature variants of a package count once. The [original sequential-revocation experiment](../../benchmarks/adoption/results/2026-10-19) is preserved as historical evidence, with its producer files in commit `f43e46f`.
 
 | Native probe | Compiled packages | Binary MiB | Session RSS MiB | 1 worker validations/s | 8 workers validations/s |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| easy-auth | 144 | 4.63 | 73.41 | 1477 | 4600 |
-| RustAuth core + SQLx | 169 | 5.26 | 41.91 | 800 | 2637 |
-| lucid-auth | 304 | 8.76 | 31.00 | 808 | 2879 |
+| easy-auth | 144 | 4.68 | 73.48 | 1337 | 4078 |
+| RustAuth core + SQLx | 169 | 5.30 | 42.39 | 704 | 2600 |
+| lucid-auth | 304 | 8.79 | 30.97 | 735 | 2747 |
 
-Eight-worker throughput ranges across the nine trials were 4090–4814, 2548–2837 and 2724–2977 validations/s respectively. Median trial p95 latencies were 2.25, 3.85 and 3.45 ms. These are observations from this local workload, without a confidence interval or general capacity claim. Each project rejected all 192 post-revocation validations across its three processes and preserved the other user's session. Median awaited revoke duration was 2.37, 2.40 and 4.36 ms respectively.
+Eight-worker throughput ranges across the nine trials were 3583–4245, 2084–2875 and 2480–2965 validations/s respectively. Median trial p95 latencies were 2.78, 3.89 and 3.80 ms. These are observations from this local workload, without a confidence interval or general capacity claim.
+
+During each revocation scenario, seven other users continuously validated sessions until all 64 post-return target checks had rejected. Every process verified that the background workers stayed active, then stopped and drained them and checked another user again. Across each project's three processes, all 192 post-return target checks rejected while the workers completed 1054, 717 and 761 successful background validations respectively, including draining in-flight background calls. Median awaited revoke duration under that load was 7.48, 3.70 and 8.92 ms. The run fails if background load ends early; these checks do not treat an earlier in-flight validation of the revoked target as a violation.
 
 Environment: Rust 1.95.0, arm64 macOS, ten host logical CPUs; PostgreSQL 17.11 arm64 Alpine in Docker with ten CPUs and approximately 7.65 GiB VM memory. Native clients use loopback TCP into the same service. Builds were stopped during the final measurements. The first runner dry run and a failed prototype using lucid-auth's optional username schema were excluded; the reported lucid-auth probe uses default email/password signup with no username plugin.
 
 This was a shared development host, not dedicated benchmark hardware. Each workload uses eight users and one active session per user; easy-auth also retains the revoked enrollment-predecessor rows and their audit facts. The tiny dataset and different library query/retention policies limit extrapolation to larger installations.
 
-All probes use two runtime worker threads, a pool maximum of ten, disabled client-side session caches, the same local PostgreSQL service and a bounded workload at one and eight concurrent workers. Each trial performs 512 successful validations after warmup. Sequential post-return revocation is tested separately; it does not prove every in-flight or multi-process race. RSS is sampled every 100 ms and can miss short peaks; allocator retention after credential setup remains part of the observed process.
+All probes use two runtime worker threads, a pool maximum of ten, disabled client-side session caches, the same local PostgreSQL service and a bounded workload at one and eight concurrent workers. Each throughput trial performs 512 successful validations after warmup. The revocation scenario follows those trials under its own sustained background load; it does not prove every in-flight or multi-process race. RSS is sampled every 100 ms and can miss short peaks; allocator retention after credential setup remains part of the observed process.
 
 The workloads preserve each library's semantics. easy-auth updates idle activity during every validation; the other APIs follow their own refresh policies. A faster read path cannot therefore establish equivalent idle-expiry, locking or audit behavior. Probe binaries omit HTTP, SMTP, optional UI and most federation functionality. Their sizes cannot establish a full standalone-server footprint advantage.
 
@@ -40,7 +42,7 @@ The locked comparison graph includes RUSTSEC-2023-0071 (`rsa` 0.9.10). The lucid
 
 ## Adoption decision
 
-The narrow easy-auth integration has fewer compiled dependencies and a smaller executable in this experiment. It also had the highest sampled post-provisioning RSS. Different password defaults and allocator retention limit causal interpretation; the result does not establish a generally smaller operational footprint. Its validation path was faster in this particular workload, while preserving its idle-activity update. Larger datasets, sustained load, full HTTP stacks and the required protocol features still need M09 measurements.
+The narrow easy-auth integration has fewer compiled dependencies and a smaller executable in this experiment. It also had the highest sampled post-provisioning RSS, and its awaited revocation under load was slower than RustAuth's here. Different password defaults and allocator retention limit causal interpretation; the result does not establish a generally smaller operational footprint. Its validation path was faster in this particular workload, while preserving its idle-activity update. Larger datasets, long-duration load, full HTTP stacks and the required protocol features still need M09 measurements.
 
 Immediate post-return server-side revocation is not unique to this project: all three native integrations passed. Setup is not uniformly simpler either. Our explicit realm, verified mailbox and password-policy composition needs more application code than the two native signup paths. Those paths use different verification policies, so line count alone is not a fair usability score. No five-minute onboarding or conformance advantage is established here.
 

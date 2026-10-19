@@ -1,0 +1,68 @@
+{
+  "phase": "result",
+  "project": "lucid-auth-postgres",
+  "pool_max": 10,
+  "session_count": 8,
+  "trials": [
+    {
+      "workers": 1,
+      "requests": 512,
+      "seconds": 0.772643959,
+      "requests_per_second": 662.6596817797678,
+      "p50_ms": 1.4781250000000001,
+      "p95_ms": 1.736625
+    },
+    {
+      "workers": 1,
+      "requests": 512,
+      "seconds": 0.710719042,
+      "requests_per_second": 720.3971889640181,
+      "p50_ms": 1.374041,
+      "p95_ms": 1.6170419999999999
+    },
+    {
+      "workers": 1,
+      "requests": 512,
+      "seconds": 0.730922958,
+      "requests_per_second": 700.4842225793105,
+      "p50_ms": 1.389625,
+      "p95_ms": 1.758375
+    },
+    {
+      "workers": 8,
+      "requests": 512,
+      "seconds": 0.206424167,
+      "requests_per_second": 2480.329737748197,
+      "p50_ms": 2.99925,
+      "p95_ms": 3.9170000000000003
+    },
+    {
+      "workers": 8,
+      "requests": 512,
+      "seconds": 0.176681875,
+      "requests_per_second": 2897.863745220046,
+      "p50_ms": 2.653833,
+      "p95_ms": 3.578833
+    },
+    {
+      "workers": 8,
+      "requests": 512,
+      "seconds": 0.191638417,
+      "requests_per_second": 2671.698128251602,
+      "p50_ms": 2.931,
+      "p95_ms": 3.815917
+    }
+  ],
+  "revoke_ms": 8.924959,
+  "background_workers": 7,
+  "background_validations": 248,
+  "background_load_sustained": true,
+  "post_revoke_rejections": 64,
+  "other_user_still_valid": true,
+  "sampled_setup_peak_rss_kib": 31088,
+  "sampled_session_peak_rss_kib": 31712,
+  "sampled_session_min_rss_kib": 31104,
+  "session_rss_sample_count": 33,
+  "repetition": 3,
+  "binary_bytes": 9217200
+}

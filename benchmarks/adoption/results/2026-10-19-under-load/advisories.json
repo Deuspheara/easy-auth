@@ -1,0 +1,30 @@
+{
+  "scope": "isolated comparison Cargo.lock, not the production workspace",
+  "scan_date": "2026-10-19",
+  "advisories": [
+    {
+      "id": "RUSTSEC-2023-0071",
+      "title": "Marvin Attack: potential key recovery through timing sidechannels",
+      "package": "rsa",
+      "version": "0.9.10",
+      "url": "https://github.com/RustCrypto/RSA/issues/626",
+      "compiled_probe_features": [
+        "lucid"
+      ],
+      "not_compiled_probe_features": [
+        "easy",
+        "rustauth"
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "kind": "unmaintained",
+      "package": "atomic-polyfill",
+      "version": "1.0.3",
+      "id": "RUSTSEC-2023-0089",
+      "title": "atomic-polyfill is unmaintained",
+      "compiled_probe_features": []
+    }
+  ]
+}
