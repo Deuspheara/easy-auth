@@ -334,3 +334,10 @@ key in the provider. Retain this recovery browser through an interrupted attempt
 normal new-key sign-in is available only after server completion. The
 [provider-side boundary](../architecture/adr/0012-saved-passkey-recovery.md#provider-side-replacement-is-outside-the-sql-transaction)
 and recorded Safari/Dashlane save-prompt failure remain part of the recovery review.
+
+Prompt errors now identify creation or verification and distinguish an uncompleted
+prompt, a browser/provider abort and a page change. These are fixed diagnostic
+categories, not proof of a provider bug or successful recovery. A page change asks
+you to resume in the same browser. Raw provider messages are never displayed or
+logged. Older device evidence using the generic prompt message cannot distinguish
+these categories retrospectively.

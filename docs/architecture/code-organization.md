@@ -297,3 +297,11 @@ static resource routing in `manual.rs`. It calls real signup through the shared
 reference-client transport and contains no alternate registration/session policy.
 Its additional native case is separate from the seven recovery scenarios. These
 fixture-only resources never enter library or normal server composition.
+
+Reference-client prompt classification stays private in `pages/recovery/shared.js`
+next to the scoped native/network/page-lifetime transport. No handler or core policy
+is duplicated. Controlled creation/verification rejection and restored-page abort
+cases live in `tests/browser/passkeys/recovery/prompt-errors.cjs`, invoked before
+the retained-authenticator case's actual successful signatures. The longer ordered
+negative scenario keeps its abort/restore/no-request assertions visible together;
+both modules remain under 120 lines.

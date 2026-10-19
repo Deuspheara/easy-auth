@@ -316,3 +316,11 @@ recovered session. The display name changes to the public account ID in recovery
 its causal role in the provider failure is unproven. The failure is an open
 interoperability gate, not permission for a weaker fallback or an assertion-flow
 rewrite. See the versioned [partial device record](../../../tests/browser/passkeys/results/2026-10-19/safari-dashlane-recovery.json).
+
+Client diagnostics distinguish native creation from verification, finite native
+rejection categories, request interruption and the client's own page-lifetime
+cancellation. Navigation generation is rechecked on rejection as well as success,
+including a restored page reopening before an earlier abort rejects. Only fixed
+categories survive; native error messages/causes are discarded. Diagnostic text
+never establishes credential/session authority. The earlier supervised record used
+conflated feedback and cannot establish its exact native exception category.

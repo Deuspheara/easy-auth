@@ -121,7 +121,7 @@ async function main() {
 }
 main().catch(error => {
   // Never echo assertion values, message bodies, proof URLs, cookies or child output.
-  const frame = error.stack?.match(/recovery\/(cases|setup|cancellation|manual|same-device)\.cjs:(\d+)/);
+  const frame = error.stack?.match(/recovery\/(cases|setup|cancellation|manual|same-device|prompt-errors)\.cjs:(\d+)/);
   console.error('Recovery pages suite failed:', error.caseName || 'startup/cleanup', error.stageName || 'case', error.name, frame ? frame[1] + ':' + frame[2] : 'fixture');
   process.exitCode = 1;
 });

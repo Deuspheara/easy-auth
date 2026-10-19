@@ -236,3 +236,10 @@ a cause. Record the failure separately from Chromium success, retain stable acco
 handles and original deadlines, and keep ordinary activation gated. Operational
 fixture summaries now distinguish pending registration from pending assertion;
 the legacy total counts both and is never proof that registration succeeded.
+
+Client error attribution must not turn navigation cancellation into alleged
+provider rejection. The shared reference transport tracks page generations through
+both resolved and rejected operations, and maps native failures to finite operation/
+category text without retaining raw messages or causes. Synthetic browser failures
+validate those diagnostics separately from real native signature tests; neither
+category nor UI feedback can authorize registration, sign-in or recovery.

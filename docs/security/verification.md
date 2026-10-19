@@ -1352,3 +1352,54 @@ protocol options, SQL transaction, dependency or migration changes were needed f
 these diagnostic tests. Both preceding hosted CI runs (39305280503 and 39306302790)
 completed successfully. AUTH-20 remains In Progress; the unresolved Safari/Dashlane
 path, wider device evidence, independent review and safe activation remain gates.
+
+## AUTH-20 safe client prompt attribution (2026-10-19)
+
+Investigation found a client diagnostic bug: the same text described native
+`NotAllowedError`, native `AbortError` and the client's own navigation cancellation.
+The earlier Safari/Dashlane observation therefore cannot establish its exact native
+exception category. It remains a partial failure; this change does not establish
+a fix or retroactively attribute it to a provider defect.
+
+The shared reference transport now preserves finite creation/verification categories
+and distinguishes request interruption from a changed page. Its generation check
+runs on rejected operations as well as successful results, including page restoration
+before an earlier abort's promise continuation. Native error messages and causes
+are discarded rather than echoed, logged or persisted. Unknown native errors map
+to fixed failure text. Backend authority, options, proof checks, deadlines and
+redacted HTTP errors remain unchanged; UI categories grant nothing.
+
+The existing retained-authenticator scenario now runs controlled creation rejection,
+creation abort, verification rejection and simulated persisted pagehide/pageshow
+cases before actual successful native signatures. It requires different fixed
+messages, no synthetic private detail in output, no registration submission from
+failed creation/navigation and exact 401 session rejection. Native methods are
+restored; the original authenticator then creates/proves a new credential and the
+still-fresh old signed proof is rejected. Only the old-proof issuance moves after
+the controlled failures to preserve its original two-minute validity; the existing
+110-second freshness assertion and all earlier security checks remain. Controlled
+failures and simulated events are diagnostic tests, not real-provider reproduction.
+
+Final checks pass: formatting; strict locked workspace/all-target Clippy with
+default/all features; **93 default** and **270 all-feature real-PostgreSQL workspace
+tests** (2 Axum unit, 55 HTTP/database, 10 core, 203 PostgreSQL; the logging subprocess
+repeats an included core case); compiled-dependency audit, cargo-deny and npm audit.
+No failures or ignored cases; inactive SQLx/MySQL RSA advisory stays visible.
+All **9 native recovery/fixture cases pass**, preserving the original seven cases.
+The [new report](../../tests/browser/passkeys/results/2026-10-19/chromium-prompt-errors.json)
+matches **427 source hashes** and its fixed producer binary. Source admission is
+**39 under the unchanged 40 limit**; original continuation admission also remains
+unchanged. Final registration/assertion/total pending and weak/provenance counts
+are zero. The owned database and fourteen exact owned messages are removed.
+Historical reports remain immutable. The complete staged diff receives redacted
+Gitleaks scanning before publication.
+
+Source review keeps transport/classification private in the 111-line shared module
+and controlled scenarios in a separate 73-line feature test module. The longer
+ordered negative case retains abort/restore/no-request assertions together as a
+justified test-size exception. No structural cleanup is deferred. No Rust API,
+OpenAPI, SQL, migration or dependency changes. ADR/guide/threat-model/organization
+and native instructions record the limits. Further device prompts or provider/
+security-setting changes were not requested or performed. The Safari/Dashlane
+creation cause, wider device evidence, independent review and safe activation
+remain open; AUTH-20 is still In Progress.

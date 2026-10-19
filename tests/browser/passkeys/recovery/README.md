@@ -107,3 +107,13 @@ The legacy `recovery_candidates` aggregate counts all replacement rows. Use
 `recovery_registrations_pending` versus `recovery_assertions_pending` to distinguish
 an outstanding create operation from a verified private registration. All three
 must drain to zero on successful automated completion/cancellation.
+
+The retained-authenticator case also injects controlled native creation rejection/
+abort, verification rejection and a simulated persisted pagehide/pageshow sequence.
+These test diagnostic handling, not real provider failure reproduction. Provider
+message details must not appear; navigation must be attributed to the page rather
+than the provider. Failed creation/navigation must send no registration and leave
+session access at 401. Native methods are restored before actual positive create/
+get signatures and stale-proof rejection. Existing source/continuation limits are
+unchanged; the extra attempts remain within them. The historical Safari record's
+old generic message cannot identify its native exception category.

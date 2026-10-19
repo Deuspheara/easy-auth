@@ -5,6 +5,7 @@ const {profile, assertion, startLogin} = require('../assertions.cjs');
 const {signupAssertion, successfulSignup} = require('../signup/ceremony.cjs');
 const {setupCode, storageIsEmpty} = require('./setup.cjs');
 const {startPage} = require('./cases.cjs');
+const {promptErrors, verificationError} = require('./prompt-errors.cjs');
 
 async function sameDeviceRecovery(browser, origin, prepareClock) {
   const name = 'native-recovery-with-original-resident-authenticator';
@@ -19,9 +20,6 @@ async function sameDeviceRecovery(browser, origin, prepareClock) {
         await assertion(page, signup.assertionOptions));
       const code = await setupCode(page, origin, owner.id);
       await startPage(page, origin, owner.id, code);
-      const oldPending = await startLogin(page, 'account_bound', owner.id);
-      const oldProof = await assertion(page, oldPending);
-      const oldIssued = Date.now();
       // Keep the actual original resident authenticator and credential. Earlier
       // cases deliberately remove it to model complete device loss.
       const before = await cdp.send('WebAuthn.getCredentials', {authenticatorId});
@@ -30,6 +28,11 @@ async function sameDeviceRecovery(browser, origin, prepareClock) {
       await prepareClock(owner.id);
       await page.locator('#refresh').click();
       await page.waitForFunction(() => !document.getElementById('replace').disabled);
+      await promptErrors(page);
+      const oldPending = await startLogin(page, 'account_bound', owner.id);
+      await verificationError(page, oldPending.options);
+      const oldProof = await assertion(page, oldPending);
+      const oldIssued = Date.now();
       let pendingOnlyChecked = false;
       await page.route('**/v1/passkeys/recovery/replacement/finish', async route => {
         await profile(page, 401);
@@ -74,6 +77,7 @@ async function sameDeviceRecovery(browser, origin, prepareClock) {
     same_account_user_handle: true, username_changed_from_signup: usernameChanged,
     display_name_changed_from_signup: displayNameChanged, registration_policy_unchanged: true,
     resident_credentials_after: credentialsAfter, native_replacement_create_and_assert: true,
+    controlled_creation_error_and_navigation_categories: true,
     stale_signed_proof_rejected: true, trusted_elapsed_time_fixture: true};
 }
 module.exports = {sameDeviceRecovery};
