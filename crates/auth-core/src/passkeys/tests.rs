@@ -1,5 +1,6 @@
 use super::*;
 use serde_json::{Value, json};
+use uuid::Uuid;
 
 #[test]
 fn rejects_ambiguous_or_insecure_configuration() {
