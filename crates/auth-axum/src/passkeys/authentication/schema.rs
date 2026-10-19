@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub(super) struct WebAuthnRequestOptions {
+pub(in crate::passkeys) struct WebAuthnRequestOptions {
     public_key: AuthenticationOptions,
     /// Only conditional autofill supplies this hint. Omitted for modal/account-bound UI.
     mediation: Option<String>,
@@ -34,7 +34,7 @@ struct AuthenticationDescriptor {
 
 #[derive(Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub(super) struct WebAuthnAssertionResponse {
+pub(in crate::passkeys) struct WebAuthnAssertionResponse {
     id: String,
     raw_id: String,
     #[serde(rename = "type")]

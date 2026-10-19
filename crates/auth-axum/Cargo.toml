@@ -12,6 +12,7 @@ workspace = true
 [features]
 passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
 passkey-authentication = ["passkey-enrollment"]
+passkey-signup = ["passkey-authentication"]
 
 [dependencies]
 auth-core.workspace = true
@@ -35,7 +36,7 @@ tower = { version = "0.5", features = ["util"] }
 [[example]]
 name = "passkey-browser"
 path = "examples/passkey-browser/main.rs"
-required-features = ["passkey-authentication"]
+required-features = ["passkey-signup"]
 
 [[example]]
 name = "export_passkey_openapi"
@@ -44,3 +45,7 @@ required-features = ["passkey-enrollment"]
 [[example]]
 name = "export_passkey_authentication_openapi"
 required-features = ["passkey-authentication"]
+
+[[example]]
+name = "export_passkey_signup_openapi"
+required-features = ["passkey-signup"]

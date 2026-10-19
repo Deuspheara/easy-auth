@@ -141,3 +141,12 @@ reviewed size exceptions, not a generic workflow abstraction. Signup integration
 tests separate protocol, binding, limits, collisions, atomicity, migration and
 observed expiry waits. The software residence hint adjustment is test-only and
 explicit; production options and verifier policy remain intact.
+
+Experimental signup HTTP lives in `passkeys/signup/` with separate composition,
+transport types, handlers and full contract. It reuses the actual enrollment/sign-in
+route builders and canonical wire schemas, with only parent-feature visibility for
+shared schema types. The anonymous-cookie guard is a transport rule; verification,
+limits and persistence remain core/PostgreSQL responsibilities. Browser signup cases
+and ceremony helpers live in `tests/browser/passkeys/signup/`; fixture summary
+queries have a separate module. No public verification internals or duplicate
+business policy were introduced.

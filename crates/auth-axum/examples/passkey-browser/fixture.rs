@@ -1,7 +1,10 @@
 use super::mail::DisabledMail;
-use auth_core::{Auth, PasskeyEnrollment, PasskeyService, PasskeySignIn, Repository, Secret};
+use auth_core::{
+    Auth, PasskeyEnrollment, PasskeyService, PasskeySignIn, PasskeySignup, PasswordService,
+    Repository, Secret,
+};
 use auth_postgres::Postgres;
-use easy_auth_axum::{BrowserConfig, experimental_passkey_router};
+use easy_auth_axum::{BrowserConfig, experimental_passkey_signup_router};
 use sqlx::postgres::PgPoolOptions;
 use std::{error::Error, net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
@@ -52,12 +55,16 @@ async fn run(pool: sqlx::PgPool, sessions: Vec<String>) -> Result<(), Box<dyn Er
         service.clone(),
         store.clone(),
     ));
-    let sign_in = Arc::new(PasskeySignIn::new(realm, service, store.clone()));
-    let app = experimental_passkey_router(
-        Auth::new(realm, store, Arc::new(DisabledMail)),
+    let sign_in = Arc::new(PasskeySignIn::new(realm, service.clone(), store.clone()));
+    let signup = Arc::new(PasskeySignup::new(realm, service, store.clone()));
+    let app = experimental_passkey_signup_router(
+        Auth::new(realm, store, Arc::new(DisabledMail)).with_passwords(Arc::new(
+            PasswordService::new("a compromised fixture password")?,
+        )),
         browser,
         enrollment,
         sign_in,
+        signup,
     )?;
     super::counterless::listen(pool.clone(), realm, *owners.last().ok_or("empty fixture")?);
     println!("{}", serde_json::json!({"origin":origin}));

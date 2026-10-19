@@ -51,8 +51,10 @@ async function finish(page, pending, credential, expected = 201) {
 async function withAuthenticator(browser, origin, session, transport, operation, options = {}) {
   const context = await browser.newContext();
   try {
-    await context.addCookies([{name: 'auth-session', value: session, url: origin, httpOnly: true,
-      sameSite: 'Lax', secure: false}]);
+    if (session !== undefined) {
+      await context.addCookies([{name: 'auth-session', value: session, url: origin, httpOnly: true,
+        sameSite: 'Lax', secure: false}]);
+    }
     const page = await context.newPage();
     await page.goto(origin);
     const cdp = await context.newCDPSession(page);

@@ -10,6 +10,7 @@
 | Passkey registration | Real PostgreSQL attack/concurrency/rollback corpus; experimental HTTP boundary/contract; eight real Chromium virtual-authenticator cases | No real-device evidence | Experimental opt-in only; ordinary composition disabled |
 | Passkey sign-in and modal discoverability | Real signed protocol/database corpus, experimental HTTP contract and native Chromium platform/USB assertions, resident discovery, signed context/backup/counter checks | No real-device evidence | Explicit experimental composition; ordinary activation gated |
 | Passkey-first accounts and stronger-account recovery | Not implemented yet | None | Remaining M03 work; ordinary activation blocked |
+| Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; contact attachment and full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
 | Enterprise OIDC client | None yet | None | M05 required; unavailable |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
@@ -66,3 +67,20 @@ through one private fixture stdin command. Actual key/signature/session code sta
 unchanged; its two signed zero assertions use separate one-use challenges. This
 does not establish counterless native enrollment, real hardware, other browsers or
 conditional-autofill UI. [Fixture details](../../tests/browser/passkeys/README.md).
+
+## AUTH-53 anonymous signup boundary — 2026-10-19
+
+The expanded native suite passes 31 Chromium virtual-authenticator cases: the
+previous 20 plus 11 anonymous signup cases. New contexts carry no seeded session
+and retain the ORIGINAL resident/required-UV options. Platform/internal and roaming/
+USB keys complete registration, a separate signed assertion, protected null-email
+user retrieval, then account-bound and modal discovery sign-in. Other new cases
+cover registration challenge/origin/RP/UV, signed assertion UP/UV/signature, replay,
+wrong browser/existing-session confusion and genuine signed cross-origin context.
+Counts are 31 credentials, 20 enrollment audits, 11 email-free passkey-required users/
+signup audits, 17 authentication audits, 28 total passkey sessions, 27 authentication
+finish admissions, 33 signup finish admissions and zero pending rows. The prior
+counterless test's one trusted storage setup remains limited to its old seeded
+account; anonymous signup has no such setup or preissued session. No private key
+is exported. Physical authenticators, other browsers, verified contact attachment
+and stronger-account recovery remain separate gates.

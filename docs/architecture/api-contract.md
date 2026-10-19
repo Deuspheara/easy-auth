@@ -56,8 +56,8 @@ Default and experimental OpenAPI snapshots include this shared contract change.
 Passkey-required accounts reject weak-method sessions, email/password login and
 password recovery; mail-only lifecycle operations are unavailable pending
 AUTH-20. Fresh passkey session controls work without email. The optional core/PostgreSQL signup use case now requires a separate verified
-assertion before creating the account/session; signup HTTP routes/native browser
-evidence and verified-mailbox attachment remain AUTH-53 implementation work. See the
+assertion before creating the account/session. Explicit signup HTTP/native browser
+evidence now exists; verified-mailbox attachment remains AUTH-53 implementation work. See the
 [model/migration guide](../guides/optional-mailbox.md).
 
 ## Explicit experimental passkey enrollment
@@ -119,3 +119,27 @@ extra/unknown mode fields are rejected. Modal discovery has no selected account;
 conditional mode preserves the browser autofill hint. Private state and session
 secrets are absent from JSON. See the sign-in guide for native JSON conversion,
 counter/backup/context policy and the new-browser nonresident selection limitation.
+
+## Explicit experimental anonymous signup
+
+`easy-auth-axum/passkey-signup` exports `experimental_passkey_signup_router`,
+combining base, enrollment, sign-in and three signup routes with a [full schema](openapi-passkey-signup.json).
+Normal server composition and the earlier experimental constructors do not enable
+signup implicitly. Every signup POST requires exact Origin, JSON, no session cookie
+and at most 32 KiB; unknown fields are rejected. Even an expired/unknown session
+cookie requires explicit logout first. Both completion stages require the original
+HttpOnly passkey browser binding.
+
+| POST path | Input | Result |
+| --- | --- | --- |
+| `/v1/passkeys/signup/start` | `{display_name}` | 200 `{transaction_id,options}` with required-UV resident creation options and binding cookie; no durable account/session |
+| `/v1/passkeys/signup/registration` | `{transaction_id,credential}` registration JSON | 200 `{transaction_id,options}` for separate assertion; only the candidate/stage changes |
+| `/v1/passkeys/signup/finish` | `{transaction_id,credential}` assertion JSON | 204 fresh session cookie after verified atomic account/key/session/audit completion |
+
+Registration alone never authenticates. The prospective owner is server-selected;
+no client owner, email, RP or residence override is accepted. The two-minute database
+expiry is not extended at registration completion. New authenticated users have
+`email: null` and passkey-required policy. Existing error/cookie/CSRF rules apply.
+See the [signup guide](../guides/passkey-signup.md) for limits, one-use scope and
+native platform/roaming evidence. Verified-mailbox attachment and AUTH-20 recovery/
+management remain required before ordinary activation.

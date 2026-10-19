@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const {complete} = require('./assertions.cjs');
 
-async function frameAssertion(page, origin, pending) {
+async function frameAssertion(page, origin, pending, finish = complete) {
   const frameUrl = origin + '/assertion-context-fixture';
   // Only this controlled test document replaces framing headers, isolating core
   // signed-context policy. The actual API and its response headers are unchanged.
@@ -32,7 +32,7 @@ async function frameAssertion(page, origin, pending) {
     assert.equal(Boolean(result.credential), true, 'native iframe produces an actual signed assertion');
     const clientData = JSON.parse(Buffer.from(result.credential.response.clientDataJSON, 'base64url').toString());
     assert.equal(clientData.crossOrigin, true, 'browser signs the cross-origin context');
-    await complete(frame, pending, result.credential, 401);
+    await finish(frame, pending, result.credential, 401);
   } finally {
     await new Promise(resolve => parent.close(resolve));
     await page.unroute(frameUrl);

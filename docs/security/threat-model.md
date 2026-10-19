@@ -26,8 +26,10 @@ AUTH-53's [email-free identity design](../architecture/adr/0009-passkey-first-id
 now has optional core/PostgreSQL signup: pending-only identity allocation, separate
 verified assertion, exact proof snapshots and atomic one-use completion. Final
 expiry follows all writes, including session/audit waits. Realm/browser caps and
-durable admission bound pending resources. HTTP/native signup and mailbox attachment
-remain implementation/test requirements. Attachment must preserve passkey-required
+durable admission bound pending resources. Experimental HTTP signup rejects any
+existing session cookie, requires exact Origin and browser binding, and has native
+resident platform/USB proof and signed-context negatives. Mailbox attachment remains
+an implementation/test requirement. Attachment must preserve passkey-required
 policy and deny weaker fallback, including competing mailbox signup and preissued
 proofs. Ordinary composition stays gated through AUTH-20 and remaining M03 evidence.
 

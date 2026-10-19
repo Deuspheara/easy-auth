@@ -39,6 +39,7 @@ The optional-email model, migration 0009, nullable public contract and initial
 passkey-required policy gates are implemented. Migration 0010 adds pending-only
 registration/assertion signup in core/PostgreSQL: only verified assertion completion
 creates the user/key/session and typed signup audit, with final expiry checking
-after all writes. [HTTP/native signup evidence](../guides/passkey-signup.md) and
-verified-mailbox attachment remain required. AUTH-20 still owns full stronger-account
+after all writes. [Experimental HTTP/native signup](../guides/passkey-signup.md)
+now verifies anonymous platform/roaming enrollment, assertion and later account-bound/
+discoverable login. Verified-mailbox attachment remains required. AUTH-20 still owns full stronger-account
 management and recovery closure.

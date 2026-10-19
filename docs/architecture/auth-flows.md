@@ -56,9 +56,10 @@ Embedded RP is the application's domain; centralized RP belongs to the authentic
 
 ## Email-free passkey signup (AUTH-53)
 
-The optional shared core/PostgreSQL flow below is implemented. Its HTTP adapter
-and native anonymous-browser evidence remain in progress; this does not enable
-ordinary server composition. See the [signup guide](../guides/passkey-signup.md).
+The optional shared core/PostgreSQL flow below is implemented, with explicit
+experimental HTTP and native anonymous platform/roaming Chromium evidence. This
+does not enable ordinary server composition; contact attachment and full stronger-
+account management/recovery remain required. See the [signup guide](../guides/passkey-signup.md).
 
 ```mermaid
 sequenceDiagram

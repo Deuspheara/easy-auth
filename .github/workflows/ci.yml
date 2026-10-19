@@ -40,7 +40,7 @@ jobs:
         working-directory: tests/browser/passkeys
       - run: npx --no-install playwright install --with-deps chromium
         working-directory: tests/browser/passkeys
-      - run: cargo build --locked -p easy-auth-axum --example passkey-browser --features passkey-authentication
+      - run: cargo build --locked -p easy-auth-axum --example passkey-browser --features passkey-signup
       - run: node tests/browser/passkeys/run.cjs
       - run: cargo install cargo-audit --locked
       - run: python3 scripts/audit.py

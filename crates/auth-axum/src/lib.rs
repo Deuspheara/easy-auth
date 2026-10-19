@@ -15,4 +15,6 @@ pub use handlers::sessions::authenticate;
 pub use passkeys::{experimental_passkey_enrollment_router, passkey_enrollment_openapi};
 #[cfg(feature = "passkey-authentication")]
 pub use passkeys::{experimental_passkey_router, passkey_authentication_openapi};
+#[cfg(feature = "passkey-signup")]
+pub use passkeys::{experimental_passkey_signup_router, passkey_signup_openapi};
 pub use router::router;

@@ -1,10 +1,52 @@
-# Experimental passkey signup core
+# Experimental passkey signup
 
 The optional core/PostgreSQL signup flow creates an account without email, but
-only after registration **and** an independently verified assertion. It is not yet
-mounted by an HTTP router or the standalone service. Anonymous Chromium signup,
-verified-mailbox attachment and AUTH-20's stronger-account management/recovery
-remain required before ordinary activation. No real-device or production claim.
+only after registration **and** an independently verified assertion. Explicit
+experimental Axum composition now exposes this flow, with real Chromium platform/
+roaming virtual-authenticator signup and subsequent account-bound/discoverable login.
+Verified-mailbox attachment and AUTH-20's stronger-account management/recovery
+remain required before ordinary standalone/server activation. No real-device or
+production claim.
+
+## HTTP composition and contract
+
+Enable `easy-auth-axum/passkey-signup`. Compose the existing trusted realm,
+`PasskeyService`, PostgreSQL repository, `Auth` and `BrowserConfig`, then construct
+`PasskeyEnrollment`, `PasskeySignIn` and `PasskeySignup` with that same realm/service/
+repository. Pass their Arcs to `experimental_passkey_signup_router(auth, browser,
+enrollment, sign_in, signup)`. Startup rejects realm/origin disagreement in any
+service. The normal server/router and earlier experimental constructors do not
+automatically acquire signup routes. The browser fixture is a runnable composition
+example, with its own disposable database; it is not a deployment server.
+
+| POST path | JSON | Success |
+| --- | --- | --- |
+| `/v1/passkeys/signup/start` | `{display_name}` | 200 `{transaction_id,options}` with creation options; sets/reuses the independent HttpOnly passkey binding |
+| `/v1/passkeys/signup/registration` | `{transaction_id,credential}` with native registration JSON | 200 `{transaction_id,options}` with assertion options; no account/session cookie |
+| `/v1/passkeys/signup/finish` | `{transaction_id,credential}` with native assertion JSON | 204 with fresh HttpOnly session cookie after atomic verified completion |
+
+Every POST requires the exact configured Origin and JSON, with a 32 KiB encoded
+body bound. Outer objects reject unknown/duplicate fields, including owner/email/
+RP inputs and attempts to disable resident options. Core decoded proof buffers
+remain separately bounded. Only public options and transaction ID are returned;
+private verification state stays server-side. The full merged [OpenAPI snapshot](../architecture/openapi-passkey-signup.json)
+is served at `/openapi.json`; previous base/enrollment/authentication schemas are
+preserved.
+
+All three routes reject requests carrying **any** session cookie, including expired,
+unknown, malformed or duplicate credentials. Call `POST /v1/logout` first to clear
+an old cookie. This prevents signup from silently replacing an existing session.
+Both completion stages also require the original passkey binding. The binding is
+`__Host-auth-passkey` under HTTPS and `auth-passkey` in explicit localhost development,
+with HttpOnly, SameSite=Lax, Path=/, no Domain, Max-Age=120 and Secure under HTTPS.
+Registration completion neither refreshes the two-minute database expiry nor issues
+a session. User retrieval becomes available only after the final verified assertion.
+
+Errors use existing redacted codes/statuses: 400 invalid JSON/input, 401 rejected
+session/binding/proof/stage/expiry/replay, 403 Origin, 413 body bound, 415 media,
+429 admission/capacity, 503 unavailable and 504 timeout. No failed or rolled-back
+operation emits a signup success fact. One-use is per pending transaction; separate
+legitimate signup ceremonies have separate server-owned prospective identities.
 
 ## Shared-core sequence
 
@@ -81,10 +123,15 @@ The pinned test-only SoftToken explicitly rejects residence. Its fixture first
 asserts that production options request residence, then changes only the software
 client's residence hints. It leaves private server state, challenge, RP, required
 UV and production verification intact. These are real signed **nonresident**
-proof/transaction tests, not native residence or discovery evidence. The missing
-anonymous platform/roaming Chromium flow must use the original production options.
+proof/transaction tests, not native residence or discovery evidence. Separately,
+Chromium platform/internal and roaming/USB signup now uses the ORIGINAL production
+resident options, without a seeded session, and proves later account-bound and
+modal resident discovery. Eleven native signup cases include registration context/
+RP/UV, assertion UP/UV/signature, replay, cross-browser/session confusion and an
+actually signed cross-origin iframe context; valid controls still complete. They
+are part of the 31-case [browser suite](../../tests/browser/passkeys/README.md).
 
-HTTP signup composition/contracts and browser tests are the next AUTH-53 boundary.
-Mailbox attachment still requires fresh passkey control plus a separate verified
+Mailbox attachment is the next AUTH-53 boundary and still requires fresh passkey
+control plus a separate verified
 target-mailbox proof without weakening account policy. General lifecycle/recovery,
 other browsers and real devices remain open. See [ADR 0009](../architecture/adr/0009-passkey-first-identity.md).

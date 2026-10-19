@@ -2,8 +2,8 @@
 
 AUTH-53's identity/storage boundary supports users without email. Optional
 [core/PostgreSQL passkey signup](passkey-signup.md) now requires verified assertion
-before account/session creation. Its HTTP/native browser integration and
-verified-mailbox attachment are still being implemented;
+before account/session creation, now with explicit experimental HTTP and native
+Chromium resident signup/login. Verified-mailbox attachment is still being implemented;
 this model change does not expose either workflow or enable ordinary passkey
 composition. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
 
@@ -70,6 +70,7 @@ See [ADR 0009](../architecture/adr/0009-passkey-first-identity.md).
 Real PostgreSQL tests cover upgrade preservation, nullable/uniqueness constraints,
 weak-method and fallback denial, preissued proofs, post-lock policy changes,
 no-email session controls and NULL-to-email snapshot races. An HTTP/storage
-fixture verifies exact null serialization and route rejection; it is not evidence
-of anonymous signup or native private-key proof. Those remain AUTH-53 acceptance
-work, alongside the existing browser/device interoperability gates.
+fixture verifies exact null serialization and route rejection. Separately, eleven
+native anonymous-signup cases now prove resident registration, genuine assertion
+and later bound/discoverable login without email. Verified contact attachment and
+other-browser/real-device gates remain AUTH-53/M03 acceptance work.

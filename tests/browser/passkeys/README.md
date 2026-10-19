@@ -1,10 +1,10 @@
-# Chromium passkey enrollment and assertion checks
+# Chromium passkey enrollment, assertion and anonymous signup checks
 
 This is a test-only Node/Playwright dependency, not part of the Rust authentication
 runtime. It exercises the explicit experimental Axum enrollment router, the real
 core verifier and PostgreSQL transactions through `navigator.credentials.create`
 and `navigator.credentials.get`. Default server composition does not enable these
-experimental routes; stronger-account recovery and passkey-first enrollment remain gated.
+experimental routes; verified contact attachment and stronger-account management/recovery remain gated.
 
 Use the local PostgreSQL development service and set `DATABASE_URL` to its
 CREATEDB-capable development connection. Only loopback database hosts are accepted.
@@ -14,7 +14,7 @@ deployed authentication server.
 
 ```sh
 docker compose up -d --wait postgres
-cargo build --locked -p easy-auth-axum --example passkey-browser --features passkey-authentication
+cargo build --locked -p easy-auth-axum --example passkey-browser --features passkey-signup
 cd tests/browser/passkeys
 npm ci --ignore-scripts
 npm audit --audit-level=low
@@ -27,12 +27,16 @@ If affected by the local proc-macro LINKEDIT issue, use the existing explicit Ca
 build-dependency strip workaround. CI uses Linux and does not need that workaround.
 
 The runner privately passes twenty newly generated session secrets to its child
-fixture through the environment. The fixture seeds verified identities/sessions
-using the existing repository's one-time proof transaction; these are passkey tests,
-not SMTP/signup tests. There is no test sign-in/proof endpoint. Mail is
-explicitly unavailable. Each isolated browser context gets its own generated
-session cookie. The real enrollment HTTP start sets the HttpOnly browser-binding
-cookie, and actual browser-generated credential JSON completes registration.
+fixture through the environment. For the original enrollment/assertion cases it
+seeds verified identities/sessions through the existing repository proof transaction;
+those cases do not test SMTP. Their isolated contexts get distinct session cookies.
+The eleven new signup cases start WITHOUT a seeded cookie, choose only a display
+label and use native resident creation plus a separately signed assertion through
+the real signup HTTP API. The prospective UUID is server-selected, and protected
+user retrieval stays 401 until final proof. There is no test sign-in/proof endpoint;
+mail transport is explicitly unavailable. Passwords are configured so native
+passkey-required password-enrollment denial exercises policy rather than a disabled
+feature. All actual credential JSON goes through the shared core/PostgreSQL flow.
 
 After registration, twelve additional cases log out the seeded session, sign real
 assertions, complete the HTTP transaction and verify the protected session. They
@@ -43,7 +47,7 @@ iframe replaces framing headers only for its own controlled test document so cor
 context validation is exercised; API response protections remain unchanged. The
 aggregate finish-admission count proves the signed negative cases reached core.
 
-The final case uses CDP `signCount=-1` for real signed zero assertions. Chromium
+The final preexisting authentication case uses CDP `signCount=-1` for real signed zero assertions. Chromium
 creates a credential with counter 1 even in this setup: first, a signed reset to
 zero is correctly rejected. A single private stdin command then prepares trusted
 stored-zero metadata for the last seeded account's unused credential and cancels
@@ -67,9 +71,11 @@ cookies, credential payloads or virtual private keys enter output.
 
 The fixture reports aggregate credential/audit/pending counts, closes connections
 and drops its exact owned database on normal completion or test failure. The runner
-requires successful cleanup, twenty credentials/enrollment audits, thirteen
-passkey sessions/authentication audits, twenty-three admitted finish attempts,
-one backed-up credential, one used counterless credential and no pending state.
+requires successful cleanup, 31 credentials, 20 enrollment audits, 11 email-free
+passkey-required users/signup audits, 17 later authentication audits, 28 total
+passkey sessions, 27 authentication-finish admissions and the exact per-case signup
+admission total (33 for the recorded Chromium run), with zero pending state. One
+backed-up and one used counterless credential belong to the preexisting cases.
 If forced process
 termination prevents cleanup, it fails rather than claiming the database was removed.
 
@@ -80,8 +86,12 @@ state recording here: those artifacts can contain credentials. The runner does n
 request or export virtual-authenticator private keys.
 
 Only Chromium virtual authenticators are automated here. Safari, Firefox, real
-hardware, Apple/Google passkey providers, conditional-autofill UI, passkey-first
-accounts and recovery remain separate evidence requirements. Modal resident
-discovery and assertions are now automated. The packed
+hardware, Apple/Google passkey providers, conditional-autofill UI, verified-mailbox
+attachment and stronger-account recovery remain separate evidence requirements.
+Anonymous resident signup and both later account-bound/modal-discovery login are
+now automated for internal/platform and USB/roaming transports. Additional signup
+cases cover bad registration context/RP/UV, actual assertion UP/UV/signature,
+replay, existing-session/cross-browser confusion and signed cross-origin iframe
+rejection. Native production options are not weakened for a software signer. The packed
 attestation signature-attack corpus is covered by the Rust/software-authenticator
 suite; it is not mislabeled as browser hardware attestation coverage.

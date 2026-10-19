@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Experimental anonymous passkey signup HTTP routes and complete OpenAPI, with
+  session-confusion guards and eleven Chromium resident platform/USB signup cases,
+  later bound/discoverable login and native negative proofs. Verified-mailbox
+  attachment and full stronger-account recovery remain in progress (AUTH-53).
+
 - Optional core/PostgreSQL email-free signup with separate registration/assertion
   stages, bounded pending state, one-use atomic account/key/session/audit creation
   and final post-write expiry checks. HTTP/native signup and mailbox attachment

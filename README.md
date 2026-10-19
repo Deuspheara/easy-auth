@@ -13,17 +13,17 @@ now has core/PostgreSQL, HTTP and Chromium virtual-authenticator evidence. It is
 disabled in normal server composition. Optional [core/PostgreSQL passkey sign-in](docs/research/passkey-authentication.md)
 now verifies proof and atomically issues sessions through an explicit
 [experimental HTTP API](docs/guides/passkey-authentication.md), with native platform/USB
-assertions and resident discovery checks. Passkey-first accounts and reviewed
-stronger-account policy remain unfinished. See the
+assertions and resident discovery checks. Reviewed stronger-account management,
+recovery and verified contact attachment remain unfinished. See the
 [reproducible browser checks](tests/browser/passkeys/README.md); virtual tests are
 separate from real-device/provider interoperability.
 
 The [optional-mailbox model](docs/guides/optional-mailbox.md) now preserves existing
 mailbox accounts while supporting null email, display labels and passkey-required
-policy without weaker login/reset fallback. Optional [signup core/PostgreSQL](docs/guides/passkey-signup.md)
-now creates an account/session only after registration and verified assertion.
-HTTP/native anonymous signup and verified contact attachment remain in progress;
-ordinary passkey composition stays gated.
+policy without weaker login/reset fallback. [Experimental anonymous signup](docs/guides/passkey-signup.md)
+now has core/PostgreSQL, explicit HTTP and native Chromium resident platform/USB
+evidence; it creates an account/session only after registration and verified assertion.
+Verified contact attachment remains in progress; ordinary passkey composition stays gated.
 
 ## Run locally
 

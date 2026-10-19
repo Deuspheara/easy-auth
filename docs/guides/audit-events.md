@@ -48,7 +48,7 @@ actor and one owned issued session. It keeps version 1/nine columns and is writt
 only after verified assertion. Registration-stage advancement emits no success
 fact or session. Final expiry/one-use consumption follows the audit write; expiry
 or audit/persistence failure rolls the account/key/session/fact back together.
-HTTP/native signup integration remains pending.
+Experimental HTTP/native signup now exercises this transaction; ordinary activation remains gated.
 
 ## Operator reads and linking
 

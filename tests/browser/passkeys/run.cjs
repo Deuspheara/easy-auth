@@ -8,6 +8,7 @@ const readline = require('node:readline');
 const {chromium} = require('playwright');
 const {runCases} = require('./cases.cjs');
 const {runAuthenticationCases} = require('./authentication.cjs');
+const {runSignupCases} = require('./signup/cases.cjs');
 
 const root = path.resolve(__dirname, '../../..');
 
@@ -70,6 +71,7 @@ async function main() {
     version = browser.version();
     results = await runCases(browser, origin, sessions);
     results.push(...await runAuthenticationCases(browser, origin, sessions.slice(results.length), prepareCounterless));
+    results.push(...await runSignupCases(browser, origin, sessions[0]));
   } catch (error) { failure = error; }
   finally {
     if (browser) await browser.close();
@@ -92,13 +94,19 @@ async function main() {
   }
   assert.equal(stderr, '', 'fixture must not emit unexpected diagnostic output');
   assert.equal(summary.credentials, results.length, 'each case commits one genuine registration');
-  assert.equal(summary.audits, results.length, 'audit count matches committed credentials');
+  const signups = results.filter(result => result.signup).length;
+  assert.equal(summary.audits, results.length - signups, 'existing enrollment audits remain separate');
+  assert.equal(summary.signup_audits, signups, 'one committed fact per anonymous signup');
+  assert.equal(summary.signup_users, signups, 'new users have no mailbox and require passkey proof');
+  assert.equal(summary.signup_pending, 0, 'all signup ceremonies are consumed');
+  const signupFinishes = results.reduce((total, result) => total + (result.signup_finishes || 0), 0);
+  assert.equal(summary.signup_finish_attempts, signupFinishes, 'signed negatives reached signup verification');
   assert.equal(summary.pending, 0, 'all cases finish or consume their original ceremony');
   const authentications = results.reduce((total, result) => total + (result.authentications || 0), 0);
   assert.equal(summary.authentication_audits, authentications, 'each verified sign-in commits one audit');
-  assert.equal(summary.passkey_sessions, authentications, 'each verified sign-in commits one session');
+  assert.equal(summary.passkey_sessions, authentications + signups, 'each verified sign-in/signup commits one session');
   assert.equal(summary.authentication_pending, 0, 'valid completions and explicit counterless fixture reset leave no pending state');
-  assert.equal(summary.authentication_finish_attempts, 23, 'all signed negatives reached admitted core verification');
+  assert.equal(summary.authentication_finish_attempts, 27, 'all signed negatives reached admitted core verification');
   assert.equal(summary.backed_up_credentials, 1, 'eligible backup-state change persisted');
   assert.equal(summary.zero_counter_credentials, 1, 'counterless credential state persisted');
   const report = {recorded_at: new Date().toISOString(), node: process.version, playwright: require('playwright/package.json').version,
@@ -106,7 +114,7 @@ async function main() {
     rustc: execFileSync('rustc', ['--version']).toString().trim(),
     fixture_binary_sha256: crypto.createHash('sha256').update(fs.readFileSync(binary)).digest('hex'),
     source_base_revision: execFileSync('git', ['rev-parse', 'HEAD'], {cwd: root}).toString().trim(),
-    source_sha256: fingerprints(), fixture: 'loopback; disposable PostgreSQL; seeded verified sessions; one trusted counterless storage fixture',
+    source_sha256: fingerprints(), fixture: 'loopback; disposable PostgreSQL; seeded accounts for existing flows; anonymous resident signup; one trusted counterless fixture for the preexisting authentication case',
     cases: results, database: summary, fixture_database_removed: removed};
   if (process.env.EASY_AUTH_TEST_REPORT) {
     const destination = path.resolve(process.env.EASY_AUTH_TEST_REPORT);
