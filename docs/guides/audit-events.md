@@ -12,6 +12,7 @@ Both server compositions record the same committed lifecycle facts through the s
 | `password_authenticated` | none | newly issued session | Password verification and exact stored-credential recheck committed |
 | `password_enrolled` | fresh initiating session | replacement session | First credential enrollment and rotation committed |
 | `passkey_enrolled` | fresh initiating session | none | Optional core/PostgreSQL registration verified, state consumed and unique credential inserted; no new authenticated session |
+| `passkey_authenticated` | none | newly issued session | Experimental verified assertion, exact-state consume, credential update and new session committed atomically |
 | `password_reset` | none | none | Current recovery proof consumed, credential replaced and sessions/proofs invalidated |
 | `session_revoked` | initiating owned session | revoked session | Logout or individual revocation changed an owned record |
 | `all_sessions_revoked` | fresh initiating session | none | Owned sessions and pending proofs canceled |
@@ -33,6 +34,11 @@ with an owned actor session and no affected session; the nine-column schema stay
 unchanged. Normal HTTP composition does not enable enrollment yet. The event is
 recorded only by the actual verified credential transaction, and follows the same
 rollback and deletion-deidentification rules as other kinds.
+
+Migration `0008_passkey_authentication.sql` adds the owned passkey-authentication
+fact with no pre-existing actor and one newly issued session, preserving version 1
+and the nine-column shape. Context, signature, backup/counter and binding failures
+create no success fact; a failed audit rolls back the session/key/state transaction.
 
 The foreign keys deliberately retain referenced user/session rows until the audit references are handled. Use the normal account-deletion flow, which clears them transactionally. A future session/audit retention job must coordinate pruning; there is no automatic retention policy in this slice. A privileged database writer remains trusted, so these records are not tamper-proof or independently audited evidence.
 

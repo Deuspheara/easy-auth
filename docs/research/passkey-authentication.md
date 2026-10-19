@@ -1,9 +1,10 @@
 # Passkey assertion boundary
 
 AUTH-19, 2026-10-19. Optional core/PostgreSQL sign-in now persists ceremonies and
-atomically issues sessions after verified proof. No HTTP login route or native
-browser assertion flow enables it yet. AUTH-19 and M03 remain in progress;
-ordinary server composition stays gated on the remaining policy and browser work.
+atomically issues sessions after verified proof. Explicit experimental HTTP routes
+now have native Chromium assertion and modal residence evidence. M03 remains
+in progress; ordinary composition stays gated on stronger-account policy
+and the remaining milestone requirements.
 
 ## Reviewed source and policy
 
@@ -11,19 +12,23 @@ Reviewed the registry release of [webauthn-rs 0.5.5](https://docs.rs/crate/webau
 its [credential types](https://docs.rs/crate/webauthn-rs/0.5.5/source/src/interface.rs)
 and [core verifier](https://docs.rs/webauthn-rs-core/0.5.5/src/webauthn_rs_core/core.rs.html),
 against [WebAuthn Level 3 assertion verification](https://www.w3.org/TR/webauthn-3/#sctn-verifying-assertion).
-Production calls only the high-level library. No credential-internals feature,
-custom assertion parsing or signature implementation is introduced.
+Production calls only the high-level library for cryptographic verification. No
+credential-internals feature or custom signature verifier is introduced. A narrow
+signed-client-context policy projection is checked separately.
 
 - Account-bound authentication uses `start_passkey_authentication` and
   `finish_passkey_authentication` with a nonempty, bounded trusted credential list.
   The private envelope binds realm, owner, exact origin and SHA-256 fingerprints
   of the original database credential bytes. A changed credential requires a new
   ceremony, preventing cached counter/state from overwriting a newer snapshot.
-- Discoverable authentication uses the high-level `conditional-ui` feature and
-  preserves its conditional mediation. This is opportunistic resident-credential
-  autofill, not a general modal discoverable flow. Registration still does not
-  promise residence. Do not silently change mediation or claim a resident credential
-  from unsigned client extension results.
+- Discoverable authentication uses the high-level `conditional-ui` challenge/state
+  API. Conditional mode preserves its hint; the explicitly reviewed modal mode
+  omits only that public, client-controlled hint. It changes no private state or
+  required UP/UV/signature/RP/origin policy. Clients could already change mediation;
+  it is not signed assurance evidence. Native modal discovery is now tested.
+  Explicit resident enrollment sets public `residentKey=required` and the legacy
+  residence flag; the unchanged verifier does not certify residence or unsigned
+  `credProps`. Ordinary enrollment continues to support nonresident credentials.
 - A response credential ID is only a lookup hint. The adapter must load by trusted
   realm and RP. Verification requires the loaded ID, realm and RP to match, checks
   optional account-bound `userHandle` against its owner UUID, and requires that exact
@@ -31,11 +36,19 @@ custom assertion parsing or signature implementation is introduced.
 - Canonical base64url `id` and `rawId` must agree, type must be `public-key`, IDs
   are at most 1,024 bytes and the combined assertion buffers at most 16 KiB. The
   owning HTTP boundary must additionally bound the complete JSON request.
+- The assertion path in pinned core source does not check `crossOrigin`/`topOrigin`
+  (its registration path checks `crossOrigin`). The application therefore requires
+  a JSON object with absent/false `crossOrigin` and no `topOrigin`, rejecting duplicate
+  or malformed context fields for both ceremonies. The high-level verifier still
+  checks the signature over the complete original bytes. A real browser iframe
+  signs `crossOrigin=true`, reaches admitted verification and gets 401, followed by
+  a valid same-origin control. The test replaces framing headers only for its own
+  controlled document; real API headers stay intact.
 - The library verifies challenge, exact origin, RP hash, UP, required UV, signature
   and counter. Its constructor sets `require_valid_counter_value=true`: if either
   stored or asserted counter is nonzero, the new counter must be larger. Two zero
-  counters are supported by library policy; this checkpoint does not yet provide a
-  real signed zero-counter authenticator test. Counter failure rejects that attempt;
+  counters are supported and tested with real browser signatures against an explicit
+  trusted stored-zero fixture. Counter failure rejects that attempt;
   it does not permanently disable an account.
 - Backup eligibility is immutable in both modes. The bound library API permits
   false-to-true upgrades whereas discovery rejects them, so the wrapper additionally
@@ -44,7 +57,8 @@ custom assertion parsing or signature implementation is introduced.
   after decoding the complete `Passkey`; missing/malformed metadata fails closed.
   This couples persistence to the reviewed version and must be revisited on upgrades.
   Backup state can change for previously eligible credentials using the library's
-  update method. Signed BE-upgrade/BS-transition browser cases remain required.
+  update method. Native signed eligibility-upgrade rejection and a persisted
+  eligible backup-state transition are now tested.
 
 Private state is versioned, bounded to 1 MiB, explicitly encoded only for trusted
 database storage and has no public Serialize implementation. Stored credential
@@ -69,8 +83,9 @@ Migration 0008 adds two-minute, browser/realm/RP/purpose-bound private ceremonie
 three pending per browser and separate start/finish admission: 20 per browser and
 40 per source per ten-minute window. Admission commits before lookup/verification,
 including invalid attempts. Account-bound starts currently accept an opaque account
-ID lookup hint; no email-to-credential lookup is exposed. The HTTP account-selection
-experience still needs privacy review before enabling this flow. Discoverable
+ID lookup hint; no email-to-credential lookup is exposed. Clients obtain it from a
+previously authenticated profile or an application-owned private selector. A new
+browser with a nonresident key still needs that selection context. Discoverable
 ceremonies have no claimed owner until the actual key and handle verify.
 
 Session authentication methods are stored as `email`, `password`, `passkey` or
@@ -103,7 +118,23 @@ pending/source/browser admission, revoke-all/deletion and method migration/rotat
 The database discovery signer has the same residence limitation as the protocol
 fixture; these are not native discovery checks.
 
-Before AUTH-19 is Done: safe account selection without email enumeration, enforcement
-of reviewed stronger-account boundaries, HTTP contracts and native platform/roaming
-assertion plus real discovery and backup/zero-counter tests. AUTH-53 owns genuine email-free enrollment;
+The explicit HTTP composition has closed typed modes, host binding cookies, exact
+Origin/body/startup checks, merged concrete schemas and protected-session round trips.
+Twenty Chromium 156.0.8078.4 cases include native platform/USB nonresident assertions,
+modal resident discovery, bad UP/UV/signature, replay, wrong browser, signed iframe
+context, BE upgrade, BS transition and zero counters. Thirteen sessions/audit facts
+and 23 admitted attempts are required, with no pending state and exact DB cleanup.
+Chrome creates these keys with initial counter 1. The last case first proves a
+signed reset to zero is denied, then uses one private stdin command to prepare
+trusted stored-zero metadata for that unused test credential and cancel its old
+retryable challenge. It then proves two real signed zero assertions under independent
+one-use ceremonies. No key/signature is changed or exported; this is not counterless
+registration/hardware evidence or a production/test HTTP bypass. Playwright is pinned
+to 1.64.1: Chromium 151 silently ignored `signCount` in credential properties, confirmed
+against its exact source, while the newer browser implements it. Fixture assumptions
+and source/binary hashes are recorded transparently.
+
+Remaining gates include reviewed stronger-account boundaries, account-selection UX,
+actual conditional-autofill UI, other browsers and real devices/providers.
+AUTH-53 owns genuine email-free enrollment;
 AUTH-20 owns management/recovery. None of those gates is replaced by this verifier.

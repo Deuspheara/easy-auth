@@ -9,6 +9,10 @@ use uuid::Uuid;
 pub(super) struct PasskeyEnrollmentStartInput {
     /// Human-readable label; 1–256 UTF-8 bytes, nonblank, no control characters.
     pub(super) label: String,
+    /// Explicitly request browser residence. Success is not independently verified residence metadata.
+    #[serde(default)]
+    #[schema(default = false)]
+    pub(super) discoverable: bool,
 }
 
 #[derive(Serialize, ToSchema)]

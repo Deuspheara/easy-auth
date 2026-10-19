@@ -7,6 +7,7 @@ const path = require('node:path');
 const readline = require('node:readline');
 const {chromium} = require('playwright');
 const {runCases} = require('./cases.cjs');
+const {runAuthenticationCases} = require('./authentication.cjs');
 
 const root = path.resolve(__dirname, '../../..');
 
@@ -21,12 +22,23 @@ function fingerprints() {
 }
 
 async function main() {
-  const sessions = Array.from({length: 8}, () => crypto.randomBytes(32).toString('base64url'));
+  const sessions = Array.from({length: 20}, () => crypto.randomBytes(32).toString('base64url'));
   const binary = process.env.EASY_AUTH_PASSKEY_TEST_BINARY || path.join(root, 'target/debug/examples/passkey-browser');
   // Generated test credentials go only through the child environment and loopback
   // fixture cookies. Never log them or persist browser traces/storage state.
   const child = spawn(binary, [], {cwd: root, env: {...process.env,
-    EASY_AUTH_TEST_SESSIONS: JSON.stringify(sessions)}, stdio: ['ignore', 'pipe', 'pipe']});
+    EASY_AUTH_TEST_SESSIONS: JSON.stringify(sessions)}, stdio: ['pipe', 'pipe', 'pipe']});
+  let counterlessResolve;
+  async function prepareCounterless() {
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('counterless fixture setup timeout')), 5000);
+      counterlessResolve = prepared => {
+        clearTimeout(timer);
+        if (prepared) resolve(); else reject(new Error('counterless fixture setup failed'));
+      };
+      child.stdin.end('prepare-counterless-fixture\n');
+    });
+  }
   let summary, removed = false, stderr = '';
   let readyResolve, readyReject;
   const ready = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject; });
@@ -37,6 +49,7 @@ async function main() {
       if (value.origin) readyResolve(value.origin);
       if (Number.isInteger(value.credentials)) summary = value;
       if (value.fixture_database_removed === true) removed = true;
+      if (typeof value.counterless_fixture_prepared === 'boolean') counterlessResolve?.(value.counterless_fixture_prepared);
     } catch { readyReject(new Error('unexpected fixture output')); }
   });
   child.stderr.on('data', data => { stderr += data.toString(); });
@@ -56,9 +69,11 @@ async function main() {
     browser = await chromium.launch({headless: true});
     version = browser.version();
     results = await runCases(browser, origin, sessions);
+    results.push(...await runAuthenticationCases(browser, origin, sessions.slice(results.length), prepareCounterless));
   } catch (error) { failure = error; }
   finally {
     if (browser) await browser.close();
+    if (!child.stdin.writableEnded) child.stdin.end();
     if (child.exitCode === null) child.kill('SIGINT');
     const stopped = await Promise.race([exited, new Promise(resolve => {
       const timer = setTimeout(() => resolve({timeout: true}), 10000); timer.unref();
@@ -79,12 +94,19 @@ async function main() {
   assert.equal(summary.credentials, results.length, 'each case commits one genuine registration');
   assert.equal(summary.audits, results.length, 'audit count matches committed credentials');
   assert.equal(summary.pending, 0, 'all cases finish or consume their original ceremony');
+  const authentications = results.reduce((total, result) => total + (result.authentications || 0), 0);
+  assert.equal(summary.authentication_audits, authentications, 'each verified sign-in commits one audit');
+  assert.equal(summary.passkey_sessions, authentications, 'each verified sign-in commits one session');
+  assert.equal(summary.authentication_pending, 0, 'valid completions and explicit counterless fixture reset leave no pending state');
+  assert.equal(summary.authentication_finish_attempts, 23, 'all signed negatives reached admitted core verification');
+  assert.equal(summary.backed_up_credentials, 1, 'eligible backup-state change persisted');
+  assert.equal(summary.zero_counter_credentials, 1, 'counterless credential state persisted');
   const report = {recorded_at: new Date().toISOString(), node: process.version, playwright: require('playwright/package.json').version,
     chromium: version, platform: process.platform, arch: process.arch,
     rustc: execFileSync('rustc', ['--version']).toString().trim(),
     fixture_binary_sha256: crypto.createHash('sha256').update(fs.readFileSync(binary)).digest('hex'),
     source_base_revision: execFileSync('git', ['rev-parse', 'HEAD'], {cwd: root}).toString().trim(),
-    source_sha256: fingerprints(), fixture: 'loopback; disposable PostgreSQL; seeded verified sessions',
+    source_sha256: fingerprints(), fixture: 'loopback; disposable PostgreSQL; seeded verified sessions; one trusted counterless storage fixture',
     cases: results, database: summary, fixture_database_removed: removed};
   if (process.env.EASY_AUTH_TEST_REPORT) {
     const destination = path.resolve(process.env.EASY_AUTH_TEST_REPORT);

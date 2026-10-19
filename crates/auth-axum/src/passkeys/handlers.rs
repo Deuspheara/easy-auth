@@ -33,10 +33,18 @@ pub(super) async fn start(
         Some(browser) => browser,
         None => Secret::generate()?,
     };
-    let started = state
-        .enrollment
-        .begin(&session, &browser, &source_key(source), &input.label)
-        .await?;
+    let source = source_key(source);
+    let started = if input.discoverable {
+        state
+            .enrollment
+            .begin_discoverable(&session, &browser, &source, &input.label)
+            .await?
+    } else {
+        state
+            .enrollment
+            .begin(&session, &browser, &source, &input.label)
+            .await?
+    };
     let mut response = Json(PasskeyEnrollmentStartResponse {
         transaction_id: started.transaction,
         options: started.options,

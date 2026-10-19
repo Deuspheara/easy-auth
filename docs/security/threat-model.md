@@ -12,7 +12,7 @@ Created 2026-10-18. Not a security audit. Assets: user identity, credential veri
 | Open redirect | Exact registered redirect allowlist; never redirect to arbitrary user input | M07 invalid redirect tests |
 | Discovery/metadata SSRF | Explicit admin connections; HTTPS; DNS/IP/port allowlists, no redirects, bounded response, block private/link-local/metadata addresses unless explicit local test policy | M05 DNS rebinding/redirect/private-network tests |
 | SAML signature wrapping/XXE/replay | Reviewed XML/signature engine; use only verified content; reject DTD/external entities/duplicate IDs, pinned certs, correlation and all conditions | Hard M06 blocker until signed fixture and attack corpus passes |
-| RP/origin manipulation | Server-owned exact RP/origin, high-level webauthn-rs, UV, server-persisted single-use challenges | Optional core/PG/HTTP negatives and eight Chromium virtual-authenticator cases implemented; other browsers, real devices, sign-in/recovery remain M03 gates |
+| RP/origin manipulation | Server-owned exact RP/origin, high-level webauthn-rs, UV, server-persisted single-use challenges | Core/PG/HTTP negatives and twenty Chromium virtual-authenticator registration/assertion cases; other browsers, real devices and stronger-account recovery remain gates |
 | Unsafe linking / recovery downgrade | Fresh proof of both identities; no matching-email merge; last-credential and recovery policies; notifications/audit | M02/M03/M04 negative linking tests |
 | Tenant isolation / privilege escalation | Realm on every query/constraint; trusted router realm; no app membership/permissions in auth core | Cross-realm FK/query tests; app independently authorizes actions |
 | Brute force / spraying / mail abuse | Shared admission by realm+email and source IP; overall resource bounds; no trusted forwarded IP by default | Concurrent rate tests and load/retention plan |
@@ -29,8 +29,9 @@ state, credentials and verification admission. Protocol failures do not become
 success events; audit failure rolls back credential and state changes. Deletion
 cascades credential/state and clears owned admission/audit attribution. Upstream
 payload tracing is suppressed within synchronous verifier calls. No ordinary HTTP
-composition enables this boundary yet: passkey authentication, method provenance,
-stronger-account recovery policy, real-device/other-browser evidence and passkey-first
+composition enables this boundary yet. Experimental authentication and method
+provenance now exist; stronger-account recovery policy, real-device/other-browser
+evidence and passkey-first
 accounts remain required. See the [enrollment guide](../guides/passkey-enrollment.md).
 
 The explicit experimental HTTP composition checks realm/origin alignment at startup,
@@ -49,8 +50,13 @@ post-lock expiry statement prevent stale or expired proof commits. Consume, key
 update, session issuance and fixed-schema audit commit atomically; tests cover
 replay, rollback, competing snapshots, expiry during unchanged-row waits and deletion.
 Session methods are explicit and rotation preserves provenance. This metadata does
-not yet enforce stronger-account recovery/sensitive-action policy. HTTP account
-selection, native assertion/discovery evidence and that policy remain gates;
-ordinary composition is disabled. See the [authentication review](../research/passkey-authentication.md).
+not yet enforce stronger-account recovery/sensitive-action policy. Experimental
+HTTP now has native platform/USB assertions and modal resident discovery, plus
+signed cross-origin context rejection and backup/counter evidence. The context
+projection rejects topOrigin and true/null/duplicate crossOrigin; the pinned
+library assertion path omits those checks. A private fixture explicitly arranges
+stored-zero metadata for the native counterless acceptance test, without changing
+its public key or verifier/session code. Stronger-account policy, passkey-first
+enrollment and real-device/other-browser gates still disable ordinary composition. See the [authentication review](../research/passkey-authentication.md).
 
 The alpha now includes opt-in password enrollment and sign-in (AUTH-12). Fresh verified sessions, a configured blocklist, bounded Argon2id, shared admission, transactional enrollment/session replacement and stale-hash rechecks are required; see ../guides/passwords.md. AUTH-13 adds browser/purpose-bound password recovery, credential versions, atomic session/proof invalidation and durable non-secret notifications. AUTH-14 adds both-address verified email changes, fresh-session/mailbox-confirmed deletion, authentication-time provenance, scoped cleanup and audit deidentification. AUTH-15 adds bounded owned-session inventory, fresh-authenticated individual/all-session revocation, proof cancellation and transactional audit. Deterministic database lock tests cover concurrent logins/revoke-all and freshness revalidation after waiting. AUTH-16 adds typed, fixed-schema audit attribution with composite ownership constraints, in-transaction recording, explicit historical provenance and scoped deidentification. Logout follows user-before-session lock order. Provider linking still requires fresh current-account proof plus a separately verified identity transaction; no matching-email merge or linking-success event is enabled. Stronger-factor recovery, queue monitoring/retention and authenticated password change remain incomplete. Linking, native tokens, external callbacks and issuer routes remain excluded. Full initial release remains blocked on their milestones. Baselines and external normative references are in ../research/protocol-dependencies.md. Every implementation ticket must state tests and residual risks; update this document when boundaries change.

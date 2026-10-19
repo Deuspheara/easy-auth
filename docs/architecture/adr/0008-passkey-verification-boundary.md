@@ -3,7 +3,7 @@
 Status: accepted for the initial protocol boundary, AUTH-18, 2026-10-19.
 The optional core/PostgreSQL boundary, explicit experimental HTTP composition and
 Chromium virtual-authenticator registration checks are implemented. Ordinary server
-enrollment stays disabled pending sign-in and stronger-account policy. See the
+enrollment stays disabled pending the full stronger-account policy. See the
 [enrollment guide](../../guides/passkey-enrollment.md).
 
 Use `webauthn-rs` 0.5.5's high-level registration API. It fixes required user
@@ -11,8 +11,11 @@ verification and supports platform/roaming selection without implementing custom
 signature or attestation verification. Disable default optional attestation APIs;
 ordinary passkey registration still uses the library's verifier. Enable state
 serialization for PostgreSQL storage of private ceremony objects. AUTH-19 also
-enables conditional UI for its high-level discoverable assertion boundary;
-preserve the library's conditional mediation.
+enables its high-level discoverable assertion boundary. Conditional mode preserves
+the mediation hint; explicit modal mode omits only that public UI hint after source
+review, retaining identical private challenge and UP/UV/signature/RP/origin checks.
+Mediation is client-controlled and conveys no signed assurance. Resident enrollment
+is an explicit browser requirement, not independently verified credential metadata.
 No credential-internals or user-presence-only feature is enabled.
 
 The protocol service accepts an exact HTTPS origin and derives RP ID from that
@@ -55,9 +58,14 @@ AUTH-19 adds the optional [assertion protocol boundary](../../research/passkey-a
 including trusted credential decoding, owner/realm/origin checks, immutable backup
 eligibility, counter updates and private authentication state. Optional core/PostgreSQL
 sign-in now has a durable atomic consume/update/session/audit transaction with method
-provenance (migration 0008). There is no HTTP login route yet. This decision does not
-establish discoverability, account login, recovery assurance or assertion browser
-interoperability. The source reviews record those remaining gates.
+provenance (migration 0008). Explicit experimental HTTP login now has real Chromium
+platform/USB assertions and modal resident discovery tests. Signed client context is
+checked separately because the pinned assertion path omits cross-origin context
+checks. No weaker cryptographic path or permissive origin is introduced. Counterless
+acceptance evidence uses real signed zero assertions and explicit trusted stored-zero
+fixture metadata; it does not prove counterless hardware enrollment. The source
+reviews and browser record distinguish those boundaries from remaining recovery,
+other-browser and real-device gates.
 Do not enable ordinary server enrollment until
 registered credentials are usable and mailbox/password flows cannot bypass the
 reviewed stronger-account policy. Passkey-first accounts remain required and need

@@ -10,6 +10,28 @@ use uuid::Uuid;
 const MAX_REGISTRATION_RESPONSE_BYTES: usize = 16 * 1024;
 
 impl PasskeyService {
+    /// Explicit request for browser residence, not independently verified metadata.
+    /// The caller must still retain account-bound sign-in for nonresident credentials.
+    pub fn begin_discoverable_registration(
+        &self,
+        owner: Uuid,
+        account_name: &str,
+        excluded_credentials: &[Vec<u8>],
+    ) -> Result<(PasskeyCreationOptions, PrivatePasskeyRegistration)> {
+        let (mut options, state) =
+            self.begin_registration(owner, account_name, excluded_credentials)?;
+        let selection = options
+            .public_key
+            .authenticator_selection
+            .as_mut()
+            .ok_or(Error::Unavailable)?;
+        // This field's public enum is not reexported by the high-level prelude.
+        selection.resident_key =
+            Some(serde_json::from_value("required".into()).map_err(|_| Error::Unavailable)?);
+        selection.require_resident_key = true;
+        Ok((options, state))
+    }
+
     pub fn begin_registration(
         &self,
         owner: Uuid,
@@ -57,6 +79,7 @@ impl PasskeyService {
         if state.origin != self.origin.as_str() || !bounded_response(response) {
             return Err(Error::Unauthorized);
         }
+        super::client_context::require_same_origin(response.response.client_data_json.as_slice())?;
         let credential = logging::without_payload_events(|| {
             self.verifier
                 .finish_passkey_registration(response, &state.state)

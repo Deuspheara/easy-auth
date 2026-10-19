@@ -22,6 +22,17 @@ mod tests {
         }
     }
     impl Subscriber for Recorder {
+        fn register_callsite(
+            &self,
+            _: &'static Metadata<'static>,
+        ) -> tracing::subscriber::Interest {
+            // Scoped subscribers coexist with other tests' empty dispatchers. Keep
+            // callsite interest dynamic instead of caching this recorder as Always.
+            tracing::subscriber::Interest::sometimes()
+        }
+        fn max_level_hint(&self) -> Option<tracing::level_filters::LevelFilter> {
+            Some(tracing::level_filters::LevelFilter::TRACE)
+        }
         fn enabled(&self, _: &Metadata<'_>) -> bool {
             true
         }

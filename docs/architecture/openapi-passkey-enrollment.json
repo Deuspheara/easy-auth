@@ -2249,6 +2249,11 @@
           "label"
         ],
         "properties": {
+          "discoverable": {
+            "type": "boolean",
+            "description": "Explicitly request browser residence. Success is not independently verified residence metadata.",
+            "default": false
+          },
           "label": {
             "type": "string",
             "description": "Human-readable label; 1–256 UTF-8 bytes, nonblank, no control characters."

@@ -1,6 +1,7 @@
 mod authentication;
 mod authentication_repository;
 mod authentication_state;
+mod client_context;
 mod configuration;
 mod credential;
 mod enrollment;

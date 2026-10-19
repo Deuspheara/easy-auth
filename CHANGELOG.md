@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Optional passkey assertion verification and atomic PostgreSQL challenge/key/session/audit transactions, with owner/realm/browser binding, counter/backup policy and explicit session authentication methods. HTTP login, stronger-account policy and native browser assertion coverage remain unfinished (AUTH-19).
+- Experimental passkey HTTP sign-in and atomic PostgreSQL challenge/key/session/audit transactions, with owner/realm/browser binding, counter/backup/context policy and explicit session methods. Twenty Chromium cases cover registration, real assertions and modal resident discovery; stronger-account policy and passkey-first enrollment remain unfinished (AUTH-19).
 
 - Experimental passkey registration through the high-level verifier, atomic PostgreSQL ceremonies, explicit Axum opt-in, a concrete OpenAPI extension and reproducible Chromium platform/USB virtual-authenticator checks. Ordinary server enrollment remains disabled pending passkey sign-in and stronger-account policy (AUTH-18).
 

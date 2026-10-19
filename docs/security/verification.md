@@ -2,6 +2,47 @@
 
 This is alpha implementation evidence, not an independent security audit or a production release.
 
+## AUTH-19 experimental sign-in checkpoint — 2026-10-19
+
+The optional HTTP router now reuses atomic core/PostgreSQL sign-in with closed modes,
+exact realm/origin startup checks, host binding cookies and concrete merged schemas.
+Ordinary composition remains gated. Source review adds explicit signed-client-context
+policy because the pinned library assertion path omits crossOrigin/topOrigin checks.
+Modal mode adjusts only a public mediation hint, retaining required UP/UV and all
+cryptographic checks; explicit resident enrollment changes only browser requirements,
+without declaring unsigned residence metadata authoritative.
+
+Final local workspace tests pass sequentially: default 59, all-features 102, with
+zero failures/ignored tests. Formatting, strict all-target/all-feature Clippy,
+compiled-advisory and cargo-deny checks pass; npm audit reports zero vulnerabilities.
+The first full run exposed a logging test positive-control failure under concurrent
+scoped dispatchers. Its recorder now advertises dynamic callsite interest and an
+explicit TRACE hint; three repeated concurrent core suites and the final workspace
+run pass with exposure, suppression and caller-log restoration assertions retained.
+Production tracing policy and required checks were not relaxed.
+
+Twenty Chromium 156.0.8078.4 cases pass through real HTTP and PostgreSQL: registration,
+native platform/USB account-bound assertions, modal resident discovery, bad UP/UV/
+signature, replay, missing binding, signed iframe context, BE upgrade, BS update and
+signed zero counters. Thirteen sessions/authentication audits and twenty-three
+admitted finish attempts confirm valid commits and admission of the signed negatives.
+Twenty credentials/enrollment audits, no pending state, one backed-up/one counterless
+used key and exact fixture DB removal are required. The counterless acceptance test
+explicitly prepares trusted stored-zero metadata for one unused test credential;
+it changes no public key, signature verifier or session code and is not native
+counterless-enrollment/hardware evidence. See the [fixture details](../../tests/browser/passkeys/README.md).
+
+The test-only dependency is pinned to Playwright 1.64.1. Chromium 151 silently ignored
+the counter property setter, verified in its exact upstream handler; newer Chromium
+supports it. HTTP tests also caught ignored extra fields on unit enum variants;
+empty struct variants now enforce the closed contract. A context-policy unit test
+rejects true/null/duplicate crossOrigin and every topOrigin. The new source files
+are grouped by protocol, HTTP contract, browser assertions and fixture responsibility.
+
+This is incremental AUTH-19 evidence. Stronger-account sensitive-action/recovery
+policy, passkey-first enrollment, other browsers/real devices and full M03 activation
+remain unfinished. Older sections below preserve their checkpoint scope and counts.
+
 ## AUTH-18 experimental HTTP/browser checkpoint — 2026-10-19
 
 The explicit experimental Axum composition adds typed enrollment start/finish,
@@ -25,7 +66,7 @@ are still release gates.
 - Cross-origin status uses CDP response-extra-info because CORS blocks page access
   and can suppress Playwright response events. The assertion still requires the
   actual POST's HTTP 403. No CORS protection or product behavior was weakened.
-- Adding the known binding cookie intentionally makes feature-enabled logout/
+- Adding the known binding cookie intentionally makes feature-enabled current/all-session
   revocation clear six cookies. Regression checks now explicitly require that name
   and retain zero-Max-Age checks, while default builds still require five cookies.
 - Contract review caught the experimental finish DTO sharing the existing email

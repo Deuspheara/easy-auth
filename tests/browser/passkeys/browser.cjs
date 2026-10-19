@@ -8,12 +8,13 @@ async function post(page, path, body) {
   return page.evaluate(async ({path, body}) => {
     const response = await fetch(path, {method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)});
-    return {status: response.status, body: await response.json()};
+    const text = await response.text();
+    return {status: response.status, body: text ? JSON.parse(text) : null};
   }, {path, body});
 }
 
-async function start(page) {
-  const result = await post(page, START, {label: 'Browser test key'});
+async function start(page, options = {}) {
+  const result = await post(page, START, {label: 'Browser test key', ...options});
   assert.equal(result.status, 200, 'start status');
   assert.equal(result.body.options.publicKey.authenticatorSelection.userVerification, 'required');
   assert.equal(result.body.options.publicKey.rp.id, 'localhost');
@@ -47,7 +48,7 @@ async function finish(page, pending, credential, expected = 201) {
   return response;
 }
 
-async function withAuthenticator(browser, origin, session, transport, operation) {
+async function withAuthenticator(browser, origin, session, transport, operation, options = {}) {
   const context = await browser.newContext();
   try {
     await context.addCookies([{name: 'auth-session', value: session, url: origin, httpOnly: true,
@@ -58,7 +59,7 @@ async function withAuthenticator(browser, origin, session, transport, operation)
     await cdp.send('WebAuthn.enable', {enableUI: false});
     const {authenticatorId} = await cdp.send('WebAuthn.addVirtualAuthenticator', {options: {
       protocol: 'ctap2', transport, hasResidentKey: true, hasUserVerification: true,
-      isUserVerified: true, automaticPresenceSimulation: true
+      isUserVerified: true, automaticPresenceSimulation: true, ...options
     }});
     return await operation({context, page, cdp, authenticatorId});
   } finally { await context.close(); }

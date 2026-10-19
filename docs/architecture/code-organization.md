@@ -113,3 +113,11 @@ completion. Its `save` and `commit` exceed the function-size trigger to keep bro
 count locking and user/key/ceremony lock order, exact snapshot and post-wait expiry
 checks, credential mutation, session/audit insertion and rollback visible. Tests
 group binding, concurrency, migration and unchanged-row wait invariants separately.
+
+Experimental HTTP sign-in lives under `passkeys/authentication/`: route composition,
+thin handlers, closed modes and concrete wire schemas each have a focused module.
+Browser registration and assertion cases use separate modules; signed iframe
+context and the fixed counterless storage fixture each own their setup. The longer
+fixture/runner functions retain ordered resource ownership, safe output and cleanup;
+no test HTTP sign-in/proof bypass is added. The stdin setup changes only one unused
+fixture credential's trusted counter metadata and cancels its prior test challenge.

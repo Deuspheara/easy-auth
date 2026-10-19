@@ -8,7 +8,8 @@
 | Email change/account deletion | Both-address proof, freshness/rotation, uniqueness races, rollback, cleanup/deidentification and cross-user/realm tests | Actual SMTP confirmations/notices in both compositions | Alpha lifecycle; application data/backup deletion outside auth scope |
 | Embedded vs standalone | Same Auth use cases/router; compiled custom protected-route example | Fresh contributor walkthrough pending | Implemented shared composition |
 | Passkey registration | Real PostgreSQL attack/concurrency/rollback corpus; experimental HTTP boundary/contract; eight real Chromium virtual-authenticator cases | No real-device evidence | Experimental opt-in only; ordinary composition disabled |
-| Passkey sign-in, discoverability, passkey-first accounts and recovery | None yet | None | Remaining M03 work; unavailable |
+| Passkey sign-in and modal discoverability | Real signed protocol/database corpus, experimental HTTP contract and native Chromium platform/USB assertions, resident discovery, signed context/backup/counter checks | No real-device evidence | Explicit experimental composition; ordinary activation gated |
+| Passkey-first accounts and stronger-account recovery | Not implemented yet | None | Remaining M03 work; ordinary activation blocked |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
 | Enterprise OIDC client | None yet | None | M05 required; unavailable |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
@@ -40,3 +41,20 @@ browser-fixture databases afterward. Identity/session setup uses the repository'
 verified fixture transaction; this browser run does not replace SMTP/signup tests.
 No browser storage, trace, cookie, protocol payload or virtual private key is
 stored in the record. [Reproduction instructions](../../tests/browser/passkeys/README.md).
+
+## AUTH-19 assertion browser boundary
+
+The expanded suite uses pinned Playwright 1.64.1 / Chromium 156.0.8078.4. Twenty
+cases exercise real HTTP/PostgreSQL registration and assertions, including internal
+and USB nonresident account-bound login, modal resident discovery with a native
+owner handle, UP/UV/signature rejection, replay, missing binding, signed cross-origin
+iframe rejection, BE-upgrade rejection, eligible BS update and real signed zeros.
+It requires twenty credentials/enrollment audits, thirteen authentication audits
+and sessions, twenty-three admitted finish attempts and exact database cleanup.
+
+The zero case first rejects zero against stored nonzero metadata, then explicitly
+arranges trusted stored-zero metadata for an unused native-created test credential
+through one private fixture stdin command. Actual key/signature/session code stays
+unchanged; its two signed zero assertions use separate one-use challenges. This
+does not establish counterless native enrollment, real hardware, other browsers or
+conditional-autofill UI. [Fixture details](../../tests/browser/passkeys/README.md).

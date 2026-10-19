@@ -1,9 +1,9 @@
 # HTTP contract v1
 
-AUTH-19's optional Rust/PostgreSQL passkey sign-in use case has no login HTTP route
-or OpenAPI extension yet. It issues a session only through its atomic verified
-transaction; browser account selection and stronger-account policy remain in progress. See the
-[assertion boundary review](../research/passkey-authentication.md).
+AUTH-19 adds explicit experimental passkey HTTP sign-in, separately enabled from
+the ordinary router/server. Its verified session transaction, mode/selection contract
+and remaining stronger-account gates are documented in the
+[sign-in guide](../guides/passkey-authentication.md).
 
 Initial same-origin browser contract. Realm is trusted router configuration. JSON bodies are bounded at 8 KiB. Auth responses use Cache-Control: no-store. Errors expose stable codes; internal database/SMTP details never reach the caller. Authentication secrets never appear in query parameters or response JSON.
 
@@ -57,7 +57,7 @@ and does not implement sign-in, passkey-first accounts or stronger-account recov
 
 | Method/path | Input | Output / behavior |
 | --- | --- | --- |
-| POST /v1/passkeys/enrollment/start | `{label}`, fresh session cookie and exact Origin | 200 `{transaction_id, options: {publicKey: ...}}`; sets/reuses two-minute HttpOnly passkey-browser binding |
+| POST /v1/passkeys/enrollment/start | `{label, discoverable?:bool}`, fresh session cookie and exact Origin | 200 `{transaction_id, options: {publicKey: ...}}`; optional explicit resident request; sets/reuses two-minute HttpOnly browser binding |
 | POST /v1/passkeys/enrollment/finish | `{transaction_id, credential}`, same session/binding cookies and exact Origin | 201 `{id}` after verified, atomic single-use registration; no new authenticated session |
 
 Only these two experimental endpoints use a 32 KiB encoded JSON body bound;
@@ -72,8 +72,9 @@ The private serialized verification state is absent from options, cookies and
 response JSON. The binding cookie is `__Host-auth-passkey` under HTTPS, otherwise
 `auth-passkey` in explicit localhost development; HttpOnly, SameSite=Lax, Path=/,
 no Domain, Max-Age=120, Secure under HTTPS. It is retained after one completion so
-other pending ceremonies in the same browser can finish, and is cleared on logout
-or current/all-session revocation when the feature is compiled.
+other pending ceremonies in the same browser can finish. Current/all-session
+revocation clears it when the feature is compiled; logout clears the authenticated
+session, and this short-lived binding expires separately.
 
 Errors use the existing redacted codes: 400 invalid input/JSON, 401 invalid,
 expired, replayed or misbound authentication/proof, 403 rejected Origin, 413 body
@@ -86,3 +87,21 @@ against live output. Default [OpenAPI](../openapi.json) remains unchanged.
 See the [enrollment guide](../guides/passkey-enrollment.md) and
 [browser test instructions](../../tests/browser/passkeys/README.md) for verified
 boundaries and remaining M03 release gates.
+
+## Explicit experimental passkey authentication
+
+The additional `passkey-authentication` feature exports `experimental_passkey_router`
+and a [full schema](openapi-passkeys.json), combining base, enrollment and sign-in.
+Ordinary server composition stays gated on the remaining M03 security policy.
+
+| Method/path | Input | Output / behavior |
+| --- | --- | --- |
+| POST /v1/passkeys/authentication/start | `{mode:"account_bound",account_id}`, `{mode:"discoverable"}` or `{mode:"conditional"}`, exact Origin | 200 `{transaction_id,options}`; persists private state; sets/reuses host binding cookie |
+| POST /v1/passkeys/authentication/finish | `{transaction_id,credential}`, same binding and exact Origin | 204 with fresh session cookie after atomic verified key/state/session/audit commit |
+
+Both use 32 KiB bodies and the same redacted errors and cookie policy as enrollment.
+Account selection uses an opaque remembered/private owner hint; email lookup and
+extra/unknown mode fields are rejected. Modal discovery has no selected account;
+conditional mode preserves the browser autofill hint. Private state and session
+secrets are absent from JSON. See the sign-in guide for native JSON conversion,
+counter/backup/context policy and the new-browser nonresident selection limitation.

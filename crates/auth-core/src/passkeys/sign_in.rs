@@ -12,6 +12,12 @@ pub struct PasskeySignInOptions {
     pub options: PasskeyAuthenticationOptions,
 }
 
+enum SignInMode {
+    Account(Uuid),
+    Conditional,
+    Modal,
+}
+
 /// Explicit optional composition. No normal HTTP/server login route enables this
 /// until account selection and stronger-account policy have been reviewed.
 pub struct PasskeySignIn {
@@ -48,7 +54,8 @@ impl PasskeySignIn {
         browser: &Secret,
         source: &str,
     ) -> Result<PasskeySignInOptions> {
-        self.begin(Some(owner), browser, source).await
+        self.begin(SignInMode::Account(owner), browser, source)
+            .await
     }
 
     pub async fn begin_discoverable(
@@ -56,26 +63,41 @@ impl PasskeySignIn {
         browser: &Secret,
         source: &str,
     ) -> Result<PasskeySignInOptions> {
-        self.begin(None, browser, source).await
+        self.begin(SignInMode::Conditional, browser, source).await
+    }
+
+    pub async fn begin_modal(
+        &self,
+        browser: &Secret,
+        source: &str,
+    ) -> Result<PasskeySignInOptions> {
+        self.begin(SignInMode::Modal, browser, source).await
     }
 
     async fn begin(
         &self,
-        owner: Option<Uuid>,
+        mode: SignInMode,
         browser: &Secret,
         source: &str,
     ) -> Result<PasskeySignInOptions> {
         let request = self.request(browser, source, Uuid::new_v4());
+        let owner = match mode {
+            SignInMode::Account(owner) => Some(owner),
+            _ => None,
+        };
         let credentials = self
             .repository
             .prepare_authentication(&request, self.service.rp_id(), owner)
             .await?;
-        let (options, state) = match owner {
-            Some(owner) => {
+        let (options, state) = match mode {
+            SignInMode::Account(owner) => {
                 self.service
                     .begin_account_authentication(self.realm, owner, &credentials)?
             }
-            None => self.service.begin_discoverable_authentication(self.realm)?,
+            SignInMode::Conditional => {
+                self.service.begin_discoverable_authentication(self.realm)?
+            }
+            SignInMode::Modal => self.service.begin_modal_authentication(self.realm)?,
         };
         let transaction = request.transaction;
         self.repository

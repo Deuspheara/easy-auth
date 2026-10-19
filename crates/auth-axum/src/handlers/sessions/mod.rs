@@ -26,7 +26,7 @@ pub async fn authenticate(
     let secret = read_cookie(headers, browser.session_name())?;
     auth.authenticate(&secret).await
 }
-pub(super) fn session_response(state: &AppState, session: &Secret) -> Response {
+pub(crate) fn session_response(state: &AppState, session: &Secret) -> Response {
     let mut response = StatusCode::NO_CONTENT.into_response();
     response.headers_mut().append(
         header::SET_COOKIE,

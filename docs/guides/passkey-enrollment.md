@@ -1,11 +1,11 @@
 # Passkey enrollment implementation boundary
 
-AUTH-18 is in progress. The optional core/PostgreSQL enrollment path now persists
+AUTH-18 is complete. The optional core/PostgreSQL enrollment path persists
 and verifies registration ceremonies. An explicit experimental HTTP composition
 and Chromium virtual-authenticator tests are implemented; normal embedded/server
-composition does not enable it. Passkey sign-in, discoverable/passkey-first accounts, credential
-management and reviewed recovery are still required in M03. This guide is not a
-passkey-login quick start or evidence of browser interoperability.
+composition does not enable it. Experimental [passkey sign-in](passkey-authentication.md)
+now includes native assertions and modal residence checks. Passkey-first accounts,
+credential management and reviewed stronger-account policy remain M03 requirements.
 
 ## Core and persistence
 
@@ -22,7 +22,10 @@ a trusted source identifier and a user-supplied credential label. The adapter
 selects the owner from the realm/session; clients cannot nominate a user or RP.
 The label is bounded to 256 UTF-8 bytes and rejects empty/control-character input.
 The returned transaction UUID and public creation options are safe browser inputs;
-the paired private state stays exclusively in PostgreSQL. No session secret,
+the paired private state stays exclusively in PostgreSQL. `begin_discoverable` (HTTP
+`discoverable:true`) explicitly requests resident-key creation without treating
+creation or unsigned client extension results as verified residence metadata.
+No session secret,
 browser secret or state belongs in a URL or application log.
 
 `finish` loads only the current session/browser/realm-bound transaction, verifies
@@ -98,7 +101,8 @@ an actual cross-origin POST and another browser missing the binding cookie.
 Each case has a successful registration control; aggregate credentials and audit
 facts must match, pending state must be empty, and the disposable database must be
 removed. This establishes that specific virtual-browser boundary, not real-device,
-Safari/Firefox, discoverable, authentication or recovery interoperability.
+Safari/Firefox or recovery interoperability. AUTH-19 extends the suite with native
+assertions and modal resident discovery, documented in the sign-in guide.
 
 The `passkey-enrollment` Axum feature exports an explicitly named experimental
 router. It validates matching configured realm/origin, retains the base API and

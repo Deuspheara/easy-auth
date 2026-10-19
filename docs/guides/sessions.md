@@ -1,5 +1,12 @@
 # Managing browser sessions
 
+Passkey sign-in additionally records an internal authentication method in migration
+0008: email, password, passkey or legacy_unknown. It is separate from the public
+inventory/time fields. Migration does not infer historical methods, and password
+enrollment rotations preserve their initiating method/time. Method metadata does
+not by itself enable stronger-account recovery or sensitive-action policy; those
+remain M03 gates before ordinary passkey composition.
+
 The embedded router and standalone service share the same session controls. A valid session can list its own user's active sessions in the configured realm. Revoking an individual session or all sessions requires authentication within five minutes. Touching a session or rotating it does not reset that window; sign in again when a sensitive operation returns 401. Ordinary logout remains available without fresh authentication.
 
 ## HTTP API

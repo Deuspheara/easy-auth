@@ -18,6 +18,9 @@ mod sessions;
 
 #[path = "browser/audit.rs"]
 mod audit;
+#[cfg(feature = "passkey-authentication")]
+#[path = "browser/passkey_authentication/mod.rs"]
+mod passkey_authentication;
 #[cfg(feature = "passkey-enrollment")]
 #[path = "browser/passkeys.rs"]
 mod passkeys;

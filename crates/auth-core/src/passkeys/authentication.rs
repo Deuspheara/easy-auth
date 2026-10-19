@@ -114,6 +114,17 @@ impl PasskeyService {
         Ok(raw)
     }
 
+    /// Modal discovery changes only the client-controlled mediation hint. Private
+    /// challenge state and required UP/UV/signature/origin/RP policy stay identical.
+    pub fn begin_modal_authentication(
+        &self,
+        realm: Uuid,
+    ) -> Result<(PasskeyAuthenticationOptions, PrivatePasskeyAuthentication)> {
+        let (mut options, state) = self.begin_discoverable_authentication(realm)?;
+        options.mediation = None;
+        Ok((options, state))
+    }
+
     /// Counter checks, signature, UP/UV, challenge, RP and origin validation stay in
     /// the reviewed high-level library. No database mutation or session is issued here.
     pub fn verify_authentication(
@@ -124,6 +135,7 @@ impl PasskeyService {
     ) -> Result<VerifiedPasskeyAuthentication> {
         let expected_state = state.encode_for_database()?;
         let id = self.authentication_credential_id(response)?;
+        super::client_context::require_same_origin(response.response.client_data_json.as_slice())?;
         if state.realm != stored.realm
             || state.origin != self.origin.as_str()
             || stored.rp_id != self.rp_id

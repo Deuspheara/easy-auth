@@ -46,16 +46,47 @@ impl PasskeyEnrollment {
         source: &str,
         label: &str,
     ) -> Result<PasskeyEnrollmentOptions> {
+        self.begin_with_residence(session, browser, source, label, false)
+            .await
+    }
+
+    pub async fn begin_discoverable(
+        &self,
+        session: &Secret,
+        browser: &Secret,
+        source: &str,
+        label: &str,
+    ) -> Result<PasskeyEnrollmentOptions> {
+        self.begin_with_residence(session, browser, source, label, true)
+            .await
+    }
+
+    async fn begin_with_residence(
+        &self,
+        session: &Secret,
+        browser: &Secret,
+        source: &str,
+        label: &str,
+        discoverable: bool,
+    ) -> Result<PasskeyEnrollmentOptions> {
         configuration::display_name(label)?;
         let context = self
             .repository
             .enrollment_context(self.realm, session.verifier(), self.service.rp_id())
             .await?;
-        let (options, state) = self.service.begin_registration(
-            context.user_id,
-            &context.account_name,
-            &context.excluded_credentials,
-        )?;
+        let (options, state) = if discoverable {
+            self.service.begin_discoverable_registration(
+                context.user_id,
+                &context.account_name,
+                &context.excluded_credentials,
+            )?
+        } else {
+            self.service.begin_registration(
+                context.user_id,
+                &context.account_name,
+                &context.excluded_credentials,
+            )?
+        };
         let transaction = Uuid::new_v4();
         self.repository
             .save_enrollment(PasskeyEnrollmentStart {

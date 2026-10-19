@@ -1,4 +1,5 @@
 //! Disposable browser-test fixture only. Never deploy or use as an authentication server.
+mod counterless;
 mod fixture;
 mod mail;
 
@@ -26,7 +27,7 @@ async fn run() -> Result<(), Box<dyn Error>> {
         return Err("browser fixture requires loopback PostgreSQL".into());
     }
     let sessions: Vec<String> = serde_json::from_str(&std::env::var("EASY_AUTH_TEST_SESSIONS")?)?;
-    if sessions.is_empty() || sessions.len() > 16 {
+    if sessions.is_empty() || sessions.len() > 32 {
         return Err("invalid fixture count".into());
     }
     let admin = PgPoolOptions::new()

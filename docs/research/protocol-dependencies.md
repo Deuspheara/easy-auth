@@ -21,7 +21,8 @@ private-state serialization boundary, RP ownership, discoverability limitations,
 authentication provenance/recovery prerequisites and concrete browser/database
 test requirements. Experimental enrollment has real Chromium evidence; optional
 assertion verification is described in the [authentication review](passkey-authentication.md).
-Optional core/PostgreSQL sign-in is implemented; HTTP login and management remain
+Optional core/PostgreSQL and experimental HTTP sign-in have native Chromium
+assertion/modal-discovery evidence. Ordinary activation and management remain
 unfinished. Source review alone
 is not interoperability evidence.
 

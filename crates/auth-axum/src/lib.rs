@@ -13,4 +13,6 @@ pub use contract::openapi;
 pub use handlers::sessions::authenticate;
 #[cfg(feature = "passkey-enrollment")]
 pub use passkeys::{experimental_passkey_enrollment_router, passkey_enrollment_openapi};
+#[cfg(feature = "passkey-authentication")]
+pub use passkeys::{experimental_passkey_router, passkey_authentication_openapi};
 pub use router::router;

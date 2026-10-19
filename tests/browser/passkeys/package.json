@@ -2,7 +2,13 @@
   "name": "easy-auth-passkey-browser-tests",
   "private": true,
   "version": "0.0.0",
-  "scripts": { "test": "node run.cjs" },
-  "engines": { "node": ">=22" },
-  "devDependencies": { "playwright": "1.62.1" }
+  "scripts": {
+    "test": "node run.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1"
+  }
 }

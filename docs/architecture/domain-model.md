@@ -4,7 +4,7 @@ A realm is an authentication security partition; it is not a workspace/business 
 
 User has opaque random UUID, realm, verified email and lifecycle status. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. ExternalIdentity is unique by (realm, connection, trusted issuer, subject); matching emails never merge users. Linking proves current fresh session and a new provider transaction. Unlinking cannot remove the last usable credential/recovery path. Merges are disabled until separately reviewed.
 
-Password credentials now store a salted Argon2id PHC string under a realm/user composite key, with single-enrollment uniqueness. Enrollment requires a fresh verified session and replaces existing sessions atomically. Credentials (password, passkey) are distinct from provider accounts and user records. The optional passkey enrollment boundary stores RP-scoped credential/public-key state, counter/backup state and a user label; sign-in and credential management remain unfinished. Planned discoverable enrollment must provision a passkey-first user under a reviewed enrollment transaction. Recovery cannot silently replace stronger assurance with email; explicit policy, delays/notifications and audit required.
+Password credentials now store a salted Argon2id PHC string under a realm/user composite key, with single-enrollment uniqueness. Enrollment requires a fresh verified session and replaces existing sessions atomically. Credentials (password, passkey) are distinct from provider accounts and user records. The optional passkey enrollment boundary stores RP-scoped credential/public-key state, counter/backup state, last-use metadata and a user label; ordinary activation and credential management remain unfinished. Planned discoverable enrollment must provision a passkey-first user under a reviewed enrollment transaction. Recovery cannot silently replace stronger assurance with email; explicit policy, delays/notifications and audit required.
 
 AuthenticationTransaction carries realm/client/connection, purpose, browser binding, state/nonce/PKCE verifier and expiry. VerificationChallenge holds only token/browser verifiers, email/purpose and expiry. Consume atomically in the transaction that creates the user and session. A failed session insert rolls back consumption. Password-reset proofs use a separate table/cookie and bind the current credential version; consumption, password/version update, session/proof invalidation, audit and non-secret notification enqueue commit atomically. Delivery claims are leased and realm scoped. Parallel consumption yields one winner. PostgreSQL constraints include realm in all identity relations.
 
@@ -17,9 +17,10 @@ short-lived enrollment and authentication transactions. Experimental HTTP enroll
 is available; optional core/PostgreSQL sign-in now atomically consumes browser-bound
 proof state, updates the credential and last-use time, issues an owned session and
 audits authentication. See the [enrollment guide](../guides/passkey-enrollment.md)
-and [authentication review](../research/passkey-authentication.md). HTTP sign-in,
-safe account selection and stronger-account policy remain unfinished; ordinary
-server composition stays gated.
+and [authentication review](../research/passkey-authentication.md). Experimental HTTP sign-in now covers account-bound and modal resident discovery,
+with an opaque owner hint and no email-to-credential resolver. Stronger-account
+policy, passkey-first enrollment and the remaining M03 work keep ordinary
+composition gated.
 
 Migration 0008 records session authentication method separately from time: email,
 password, passkey or legacy_unknown. Existing sessions retain unknown method;
