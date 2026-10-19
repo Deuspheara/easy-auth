@@ -95,3 +95,10 @@ replay, existing-session/cross-browser confusion and signed cross-origin iframe
 rejection. Native production options are not weakened for a software signer. The packed
 attestation signature-attack corpus is covered by the Rust/software-authenticator
 suite; it is not mislabeled as browser hardware attestation coverage.
+
+The separate [native SMTP contact suite](attachment/README.md) uses the real server
+SMTP adapter and local Mailpit, rather than the disabled-mail adapter in this
+31-case fixture. It adds two anonymous platform/USB signup-to-contact cases with
+actual email confirmation, session rotation and subsequent passkey login. CI runs
+both suites sequentially with owned disposable databases; their aggregate counts
+and evidence records stay separate.

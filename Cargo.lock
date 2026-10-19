@@ -470,6 +470,7 @@ dependencies = [
  "easy-auth-core",
  "easy-auth-postgres",
  "lettre",
+ "serde_json",
  "sqlx",
  "tokio",
  "tracing",

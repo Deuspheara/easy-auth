@@ -9,6 +9,12 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+experimental-passkeys = ["auth-axum/passkey-signup", "auth-core/passkeys", "auth-postgres/passkeys"]
+
+[dev-dependencies]
+serde_json.workspace = true
+
 [dependencies]
 zeroize.workspace = true
 auth-core.workspace = true
@@ -27,3 +33,8 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 [[bin]]
 name = "easy-auth"
 path = "src/main.rs"
+
+[[example]]
+name = "passkey-smtp-browser"
+path = "examples/passkey-smtp-browser/main.rs"
+required-features = ["experimental-passkeys"]

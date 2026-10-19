@@ -159,3 +159,11 @@ bindings, session rotation, audit and final post-write expiry consumption visibl
 together. Integration cases separate binding, atomicity, concurrency, observed
 waits and migration. Test mail state has named fields in `tests/support/mail.rs`;
 no positional tuple or public production delivery internals are added.
+
+Native SMTP contact tests use a server example with separate owned-process,
+configuration/composition and aggregate-database modules. It calls the real public
+`configured_auth` facade and leaves the private SMTP adapter private. Native cases,
+owned Mailpit access and runner/provenance each have a focused JavaScript module.
+Longer orchestration retains ordered resource ownership/cleanup and never logs
+captured child diagnostics or proof-bearing assertion values. No production fixture
+endpoint or generic workflow engine is introduced.
