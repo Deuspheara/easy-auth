@@ -15,6 +15,12 @@ pub struct PasskeyRecoveryClaims {
 }
 
 impl PasskeyRecoveryClaims {
+    pub fn realm(&self) -> Uuid {
+        self.realm
+    }
+    pub fn origin(&self) -> &str {
+        self.service.origin()
+    }
     /// An alerted owner who lost every key can still deny a fraudulent claim
     /// using the retained saved code. This never revives the consumed code.
     pub async fn cancel_with_code(&self, user_id: Uuid, code: &Secret, source: &str) -> Result<()> {
@@ -88,6 +94,19 @@ impl PasskeyRecoveryClaims {
     ) -> Result<()> {
         self.repository
             .cancel_passkey_recovery_claim(&self.request(user_id, browser, source), id)
+            .await
+    }
+
+    /// An alerted owner need not know the claimant's response ID. Genuine fresh
+    /// key proof may deny the current owned RP claim without disclosing it.
+    pub async fn cancel_current_with_key(&self, session: &Secret, source: &str) -> Result<()> {
+        self.repository
+            .cancel_current_passkey_recovery_with_key(&PasskeyRecoveryKeyCancellation {
+                realm: self.realm,
+                rp_id: self.service.rp_id().into(),
+                session: session.verifier(),
+                source: Sha256::digest(source.as_bytes()).into(),
+            })
             .await
     }
 

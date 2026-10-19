@@ -50,6 +50,20 @@ impl PasskeyRecoveryClaimRepository for Postgres {
         cancellation::browser(&self.pool, request, id).await
     }
 
+    async fn cancel_current_passkey_recovery_with_key(
+        &self,
+        request: &PasskeyRecoveryKeyCancellation,
+    ) -> Result<()> {
+        super::super::sensitive_admission::admit_sensitive_action(
+            self,
+            request.realm,
+            request.session,
+            request.source,
+        )
+        .await?;
+        cancellation::key(&self.pool, request, None).await
+    }
+
     async fn cancel_passkey_recovery_with_key(
         &self,
         request: &PasskeyRecoveryKeyCancellation,
@@ -62,7 +76,7 @@ impl PasskeyRecoveryClaimRepository for Postgres {
             request.source,
         )
         .await?;
-        cancellation::key(&self.pool, request, id).await
+        cancellation::key(&self.pool, request, Some(id)).await
     }
 }
 

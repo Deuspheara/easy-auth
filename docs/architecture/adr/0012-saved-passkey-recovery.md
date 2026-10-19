@@ -2,7 +2,8 @@
 
 Status: experimental saved-code configuration, claim scheduling/cancellation and
 core/PostgreSQL replacement-key completion implemented in AUTH-20, 2026-10-19.
-Recovery HTTP boundaries and independent security review remain open. Ordinary enablement and stronger-policy activation
+Explicit experimental HTTP transport is implemented; reference pages, native/physical
+recovery evidence and independent security review remain open. Ordinary enablement and stronger-policy activation
 are not approved by this document. No AAL, MFA, conformance or production claim.
 
 ## Threat and authority
@@ -84,8 +85,8 @@ configuration transport; they do not exercise the replacement service below.
 ## Implemented claim scheduling and cancellation
 
 The optional `PasskeyRecoveryClaims` core/PostgreSQL boundary exposes begin,
-resume/status and cancellation only. There is no HTTP claim endpoint; this service
-issues no replacement credential or authenticated session. Public readiness metadata is not verified
+resume/status and cancellation only. The separate explicit HTTP composition below
+wraps these operations; this service issues no replacement credential or session. Public readiness metadata is not verified
 proof and must never authorize an application session or key binding.
 
 A correct current saved code reserves one claim under owner/code locks. The claim
@@ -200,7 +201,7 @@ retryable queue semantics as other notices.
 
 This core/PostgreSQL implementation has software-authenticator transaction evidence,
 not a usable browser recovery page, native recovery interoperability or independent
-policy approval. Claim/replacement HTTP, consent/usability, real-device/browser
+policy approval. Reference pages, consent/usability, native/real-device/browser recovery
 proof and safe activation remain required.
 
 Stronger-policy activation must wait for implemented, reviewed recovery and real
@@ -208,3 +209,49 @@ private-key proof. Before ordinary enablement, test rollback, one-use/race behav
 version changes, tenant/owner/browser/RP isolation, notification failure/receipt,
 clock/lock expiry and cancellation, plus native and physical-device/browser flows.
 These are remaining acceptance work, not a claimed property of configuration.
+
+
+## Explicit experimental recovery HTTP
+
+`passkey-recovery` exports `experimental_passkey_recovery_router` with named
+`PasskeyRecoveryServices`. Startup validates all seven services against the trusted
+realm and exact origin, reusing prior route builders/documents. Older constructors
+retain their routes and full schemas. Ordinary server composition remains disabled.
+The additive [full contract](../openapi-passkey-recovery.json) describes ten new
+POST operations; no account/email resolver, GET grant, query selector or CORS
+fallback is introduced. Outer JSON is closed, ordinary bodies retain 8 KiB, and
+registration/assertion responses alone permit 32 KiB with the same core bounds.
+All operations use the shared exact-Origin/no-store/redacted-error boundary.
+
+Before consuming a saved code, the anonymous browser must successfully POST `{}`
+to `/v1/passkeys/recovery/browser`. It establishes/reuses an independent HttpOnly,
+Secure `__Host-auth-passkey-recovery` cookie (explicit loopback development has a
+separate unprefixed name). Rebinding retains the same capability and refreshes
+cookie retention only, never a database deadline. Clients must perform this step
+immediately before starting a claim and retain the cookie through the wait. Claim
+start requires it and does not return another capability, so a lost start response
+can resume using only the public account ID and the already-established browser.
+No code or browser secret enters URLs, returned metadata or browser storage APIs.
+Clearing/losing that cookie can make a reserved claim unusable as already documented.
+
+Claim start/resume/status/browser cancellation and all replacement operations reject
+any session cookie, including expired/unknown ones: explicitly log out first. This
+prevents recovery from silently replacing another browser account session. Other
+purpose cookies cannot substitute for the recovery binding. Reserved-code denial
+needs no browser cookie and grants no access. Genuine-key cancellation is instead
+POST `/v1/passkeys/recovery/claims/cancel-with-key` with `{}` and a genuinely fresh
+session. It selects the current owner/RP claim under the existing locks; an alerted
+owner need not know a claimant-only UUID or saved code. The original explicit-ID
+core cancellation remains supported. Custom claim repositories must implement
+`cancel_current_passkey_recovery_with_key` with equivalent admission/ownership and
+deadline semantics. No anonymous status lookup is added for this usability fix.
+
+Only committed actual replacement assertion completion sets a fresh session cookie.
+It clears stale auth/action cookies while retaining the independent recovery cookie,
+which may bind another account's claim. Terminal database state prevents replay.
+Neither binding, delay metadata, registration, cancellation nor any error sets a
+session. Wrong/stale/cancelled proofs and persistence failures return generic errors
+without success cookies; a lost successful finish response uses normal key sign-in.
+Reference pages, usable consent/instructions and real recovery browser/device
+interoperability are separate remaining evidence, not properties established by
+software HTTP tests or by this experimental constructor.

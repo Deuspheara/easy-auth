@@ -206,8 +206,7 @@ queued notice. See [ADR 0012](adr/0012-saved-passkey-recovery.md) and the
 
 
 Optional `PasskeyRecoveryClaims` adds core/PostgreSQL claim begin/resume/status
-and browser, fresh-key or reserved-code cancellation. There is no HTTP claim route
-or schema change in this stage, and its non-secret readiness metadata is never
+and browser, fresh-key or reserved-code cancellation. Its non-secret readiness metadata is never
 session/key authority. It reserves a saved code once, binds its exact generation
 and browser to the configured realm/owner/RP, preserves same-browser retry timing,
 and enforces a 24-hour delay plus seven-day expiry using database time. Verified-
@@ -217,7 +216,7 @@ Reserved-code cancellation is deny-only and cannot transfer a browser or revive
 proof. The required delivery port adds started/cancelled notices. See
 [ADR 0012](adr/0012-saved-passkey-recovery.md) for rate scopes, lost-response handling,
 original deadline/receipt rules, the separate replacement service and remaining
-HTTP/review/activation gates.
+native/review/activation gates.
 
 
 The experimental `PasskeyRecoveryReplacement` Rust service now exposes private
@@ -225,7 +224,40 @@ begin/finish-registration/finish operations for a `PasskeyRecoveryTarget` (publi
 user and claim UUIDs) plus the original browser secret. It returns creation/assertion
 options and a transaction UUID; only committed genuine assertion completion returns
 a fresh `Secret` session. Repository contracts use private verified transitions and
-exact snapshots. This adds no HTTP route or OpenAPI path: existing constructors,
-wire documents and ordinary activation remain unchanged. A repeated completion is
+exact snapshots. The separate HTTP constructor below exposes them; existing
+constructors, wire documents and ordinary activation remain unchanged. A repeated completion is
 unauthorized; a lost response is resolved by ordinary sign-in with the installed
 replacement key, never by returning another recovery grant.
+
+
+The opt-in `passkey-recovery` feature exports `experimental_passkey_recovery_router`
+and [the complete recovery OpenAPI](openapi-passkey-recovery.json). Named
+`PasskeyRecoveryServices` supply enrollment/sign-in/signup/management/setup/claims/
+replacement; startup validates every realm/origin. Older constructors retain their
+schemas/routes. Ten new POST paths under `/v1/passkeys/recovery/` are:
+
+| Suffix | Closed body | Success |
+| --- | --- | --- |
+| `browser` | `{}` | 204; establish/retain separate recovery browser cookie |
+| `claims/start` | `{account_id,code}` | 200 claim metadata; pre-bound browser required |
+| `claims/resume` | `{account_id}` | 200 same browser-bound claim after lost response |
+| `claims/status` | `{account_id,claim_id}` | 200 timing metadata only |
+| `claims/cancel` | `{account_id,claim_id}` | 204; bound-browser denial |
+| `claims/cancel-with-code` | `{account_id,code}` | 204; reserved-code denial, no browser transfer |
+| `claims/cancel-with-key` | `{}` | 204; current owner/RP selected by genuine fresh session |
+| `replacement/start` | `{account_id,claim_id}` | 200 `{transaction_id,options}` |
+| `replacement/registration` | `{account_id,claim_id,transaction_id,credential}` | 200 private-candidate assertion options |
+| `replacement/finish` | `{account_id,claim_id,transaction_id,credential}` | 204; committed actual assertion sets session |
+
+Claim metadata is exactly `{claim_id,expires_at_ms,not_before_ms,notification_required,
+ready}`; nullable not-before remains explicit. All require exact Origin and reject
+query selectors; stateful reads are POST only. Ordinary bodies retain 8 KiB, while
+the two WebAuthn response paths allow 32 KiB. Anonymous claim/replacement operations
+reject any existing session cookie; only fresh-key cancellation uses one. Recovery
+has an independent host-bound HttpOnly cookie established before consumption;
+other action/session cookies cannot replace it. Only final successful assertion
+sets a session, clears stale action cookies and preserves the independent recovery
+binding for other claims. Errors never return success cookies/proof values. Cookie
+retention is seven days; original database deadlines remain authoritative. See
+[ADR 0012](adr/0012-saved-passkey-recovery.md) for cancellation, lost-response and
+remaining review/device/activation gates. This adds no ordinary server enablement.

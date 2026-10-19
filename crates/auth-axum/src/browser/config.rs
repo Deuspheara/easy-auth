@@ -81,6 +81,14 @@ impl BrowserConfig {
             "auth-attach"
         }
     }
+    #[cfg(feature = "passkey-recovery")]
+    pub(crate) fn recovery_name(&self) -> &'static str {
+        if self.secure {
+            "__Host-auth-passkey-recovery"
+        } else {
+            "auth-passkey-recovery"
+        }
+    }
     pub(crate) fn cookie(&self, name: &str, secret: Option<&Secret>, max_age: u32) -> HeaderValue {
         let value = format!(
             "{name}={}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{}",

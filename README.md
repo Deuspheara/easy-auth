@@ -26,7 +26,10 @@ now has core/PostgreSQL, explicit HTTP and native Chromium resident platform/USB
 evidence; it creates an account/session only after registration and verified assertion.
 [Verified contact attachment](docs/guides/email-attachment.md) now has core/PostgreSQL
 and experimental HTTP tests plus native Chromium/SMTP confirmation evidence.
-Ordinary passkey composition stays gated.
+Ordinary passkey composition stays gated. The optional
+[experimental recovery HTTP API](docs/guides/passkey-management.md#experimental-recovery-http)
+now exposes delayed browser-bound claims and signed replacement completion;
+reference pages, independent review and recovery device evidence remain open.
 
 ## Run locally
 

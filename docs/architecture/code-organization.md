@@ -265,3 +265,15 @@ audit/notice, consumption and final deadline visible; invalidation is a named
 transaction-bound operation, not independent policy. Tests separate lifecycle,
 boundary/protocol, invalidation, rollback/races, migration and observed row/final-write
 waits. Longer scenarios preserve arranged authority and full rollback assertions.
+
+
+Experimental recovery HTTP lives under `passkeys/recovery/`: named service
+composition and body-limited route groups, concrete wire types/full schema, cookie/
+anonymous-session boundary, binding, claim metadata, cancellation and replacement
+handlers each have a focused module. The setup route builder was extracted and
+checked before extension; older constructors keep their schemas. No SQL or duplicate
+recovery policy enters handlers. Current-key cancellation shares the existing core/
+PostgreSQL authority/transaction path. Integration cases group binding, boundaries,
+contract, cancellation, lifecycle/concurrency and rollback/receipt behavior under
+the owning feature. Longer fixtures/scenarios retain actual proof and ordered
+resource/state assertions; new implementation modules remain below 300 lines.

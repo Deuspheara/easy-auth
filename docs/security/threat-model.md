@@ -175,9 +175,9 @@ cancellation counter. There is no mailbox-only cancellation/login authority. Cod
 rotation invalidates claims atomically, deletion erases owned state/audit targets,
 and source/unlinked abuse metadata remains separately retained. Email-free users
 lack independent alerts; lost browser capability, expired/cancelled proof and
-long SMTP outages have explicit recovery limits. There is no claim HTTP endpoint;
-private replacement/session completion uses the separate service below. Independent
-review, consent/usability, HTTP/native replacement races and physical-device
+long SMTP outages have explicit recovery limits. Claim/replacement HTTP uses the
+separate explicit experimental constructor described below. Independent
+review, consent/usability, native replacement races and physical-device
 evidence remain gates.
 
 
@@ -192,5 +192,20 @@ consumption waits. Other-RP saved proof and old keys/sessions/bound proofs are
 invalidated without crossing realm/owner. Completion replay grants nothing; a lost
 successful response requires normal sign-in with the installed key. The saved code
 stays consumed and must be replaced after sign-in. No policy upgrade or contact
-change occurs. Independent review, HTTP/browser usability, physical devices and safe
+change occurs. Independent review, reference-page/browser usability, physical devices and safe
 activation remain release gates; transaction tests do not establish them.
+
+
+Experimental recovery HTTP requires a pre-established separate host-bound HttpOnly
+browser cookie before saved-code consumption, allowing same-capability lost-response
+resume without returning a raw capability. Exact Origin, closed inputs, no query
+selectors, 8 KiB ordinary/32 KiB WebAuthn response bodies and redacted/no-store errors
+remain shared. Anonymous operations reject any session cookie to prevent silent
+account replacement; only deliberate fresh-key cancellation uses session authority.
+It can deny the current owned RP claim without a claimant-only ID, making fixed
+non-secret alerts actionable to an owner with a surviving key. No anonymous claim
+lookup or owner selector is added. Only actual committed replacement assertion sets
+a session; registration/readiness/cancellation/errors never do. Cookie retention
+cannot extend database deadlines, and losing the capability retains the documented
+fail-closed recovery limits. Independent review, usable reference pages, native/
+physical-device recovery evidence and ordinary activation remain open.

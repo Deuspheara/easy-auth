@@ -172,8 +172,8 @@ configuration response. Email-free confirmation sends no fabricated email.
 ## Experimental recovery claim state
 
 `PasskeyRecoveryClaims` currently provides core/PostgreSQL `begin`, `resume`,
-`status`, `cancel`, `cancel_with_key` and `cancel_with_code`. There is no HTTP claim
-endpoint, and this service issues no key or session. These methods must not be advertised
+`status`, `cancel`, `cancel_with_key`, `cancel_current_with_key` and `cancel_with_code`.
+This service issues no key or session; the explicit HTTP wrapper is described below. These methods must not be advertised
 as working all-keys-lost login. See [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
 
 Begin supplies the explicit public account ID, saved code and a separate browser
@@ -194,7 +194,7 @@ it. New confirmed code configuration invalidates older claims, while preparing
 an unconfirmed replacement preserves them. Loss of the original browser capability,
 expiry or cancellation may require a working key to configure new recovery proof;
 there is no hidden mailbox/password recovery. Activation awaits independent review
-of these limits and a fully implemented replacement-key flow.
+of these limits and native/physical-device recovery evidence.
 
 Source admission remains 40 attempts per ten minutes. Begin also spends a ten-attempt
 account code-verification budget; continuation spends a separate ten-attempt
@@ -230,6 +230,61 @@ grant. A failed transaction preserves the previous keys and candidate for a vali
 retry within the original two-minute ceremony and seven-day claim caps. Restarting
 candidate registration invalidates its prior challenge and does not reset the claim.
 
-There are no claim/replacement HTTP routes or reference recovery pages yet. This
-is experimental integration API, pending independent policy review, browser/device
-verification, usable consent/instructions and safe ordinary activation.
+The explicit HTTP transport below is available, with no reference recovery page
+yet. Independent policy review, native recovery/browser/device verification, usable
+consent/instructions and safe ordinary activation remain required.
+
+
+## Experimental recovery HTTP
+
+Enable `easy-auth-axum/passkey-recovery` and call
+`experimental_passkey_recovery_router(auth, browser, PasskeyRecoveryServices { ... })`
+with the seven explicitly aligned passkey services. Older constructors and ordinary
+embedded/standalone composition retain their existing routes. Use the
+[full HTTP contract](../architecture/openapi-passkey-recovery.json) and
+[endpoint table](../architecture/api-contract.md); no reference recovery page or
+production activation is provided by this feature.
+
+1. Explain the bearer-code, fixed delay, notification and browser-loss limits before
+   consuming proof. A reserved code cannot restart after cancellation/expiry. Retain
+   an independent offline code and, where possible, multiple working keys. Retain
+   the public account UUID from authenticated `GET /v1/session` alongside the code;
+   the configuration preparation ID is a different pending identifier. Do not
+   offer mailbox/password fallback or claim that email-free accounts get alerts.
+2. Explicitly log out any existing session. Immediately before starting recovery,
+   POST `{}` to `/v1/passkeys/recovery/browser` and await its cookie response. It
+   establishes/reuses `__Host-auth-passkey-recovery`, HttpOnly/Secure/Path=/ and
+   SameSite=Lax, with seven-day retention. Explicit loopback development uses
+   `auth-passkey-recovery`. Rebinding preserves the capability and never extends
+   a claim. Keep this browser/cookie through the wait; do not copy it into URLs,
+   JavaScript storage, email or logs.
+3. POST `{account_id,code}` to `claims/start`. Use the public opaque account ID,
+   never an email resolver. Only the browser cookie is authority to resume the
+   reserved claim; metadata includes its public UUID/times and notification flag.
+   On a lost start response, POST `{account_id}` to `claims/resume`, preserving the
+   cookie. Status uses `{account_id,claim_id}` and grants no permission by itself.
+4. While waiting, existing keys remain usable. An alerted owner can sign in freshly
+   with a key and POST `{}` to `claims/cancel-with-key`; no claimant-only UUID or
+   saved code is needed. Bound browsers can use `claims/cancel`; retained codes can
+   use `claims/cancel-with-code` from an anonymous browser. These deny only and never
+   reopen the code. Email alerts contain no credential or cancellation link.
+5. Once eligible, POST the public account/claim target to `replacement/start`, then
+   send the actual `navigator.credentials.create` response to `replacement/registration`
+   and its separately signed `navigator.credentials.get` result to `replacement/finish`.
+   Send `transaction_id` with both responses. Core still validates delay/receipt,
+   generation, exact browser/owner/RP, proof and original deadlines at every stage.
+   Registration cannot sign in, and cancellation/rotation invalidates candidates.
+6. Only committed final assertion sets a fresh session. Old owner keys/sessions/
+   proofs are invalidated. The independent recovery cookie is retained for any
+   other account's claim; terminal state prevents replay. If the successful response
+   is lost, sign in normally with the installed replacement key. Configure and
+   confirm a new offline code afterward; the reserved code stays consumed.
+
+All ten new operations are POST-only, require exact Origin, reject query selectors
+and closed-body extras, and use no-store/generic errors. Anonymous operations reject
+even expired/unknown session cookies, so they cannot silently switch accounts.
+Cancel-with-key is the deliberate authenticated exception and infers ownership
+only from its genuinely fresh session. A failing response never sets a success
+cookie. Custom claim repositories additionally implement
+`cancel_current_passkey_recovery_with_key` with the same locked policy; the existing
+explicit-ID core cancellation API remains supported.

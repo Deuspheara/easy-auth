@@ -1,6 +1,8 @@
 mod boundary;
 mod contract;
 mod lifecycle;
+#[cfg(feature = "passkey-recovery")]
+mod recovery;
 #[cfg(feature = "passkey-recovery-setup")]
 mod recovery_setup;
 

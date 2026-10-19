@@ -64,6 +64,12 @@ pub trait PasskeyRecoveryClaimRepository: Send + Sync {
         request: &PasskeyRecoveryClaimRequest,
         id: Uuid,
     ) -> Result<()>;
+    /// Fresh key proof selects its current owned RP claim, without requiring an
+    /// identifier known only to the claiming browser. Denial only; no status grant.
+    async fn cancel_current_passkey_recovery_with_key(
+        &self,
+        request: &PasskeyRecoveryKeyCancellation,
+    ) -> Result<()>;
     /// Independent key-cancellation admission must remain available when an
     /// unauthenticated claimant has exhausted the claim's abuse budget.
     async fn cancel_passkey_recovery_with_key(

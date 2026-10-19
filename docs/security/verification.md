@@ -1077,3 +1077,80 @@ contracts/model/guides/threat model distinguish implemented core behavior from
 remaining independent review, consent/usability, recovery HTTP/native/physical-
 device evidence and safe activation. Logical expiry does not establish physical
 retention cleanup. This checkpoint does not complete AUTH-20 or its release gates.
+
+## AUTH-20 explicit recovery HTTP checkpoint (2026-10-19)
+
+AUTH-20 remains **In Progress**. The separate `passkey-recovery` feature now exports
+an explicitly aligned seven-service constructor and additive full OpenAPI for ten
+closed POST operations: browser prebinding, claim start/resume/status, three denial
+paths and private replacement start/registration/finish. Older constructors/routes/
+full schemas and ordinary server composition remain unchanged. Exact Origin,
+no-store/generic errors, no query selectors, 8 KiB ordinary/32 KiB WebAuthn response
+bounds and the existing core/PostgreSQL policy are shared. Only committed actual
+replacement assertion sets one session; anonymous operations reject any session
+cookie rather than silently switching accounts. The independent HttpOnly recovery
+cookie is established before code consumption and retained for any other claim;
+rebind/metadata never extends original database deadlines.
+
+A usability review found that a surviving-key owner receiving a fixed alert may not
+know the claimant-only UUID. New `cancel_current_with_key` and the corresponding
+repository method select the current owned configured-RP claim through the same
+fresh-key lock/transaction path. HTTP key cancellation accepts `{}`; no anonymous
+lookup, owner selector, weaker authority or status grant is added. The original
+explicit-ID core API remains supported. No migration/dependency versions changed.
+
+The separate setup route extraction (`b8b6c44`) passed all **8 existing setup HTTP
+cases** before behavior extension. **15 new HTTP/real-PostgreSQL cases** and **one
+new PostgreSQL current-claim cancellation case** pass. Coverage includes prebinding/
+retention and lost-start resume, purpose/session/duplicate-cookie separation,
+HTTPS/development policy, Origin/closed-body/query/selector/size/media boundaries,
+no-ID genuine-key/retained-code/browser denial, bad-code flood isolation, all-service
+realm/origin startup mismatch rejection, complete published/live contract equality
+and prior-schema preservation, actual signed contact/email-free completion without
+a prior live session, registration-only non-authority, replay/lost-finish key sign-in,
+one session cookie under concurrent completion, exact rollback/retry, cancelled/bad
+proof denial and failed-notification readiness gating. Deliberate persistence
+failure requires generic 503, authority failure generic 401, neither with a success
+cookie; tests do not count arbitrary infrastructure errors as denial evidence.
+Verified-contact clock fixtures follow actual current-lease worker acknowledgement.
+Software residence hints change only the test client, preserving production options
+and existing signature/UP/UV/origin/RP verification.
+
+Final local checks with PostgreSQL 17.11 and documented Mailpit:
+
+- `cargo fmt --all -- --check`; strict locked workspace/all-target Clippy with
+  default/all features and `-D warnings` pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **267 pass** (2 Axum unit, 54 HTTP/database, 10 core, 201 PostgreSQL). The
+  logging subprocess repeats one included core case. Successful full suites have
+  no failed or ignored cases. The locked adoption `easy` binary check also passes.
+- Fresh pinned native baseline runs pass **31 Chromium and 4 real-SMTP cases**
+  with unchanged existing assertions/admission. These cover prior signup/sign-in/
+  management/code configuration, not native recovery HTTP interoperability. Fixed
+  owned producer copies were made after Cargo checks/builds; all **378/404 source
+  and binary hashes** match the immutable [browser report](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-transport.json)
+  and [SMTP report](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-recovery-transport.json).
+  Both owned native databases and exactly eleven owned messages are removed.
+- The normal-server worker's four-purpose notice/accepted-lease/full-delay smoke
+  passes through both Compose discovery and explicit CI-style container selection;
+  each run removes exactly four owned messages and its database. Dummy schema
+  fixtures prove delivery/receipt transport, not recovery authorization. Fresh
+  standalone and embedded full password/recovery/session/lifecycle SMTP smokes
+  pass with owned database cleanup. These native runs remain virtual-device evidence.
+- Compiled-dependency audit, all-feature cargo-deny and low-threshold npm audit
+  pass. The inactive SQLx/MySQL rsa advisory remains visible. The complete staged
+  diff passes redacted Gitleaks scanning before publication.
+
+Source review keeps named composition/body-limit route groups, private wire/schema,
+binding, anonymous-cookie policy, metadata, denial and replacement handlers in
+focused modules. No SQL or independent recovery policy enters transport. Current-
+key denial shares existing transaction/deadline code with explicit-ID denial.
+New implementation modules and feature test files stay below roughly 300 lines;
+longer integration fixtures/scenarios retain actual proof, resource and full-state
+assertions rather than hiding ordering. No structural cleanup is deferred. ADR 0012,
+API/organization/threat-model docs, README and the management guide now document
+public account-ID retention, prebinding, cancellation and lost-response steps.
+Reference pages/consent usability, native/physical-device/other-browser recovery
+proof, independent policy review and safe ordinary activation remain required.
+This checkpoint does not complete AUTH-20 or any release/security-review gate.

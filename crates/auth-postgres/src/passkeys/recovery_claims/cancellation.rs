@@ -55,12 +55,17 @@ pub(super) async fn browser(
 pub(super) async fn key(
     pool: &PgPool,
     request: &PasskeyRecoveryKeyCancellation,
-    id: Uuid,
+    id: Option<Uuid>,
 ) -> Result<()> {
     let mut tx = pool.begin().await.map_err(unavailable)?;
     let caller =
         super::super::authority::fresh_passkey_caller(&mut tx, request.realm, request.session)
             .await?;
+    let id=match id {
+        Some(id)=>id,
+        None=>sqlx::query_scalar("SELECT id FROM auth_passkey_recovery_claims WHERE realm_id=$1 AND user_id=$2 AND rp_id=$3 AND cancelled_at IS NULL AND completed_at IS NULL")
+            .bind(request.realm).bind(caller.user).bind(&request.rp_id).fetch_optional(&mut *tx).await.map_err(unavailable)?.ok_or(auth_core::Error::Unauthorized)?,
+    };
     let deadline = ownership::claim(
         &mut tx,
         request.realm,

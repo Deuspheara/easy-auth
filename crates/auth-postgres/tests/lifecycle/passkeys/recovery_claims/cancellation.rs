@@ -210,3 +210,28 @@ async fn audit_or_notice_failure_rolls_back_code_reservation_and_cancellation(po
         .await
         .unwrap();
 }
+
+#[sqlx::test(migrations = "./migrations")]
+async fn alerted_owner_can_cancel_current_claim_with_a_key_without_knowing_claim_id(pool: PgPool) {
+    let f = Claims::new(pool.clone(), false).await;
+    let claim = f
+        .flow
+        .begin(f.owner, &f.code, &f.browser, SOURCE)
+        .await
+        .unwrap();
+    assert!(matches!(
+        f.flow.cancel_current_with_key(&f.weak, SOURCE).await,
+        Err(Error::Unauthorized)
+    ));
+    f.flow
+        .cancel_current_with_key(&f.f.session, SOURCE)
+        .await
+        .unwrap();
+    assert!(matches!(
+        f.flow.status(f.owner, &f.browser, SOURCE, claim.id).await,
+        Err(Error::Unauthorized)
+    ));
+    let facts:i64=sqlx::query_scalar("SELECT count(*) FROM auth_audit a JOIN auth_sessions s ON s.realm_id=a.realm_id AND s.id=a.actor_session_id AND s.user_id=a.user_id WHERE a.realm_id=$1 AND a.user_id=$2 AND a.kind='passkey_recovery_cancelled' AND a.recovery_claim_id=$3 AND s.authentication_method='passkey'")
+        .bind(f.f.realm).bind(f.owner).bind(claim.id).fetch_one(&pool).await.unwrap();
+    assert_eq!(facts, 1);
+}

@@ -28,3 +28,10 @@ mod recovery_setup;
 pub use recovery_setup::{
     experimental_passkey_recovery_setup_router, passkey_recovery_setup_openapi,
 };
+
+#[cfg(feature = "passkey-recovery")]
+mod recovery;
+#[cfg(feature = "passkey-recovery")]
+pub use recovery::{
+    PasskeyRecoveryServices, experimental_passkey_recovery_router, passkey_recovery_openapi,
+};
