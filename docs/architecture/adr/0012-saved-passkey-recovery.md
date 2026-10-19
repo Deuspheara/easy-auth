@@ -291,3 +291,28 @@ required worker receipt, preserving original expiry and all production policy.
 This proves browser/proof/transaction behavior across an arranged elapsed wait;
 it does not establish a real 24-hour test run, physical hardware, a security audit
 or general browser interoperability. Fixture executables must never be deployed.
+
+
+## Provider-side replacement is outside the SQL transaction
+
+The [WebAuthn user-handle model](https://www.w3.org/TR/2026/REC-webauthn-3-20260825/)
+uses the stable RP/account handle to replace an existing discoverable credential.
+Do not randomize that identity or weaken residence/UV to evade a provider problem.
+A provider can replace its local credential during creation, before server
+registration/assertion and commit. SQL rollback preserves server rows; it cannot
+restore a provider-side private key or undo cloud synchronization. An interrupted
+creation may therefore leave the server's old key intact while its former provider
+copy is unavailable. Keep the bound recovery browser and original claim deadlines;
+a new key supports normal sign-in only after successful server completion.
+
+A new native case retains the original resident authenticator, verifies unchanged
+registration policy and stable user handle, and completes replacement on that same
+authenticator. Chromium ends with one different resident credential and rejects the
+old signed proof. This is distinct from the earlier original-device-loss cases.
+Supervised Safari/Dashlane testing succeeds through genuine signup/configuration/
+claim resume, but replacement stalls in the save prompt before a registration
+response is verified. Exact stage is registration, with no verified candidate or
+recovered session. The display name changes to the public account ID in recovery;
+its causal role in the provider failure is unproven. The failure is an open
+interoperability gate, not permission for a weaker fallback or an assertion-flow
+rewrite. See the versioned [partial device record](../../../tests/browser/passkeys/results/2026-10-19/safari-dashlane-recovery.json).

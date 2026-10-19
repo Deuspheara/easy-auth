@@ -28,8 +28,18 @@ async fn collect(pool: &sqlx::PgPool, facts: &mut serde_json::Value) -> Result<(
             "SELECT count(*) FROM auth_audit WHERE kind='passkey_recovered'",
         ),
         (
+            // Legacy total includes unverified registration rows, not just
+            // credentials that have advanced to private assertion verification.
             "recovery_candidates",
             "SELECT count(*) FROM auth_passkey_recovery_replacements",
+        ),
+        (
+            "recovery_registrations_pending",
+            "SELECT count(*) FROM auth_passkey_recovery_replacements WHERE stage='registration'",
+        ),
+        (
+            "recovery_assertions_pending",
+            "SELECT count(*) FROM auth_passkey_recovery_replacements WHERE stage='assertion'",
         ),
         (
             "recovery_pending",

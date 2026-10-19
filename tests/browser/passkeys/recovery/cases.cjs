@@ -142,4 +142,4 @@ async function runPages(browser, origin, mail, prepareClock) {
   results.push(...await cancellations(browser, origin, mail, ownerWithContact, startPage));
   return results;
 }
-module.exports = {runPages};
+module.exports = {runPages, startPage};

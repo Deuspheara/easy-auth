@@ -1,0 +1,81 @@
+{
+  "recorded_at": "2026-10-19T19:17:35.839137+00:00",
+  "status": "partial_failure",
+  "browser": {
+    "name": "Safari",
+    "version": "27.2",
+    "build": "22625.2.4.1",
+    "evidence": "About dialog"
+  },
+  "os": {
+    "name": "macOS",
+    "version": "27.2",
+    "build": "26B5086k"
+  },
+  "replacement_provider": {
+    "name": "Dashlane",
+    "version": "6.2641.0",
+    "build": "544922",
+    "evidence": "system save sheet and application bundle metadata"
+  },
+  "source_commit": "af1bf4f9cb9ad8875d49f48bf2c9c2ee63ef95cd",
+  "fixture_binary_sha256": "fba4460af5fa2546e9f3ddc04372f0e7c810120da9d4185a5e520132512c8cf4",
+  "source_evidence_report": "chromium-manual-bootstrap.json",
+  "observed_successes": [
+    "actual signup registration and separate signed assertion",
+    "fresh passkey sign-in and confirmed offline code; transient display cleared",
+    "saved-code consumption and immediate replacement ineligibility",
+    "reload and same-browser resume without code reentry",
+    "owned elapsed-time arrangement with original expiry and 24-hour policy unchanged"
+  ],
+  "failed_path": {
+    "operation": "replacement native credential creation",
+    "user_report": "save sheet remains after fingerprint approval",
+    "reproduced_after_reload_resume": true,
+    "observed_sheet_provider": "Dashlane",
+    "registration_stage": "registration",
+    "verified_private_candidates": 0,
+    "completed_claims": 0,
+    "recovered_audits": 0,
+    "original_server_keys_remaining": 1,
+    "root_cause": "not established; provider display-field and existing-credential interaction require investigation",
+    "unrevoked_session_row_count_unchanged_from_before_replacement": true
+  },
+  "arranged_elapsed_time": true,
+  "real_24_hour_wait": false,
+  "independent_review": false,
+  "provider_settings_changed": false,
+  "credential_responses_or_codes_saved": false,
+  "final_database_observation": {
+    "users": 1,
+    "credentials": 1,
+    "proven_credentials": 1,
+    "signup_audits": 1,
+    "configured": 2,
+    "recovery_audits": 0,
+    "pending_setups": 0,
+    "active_codes": 0,
+    "claims_started": 1,
+    "claims_completed": 0,
+    "claim_expiry_us": 1793041205476842,
+    "claim_ready": true,
+    "claim_delay_seconds": 86400,
+    "notification_required": false,
+    "candidates": 1,
+    "candidate_stage": "registration",
+    "verified_private_candidates": 0,
+    "live_sessions": 1,
+    "weak_sessions": 0,
+    "original_keys_remaining": 1
+  },
+  "fixture_database_removed": true,
+  "fixture_exit": 0,
+  "credential_manager_entry_cleanup": "not verified; server cleanup does not remove stored or synced passkeys",
+  "limitations": [
+    "email-free path only; no contact/SMTP device evidence",
+    "failure occurs before a verified registration; not proof of a server signature-verification failure",
+    "original server key retention does not establish preservation of its provider-side private key",
+    "no claim of Apple Passwords interoperability or hardware-bound/certified assurance"
+  ],
+  "count_semantics": "live_sessions counts rows without revoked_at; this alone does not establish unexpired or fresh authority"
+}

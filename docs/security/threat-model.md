@@ -223,3 +223,16 @@ backdates only linked claim timing after a required real receipt; it never seeds
 keys/sessions/receipts, extends original expiry or exposes a production clock API.
 Physical hardware, other browsers and independent recovery-policy review remain
 unverified; native emulation and self-review cannot satisfy those gates.
+
+
+Recovery's SQL transaction does not control credential-provider storage. Creation
+on an existing resident authenticator can replace its local key before server
+commit; preserving old server rows is not a promise that the provider retains the
+old private key. A new same-authenticator native case covers successful replacement
+and stale-signature rejection. Supervised Safari/Dashlane instead stalls during
+native creation, leaving only a registration-stage pending row and no verified
+candidate/completion. Provider-side identity/display handling remains unproven as
+a cause. Record the failure separately from Chromium success, retain stable account
+handles and original deadlines, and keep ordinary activation gated. Operational
+fixture summaries now distinguish pending registration from pending assertion;
+the legacy total counts both and is never proof that registration succeeded.

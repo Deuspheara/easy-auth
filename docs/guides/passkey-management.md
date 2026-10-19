@@ -326,3 +326,11 @@ actual resident internal/USB create/get operations and real SMTP notices, with a
 trusted owned-fixture elapsed-time arrangement after required acknowledgement.
 It is virtual-device evidence and must not be described as physical-device testing
 or a real 24-hour waiting-period run.
+
+
+A provider may replace its existing stored passkey while creating a recovery
+candidate, before server completion. A server rollback cannot restore that private
+key in the provider. Retain this recovery browser through an interrupted attempt;
+normal new-key sign-in is available only after server completion. The
+[provider-side boundary](../architecture/adr/0012-saved-passkey-recovery.md#provider-side-replacement-is-outside-the-sql-transaction)
+and recorded Safari/Dashlane save-prompt failure remain part of the recovery review.

@@ -1289,3 +1289,66 @@ extension. Fixture static routing, manual assets and its additional native case
 remain focused modules under 300 lines; no structural cleanup is deferred.
 The native guide describes private operator entry, arranged-time limits and separate
 credential-manager cleanup. Automated emulation cannot establish real-device success.
+
+## AUTH-20 same-provider replacement investigation (2026-10-19)
+
+The supervised [Safari/Dashlane record](../../tests/browser/passkeys/results/2026-10-19/safari-dashlane-recovery.json)
+is a **partial failure**, not an interoperability pass. Safari 27.2
+(22625.2.4.1), macOS 27.2 (26B5086k) and the observed Dashlane native save provider
+6.2641.0 (544922) were identified without inspecting the vault. Actual signup plus
+separate signed assertion, fresh sign-in/code confirmation, reservation, immediate
+ineligibility, reload/resume and original-expiry-preserving elapsed-time arrangement
+succeeded. The signup provider was not separately observed. Two replacement attempts
+stayed on the native save sheet after operator-reported fingerprint approval.
+The page reported an uncompleted native prompt; exact database stage remained
+`registration`, with no verified private credential, completed claim or recovered
+audit. The original server key remained; provider-side private-key preservation
+was not established. Existing unrevoked session-row count is not fresh/unexpired
+authority. The owned process exited successfully and its database was removed.
+Credential-manager entry cleanup is unverified. Codes, assertion/registration
+responses, vault contents and security-setting changes are absent from the record.
+
+A pending replacement row had initially been mistaken for verified registration
+while investigating. The fixture now reports pending registration and pending
+assertion separately, retaining the older total for compatibility. Neither a row
+count nor registration alone grants access. No speculative assertion-flow change,
+provider switch, identity randomization or weakened verification was retained.
+The save callback's root cause remains unproven; the display-field difference and
+existing-provider-entry interaction are diagnostic hypotheses only.
+
+A ninth native case fills a real coverage gap: it keeps the original resident
+virtual authenticator rather than removing it as the earlier lost-device cases do.
+The actual same-device creation/assertion succeeds. It checks stable account user
+handle, empty exclusion list and unchanged RP, algorithms, timeout, attestation,
+residence/UV and extensions; username/display metadata differ from signup. A gated
+finish request proves the browser is still anonymous after registration. The
+resulting authenticator has one different resident credential, and a still-fresh
+old signed proof is rejected. New code configuration succeeds. This demonstrates
+Chromium behavior, not the cause or resolution of the real-provider hang. ADR 0012,
+the guide and threat model now distinguish SQL rollback from provider storage:
+creation may replace a provider entry before server commit, which SQL cannot undo.
+
+Final checks: formatting, strict locked default/all-feature workspace/all-target
+Clippy, **93 default** and **270 all-feature workspace tests** (203 PostgreSQL),
+compiled-dependency audit, all-feature cargo-deny and npm audit pass. No failed or
+ignored tests; inactive SQLx/MySQL RSA advisory remains visible. All **9 current
+native recovery/fixture cases pass**, including all seven original scenarios.
+The [new report](../../tests/browser/passkeys/results/2026-10-19/chromium-same-device-recovery.json)
+matches all **426 source hashes** and its fixed producer binary. Aggregates are
+nine users/keys/signup audits/codes, eight starts/five completions/three cancellations,
+fourteen configurations/six unused codes, thirty-five source admissions (original
+limit forty), and zero remaining registration/assertion/total candidates, weak
+provenance or pending work. The automated database and fourteen exact owned messages
+are removed. Earlier published 31-browser/four-SMTP and eight-case reports remain
+immutable; normal application behavior is unchanged. Physical evidence uses its
+previous `af1bf4f` producer, matched to that checkpoint's source/binary report.
+The complete staged diff receives redacted Gitleaks scanning before publication.
+
+The new 79-line native module keeps its longer ordered actual-device/proof/state
+scenario together as a test-size exception. The 69-line fixture query table stays
+cohesive despite the function-size trigger: it maps fixed aggregate names to SQL,
+not independent policy. No structural cleanup is deferred. No production service,
+protocol options, SQL transaction, dependency or migration changes were needed for
+these diagnostic tests. Both preceding hosted CI runs (39305280503 and 39306302790)
+completed successfully. AUTH-20 remains In Progress; the unresolved Safari/Dashlane
+path, wider device evidence, independent review and safe activation remain gates.

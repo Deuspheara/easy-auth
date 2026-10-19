@@ -33,7 +33,9 @@ loopback Mailpit. Owned random DBs are dropped after child shutdown. Only exact
 random recipient namespace messages are removed; an empty delete-all request is
 never sent. An eighth case verifies the fixture-only human signup page, actual
 registration plus separate assertion, explicit consent and confirmed saved-code
-configuration. Expected completion/cancellation/provenance/pending facts and original
+configuration. A ninth retains the original resident authenticator for replacement,
+compares registration policy/user-handle continuity and checks old-signature denial.
+Expected completion/cancellation/provenance/pending facts and original
 source admission are asserted. Baseline 31-browser/four-SMTP suites remain separate
 with all their earlier assertions intact. CI runs all three suites.
 
@@ -93,3 +95,15 @@ and Mailpit available. It prints its random localhost origin. In the chosen brow
 Keep observed results, operator-reported provider details, automated emulation and
 independent security review distinct. Do not label synced platform credentials as
 hardware-bound or treat one device/browser path as complete interoperability proof.
+
+
+The same-device case deliberately keeps the original authenticator and its resident
+credential. The lost-device cases still remove theirs. It verifies unchanged RP,
+algorithm, timeout, attestation, residence/UV and extension policy; only display
+metadata differs from signup. Chromium's resulting single resident credential has
+a new ID. This does not establish the same behavior in a real provider. Provider
+storage may change before server completion; server rollback cannot restore it.
+The legacy `recovery_candidates` aggregate counts all replacement rows. Use
+`recovery_registrations_pending` versus `recovery_assertions_pending` to distinguish
+an outstanding create operation from a verified private registration. All three
+must drain to zero on successful automated completion/cancellation.
