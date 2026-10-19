@@ -5,6 +5,8 @@ mod email;
 mod error;
 mod identity;
 mod notifications;
+#[cfg(feature = "passkeys")]
+mod passkeys;
 mod password;
 mod ports;
 mod secret;
@@ -16,6 +18,11 @@ pub use email::normalize_email;
 pub use error::{Error, Result};
 pub use identity::User;
 pub use notifications::{SecurityNotice, SecurityNoticeKind};
+#[cfg(feature = "passkeys")]
+pub use passkeys::{
+    PasskeyCreationOptions, PasskeyRegistrationResponse, PasskeyService,
+    PrivatePasskeyRegistration, VerifiedPasskey,
+};
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};
 pub use secret::{Secret, Verifier};

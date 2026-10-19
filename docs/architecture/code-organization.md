@@ -47,6 +47,7 @@ crates/auth-core/src/
   auth/                     # Auth composition and feature use cases
   ports.rs                  # Repository and delivery contracts
   password.rs               # Bounded hashing and password policy
+  passkeys/                 # Optional protocol verifier/config/private state; enrollment wiring pending
   email.rs, secret.rs       # Input and secret policies, with unit tests
   audit.rs, error.rs, identity.rs, notifications.rs, sessions.rs
 crates/auth-postgres/src/

@@ -2,6 +2,37 @@
 
 This is alpha implementation evidence, not an independent security audit or a production release.
 
+## AUTH-18 initial verifier checkpoint — 2026-10-19
+
+The optional core `passkeys` feature now wraps high-level webauthn-rs registration
+with strict origin/RP configuration, required user verification, bounded private
+database-state encoding and redacted failures. The [ADR](../architecture/adr/0008-passkey-verification-boundary.md)
+documents ownership and logging boundaries. This checkpoint does **not** implement
+durable enrollment, account authorization, HTTP endpoints or browser interoperability.
+AUTH-18 remains In Progress; those acceptance criteria still need implementation.
+
+- `cargo fmt --all -- --check` and strict workspace/all-target/all-feature Clippy passed.
+- `cargo test --locked --workspace --all-features`: 64 passed, zero failed/ignored,
+  including the existing 11 HTTP/PostgreSQL and 42 PostgreSQL lifecycle tests.
+  Five new core tests cover configuration, state bounds/round-trip, fresh challenges,
+  origin/port changes, redaction and actual upstream payload-log suppression with a
+  positive control. They do not substitute for the remaining protocol attack corpus.
+- Default workspace build passed. Its compiled graph excludes webauthn-rs;
+  the all-features graph includes it. No server composition enables enrollment.
+- All-feature compiled advisory and cargo-deny gates passed. The inactive optional
+  SQLx MySQL/RSA finding remains visible. A synthetic advisory for webauthn-rs 0.5.5
+  was injected into audit output while using the real feature graph; the gate
+  correctly rejected it as compiled. No advisory ignore was introduced.
+- Both Gitleaks 8.24.3 and 8.30.1 passed a source-only snapshot including untracked
+  feature files. Five package/version-scoped MPL exceptions and redistribution
+  notices accompany the dependency. Native OpenSSL packaging remains a release gate.
+
+Local macOS commands used the previously documented unstripped build-dependency
+workaround (`profile.dev.build-override.strip="none"`, dev debug information off,
+two build jobs). CI now tests default and all features, lints all features and
+audits the complete feature graph, with explicit Linux OpenSSL build dependencies.
+Hosted verification of this checkpoint is still pending publication.
+
 - Rust 1.95.0: `cargo check --workspace` passed.
 - `cargo fmt --all -- --check` and `cargo clippy --locked --workspace --all-targets -- -D warnings` passed.
 - `cargo test --locked --workspace`: 13 tests passed, zero failures/ignored. Four unit tests, three Axum HTTP/database tests, six PostgreSQL lifecycle/constraint/concurrency tests. Real PostgreSQL 17 with isolated test databases and actual migrations.

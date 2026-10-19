@@ -3,7 +3,8 @@
 
 Cargo.lock includes inactive optional SQLx MySQL/RSA packages. Do not suppress their
 advisory globally: derive the compiled graph each run, including build/dev deps and
-all platforms. cargo-deny independently audits the selected feature graph in CI.
+all platforms and workspace features. cargo-deny independently audits the complete
+feature graph in CI; optional native protocol dependencies must not escape review.
 """
 import json
 import subprocess
@@ -19,7 +20,7 @@ if 'vulnerabilities' not in report or report.get('error'):
     print('Advisory database audit failed.', file=sys.stderr)
     sys.exit(1)
 graph = subprocess.run(['cargo', 'tree', '--locked', '--workspace', '--target', 'all',
-    '--edges', 'normal,build,dev', '--prefix', 'none', '--format', '{p}', '--no-dedupe'],
+    '--all-features', '--edges', 'normal,build,dev', '--prefix', 'none', '--format', '{p}', '--no-dedupe'],
     capture_output=True, text=True, check=True)
 active = set()
 for line in graph.stdout.splitlines():

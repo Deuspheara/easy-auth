@@ -29,6 +29,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 url = "2"
 unicode-normalization = "0.1.24"
 zeroize = "1"
+webauthn-rs = { version = "=0.5.5", default-features = false, features = ["danger-allow-state-serialisation"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

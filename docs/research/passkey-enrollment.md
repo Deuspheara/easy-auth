@@ -112,3 +112,18 @@ Normative baseline: [WebAuthn Level 3](https://www.w3.org/TR/webauthn-3/), espec
 registration verification, credential scope, user verification and backup state.
 No conformance, interoperability or production-readiness claim follows from this
 source review.
+
+## Initial implementation checkpoint
+
+The optional `easy-auth-core/passkeys` feature now implements the protocol boundary
+in [ADR 0008](../architecture/adr/0008-passkey-verification-boundary.md): validated
+configuration, public creation options, private versioned database state and a
+verified-credential wrapper. It does not yet persist or consume ceremonies, perform
+account authorization, expose HTTP routes or demonstrate browser interoperability.
+No normal server composition enables it. Database/HTTP wiring and all enrollment
+acceptance tests above remain required for AUTH-18.
+
+Upstream TRACE logging of state and input is suppressed within synchronous library
+calls; a positive-control regression test proves the upstream event exists before
+checking our boundary. The [dependency notices](../security/third-party-licenses/webauthn.md)
+record exact MPL packages and native OpenSSL distribution requirements.
