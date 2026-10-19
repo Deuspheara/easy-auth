@@ -2,6 +2,7 @@
 mod counterless;
 mod fixture;
 mod mail;
+mod summary;
 
 use sqlx::postgres::PgPoolOptions;
 use std::error::Error;

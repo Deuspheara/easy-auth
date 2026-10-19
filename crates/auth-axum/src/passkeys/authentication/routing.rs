@@ -21,6 +21,20 @@ pub fn experimental_passkey_router(
     enrollment: Arc<PasskeyEnrollment>,
     sign_in: Arc<PasskeySignIn>,
 ) -> Result<Router> {
+    let enrollment = super::super::routing::enrollment_routes(&auth, &browser, enrollment)?;
+    let authentication = authentication_routes(&auth, &browser, sign_in)?;
+    Ok(
+        configured_router(auth, browser, passkey_authentication_openapi())
+            .merge(enrollment)
+            .merge(authentication),
+    )
+}
+
+pub(in crate::passkeys) fn authentication_routes(
+    auth: &Auth,
+    browser: &BrowserConfig,
+    sign_in: Arc<PasskeySignIn>,
+) -> Result<Router> {
     if auth.realm() != sign_in.realm()
         || Url::parse(browser.origin())
             .map_err(|_| Error::InvalidInput)?
@@ -29,20 +43,15 @@ pub fn experimental_passkey_router(
     {
         return Err(Error::InvalidInput);
     }
-    let enrollment = super::super::routing::enrollment_routes(&auth, &browser, enrollment)?;
+
     let base = AppState {
         auth: auth.clone(),
         browser: browser.clone(),
     };
-    let routes = Router::new()
+    Ok(Router::new()
         .route("/v1/passkeys/authentication/start", post(handlers::start))
         .route("/v1/passkeys/authentication/finish", post(handlers::finish))
         .layer(DefaultBodyLimit::max(32 * 1024))
         .layer(middleware::from_fn_with_state(base.clone(), boundary))
-        .with_state(AuthenticationState { base, sign_in });
-    Ok(
-        configured_router(auth, browser, passkey_authentication_openapi())
-            .merge(enrollment)
-            .merge(routes),
-    )
+        .with_state(AuthenticationState { base, sign_in }))
 }
