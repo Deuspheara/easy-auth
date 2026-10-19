@@ -102,8 +102,8 @@ or Vary:* disable reuse. Time spent reading the body cannot restart freshness.
 Cache expiry uses monotonic time. JWKS cache additionally matches the current
 validated discovery URI. Invalid or failed refreshes cannot return stale data.
 Per-slot try-locks reject concurrent misses promptly instead of queueing unlimited
-futures behind network I/O. Forced unknown-key refresh is not exposed; AUTH-29 owns
-the subsequent verification/rotation policy.
+futures behind network I/O. AUTH-29 adds the bounded snapshot refresh described below; token verification
+and the decision to refresh for an unknown signing key remain separate policy.
 
 Native OS DNS is not cancellable. The caller returns by its deadline, while up to
 four native jobs can remain until the resolver returns; they keep their permits so
@@ -163,3 +163,30 @@ leases, age/size/timeout/cache/realm/configuration negatives are separate eviden
 These are component/regression tests, not real Google/Apple/local-IdP interoperability.
 Provider token verification, final identity/session transactions, linking, rotation,
 real-provider checks, independent review, SAML and outbound issuer remain gates.
+
+
+## AUTH-29 amendment: bounded snapshot refresh
+
+`refresh_jwks(observed)` is an explicit backend document operation, not a token
+verification result. It accepts the opaque snapshot previously returned by this
+boundary; there is no caller-selected endpoint or key-ID cache. It repeats current
+configuration and discovery checks, then takes the existing key slot without
+queueing. A fresh snapshot that another request already fetched is reused when its
+in-memory identity differs from the observation. Expired/non-cacheable data is not
+reused, even for coalescing.
+
+A forced fetch spends a fixed 30-second per-service budget, including malformed or
+failed responses. It also obeys the existing one-second miss interval, so a just
+fetched key set is not fetched again immediately. Ordinary cache expiry remains
+subject to its original one-second interval; this is not a claim that every kind of
+request is limited to one per 30 seconds. Both timestamps live in the single bounded
+key slot. Attacker-selected `kid` strings never allocate map entries. Concurrent
+misses reject promptly; a late response after disable fails its registry recheck.
+The original five-second whole-operation, address/TLS/input and no-DB-lock-over-I/O
+bounds are retained. A failed forced refresh returns its error, never the old data.
+
+AUTH-29 still must supply mandatory typed claims and asymmetric algorithm/key policy,
+established-library signature verification, code+S256 exchange, one unknown-key
+retry per transaction, real signing-key rotation/replay negatives and local Keycloak
+evidence. This document operation establishes none of those or any identity/session
+issuance. The ticket remains open until its complete acceptance evidence exists.

@@ -16,6 +16,9 @@ const PRIVATE_JWK_FIELDS: &[&str] = &["d", "p", "q", "dp", "dq", "qi", "oth", "k
 #[derive(Clone)]
 pub struct OidcJwksDocument(Arc<[u8]>);
 impl OidcJwksDocument {
+    pub(super) fn same_snapshot(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
     pub fn as_bytes(&self) -> &[u8] {
         &self.0
     }

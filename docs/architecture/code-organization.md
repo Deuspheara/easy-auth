@@ -333,3 +333,13 @@ categories and freshness calculations together. Longer TLS and observed-database
 cases retain setup, a valid control, ordered interruption and exact assertions in
 one scenario. These are reviewed function-size exceptions with cohesive purposes.
 No unrelated structural cleanup is deferred.
+
+
+AUTH-29 extends the existing key cache slot with one forced-refresh timestamp and
+compares opaque snapshot identity in the owning metadata type. No key-ID map, new
+crate or parallel cache is introduced. `load_keys` now crosses the 50-line review
+trigger: keeping snapshot selection, expiry/URI checks, both miss budgets, fetch,
+post-network registry check and cache replacement together makes their ordering
+explicit. Refresh regressions live in named core and PostgreSQL feature modules.
+The longer core rotation scenario retains exact interval boundaries, coalescing and
+request-count controls together. All affected modules remain below 300 lines.

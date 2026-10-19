@@ -1544,3 +1544,60 @@ Private-network/private-CA IdPs are unsupported. JOSE selection, token exchange,
 claims/key rotation, final identity transactions, provider tests, SAML and outbound
 issuer remain gates. AUTH-20's Safari/Dashlane failure remains unresolved and does
 not justify further provider/security-setting changes or an activation claim.
+
+
+## AUTH-29 bounded key-refresh checkpoint (2026-10-19)
+
+This checkpoint adds the document refresh primitive only. AUTH-29 remains in
+progress: code+S256 exchange, established-library signature verification, mandatory
+typed claims/algorithm/key policy, one unknown-key retry per transaction, local
+Keycloak and final provider acceptance remain unfinished. No new dependency,
+migration, HTTP route, identity or session grant is introduced.
+
+Using `CARGO_INCREMENTAL=0`, the documented PostgreSQL setup and four test workers:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked -p easy-auth-postgres --features oidc-egress --test lifecycle oidc::
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+python3 scripts/audit.py
+cargo deny --all-features check
+npm audit --audit-level=low --prefix tests/browser/passkeys
+```
+
+All final checks pass: **93 default** and **327 unique all-feature tests** (2 Axum
+unit, 55 HTTP/database, 28 core, 234 PostgreSQL and 8 server transport). The logging
+child repeats one included core case. All seven new cases are confirmed in the
+full-suite output; focused OIDC PostgreSQL also passes all seven existing/new cases.
+No final failures or ignored tests. Compiled advisory, licenses/sources/bans and
+npm checks pass; the inactive SQLx/MySQL RSA advisory remains visible without an
+ignore. Full staged changes receive redacted secret scanning before publication.
+
+Five new core cases establish the one-second cold-fetch boundary and 30-second
+forced-attempt boundary, reuse of a completed newer snapshot, failed-attempt budget
+retention, non-cacheability, concurrent miss rejection, DNS timeout/slot release
+and disable rejection. Two new real-PG cases check disabled cached observations and
+disable committing during held key fetch without a DB lock spanning I/O. Exact
+Unauthorized/RateLimited/Unavailable assertions distinguish policy from setup
+failure. These are envelope/cache tests, not valid signing-key or token evidence.
+
+An initial strict Clippy run rejected a nested cache conditional. It was flattened
+without changing policy or assertions, and both strict variants passed afterward.
+Final all-feature lint was repeated after adding the timeout/non-cacheable cases.
+No application failure was hidden or converted into a successful negative test.
+
+Maintainability review retains a single bounded key slot and private snapshot
+identity comparison, with no key-ID map or duplicated transport/policy. Named test
+modules separate refresh cases. The ordered `load_keys` size exception and complete
+scenario rationale are recorded in code-organization.md; all affected Rust modules
+remain below 300 lines. No unrelated cleanup is deferred.
+
+Native browser/SMTP scripts were not rerun locally for this core/cache change;
+exact-head hosted CI remains a separate gate and runs them. The previous AUTH-28
+implementation's [CI39326434266](https://github.com/Deuspheara/easy-auth/actions/runs/39326434266)
+passed all gates. A later checkpoint cannot inherit that run as proof of its own
+hosted result. Independent review, real provider verification and ordinary activation
+remain open, including the previously recorded Safari/Dashlane failure.

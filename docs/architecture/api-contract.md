@@ -285,3 +285,9 @@ AUTH-28 adds the optional core/server-library document API described in the
 callback, token endpoint or authentication grant. Normal `configured_auth`
 composition remains unchanged. Documents are backend input to a future reviewed
 verifier; callers cannot treat fetch success as authentication or authorization.
+
+
+AUTH-29's `OidcDocuments::refresh_jwks` is a backend-only bounded document operation
+using an opaque observed snapshot. It accepts no endpoint/key-ID selector, exposes
+no new HTTP/OpenAPI route and returns no verified identity or session. The token
+verification/exchange and provider activation contracts remain unimplemented.

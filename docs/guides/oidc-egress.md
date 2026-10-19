@@ -64,3 +64,14 @@ variables to itself and verifies a real direct request without process-global TL
 initialization. No system proxy/security setting, credential manager or user
 credential is changed. Real provider/browser/native interoperability remains
 subsequent acceptance work; normal server composition activates no provider flow.
+
+
+The AUTH-29 document primitive `refresh_jwks(&observed)` supports the future
+verifier's unknown-key path. Supply the prior `OidcJwksDocument`, not a URL or key
+ID. An already completed newer fresh snapshot is reused; otherwise a forced attempt
+requires the fixed 30-second refresh budget and ordinary one-second miss interval.
+Failure spends the refresh budget and returns an error without old-data fallback.
+A caller immediately retrying a cold fetch can receive RateLimited. Normal cache
+expiry still follows the ordinary miss interval. Share the document service to
+share these limits; recreating it per request defeats the intended resource policy.
+No token verification or automatic retry loop is provided by this method.

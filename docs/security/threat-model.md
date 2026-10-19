@@ -280,3 +280,13 @@ original transaction expiry and linking authority under locks. No account linkin
 provider credential handling or permission grant is added. See
 [ADR 0014](../architecture/adr/0014-oidc-egress.md) for explicit limits and remaining
 provider, operational, independent review and release gates.
+
+
+AUTH-29 adds an explicit opaque-snapshot key refresh with a fixed 30-second forced
+attempt budget, including failed responses, alongside the existing ordinary miss
+interval. A newer fresh snapshot can satisfy old observers without another request;
+HTTP expiry/non-cacheability still prevents reuse. No attacker key-ID map is kept.
+Refresh repeats realm/configuration checks and uses the same pinned transport with
+no database lock spanning network work. Token signature/claim validation, one retry
+per consumed transaction and local provider rotation evidence remain required;
+fetching or refreshing a key envelope does not authenticate anyone.

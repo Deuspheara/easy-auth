@@ -10,6 +10,7 @@ use url::Url;
 
 const MAX_CACHE_SECONDS: u64 = 300;
 const MIN_NETWORK_INTERVAL: Duration = Duration::from_secs(1);
+const MIN_FORCED_KEY_REFRESH_INTERVAL: Duration = Duration::from_secs(30);
 
 struct DiscoveryCache {
     expires: Instant,
@@ -28,6 +29,7 @@ struct DiscoverySlot {
 }
 #[derive(Default)]
 struct KeysSlot {
+    refreshed: Option<Instant>,
     cached: Option<KeysCache>,
     attempted: Option<Instant>,
 }
@@ -70,7 +72,16 @@ impl OidcDocuments {
     /// Raw bounded envelope for a future reviewed JOSE verifier. These bytes do
     /// not establish a trusted key, signature, algorithm, claim or authentication.
     pub async fn jwks(&self) -> Result<OidcJwksDocument> {
-        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys())
+        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys(None))
+            .await
+            .map_err(|_| Error::Unavailable)?
+    }
+
+    /// Request a bounded refresh after a verifier found an unknown key ID in this
+    /// exact snapshot. A newer cached snapshot is reused without another fetch.
+    /// This operation verifies no signature or claim and never authenticates.
+    pub async fn refresh_jwks(&self, observed: &OidcJwksDocument) -> Result<OidcJwksDocument> {
+        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys(Some(observed)))
             .await
             .map_err(|_| Error::Unavailable)?
     }
@@ -104,7 +115,7 @@ impl OidcDocuments {
         Ok(value)
     }
 
-    async fn load_keys(&self) -> Result<OidcJwksDocument> {
+    async fn load_keys(&self, observed: Option<&OidcJwksDocument>) -> Result<OidcJwksDocument> {
         let discovery = self.load_discovery().await?;
         self.repository
             .check_oidc_connection(&self.connection)
@@ -114,10 +125,23 @@ impl OidcDocuments {
             .cached
             .as_ref()
             .filter(|cached| cached.expires > Instant::now() && cached.url == discovery.jwks_uri())
+            && observed.is_none_or(|previous| !cached.value.same_snapshot(previous))
         {
             return Ok(cached.value.clone());
         }
+        if observed.is_some()
+            && cache.refreshed.is_some_and(|previous| {
+                Instant::now().duration_since(previous) < MIN_FORCED_KEY_REFRESH_INTERVAL
+            })
+        {
+            return Err(Error::RateLimited);
+        }
         admit_fetch(&mut cache.attempted)?;
+        if observed.is_some() {
+            // Failed refreshes spend the same fixed budget; key IDs never become
+            // map keys, so attacker-selected IDs cannot grow cache/admission state.
+            cache.refreshed = Some(Instant::now());
+        }
         let response = self
             .fetch(self.policy.endpoint(discovery.jwks_uri())?)
             .await?;
