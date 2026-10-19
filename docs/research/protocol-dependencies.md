@@ -16,6 +16,12 @@ Assessment date: 2026-10-18. Candidates require lockfile/advisory and license re
 
 **Hard SAML release blocker:** until a specific pinned dependency passes signature-wrapping, duplicate-ID, unsigned-claims, attacker-KeyInfo, DTD/XXE, replay, audience/destination/recipient/issuer/time/InResponseTo tests and a focused security review, ship no SAML ACS. Do not silently accept unsigned responses. Native dependencies are preferable to unreviewed custom verification.
 
+AUTH-18's [passkey enrollment source review](passkey-enrollment.md) records the
+private-state serialization boundary, RP ownership, discoverability limitations,
+authentication provenance/recovery prerequisites and concrete browser/database
+test requirements. Passkeys remain unimplemented; the source review is not
+interoperability evidence.
+
 Baselines: [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700), [RFC 8252](https://www.rfc-editor.org/rfc/rfc8252), [OIDC Core](https://openid.net/specs/openid-connect-core-1_0.html), [Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html), [WebAuthn Level 3](https://www.w3.org/TR/webauthn-3/), [OASIS SAML specifications](https://www.oasis-open.org/standard/saml/), [OWASP SAML guidance](https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html), [NIST 800-63B-4](https://pages.nist.gov/800-63-4/sp800-63b.html).
 
 ## Resolved first-slice dependency evidence
