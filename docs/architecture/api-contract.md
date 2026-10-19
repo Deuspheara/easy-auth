@@ -290,13 +290,15 @@ verifier; callers cannot treat fetch success as authentication or authorization.
 AUTH-29's `OidcDocuments::refresh_jwks` is a backend-only bounded document operation
 using an opaque observed snapshot. It accepts no endpoint/key-ID selector, exposes
 no new HTTP/OpenAPI route and returns no verified identity or session. The token
-verification boundary is described below; code exchange and provider activation
-contracts remain unimplemented.
+verification/code-exchange boundary is described below; provider activation
+and HTTP callback contracts remain unimplemented.
 
 The opt-in `oidc-verification` library API adds `OidcIdToken`, explicit
 `OidcVerificationPolicy`, `OidcTokenVerifier` and an opaque `VerifiedOidcIdentity`.
 Its repository port validates consumed exchange context against database time.
-It exposes no HTTP/OpenAPI callback or authentication route, does not perform the
-code exchange, and does not serialize a verified identity as a browser credential.
+It also adds `OidcCodeExchange`, explicit `OidcClientAuthentication`, protected
+code/request/response values and the `OidcTokenHttp` backend port implemented by
+`OidcHttps`. It exposes no HTTP/OpenAPI callback or authentication route and does
+not serialize a verified identity as a browser credential.
 See the [verification guide](../guides/oidc-verification.md). Existing ordinary
 server composition and wire schemas remain unchanged.

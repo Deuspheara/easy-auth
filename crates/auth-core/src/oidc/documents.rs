@@ -122,6 +122,25 @@ impl OidcDocuments {
 
     async fn load_keys(&self, observed: Option<&OidcJwksDocument>) -> Result<OidcJwksDocument> {
         let discovery = self.load_discovery().await?;
+        self.load_keys_from(&discovery, observed).await
+    }
+
+    #[cfg(feature = "oidc-verification")]
+    pub(super) async fn keys_from_discovery(
+        &self,
+        discovery: &OidcDiscovery,
+        observed: Option<&OidcJwksDocument>,
+    ) -> Result<OidcJwksDocument> {
+        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys_from(discovery, observed))
+            .await
+            .map_err(|_| Error::Unavailable)?
+    }
+
+    async fn load_keys_from(
+        &self,
+        discovery: &OidcDiscovery,
+        observed: Option<&OidcJwksDocument>,
+    ) -> Result<OidcJwksDocument> {
         self.repository
             .check_oidc_connection(&self.connection)
             .await?;

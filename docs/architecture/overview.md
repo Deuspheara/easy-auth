@@ -36,5 +36,7 @@ OAuth state. Core uses fixed per-key josekit/OpenSSL verification with mandatory
 typed claim policy and bounded workers. PostgreSQL reuses configuration/owner/session
 locks and final database time before and after I/O. Its opaque verified identity
 retains original transaction/token caps and grants no local session or linking
-authority. Code exchange and final issuance remain open.
+authority. Its optional code exchange uses original S256 proof and explicit
+registered client authentication through the same pinned HTTPS adapter. Local
+Keycloak acceptance and final issuance remain open.
 [ADR 0015](adr/0015-oidc-token-verification.md) records the boundary.

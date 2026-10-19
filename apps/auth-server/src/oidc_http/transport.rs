@@ -10,6 +10,10 @@ use tokio::sync::Semaphore;
 
 const MAX_IN_FLIGHT_OPERATIONS: usize = 4;
 
+#[cfg(feature = "oidc-verification")]
+#[path = "token.rs"]
+mod token;
+
 /// Shared concrete metadata transport. Clone/share one adapter across configured
 /// connections; no HTTP API, provider credential or permissive development mode.
 #[derive(Clone)]

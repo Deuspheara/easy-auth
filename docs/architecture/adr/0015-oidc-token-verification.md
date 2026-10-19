@@ -1,8 +1,8 @@
 # ADR 0015: Transaction-bound OIDC token verification
 
 Date: 2026-10-20. Status: accepted for AUTH-29's optional core/PostgreSQL
-verification boundary. AUTH-29 remains in progress. Token endpoint exchange,
-local Keycloak acceptance and final local identity/session issuance remain gates;
+verification and code-exchange boundary. AUTH-29 remains in progress.
+Local Keycloak acceptance and final local identity/session issuance remain gates;
 this decision activates no provider route or ordinary authentication composition.
 
 ## Context and dependency choice
@@ -120,3 +120,55 @@ No migration or HTTP/OpenAPI route is added. Native browser/passkey/SMTP checks 
 hosted publication remain separate gates. Real provider web/native acceptance,
 final identity resolution/linking/issuance, independent review, SAML and outbound
 issuer remain open. AUTH-29 must not be marked Done on this partial boundary.
+
+## Code and S256 exchange
+
+The same optional feature exposes `OidcCodeExchange`, an explicit trusted client
+registration authentication choice, protected authorization-code/request/response
+values, and `OidcTokenHttp`. Core owns form construction, response classification
+and protocol policy. `OidcHttps` implements the port using its existing shared
+capacity, public TLS roots, pinned addresses, original hostname and bounded reader.
+There is no production private-network, private-root or automatic method fallback.
+
+Use one service for one persisted configuration revision. Public, client-secret
+Basic and client-secret Post are explicit choices; discovery must advertise the
+chosen method and S256. An omitted authentication-method member defaults to Basic
+according to Discovery, never public authentication. Basic form-encodes client ID
+and secret independently before base64, rather than concatenating raw values.
+Credentials/policy changes require a fresh persisted revision and service replacement.
+
+`authorization_url` takes the matching `OAuthStart`, keeps state/nonce transient,
+adds openid plus bounded unique requested scopes, and uses the original S256
+challenge. Reserved endpoint query parameters reject rather than overriding trusted
+bindings. Browser transport still owns protected state/proof retention and actual
+callback extraction; no HTTP route or cookie transport is added here.
+
+After callback consumption, `exchange` consumes the owned context and code. It
+checks exact configuration and current database authority, loads validated metadata,
+resolves the checked token target, and rechecks authority after DNS before sending
+any code/client secret. One form POST contains the original verifier and exact
+redirect. There are no retries, redirects, ambient proxies or cookies. Discard failed
+consumed contexts and start a new flow; never resurrect state or retry its code.
+
+A successful JSON response must contain an ID token, access token and Bearer type;
+unused access/refresh tokens are bounded and discarded, never session credentials.
+Only its ID-token field enters established signature/claim verification. Valid
+HTTP400 invalid_grant is Unauthorized; client/configuration, malformed provider,
+network and timeout failures are Unavailable. Admission remains RateLimited. Raw
+error descriptions, token bodies and foreign causes are never diagnostics.
+
+The two shared service leases cover discovery, POST and signature verification.
+Code exchange has a 30-second whole-operation cap including the existing 15-second
+verification bound; each document/transport operation retains its shorter limits.
+Native crypto keeps its lease after cancellation. Discovery is reused only within
+one logical bounded verification/exchange, including unknown-key refresh. This
+avoids refetching no-cache metadata and self-throttling after a consumed code;
+HTTP freshness and ordinary/forced fetch budgets remain unchanged across operations.
+Private snapshot reuse repeats registry checks and keeps JWKS URI/freshness binding.
+
+Component evidence includes actual signed successes through every configured
+client-authentication method, exact proof/form binding, replay and post-DNS expiry,
+provider/infrastructure error separation and actual TLS POST negatives. Private TLS
+fixtures substitute only their owned address/root at the internal adapter boundary;
+production IP/TLS rules and opaque request constructors remain intact. These checks
+are not the required independent local Keycloak acceptance or final session issuance.

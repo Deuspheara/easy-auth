@@ -27,7 +27,7 @@ pub(super) enum Failure {
     Size,
 }
 
-fn network(error: reqwest::Error) -> Failure {
+pub(super) fn network(error: reqwest::Error) -> Failure {
     if error.is_timeout() {
         return Failure::Timeout;
     }
@@ -69,8 +69,24 @@ pub(super) async fn download(
 /// Shared bounded response boundary for configured document and token requests.
 /// Callers own request construction, credentials and the whole request deadline.
 pub(super) async fn read(
+    response: reqwest::Response,
+    addresses: &[SocketAddr],
+) -> Result<OidcHttpResponse, Failure> {
+    read_statuses(response, addresses, &[200]).await
+}
+
+#[cfg(feature = "oidc-verification")]
+pub(super) async fn read_token(
+    response: reqwest::Response,
+    addresses: &[SocketAddr],
+) -> Result<OidcHttpResponse, Failure> {
+    read_statuses(response, addresses, &[200, 400, 401]).await
+}
+
+async fn read_statuses(
     mut response: reqwest::Response,
     addresses: &[SocketAddr],
+    statuses: &[u16],
 ) -> Result<OidcHttpResponse, Failure> {
     let received = tokio::time::Instant::now();
     if !response
@@ -79,7 +95,8 @@ pub(super) async fn read(
     {
         return Err(Failure::Peer);
     }
-    if response.status() != 200 {
+    let status = response.status().as_u16();
+    if !statuses.contains(&status) {
         return Err(Failure::Status);
     }
     if response
@@ -134,7 +151,7 @@ pub(super) async fn read(
         body.extend_from_slice(&chunk);
     }
     Ok(OidcHttpResponse {
-        status: 200,
+        status,
         content_type: Some(content_type),
         content_encoding,
         body,

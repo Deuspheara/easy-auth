@@ -4,7 +4,7 @@ use super::{
     input::{self, OidcIdToken},
     keys,
 };
-use crate::{Error, OAuthExchange, OidcDocuments, OidcJwksDocument, Result};
+use crate::{Error, OAuthExchange, OidcDiscovery, OidcDocuments, OidcJwksDocument, Result};
 use std::{sync::Arc, time::Duration};
 use tokio::sync::{OwnedSemaphorePermit, Semaphore};
 use zeroize::Zeroizing;
@@ -41,7 +41,7 @@ impl OidcTokenVerifier {
         token: OidcIdToken,
     ) -> Result<VerifiedOidcIdentity> {
         let lease = self.lease_operation()?;
-        self.verify_leased(exchange, token, lease).await
+        self.verify_leased(exchange, token, lease, None).await
     }
 
     pub(in crate::oidc) fn lease_operation(&self) -> Result<Arc<OwnedSemaphorePermit>> {
@@ -58,16 +58,21 @@ impl OidcTokenVerifier {
         exchange: OAuthExchange,
         token: OidcIdToken,
         lease: Arc<OwnedSemaphorePermit>,
+        discovery: Option<OidcDiscovery>,
     ) -> Result<VerifiedOidcIdentity> {
-        tokio::time::timeout(VERIFY_TIMEOUT, self.verify_inner(exchange, token, lease))
-            .await
-            .map_err(|_| Error::Unavailable)?
+        tokio::time::timeout(
+            VERIFY_TIMEOUT,
+            self.verify_inner(exchange, token, lease, discovery),
+        )
+        .await
+        .map_err(|_| Error::Unavailable)?
     }
     async fn verify_inner(
         &self,
         exchange: OAuthExchange,
         token: OidcIdToken,
         lease: Arc<OwnedSemaphorePermit>,
+        discovery: Option<OidcDiscovery>,
     ) -> Result<VerifiedOidcIdentity> {
         if exchange.configuration() != self.documents.connection() {
             return Err(Error::Unauthorized);
@@ -77,11 +82,21 @@ impl OidcTokenVerifier {
         if !self.policy.algorithms.contains(&header.alg) {
             return Err(Error::Unauthorized);
         }
-        let observed = self.documents.jwks().await?;
+        // Reuse validated discovery only inside this bounded operation. In
+        // particular, no-store metadata must not cause a second self-throttled
+        // fetch after the one-use code has already been exchanged.
+        let discovery = match discovery {
+            Some(discovery) => discovery,
+            None => self.documents.discovery().await?,
+        };
+        let observed = self.documents.keys_from_discovery(&discovery, None).await?;
         let claims = match attempt(&token, observed.clone(), lease.clone()).await? {
             Attempt::Claims(claims) => claims,
             Attempt::UnknownKey => {
-                let current = self.documents.refresh_jwks(&observed).await?;
+                let current = self
+                    .documents
+                    .keys_from_discovery(&discovery, Some(&observed))
+                    .await?;
                 match attempt(&token, current, lease).await? {
                     Attempt::Claims(claims) => claims,
                     Attempt::UnknownKey => return Err(Error::Unauthorized),

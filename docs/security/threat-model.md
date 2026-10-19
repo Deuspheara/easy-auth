@@ -311,7 +311,21 @@ Native crypto work has two shared leases and a whole-operation deadline; cancele
 blocking jobs retain their lease until completion. Raw foreign causes and token/
 claim/key/proof data stay out of diagnostics; temporary dependency buffers prevent
 a whole-process erasure claim. OpenSSL deployment/upgrade and strict clock sync
-remain operational responsibilities. Code+S256 exchange, local Keycloak/independent
-interoperability and final identity/session transactions remain required, as do
+remain operational responsibilities. Local Keycloak/independent interoperability and final identity/session transactions
+remain required, as do
 independent review and ordinary activation. See
 [ADR 0015](../architecture/adr/0015-oidc-token-verification.md).
+
+
+AUTH-29's optional code exchange sends the original verifier and exact redirect to
+only the configured, checked/pinned token endpoint. Registered public/Basic/Post
+authentication is explicit and advertised; no method downgrade or retry exists.
+Endpoint parameter collisions reject. Authority is rechecked after DNS before
+sending credentials, and after signature verification. Discovery snapshots survive
+only within one bounded logical operation; no-cache never becomes cross-operation
+reuse. One-use code failures cannot resurrect consumed state. HTTP400 invalid_grant
+is distinct from provider configuration, malformed response or network failures.
+Unused access/refresh tokens confer no authority and are discarded. Protected
+values redact Debug and zeroize owned storage, without promising whole-process
+memory erasure. Private TLS component mappings add no production network/root
+bypass. Independent Keycloak/review and final local session issuance remain gates.

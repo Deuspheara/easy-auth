@@ -366,3 +366,14 @@ The native-worker regression uses an owned runtime/queue gate and the actual pub
 verification API. It tests cancellation, prompt overload and recovered valid work
 without production hooks or wider implementation visibility. Its longer ordered
 function keeps queue ownership, cleanup and positive controls together.
+
+
+Code exchange extends `oidc/verification/exchange/` with separate authentication,
+authorization URL, protected request, response and orchestration modules. Metadata
+policy remains in core documents; `oidc_http/token.rs` owns only concrete HTTPS POST
+construction and shared bounded response reading. Private TLS fixtures obtain actual
+opaque requests through the public core flow, rather than exposing a constructor
+for tests. Core exchange scenarios separate binding, response errors, authority/
+concurrency and non-cacheable metadata. Longer ordered tests/fixture setup and form
+construction keep exact input/output and redaction invariants together; all new
+modules stay below 300 lines. No unrelated structural cleanup is deferred.

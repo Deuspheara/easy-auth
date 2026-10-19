@@ -18,6 +18,8 @@ pub use ports::{
 mod verification;
 #[cfg(feature = "oidc-verification")]
 pub use verification::{
-    OidcExchangeRepository, OidcIdToken, OidcSigningAlgorithm, OidcTokenVerifier,
-    OidcVerificationPolicy, VerifiedOidcIdentity,
+    OidcAuthorizationCode, OidcAuthorizationUrl, OidcClientAuthentication, OidcClientSecret,
+    OidcCodeExchange, OidcExchangeRepository, OidcIdToken, OidcSigningAlgorithm, OidcTokenHttp,
+    OidcTokenRequest, OidcTokenResponse, OidcTokenVerifier, OidcVerificationPolicy,
+    VerifiedOidcIdentity,
 };

@@ -2,7 +2,7 @@
 
 The explicit `oidc-verification` feature adds a core verifier and PostgreSQL context
 checks; the server feature enables those dependencies alongside its HTTPS adapter.
-It adds no callback, token endpoint exchange or ordinary provider login. See
+It includes a backend code exchange, with no callback route or ordinary provider login. See
 [ADR 0015](../architecture/adr/0015-oidc-token-verification.md) for exact policy.
 
 Trusted composition configures/persists an OAuth connection and retains the returned
@@ -17,8 +17,8 @@ After consuming the browser-bound OAuth transaction, pass the owned exchange and
 provider response's `id_token` field, never an access token or a browser-supplied
 application session credential. A signature alone does not establish a token's
 protocol source when an issuer reuses keys and claims across token types. The
-library currently does not perform the code+S256 HTTP exchange; this remains AUTH-29
-work. Discard the exchange after parsing/verification failure and start a new flow.
+preferred `OidcCodeExchange` below owns the code+S256 HTTP exchange and selects
+that response field. Discard the exchange after parsing/verification failure and start a new flow.
 Do not resurrect consumed state or retry a provider code.
 
 A successful `VerifiedOidcIdentity` carries immutable exact configuration, purpose,
@@ -67,3 +67,51 @@ cargo test --locked -p easy-auth-postgres --features oidc-verification --test li
 Full default/all-feature workspace suites run sequentially. Signature fixtures are
 component evidence; local Keycloak code exchange/rotation/replay, provider acceptance,
 independent review and ordinary activation remain required.
+
+
+## Protected code exchange
+
+Compose one shared `OidcCodeExchange` with the persisted connection's documents,
+PostgreSQL repository, explicit verification policy and registered authentication
+method. Share the concrete `OidcHttps` adapter across connections. Choose exactly
+`Public`, `ClientSecretBasic(OidcClientSecret)` or
+`ClientSecretPost(OidcClientSecret)` from trusted registration. No runtime fallback
+occurs. The method and S256 must be advertised; missing method metadata means Basic.
+Rotate persisted configuration/revision and replace the service when these change.
+
+1. Begin the matching `OAuthTransactions` flow and use `authorization_url` to build
+   the code/openid redirect with original state, nonce and S256 challenge. Retain
+   its browser-bound proof securely. The URL exposes state/nonce deliberately for
+   browser redirection; never log it or store it in analytics.
+2. Extract the actual callback through your protected transport and consume state
+   with exact redirect/issuer binding. Pass that owned exchange and parsed
+   `OidcAuthorizationCode` to `exchange`. Do not accept a browser ID/access token
+   in place of the code or construct another verifier after exchange failure.
+3. Consume the returned opaque identity through a future reviewed local persistence
+   operation. This feature still issues no local session or automatic email link.
+
+A single POST uses the original PKCE verifier and configured redirect. Basic uses
+RFC6749 component form encoding; Post/public include the client ID in the body.
+Reserved authorization/token endpoint query parameters reject ambiguous bindings.
+Unused access/refresh tokens are discarded. HTTP400 invalid_grant returns
+Unauthorized, while malformed/configuration/network failures return Unavailable.
+No code retries, redirects, cookies or ambient proxies are permitted.
+
+The exchange service shares two leases from discovery through verification and has
+a 30-second whole-operation timeout. Verification retains its 15-second bound and
+native cancellation ownership. It rechecks database authority after DNS and after
+signature verification. Non-cacheable discovery is used within that one operation,
+including a possible key refresh, then never reused by a subsequent operation.
+A rapid new operation can therefore hit the unchanged one-second metadata miss
+budget; restart the flow after admission permits, never retry a consumed code.
+No database lock spans DNS, HTTPS or native verification.
+
+Run server component TLS POST checks as well as the focused core/PostgreSQL checks:
+
+```sh
+cargo test --locked -p easy-auth-server --features oidc-verification oidc_http
+```
+
+The loopback/private-root mapping exists only in private test code. Production
+remains public-address/public-root HTTPS only. Keycloak code exchange/rotation/replay
+acceptance is still pending; these component results do not establish interoperability.

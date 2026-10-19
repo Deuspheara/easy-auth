@@ -20,6 +20,7 @@ use url::Url;
 pub(super) struct Facts {
     pub failed_tls: AtomicUsize,
     pub requests: Mutex<Vec<(String, String)>>,
+    pub bodies: Mutex<Vec<Vec<u8>>>,
 }
 
 pub(super) struct Fixture {
@@ -69,6 +70,21 @@ impl Fixture {
                     request.push(byte[0]);
                 }
                 let request = String::from_utf8(request).unwrap();
+                let length = request
+                    .lines()
+                    .find_map(|line| {
+                        let (name, value) = line.split_once(':')?;
+                        name.eq_ignore_ascii_case("content-length")
+                            .then(|| value.trim().parse::<usize>().unwrap())
+                    })
+                    .unwrap_or(0);
+                assert!(length <= 16384, "test infrastructure: bounded request body");
+                let mut body = vec![0; length];
+                stream
+                    .read_exact(&mut body)
+                    .await
+                    .expect("test infrastructure: complete request body");
+                captured.bodies.lock().unwrap().push(body);
                 captured
                     .requests
                     .lock()
@@ -117,6 +133,8 @@ impl Fixture {
 
 fn reply(path: &str) -> (String, Vec<u8>) {
     let (status,extra,body)=match path {
+        "/invalid-grant"=>("400 Bad Request",String::new(),br#"{"error":"invalid_grant"}"#.to_vec()),
+        "/invalid-client"=>("401 Unauthorized",String::new(),br#"{"error":"invalid_client"}"#.to_vec()),
         "/html"=>return ("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 2\r\nConnection: close\r\n\r\n".into(),b"{}".to_vec()),
         "/duplicate-type"=>("200 OK","Content-Type: application/json\r\n".into(),b"{}".to_vec()),
         "/age"=>return ("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nCache-Control: max-age=1\r\nContent-Length: 2\r\nConnection: close\r\n\r\n".into(),b"{}".to_vec()),

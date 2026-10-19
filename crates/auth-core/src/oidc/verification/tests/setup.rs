@@ -70,6 +70,11 @@ impl OidcExchangeRepository for Store {
     }
 }
 pub(super) struct Http {
+    pub metadata: Mutex<Value>,
+    pub cache_seconds: AtomicUsize,
+    pub hold_dns: AtomicBool,
+    pub dns_entered: Notify,
+    pub dns_release: Notify,
     pub keys: Mutex<Vec<u8>>,
     pub gets: AtomicUsize,
     pub hold: AtomicBool,
@@ -79,6 +84,10 @@ pub(super) struct Http {
 #[async_trait]
 impl OidcHttp for Http {
     async fn resolve(&self, _: &str, port: u16) -> Result<Vec<SocketAddr>> {
+        if self.hold_dns.load(Ordering::SeqCst) {
+            self.dns_entered.notify_one();
+            self.dns_release.notified().await;
+        }
         Ok(vec![SocketAddr::from(([8, 8, 8, 8], port))])
     }
     async fn get(&self, target: &OidcTarget) -> Result<OidcHttpResponse> {
@@ -88,7 +97,7 @@ impl OidcHttp for Http {
             self.release.notified().await;
         }
         let body = if target.url().path().ends_with("openid-configuration") {
-            serde_json::to_vec(&json!({"issuer":"https://issuer.example","authorization_endpoint":"https://issuer.example/authorize","token_endpoint":"https://issuer.example/token","jwks_uri":"https://issuer.example/keys","authorization_response_iss_parameter_supported":true,"code_challenge_methods_supported":["S256"]})).unwrap()
+            serde_json::to_vec(&*self.metadata.lock().unwrap()).unwrap()
         } else {
             self.keys.lock().unwrap().clone()
         };
@@ -97,7 +106,7 @@ impl OidcHttp for Http {
             content_type: Some("application/json".into()),
             content_encoding: None,
             body,
-            cache_seconds: 300,
+            cache_seconds: self.cache_seconds.load(Ordering::SeqCst) as u64,
         })
     }
 }
@@ -193,6 +202,13 @@ impl Fixture {
             disable_at: AtomicUsize::new(usize::MAX),
         });
         let http = Arc::new(Http {
+            metadata: Mutex::new(
+                json!({"issuer":"https://issuer.example","authorization_endpoint":"https://issuer.example/authorize","token_endpoint":"https://issuer.example/token","jwks_uri":"https://issuer.example/keys","authorization_response_iss_parameter_supported":true,"code_challenge_methods_supported":["S256"]}),
+            ),
+            cache_seconds: AtomicUsize::new(300),
+            hold_dns: AtomicBool::new(false),
+            dns_entered: Notify::new(),
+            dns_release: Notify::new(),
             keys: Mutex::new(serde_json::to_vec(&json!({"keys":[key.public.clone()]})).unwrap()),
             gets: AtomicUsize::new(0),
             hold: AtomicBool::new(false),

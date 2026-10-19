@@ -1687,3 +1687,75 @@ HTTP/OpenAPI route, account-policy duplication or unrelated cleanup is introduce
 Native browser/SMTP scripts were not rerun locally for this optional backend layer;
 hosted CI runs the existing pipeline. Final local identity/session transactions,
 independent review, SAML, outbound issuer and ordinary activation remain gates.
+
+
+## AUTH-29 code exchange and non-cacheable metadata (2026-10-20)
+
+The optional core code exchange now constructs the original code/S256/redirect
+request with explicit registered public, secret-Basic or secret-Post authentication.
+Its authorization URL carries original state/nonce/challenge and bounded openid
+scopes. Backend-owned zeroizing/redacted values have no Clone/Serialize; the
+trusted adapter alone accesses encoded requests. Response parsing selects only the
+protected ID-token field for established signature/claim verification and discards
+unused access/refresh tokens. There is no local session grant or HTTP callback.
+
+Eleven new core scenarios pass. They use actual ES256 signature controls through
+all three registered authentication methods, special-character Basic component
+encoding, exact code/original PKCE/redirect binding, absence of proof in URL/body
+where inappropriate, no method fallback, reserved query rejection, provider error
+classification, duplicate/missing/invalid response fields, MIME/encoding/size
+limits, new-flow nonce replay denial, post-DNS expiry before credential transmission,
+disable during POST, shared operation admission and recovery after network failure.
+Exact Unauthorized/Unavailable/RateLimited assertions separate application rejection
+from broken infrastructure; successful signature controls remain intact.
+
+A new regression first failed against the current implementation: discovery with
+zero HTTP freshness was loaded again after a successful code POST, so the same
+operation hit its own ordinary fetch budget. The fix carries one validated snapshot
+only inside the bounded logical exchange/verification, including unknown-kid refresh.
+The regression passes and checks one discovery plus one JWKS fetch, then immediate
+separate-operation RateLimited with no second POST or cross-operation cache reuse.
+All42 OIDC core tests pass, retaining existing rotation/claims/worker/admission tests.
+
+Two new TLS POST cases pass alongside all8 existing server transport cases. They
+obtain the actual opaque request through core begin/consume/exchange and call the
+same internal production POST/reader against an owned TLS listener, private fixture
+root and explicit test-only address mapping. Production public-address/root rules
+remain unchanged. HTTP400 invalid_grant reaches exact Unauthorized as a positive
+transport control; HTTP401 invalid_client reaches Unavailable without a transport
+failure. Headers/form/SNI/Host/PKCE/redirect and no-cookie behavior are checked using
+non-secret assertion output. Redirect, declared/chunked oversize, header/MIME/
+encoding and timeout negatives require exact finite transport causes and no retry.
+The sandbox's initial listener denial and a canonical-origin fixture typo were
+infrastructure failures, not acceptance evidence. No security check was relaxed.
+
+An owned metadata-only probe uses official
+[Keycloak26.8.1](https://www.keycloak.org/getting-started/getting-started-docker),
+image digest `sha256:79c623a22abacf3fe6c00a5fb30f5b7843d717b234033b80995891c06116d244`.
+The loopback-only disposable container becomes ready, then is stopped/removed.
+Its public discovery reports `no-cache, must-revalidate, no-transform, no-store`,
+S256 and issuer-response support, and Basic/Post among its advertised client methods.
+It does not advertise none; no public-client compatibility is inferred.
+This confirms the relevance of the no-cache regression, not token/code/provider
+interoperability. No provider account, production credential or token is used.
+Actual local Keycloak code/S256/signature/rotation/replay and final identity/session
+acceptance remain required; AUTH-29 remains In Progress.
+
+Final local gates pass: `cargo fmt --all -- --check`; strict locked workspace/
+all-target Clippy with default and all features; `cargo test --locked --workspace`
+(**93 tests**) followed sequentially by its `--all-features` variant (**362 unique
+cases**: 2 Axum unit, 55 HTTP/database, 54 core, 241 PostgreSQL, 10 server; the logging
+subprocess repeats one included core case). No failed or ignored cases. Compiled
+advisory audit, all-feature cargo-deny and browser npm audit pass. Inactive SQLx/MySQL
+RSA advisory remains visible; no exception is added. The staged diff receives
+redacted Gitleaks scanning before publication.
+
+The earlier structural extraction is separate commit `e12826f`; its 31 OIDC tests
+and strict all-feature lint passed before behavior was added. New modules keep
+explicit protocol policy, HTTPS, SQL and test responsibilities separate; all remain
+under 300 lines. Longer request construction and ordered fixture/scenario functions
+retain exact proof/credential/operation ordering as reviewed size exceptions. No
+migration, dependency version, public HTTP schema or ordinary composition changes;
+no unrelated structural cleanup is deferred. Previous signature checkpoint
+`b100462` has completed successful hosted CI39334677522. New exchange publication
+and hosted acceptance are recorded separately; the ticket is not complete here.

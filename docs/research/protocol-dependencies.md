@@ -108,5 +108,5 @@ Only validated public components reach the library. Foreign errors are discarded
 without formatting input-derived causes. Native jobs retain bounded leases after
 cancellation; dependency temporary allocations prevent an absolute memory-erasure
 claim. See [ADR 0015](../architecture/adr/0015-oidc-token-verification.md).
-Code exchange, local Keycloak, final identity persistence and independent review
+Local Keycloak acceptance, final identity persistence and independent review
 remain gates; dependency adoption alone completes none of those.

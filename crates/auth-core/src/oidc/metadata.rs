@@ -37,8 +37,12 @@ pub struct OidcDiscovery {
     jwks: String,
     s256: bool,
     response_issuer: bool,
+    token_authentication: Vec<String>,
 }
 impl OidcDiscovery {
+    pub fn token_authentication_methods(&self) -> &[String] {
+        &self.token_authentication
+    }
     pub fn issuer(&self) -> &str {
         &self.issuer
     }
@@ -69,6 +73,8 @@ struct Discovery {
     code_challenge_methods_supported: Vec<String>,
     #[serde(default)]
     authorization_response_iss_parameter_supported: bool,
+    #[serde(default = "default_token_authentication")]
+    token_endpoint_auth_methods_supported: Vec<String>,
 }
 
 pub(super) fn discovery(
@@ -84,6 +90,13 @@ pub(super) fn discovery(
             .code_challenge_methods_supported
             .iter()
             .any(|method| method.len() > MAX_PKCE_METHOD_BYTES)
+        || wire.token_endpoint_auth_methods_supported.len() > MAX_PKCE_METHODS
+        || wire
+            .token_endpoint_auth_methods_supported
+            .iter()
+            .any(|method| {
+                method.len() > MAX_PKCE_METHOD_BYTES || method.chars().any(char::is_control)
+            })
         || (connection.defense() == OAuthMixupDefense::RequireIssuer
             && !wire.authorization_response_iss_parameter_supported)
     {
@@ -102,6 +115,7 @@ pub(super) fn discovery(
             .iter()
             .any(|method| method == "S256"),
         response_issuer: wire.authorization_response_iss_parameter_supported,
+        token_authentication: wire.token_endpoint_auth_methods_supported,
     })
 }
 
@@ -151,4 +165,9 @@ fn check_response(response: &OidcHttpResponse, keys: bool) -> Result<()> {
         return Err(Error::Unavailable);
     }
     Ok(())
+}
+
+fn default_token_authentication() -> Vec<String> {
+    // OIDC Discovery defines Basic as the default when this member is omitted.
+    vec!["client_secret_basic".to_owned()]
 }

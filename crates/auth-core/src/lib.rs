@@ -61,6 +61,8 @@ pub use sessions::{SessionInfo, SessionPage};
 
 #[cfg(feature = "oidc-verification")]
 pub use oidc::{
-    OidcExchangeRepository, OidcIdToken, OidcSigningAlgorithm, OidcTokenVerifier,
-    OidcVerificationPolicy, VerifiedOidcIdentity,
+    OidcAuthorizationCode, OidcAuthorizationUrl, OidcClientAuthentication, OidcClientSecret,
+    OidcCodeExchange, OidcExchangeRepository, OidcIdToken, OidcSigningAlgorithm, OidcTokenHttp,
+    OidcTokenRequest, OidcTokenResponse, OidcTokenVerifier, OidcVerificationPolicy,
+    VerifiedOidcIdentity,
 };
