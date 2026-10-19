@@ -291,3 +291,56 @@ migrations 0001–0008 and prior browser artifacts remain unchanged. Full M03,
 AUTH-20 recovery/management, other-browser/real-device evidence and the later
 provider/native/issuer/security release gates remain open. Hosted exact-head
 results and commit links are tracked in Huly AUTH-53.
+
+## AUTH-53 two-stage signup core checkpoint — 2026-10-19
+
+Optional core/PostgreSQL signup now keeps registration and a verified candidate
+pending until a separate genuine assertion. One transaction creates the email-free
+passkey-required account, updated key, session and `passkey_signed_up` fact, then
+checks expiry and consumes pending state after all writes. HTTP signup/native
+anonymous-browser integration and verified-mailbox attachment remain in progress;
+this checkpoint does not complete AUTH-53, AUTH-20 or M03.
+
+- Final default workspace **69 cases** and all-feature workspace **131 cases**
+  pass sequentially on PostgreSQL 17.11. All-feature totals are adapter unit 2,
+  HTTP/database 17, core 10 and PostgreSQL 102. The logging case's body executes
+  in an exact child test process and is counted once in the core total.
+- Nineteen new signup cases cover real signed registration/assertion and later
+  account-bound login; no user/key/session/fact before assertion; stage/browser/
+  realm/RP separation; exact proof/candidate snapshots; bad challenge/origin/RP/UV,
+  signature/handle/envelope; replay/concurrency; owner/key collision without merge;
+  session/audit rollback; pending/admission bounds; upgrade preservation and invalid
+  stage shapes. Observed lock waits prove expiry during registration advancement,
+  unchanged pending-row locking, rolled-back key uniqueness and the final audit
+  insertion. Final expiry rolls every earlier insert back together.
+- The pinned SoftToken initially rejected the resident request with `NotSupported`,
+  as its source explicitly documents. The test-only helper asserts that the server
+  requests residence, then adjusts only the software client's residence hints;
+  challenge/RP/required-UV/private state and production verification stay unchanged.
+  These are signed nonresident proof/transaction cases. The UV negative uses the
+  same unsigned attestation as its valid control with only UV cleared. Native
+  resident signup/discovery remains required and must use original options.
+- An earlier full run exposed another concurrent tracing-cache positive-control
+  failure. Separate commit `c448156` isolates that exact security test in a child
+  copy of its existing unit-test executable. Actual upstream marker exposure,
+  suppression and caller-event restoration assertions remain intact; production
+  suppression is unchanged, with no global logging switch or suite serialization.
+  Three repeated concurrent core suites and the final full suite pass.
+- Strict all-target/all-feature Clippy, fmt, compiled-advisory and cargo-deny pass.
+  Gitleaks 8.24.3 and 8.30.1 pass a source snapshot including new nonignored files.
+  No dependency/lockfile changes, new cryptography or advisory ignore. Existing
+  inactive optional SQLx MySQL/RSA reporting remains visible.
+- The freshly built existing native fixture passes all **20 Chromium 156.0.8078.4 /
+  Playwright 1.64.1** regression cases. Counts remain 20 credentials/enrollment
+  audits, 13 passkey sessions/authentication audits, 23 admitted finishes, zero
+  pending and one backed-up/one used-zero-counter credential. All 212 source hashes
+  and the fresh executable hash match the local report. Exact fixture DB removal
+  is reported and independently confirmed by a zero browser-DB catalog count.
+  These existing-flow regressions are not anonymous signup or real-device evidence.
+
+Published migrations 0001–0009 and earlier committed browser evidence are unchanged.
+Core signup owns the flow/typed proof/port; PostgreSQL signup modules own admission,
+stage advancement and one visible atomic completion transaction. The deliberate
+transaction size exceptions are documented in code-organization.md. Default HTTP
+composition/OpenAPI remain unchanged by this core checkpoint. Hosted exact-head
+results and publication are tracked in Huly; release gates remain open.

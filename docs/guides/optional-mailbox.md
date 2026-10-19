@@ -1,7 +1,9 @@
 # Optional mailbox and account policy
 
-AUTH-53's identity/storage boundary supports users without email. Anonymous
-passkey signup and verified-mailbox attachment are still being implemented;
+AUTH-53's identity/storage boundary supports users without email. Optional
+[core/PostgreSQL passkey signup](passkey-signup.md) now requires verified assertion
+before account/session creation. Its HTTP/native browser integration and
+verified-mailbox attachment are still being implemented;
 this model change does not expose either workflow or enable ordinary passkey
 composition. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
 
@@ -61,8 +63,8 @@ Deploy the schema and binary together across all alpha replicas. Older workers
 do not enforce stronger-account policy or understand nullable user fields; mixed
 versions are unsupported. Do not provision email-free accounts manually as a
 replacement for the pending proof-completed signup flow. The public signup path
-will require both registration and a genuine assertion before identity/session
-creation, and mailbox attachment will require fresh passkey and mailbox proof.
+uses the core requirement for registration and genuine assertion before identity/
+session creation; mailbox attachment will require fresh passkey and mailbox proof.
 See [ADR 0009](../architecture/adr/0009-passkey-first-identity.md).
 
 Real PostgreSQL tests cover upgrade preservation, nullable/uniqueness constraints,

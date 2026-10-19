@@ -55,8 +55,9 @@ nullable `email` and `display_name`; existing verified emails remain strings.
 Default and experimental OpenAPI snapshots include this shared contract change.
 Passkey-required accounts reject weak-method sessions, email/password login and
 password recovery; mail-only lifecycle operations are unavailable pending
-AUTH-20. Fresh passkey session controls work without email. Anonymous signup and
-verified-mailbox attachment remain AUTH-53 implementation work. See the
+AUTH-20. Fresh passkey session controls work without email. The optional core/PostgreSQL signup use case now requires a separate verified
+assertion before creating the account/session; signup HTTP routes/native browser
+evidence and verified-mailbox attachment remain AUTH-53 implementation work. See the
 [model/migration guide](../guides/optional-mailbox.md).
 
 ## Explicit experimental passkey enrollment

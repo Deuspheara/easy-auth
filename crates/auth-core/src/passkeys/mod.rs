@@ -9,6 +9,7 @@ mod logging;
 mod registration;
 mod repository;
 mod sign_in;
+mod signup;
 mod state;
 #[cfg(test)]
 mod tests;
@@ -23,6 +24,11 @@ pub use repository::{
     PasskeyEnrollmentContext, PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRepository,
 };
 pub use sign_in::{PasskeySignIn, PasskeySignInOptions};
+pub use signup::{
+    PasskeySignup, PasskeySignupAssertion, PasskeySignupCreation, PasskeySignupRegistrationContext,
+    PasskeySignupRepository, PasskeySignupRequest, PasskeySignupStart,
+    VerifiedPasskeySignupRegistration,
+};
 pub use state::{PrivatePasskeyRegistration, VerifiedPasskey};
 pub use webauthn_rs::prelude::{
     CreationChallengeResponse as PasskeyCreationOptions,

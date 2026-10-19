@@ -36,6 +36,9 @@ Planned entities are not implemented tables until their milestone. Account delet
 AUTH-53's accepted [email-free identity design](adr/0009-passkey-first-identity.md)
 separates optional verified contact information from account authentication policy.
 The optional-email model, migration 0009, nullable public contract and initial
-passkey-required policy gates are implemented. Pending-only registration/assertion
-signup and verified-mailbox attachment remain planned. AUTH-20 still owns the
-full stronger-account management and recovery closure.
+passkey-required policy gates are implemented. Migration 0010 adds pending-only
+registration/assertion signup in core/PostgreSQL: only verified assertion completion
+creates the user/key/session and typed signup audit, with final expiry checking
+after all writes. [HTTP/native signup evidence](../guides/passkey-signup.md) and
+verified-mailbox attachment remain required. AUTH-20 still owns full stronger-account
+management and recovery closure.

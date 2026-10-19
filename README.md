@@ -20,8 +20,10 @@ separate from real-device/provider interoperability.
 
 The [optional-mailbox model](docs/guides/optional-mailbox.md) now preserves existing
 mailbox accounts while supporting null email, display labels and passkey-required
-policy without weaker login/reset fallback. Anonymous passkey signup and verified
-contact attachment are still in progress; ordinary passkey composition stays gated.
+policy without weaker login/reset fallback. Optional [signup core/PostgreSQL](docs/guides/passkey-signup.md)
+now creates an account/session only after registration and verified assertion.
+HTTP/native anonymous signup and verified contact attachment remain in progress;
+ordinary passkey composition stays gated.
 
 ## Run locally
 

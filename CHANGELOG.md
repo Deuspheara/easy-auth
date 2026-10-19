@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Optional core/PostgreSQL email-free signup with separate registration/assertion
+  stages, bounded pending state, one-use atomic account/key/session/audit creation
+  and final post-write expiry checks. HTTP/native signup and mailbox attachment
+  remain in progress (AUTH-53).
+
 - Optional verified mailbox and display-label model, nullable user API/OpenAPI,
   explicit passkey-required account policy, no-email session controls and locked
   denial of weaker login/reset/lifecycle paths. Anonymous signup and contact

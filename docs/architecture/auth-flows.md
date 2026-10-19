@@ -54,6 +54,30 @@ sequenceDiagram
 
 Embedded RP is the application's domain; centralized RP belongs to the authentication domain. Unrelated domains cannot freely share credentials. Multiple credentials, rename/removal, discoverable login, counter/backup-state updates, recovery and virtual/real authenticator tests are release requirements.
 
+## Email-free passkey signup (AUTH-53)
+
+The optional shared core/PostgreSQL flow below is implemented. Its HTTP adapter
+and native anonymous-browser evidence remain in progress; this does not enable
+ordinary server composition. See the [signup guide](../guides/passkey-signup.md).
+
+```mermaid
+sequenceDiagram
+  participant browserClient as Browser authenticator
+  participant authService as Shared signup core
+  participant database as PostgreSQL
+  browserClient->>authService: Start with display label and browser binding
+  authService->>database: Bound pending state with server-selected prospective UUID
+  authService-->>browserClient: Resident creation options with required UV
+  browserClient->>authService: Registration response
+  authService->>authService: Verify registration through high-level service
+  authService->>database: Advance pending state; no user or session
+  authService-->>browserClient: Account-bound assertion options
+  browserClient->>authService: Signed assertion
+  authService->>authService: Verify actual key proof and state snapshots
+  authService->>database: Insert user/key/session/audit; final expiry and one-use consume
+  authService-->>browserClient: Session secret only after atomic commit
+```
+
 ## Social and external OIDC (M04/M05)
 ```mermaid
 sequenceDiagram

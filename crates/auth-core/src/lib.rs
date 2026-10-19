@@ -24,9 +24,11 @@ pub use passkeys::{
     PasskeyAuthenticationRequest, PasskeyAuthenticationResponse, PasskeyAuthenticationStart,
     PasskeyCreationOptions, PasskeyEnrollment, PasskeyEnrollmentContext, PasskeyEnrollmentOptions,
     PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRegistrationResponse,
-    PasskeyRepository, PasskeyService, PasskeySignIn, PasskeySignInOptions,
+    PasskeyRepository, PasskeyService, PasskeySignIn, PasskeySignInOptions, PasskeySignup,
+    PasskeySignupAssertion, PasskeySignupCreation, PasskeySignupRegistrationContext,
+    PasskeySignupRepository, PasskeySignupRequest, PasskeySignupStart,
     PrivatePasskeyAuthentication, PrivatePasskeyRegistration, StoredPasskey, VerifiedPasskey,
-    VerifiedPasskeyAuthentication,
+    VerifiedPasskeyAuthentication, VerifiedPasskeySignupRegistration,
 };
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};

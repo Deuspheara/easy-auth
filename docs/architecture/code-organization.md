@@ -130,3 +130,14 @@ lock; it never acquires email locks afterward. Core user policy and HTTP nullabl
 fields stay in their owning model/transport modules. Integration cases under
 `tests/lifecycle/identity/` separate migration, admission, policy, session and
 observed-wait invariants. No generic identity engine or new crate is introduced.
+
+Signup uses focused `passkeys/signup/` modules in core and PostgreSQL. Core owns
+the flow, repository contract and unforgeable verified registration transition.
+PostgreSQL separates admission, preparation/stage advancement and final completion.
+The longer `save` and `commit` functions keep realm capacity serialization, pending
+locks, exact proof comparisons, owner/key uniqueness, session/audit inserts and
+final post-write expiry/consumption visible in one transaction. They are cohesive
+reviewed size exceptions, not a generic workflow abstraction. Signup integration
+tests separate protocol, binding, limits, collisions, atomicity, migration and
+observed expiry waits. The software residence hint adjustment is test-only and
+explicit; production options and verifier policy remain intact.

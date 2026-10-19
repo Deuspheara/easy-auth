@@ -4,6 +4,7 @@ mod concurrency;
 mod enrollment;
 mod limits;
 mod protocol;
+mod signup;
 mod waiting;
 
 use crate::support::{realm, signed_in};
