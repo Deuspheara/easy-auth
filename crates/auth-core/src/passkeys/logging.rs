@@ -50,6 +50,25 @@ mod tests {
 
     #[test]
     fn suppresses_actual_upstream_payload_events_and_restores_caller_logging() {
+        // Tracing's callsite/max-level caches are process-wide. Other tests use
+        // Dispatch::none concurrently, so run this exact positive/negative control
+        // in its own test process rather than serialize or weaken the suite.
+        const CHILD: &str = "EASY_AUTH_LOGGING_TEST_CHILD";
+        if std::env::var_os(CHILD).as_deref() != Some(std::ffi::OsStr::new("1")) {
+            let status = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "passkeys::logging::tests::suppresses_actual_upstream_payload_events_and_restores_caller_logging",
+                ])
+                .env(CHILD, "1")
+                .status()
+                .unwrap();
+            assert!(
+                status.success(),
+                "isolated upstream logging controls failed"
+            );
+            return;
+        }
         let service = PasskeyService::new("https://login.example.com", "Example").unwrap();
         let response: PasskeyRegistrationResponse = serde_json::from_value(serde_json::json!({
             "id": "private-ceremony-marker", "rawId": "AQ", "type": "public-key",
