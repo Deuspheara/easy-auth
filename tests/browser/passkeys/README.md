@@ -103,7 +103,9 @@ suite; it is not mislabeled as browser hardware attestation coverage.
 
 The separate [native SMTP contact suite](attachment/README.md) uses the real server
 SMTP adapter and local Mailpit, rather than the disabled-mail adapter in this
-31-case fixture. It adds two anonymous platform/USB signup-to-contact cases with
-actual email confirmation, session rotation and subsequent passkey login. CI runs
+31-case fixture. Its first two anonymous platform/USB signup-to-contact cases cover
+actual email confirmation, session rotation, management and subsequent passkey login.
+Two separate platform/USB accounts now exercise saved-code configuration before
+and after verified contact, including real purpose-specific notices. CI runs
 both suites sequentially with owned disposable databases; their aggregate counts
 and evidence records stay separate.

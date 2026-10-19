@@ -143,3 +143,15 @@ is not phishing resistant; offline storage is the user's responsibility. No reco
 login or stronger-policy activation is implemented. Email-free accounts have no
 independent email notification. The delayed/cancellable recovery design and its
 remaining security review are explicitly proposed in [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
+
+
+Experimental HTTP saved-code configuration uses a separate startup-aligned router,
+closed JSON/no query selectors, the shared exact-Origin/host-session boundary and
+8 KiB bodies. Only successful persisted preparation serializes a code, with
+no-store protections and no new session/action cookie. Confirmation binds the
+original session and returns no credential. Native platform/USB cases use actual
+signup assertion, email-free confirmation and verified-contact rotation with real
+SMTP notices; test code is never persisted in browser storage or reports. Existing
+negative protocol/management assertions remain intact in separate owned accounts.
+This transport addition does not implement delayed/cancellable recovery or activate
+ordinary routes; independent review and physical-device/browser gates remain.

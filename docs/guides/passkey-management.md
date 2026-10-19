@@ -95,8 +95,9 @@ browser interoperability, recovery safety or general activation readiness.
 
 The optional `PasskeyRecoverySetup` core service and
 `PasskeyRecoverySetupRepository` adapter prepare and confirm a saved recovery code.
-This configuration has no HTTP route or recovery authentication endpoint yet and
-must not be advertised as a working all-keys-lost recovery flow. It never changes
+A separate experimental HTTP constructor now exposes configuration. There is no
+recovery authentication endpoint; this must not be advertised as a working
+all-keys-lost recovery flow. It never changes
 account policy or ordinary server enablement. See
 [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md) for the implemented
 configuration boundary and separately proposed delayed recovery protocol.
@@ -133,3 +134,34 @@ it does not fabricate an authenticated session or exercise recovery login. It
 verifies SMTP content and acknowledgement, removes only its exact owned mail and
 drops its database. CI supplies its PostgreSQL service container explicitly through
 `EASY_AUTH_SMOKE_POSTGRES_CONTAINER`; database URLs must remain loopback test URLs.
+
+
+### Explicit HTTP saved-code configuration
+
+Enable `easy-auth-axum/passkey-recovery-setup` and construct
+`experimental_passkey_recovery_setup_router` with aligned Auth, BrowserConfig,
+enrollment, sign-in, signup, management and recovery-setup services. Earlier
+constructors and ordinary embedding/server composition expose neither new route.
+The [full OpenAPI document](../architecture/openapi-passkey-recovery-setup.json)
+preserves every prior route/schema and adds:
+
+| Route | Closed JSON input | Result |
+| --- | --- | --- |
+| `POST /v1/passkeys/recovery/code/prepare` | `{}` | 200 `{id,code}` once after pending persistence |
+| `POST /v1/passkeys/recovery/code/confirm` | `{id,code}` | 204 after atomic confirmation/audit/notice commit |
+
+Both require the current session cookie and exact configured Origin. Inputs cannot
+nominate an owner/realm/RP, query fields are rejected, bodies are limited to 8 KiB,
+and the code uses the canonical existing 43-character Secret encoding. Invalid
+fields/query return 400, weak/stale/foreign/replayed authority or incorrect code
+401, rejected Origin 403, oversized/wrong-media body 413/415, admission 429 and
+persistence failure 503. Errors are generic and never echo a code or request body.
+
+Prepare responses use no-store/CSP, contain no private verifier/state and set no
+new cookie. The response contains the raw recovery code: show it once through a
+protected interface for offline retention and confirmation. No later endpoint
+returns it. Confirmation and failures also issue no session/action cookies and
+never activate policy. Existing sessions remain unchanged; confirmation after a
+session rotation must restart setup under the new genuine fresh session. SMTP
+transport failure after commit remains queued/retryable and does not undo the
+configuration response. Email-free confirmation sends no fabricated email.

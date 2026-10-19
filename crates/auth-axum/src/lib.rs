@@ -21,3 +21,6 @@ pub use router::router;
 
 #[cfg(feature = "passkey-management")]
 pub use passkeys::{experimental_passkey_management_router, passkey_management_openapi};
+
+#[cfg(feature = "passkey-recovery-setup")]
+pub use passkeys::{experimental_passkey_recovery_setup_router, passkey_recovery_setup_openapi};

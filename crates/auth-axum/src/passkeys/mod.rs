@@ -21,3 +21,10 @@ pub use signup::{experimental_passkey_signup_router, passkey_signup_openapi};
 mod management;
 #[cfg(feature = "passkey-management")]
 pub use management::{experimental_passkey_management_router, passkey_management_openapi};
+
+#[cfg(feature = "passkey-recovery-setup")]
+mod recovery_setup;
+#[cfg(feature = "passkey-recovery-setup")]
+pub use recovery_setup::{
+    experimental_passkey_recovery_setup_router, passkey_recovery_setup_openapi,
+};

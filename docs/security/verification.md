@@ -849,3 +849,71 @@ lock/write/final-check/cleanup order; the organization guide documents these siz
 exceptions. No structural cleanup is deferred. Proposed delay/receipt/cancellation,
 new-key proof, one-use recovery completion, HTTP integration, activation and M03
 external evidence remain incomplete; these checks do not establish their safety.
+
+
+## AUTH-20 experimental HTTP saved-code configuration — 2026-10-19
+
+AUTH-20 remains **In Progress**. A separate `passkey-recovery-setup` feature and
+`experimental_passkey_recovery_setup_router` expose only saved-code preparation
+and confirmation. Startup aligns all service realms/origins. The earlier constructors
+and full schemas remain unchanged; the new
+[full contract](../architecture/openapi-passkey-recovery-setup.json) adds two closed
+POST bodies under `/v1/passkeys/recovery/code/{prepare,confirm}`. Exact Origin,
+host-session cookie parsing, 8 KiB JSON, no query selectors, no-store and generic
+errors remain shared. Only successfully persisted preparation serializes `{id,code}`;
+Secret's general serialization prohibition and zeroization remain intact. Neither
+operation issues a session/action cookie, upgrades policy or authenticates recovery.
+
+A separate composition/contact extraction passed the existing **8 HTTP management
+and 2 real-SMTP native cases** before behavior extension. The new **8 HTTP tests**
+prove full contract/prior-schema preservation, old-constructor route absence,
+realm/origin startup rejection, cookie/Origin/body/media/query boundaries, weak and
+stale authority, exact session/foreign-pending/wrong-code rejection with valid retry,
+durable rate limiting, confirmation/rotation with no policy or method/time change,
+email-free absence of fabricated notice, SMTP queue retry and atomic persistence
+failure with no returned code/success cookie. Initial draft tests expected different
+error labels; they were corrected to the existing published generic codes rather
+than changing application responses or accepting arbitrary errors.
+
+Final local checks with PostgreSQL 17.11 and documented Mailpit:
+
+- `cargo fmt --all -- --check`; strict locked workspace/all-target Clippy with
+  default and all features pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **210 pass** (2 Axum unit, 39 HTTP/database, 10 core, 159 PostgreSQL).
+  The logging subprocess repeats one included core case. No failures or ignored
+  tests in successful full suites.
+- Fresh pinned native runs pass **31 Chromium and 4 real-SMTP cases**. Final evidence
+  uses fixed owned copies of producer binaries after Cargo checks/builds finish;
+  recorded source/binary hashes match the
+  [browser report](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-http.json)
+  and [SMTP report](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-recovery-http.json).
+  Earlier reports remain immutable. The original management cases retain every
+  assertion, while two additional platform/USB cases use separate accounts and
+  genuine signup assertions to confirm saved-code setup while email-free, then
+  rotate it after independent real-SMTP contact proof. They reject wrong/replayed
+  codes, retain no browser storage and receive a purpose-specific real notice.
+  No source/admission limit, exclusion option or security assertion is weakened.
+- The SMTP aggregate requires four verified stronger users/proven remaining keys/
+  signup/contact facts, eight later authentication facts, two rename/removal facts,
+  four recovery-configuration facts and two active code-verifier records. Invalid
+  attachment/recovery provenance, weaker sessions, pending state and queued notices
+  are all zero. Both native databases and exactly eleven owned SMTP messages are
+  removed. These remain virtual-device results, not physical-device evidence.
+- Newly built standalone and embedded full password/recovery/sessions/lifecycle
+  SMTP smokes pass with owned database cleanup. The separate new-notice transport
+  smoke also passes with its exact one-owned-message/database cleanup.
+- Compiled-dependency audit, all-feature cargo-deny and low-threshold npm audit pass;
+  the inactive SQLx/MySQL rsa advisory remains visible. No dependency version or
+  migration changes are introduced by this HTTP boundary. The complete staged
+  diff also passes redacted Gitleaks scanning.
+
+Source review keeps thin handlers, private concrete transport DTOs and feature
+composition separate from the existing core/PostgreSQL policy. New files stay below
+300 lines; the explicit seven-service constructor and longer fixtures/tests keep
+alignment, assertions and owned-resource order visible. No structural cleanup is
+deferred by this change. Recovery claim/delay/notification receipts/cancellation,
+new-key proof and one-use recovery completion remain proposed, not implemented;
+independent review, safe activation, ordinary composition and physical-device/
+other-browser acceptance remain open. This checkpoint does not complete AUTH-20.

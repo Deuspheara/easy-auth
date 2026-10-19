@@ -31,6 +31,13 @@ impl PasskeyRecoverySetup {
         }
     }
 
+    pub fn realm(&self) -> Uuid {
+        self.realm
+    }
+    pub fn origin(&self) -> &str {
+        self.service.origin()
+    }
+
     pub async fn prepare(
         &self,
         session: &Secret,

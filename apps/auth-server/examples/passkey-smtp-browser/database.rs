@@ -21,6 +21,26 @@ async fn collect(pool: &sqlx::PgPool) -> Result<serde_json::Value, Box<dyn Error
     for (name, query) in [
         ("users", "SELECT count(*) FROM auth_users"),
         (
+            "recovery_configured",
+            "SELECT count(*) FROM auth_audit WHERE kind='passkey_recovery_configured'",
+        ),
+        (
+            "recovery_codes",
+            "SELECT count(*) FROM auth_passkey_recovery_codes",
+        ),
+        (
+            "recovery_setups_pending",
+            "SELECT count(*) FROM auth_passkey_recovery_setups",
+        ),
+        (
+            "recovery_notices_pending",
+            "SELECT count(*) FROM auth_security_notifications WHERE kind='passkey_recovery_changed'",
+        ),
+        (
+            "invalid_recovery_provenance",
+            "SELECT count(*) FROM auth_audit a JOIN auth_sessions s ON s.realm_id=a.realm_id AND s.id=a.actor_session_id WHERE a.kind='passkey_recovery_configured' AND (s.user_id<>a.user_id OR s.authentication_method<>'passkey' OR a.session_id IS NOT NULL OR a.passkey_id IS NOT NULL)",
+        ),
+        (
             "strong_verified_users",
             "SELECT count(*) FROM auth_users WHERE email IS NOT NULL AND email_verified_at IS NOT NULL AND authentication_policy='passkey_required'",
         ),

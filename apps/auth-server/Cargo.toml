@@ -10,7 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
-experimental-passkeys = ["auth-axum/passkey-management", "auth-core/passkeys", "auth-postgres/passkeys"]
+experimental-passkeys = ["auth-axum/passkey-recovery-setup", "auth-core/passkeys", "auth-postgres/passkeys"]
 
 [dev-dependencies]
 serde_json.workspace = true

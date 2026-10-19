@@ -1,6 +1,8 @@
 mod boundary;
 mod contract;
 mod lifecycle;
+#[cfg(feature = "passkey-recovery-setup")]
+mod recovery_setup;
 
 use crate::support::{Mail, post};
 use auth_core::{

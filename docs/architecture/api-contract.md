@@ -188,11 +188,18 @@ account policy or issue stronger session provenance. Existing generic 401 respon
 and wire schemas are unchanged. See the [enrollment guide](../guides/passkey-enrollment.md).
 
 
-Optional `PasskeyRecoverySetup` currently exposes core/PostgreSQL prepare/confirm
-configuration only. It requires genuine fresh passkey-method authority plus an
-owned proven key in the configured RP, stores only a saved-code verifier and binds
-confirmation to the original session/realm/owner/RP/pending ID. No new HTTP route,
-OpenAPI schema, recovery session or stronger-policy activation is exposed.
+Optional `PasskeyRecoverySetup` requires genuine fresh passkey-method authority
+plus an owned proven key in the configured RP, stores only a saved-code verifier
+and binds confirmation to the original session/realm/owner/RP/pending ID. The new
+explicit `passkey-recovery-setup` HTTP constructor exposes closed prepare `{}` ->
+200 `{id,code}` and confirm `{id,code}` -> 204 under
+`/v1/passkeys/recovery/code/{prepare,confirm}`. It validates service realm/origin,
+rejects queries, retains exact Origin/session and 8 KiB/no-store protections,
+returns generic errors and sets no session/action cookie. A code is serialized
+only in the successful prepare response after persistence. The full
+[recovery-setup schema](openapi-passkey-recovery-setup.json) preserves earlier
+schemas/routes, which remain unchanged in their older constructors. No recovery
+session or stronger-policy activation is exposed.
 `EmailDelivery::passkey_recovery_changed` is required for the new purpose-specific
 queued notice. See [ADR 0012](adr/0012-saved-passkey-recovery.md) and the
 [management guide](../guides/passkey-management.md#experimental-saved-code-configuration).

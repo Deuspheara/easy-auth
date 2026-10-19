@@ -23,9 +23,9 @@ satisfy its AAL2 recovery requirements merely by using one saved code.
 
 ## Implemented configuration boundary
 
-`PasskeyRecoverySetup` is explicit optional core/PostgreSQL configuration. It has
-no HTTP endpoint, recovery login, account-policy mutation or ordinary server
-composition. A genuine passkey-method session must remain within its original
+`PasskeyRecoverySetup` is explicit optional core/PostgreSQL configuration. The
+separate experimental HTTP constructor now exposes prepare/confirm only; it adds
+no recovery login, account-policy mutation or ordinary server composition. A genuine passkey-method session must remain within its original
 five-minute authentication, idle and absolute deadlines. The configured RP must
 have an owned key with actual assertion-use evidence. Mere registration, known
 weaker methods, legacy timestamps and rotation do not suffice.
@@ -61,6 +61,24 @@ or sign-in/cancellation link. Failed delivery retains leased retry work. Email-f
 accounts have no fabricated contact or independent email alert; audit remains
 available through the consuming application's authorized operational path. This
 configuration boundary alone does not establish usable all-keys-lost recovery.
+
+## Explicit HTTP configuration
+
+`passkey-recovery-setup` adds `experimental_passkey_recovery_setup_router`, preserving
+older constructors and documents. Startup requires aligned realm/origin for all
+services. POST `/v1/passkeys/recovery/code/prepare` accepts only `{}` and returns
+`{id,code}` once after pending persistence. POST `/v1/passkeys/recovery/code/confirm`
+accepts only `{id,code}` and returns 204 after commit. Both require the current
+session cookie and exact Origin, reject query selectors, retain the 8 KiB JSON
+boundary and use no-store/generic errors. Neither issues/rotates a session cookie.
+GET cannot prepare a code. Private response serialization exposes only this code
+at the transport boundary; Secret remains globally nonserializable and redacted.
+
+Native platform/USB tests configure before contact attachment using actual signup
+assertion proof, retain no browser storage, and then rotate configuration after a
+separate real-SMTP contact proof. Existing management cases keep their own accounts
+and all assertions, avoiding dilution of the shared admission policy. This proves
+configuration transport, not the proposed recovery protocol below.
 
 ## Proposed recovery protocol — not implemented
 

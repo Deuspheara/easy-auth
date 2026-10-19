@@ -1,7 +1,7 @@
-# Native signup, contact attachment and passkey management
+# Native signup, contact, management and saved-code configuration
 
 This suite composes the real `configured_auth` server SMTP adapter with the explicit
-experimental management router, including signup/contact routes and the real
+experimental recovery-setup router, including signup/contact/management routes and the real
 notification worker. The normal server binary stays unchanged. It creates
 an owned random PostgreSQL database, starts a child server using private process
 environment, and drops that database after stopping the child. No HTTP fixture
@@ -22,7 +22,7 @@ nonloopback PostgreSQL, SMTP and Mailpit are rejected. `EASY_AUTH_SMTP_TEST_BINA
 can select the prebuilt fixture binary. Optional `EASY_AUTH_TEST_REPORT` writes
 only aggregate evidence, source/binary hashes and controlled case names.
 
-Two cases use original resident/required-UV options with Chromium platform/internal
+The first two cases use original resident/required-UV options with Chromium platform/internal
 and roaming/USB virtual authenticators. Both start anonymously, complete native
 registration and a genuine assertion, obtain a no-email session, receive a real
 SMTP proof and explicitly confirm it in the reference page. They check independent
@@ -33,11 +33,12 @@ account-bound plus discoverable passkey login. The USB case first proves that an
 occupied target receives the same initiation response and email path but cannot
 merge either independently created account.
 
-The fixture collects only aggregate database facts after child shutdown: two
+The fixture collects only aggregate database facts after child shutdown: four
 verified stronger users/remaining proven credentials/signup facts/attachment facts,
-eight later passkey sign-ins, two rename facts, two removal facts, zero pending
-management notices, no weak-method sessions, no changed attachment authentication
-provenance and no pending signup/attachment state. No raw proofs, cookies, private
+eight later passkey sign-ins, two rename facts, two removal facts, four saved-code
+configuration facts and two active verifier records. It requires zero pending
+management/recovery notices or setups, no weak-method sessions, no invalid
+attachment/recovery actor provenance and no pending signup/attachment state. No raw proofs, cookies, private
 keys, addresses, browser storage or mail bodies are logged or saved.
 
 Mailpit reads and cleanup use its [documented v1 API](https://mailpit.axllent.org/docs/api-v1/).
@@ -53,7 +54,7 @@ cleanup before returning nonzero. Neither the fixture nor these tests implement
 stronger-account recovery or ordinary activation; those remain AUTH-20 work.
 
 
-Each case also renames its initial key, rejects stale versions and last-working-
+The first two cases also rename their initial key, rejects stale versions and last-working-
 key removal, then enrolls an independent spare device using unmodified required-
 residence/UV/exclusion options. CDP presence simulation selects which native
 virtual device answers; no key is exported and no credential metadata is seeded.
@@ -64,8 +65,10 @@ surviving-key assertion. Later bound/discoverable login uses the surviving key.
 
 The private production SMTP adapter delivers two fixed management notices per
 account. The runner checks their exact owned recipients and absence of credential
-links or untrusted labels. Cleanup deletes exactly seven owned messages: three
+links or untrusted labels. Those cases contribute seven owned messages: three
 contact proofs (including the occupied-target attempt) and four management notices.
+The two saved-code cases add two contact proofs and two recovery notices, so total
+cleanup must delete exactly eleven owned messages.
 The prior published two-case records remain immutable. Their earlier four-sign-in/
 three-message totals describe earlier producers, not this extended run. Safe fixed
 stage names diagnose failures without reflecting assertion values or mail bodies.
@@ -81,3 +84,15 @@ surviving-key signature. This is explicit signed-negative fixture setup, not a
 change to production verification or a private-key/metadata export.
 Presence selection follows the official
 [CDP WebAuthn protocol](https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/pdl/domains/WebAuthn.pdl).
+
+
+Two additional platform/USB cases start new independent accounts, preserving all
+prior management assertions and the existing admission limits. Actual signup
+assertion proves the initial private key before HTTP saved-code prepare/confirm.
+They reject a wrong code and replay, require canonical one-time code display with
+no-store and unchanged cookies, and confirm while email-free without a fabricated
+notice. They then prove a contact through real SMTP, reject the old rotated session,
+prepare/confirm a replacement code and observe exactly one purpose-specific real
+SMTP recovery-configuration notice per account. The test application persists no
+code in local/session storage, trace or evidence reports. These are saved-code
+configuration tests; there is no delayed/cancellable recovery login or activation.

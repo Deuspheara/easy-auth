@@ -229,3 +229,15 @@ is a reviewed cohesive transaction exception. Feature tests separate binding/met
 boundaries, isolation/erasure, concurrency/rollback, migration and observed expiry.
 The local notice smoke retains create/start/assert/stop/owned cleanup together;
 its longer main function makes those resource boundaries explicit.
+
+
+Saved-code HTTP configuration lives in `auth-axum/passkeys/recovery_setup/`, with
+routing, thin handlers, closed transport types and the additive full contract in
+separate modules. A private management composition function accepts the selected
+OpenAPI document; older public constructors retain their routes/document. HTTP
+tests group contract, lifecycle and boundary cases under the owning management
+feature fixture. Native contact proof has a shared focused module, while saved-code
+cases use separate accounts and preserve earlier management assertions/admission.
+The seven-argument explicit constructor and longer test/fixture composition retain
+visible service alignment/resource ownership; no generic routing framework or
+independent transport policy is introduced.

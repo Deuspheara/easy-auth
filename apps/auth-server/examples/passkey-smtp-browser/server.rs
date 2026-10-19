@@ -1,6 +1,6 @@
 use auth_core::{
-    PasskeyEnrollment, PasskeyManagement, PasskeyService, PasskeySignIn, PasskeySignup,
-    PasswordService,
+    PasskeyEnrollment, PasskeyManagement, PasskeyRecoverySetup, PasskeyService, PasskeySignIn,
+    PasskeySignup, PasswordService,
 };
 use auth_postgres::Postgres;
 use sqlx::postgres::PgPoolOptions;
@@ -45,15 +45,21 @@ pub(super) async fn serve() -> Result<(), Box<dyn Error>> {
         service.clone(),
         store.clone(),
     ));
-    let management = Arc::new(PasskeyManagement::new(auth.realm(), service, store));
+    let management = Arc::new(PasskeyManagement::new(
+        auth.realm(),
+        service.clone(),
+        store.clone(),
+    ));
+    let setup = Arc::new(PasskeyRecoverySetup::new(auth.realm(), service, store));
     let notifications = easy_auth_server::notification_worker(auth.clone());
-    let app = auth_axum::experimental_passkey_management_router(
+    let app = auth_axum::experimental_passkey_recovery_setup_router(
         auth,
         browser.clone(),
         enrollment,
         sign_in,
         signup,
         management,
+        setup,
     )?;
     let listener = TcpListener::bind(bind).await?;
     println!("{}", serde_json::json!({"origin":browser.origin()}));

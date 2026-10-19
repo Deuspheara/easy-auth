@@ -14,6 +14,7 @@ passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
 passkey-authentication = ["passkey-enrollment"]
 passkey-signup = ["passkey-authentication"]
 passkey-management = ["passkey-signup"]
+passkey-recovery-setup = ["passkey-management"]
 
 [dependencies]
 auth-core.workspace = true
@@ -55,3 +56,7 @@ required-features = ["passkey-signup"]
 [[example]]
 name = "export_passkey_management_openapi"
 required-features = ["passkey-management"]
+
+[[example]]
+name = "export_passkey_recovery_setup_openapi"
+required-features = ["passkey-recovery-setup"]

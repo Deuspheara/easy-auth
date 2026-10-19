@@ -8,6 +8,7 @@ const readline = require('node:readline');
 const {chromium} = require('playwright');
 const {mailbox} = require('./mail.cjs');
 const {runCases} = require('./cases.cjs');
+const {runRecoveryCases} = require('./recovery.cjs');
 const root = path.resolve(__dirname, '../../../..');
 
 async function main() {
@@ -45,6 +46,7 @@ async function main() {
     browser = await chromium.launch({headless: true});
     version = browser.version();
     results = await runCases(browser, origin, mail);
+    results.push(...await runRecoveryCases(browser, origin, mail));
   } catch (error) { failure = error; }
   finally {
     if (browser) await browser.close();
@@ -67,7 +69,7 @@ async function main() {
   }
   assert.equal(diagnostic, false, 'no unexpected fixture diagnostics');
   for (const field of ['users', 'strong_verified_users', 'credentials', 'signup_audits', 'attachment_audits']) {
-    assert.equal(database[field], 2, field);
+    assert.equal(database[field], 4, field);
   }
   assert.equal(database.authentication_audits, 8);
   assert.equal(database.management_renames, 2);
@@ -77,7 +79,12 @@ async function main() {
   for (const field of ['weak_sessions', 'invalid_attachment_provenance', 'attachment_pending', 'signup_pending']) {
     assert.equal(database[field], 0, field);
   }
-  assert.equal(cleanup.messages_removed, 7, 'real SMTP messages including occupied target and four management notices');
+  assert.equal(database.recovery_configured, 4);
+  assert.equal(database.recovery_codes, 2);
+  assert.equal(database.recovery_setups_pending, 0);
+  assert.equal(database.recovery_notices_pending, 0);
+  assert.equal(database.invalid_recovery_provenance, 0);
+  assert.equal(cleanup.messages_removed, 11, 'seven prior management/contact messages plus two new contacts and two recovery configuration notices');
   const sources = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {cwd: root})
     .toString().split('\0').filter(name => name && !name.includes('/results/') &&
       (/\.(rs|sql|toml|cjs|js|html|json|yml|yaml)$/.test(name) || name === 'Cargo.lock'));
