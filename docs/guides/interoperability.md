@@ -44,6 +44,14 @@ stored in the record. [Reproduction instructions](../../tests/browser/passkeys/R
 
 ## AUTH-19 assertion browser boundary
 
+The [sanitized assertion run](../../tests/browser/passkeys/results/2026-10-19/chromium-authentication.json)
+uses committed producer `235a2c300915cd05a0d6d6f92f39ccfd141e63ef`, freshly built on
+arm64 macOS with Node 24.21.0, Rust 1.95.0 and PostgreSQL 17.11. All 184 source
+fingerprints were independently checked against that commit, and the executable
+hash matches the recorded binary. This is source/run provenance, not a reproducible
+binary or independent-audit claim. An independent PostgreSQL catalog read found
+zero browser-fixture databases after removal.
+
 The expanded suite uses pinned Playwright 1.64.1 / Chromium 156.0.8078.4. Twenty
 cases exercise real HTTP/PostgreSQL registration and assertions, including internal
 and USB nonresident account-bound login, modal resident discovery with a native
