@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reject passkey enrollment when challenge/session deadlines expire during final
+  database writes; consume only after key/audit insertion and roll back expired
+  work for both mailbox and passkey-required accounts (AUTH-53).
+
 - Native platform/USB passkey signup through real SMTP contact confirmation,
   preserved identity/provenance, rotated sessions and subsequent passkey login;
   separate owned-database/Mailpit browser suite also runs in CI (AUTH-53).

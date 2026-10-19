@@ -4,8 +4,9 @@ AUTH-18 is complete. The optional core/PostgreSQL enrollment path persists
 and verifies registration ceremonies. An explicit experimental HTTP composition
 and Chromium virtual-authenticator tests are implemented; normal embedded/server
 composition does not enable it. Experimental [passkey sign-in](passkey-authentication.md)
-now includes native assertions and modal residence checks. Passkey-first accounts,
-credential management and reviewed stronger-account policy remain M03 requirements.
+now includes native assertions and modal residence checks. [Passkey-first signup](passkey-signup.md)
+also has native/SMTP evidence; credential management and reviewed stronger-account
+recovery remain M03 requirements.
 
 ## Core and persistence
 
@@ -31,8 +32,9 @@ browser secret or state belongs in a URL or application log.
 `finish` loads only the current session/browser/realm-bound transaction, verifies
 the authenticator response with the high-level library, and then revalidates under
 user-before-session locks. It compares the exact verified state encoding, checks
-expiry, ownership and credential limits, consumes state, inserts the unique
-credential and records the typed `passkey_enrolled` audit fact in one transaction.
+ownership and credential limits, locks the pending state, inserts the unique
+credential and records the typed `passkey_enrolled` audit fact, then performs final
+expiry/freshness validation and consumption in the same transaction.
 A failed insert or audit rolls everything back. Successful completion returns an
 opaque credential UUID, not a new authenticated session.
 
@@ -41,6 +43,14 @@ ID/raw ID matching the ID verified from attested data. Credential IDs are at mos
 1024 bytes; ceremony payload buffers are bounded to 16 KiB in the verifier. An HTTP
 adapter still needs its own total encoded-body bound, CSRF/origin checks and cookie
 policy; the core buffer bound does not replace transport protections.
+
+The final PostgreSQL transaction keeps the owner, initiating session and pending
+ceremony locked through credential/audit writes. Final one-use consumption checks
+exact ceremony binding/state and current database time **after** those writes,
+including credential-uniqueness and audit waits. It independently rechecks original
+session authentication freshness, idle/absolute expiry and revocation. Deadline
+failure rolls back the new key, audit fact and consumption together. Policy is
+validated under the held owner/session locks; rotation never refreshes proof time.
 
 ## Limits and lifecycle
 

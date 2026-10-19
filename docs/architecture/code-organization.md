@@ -167,3 +167,10 @@ owned Mailpit access and runner/provenance each have a focused JavaScript module
 Longer orchestration retains ordered resource ownership/cleanup and never logs
 captured child diagnostics or proof-bearing assertion values. No production fixture
 endpoint or generic workflow engine is introduced.
+
+Enrollment final consumption remains in its owning completion transaction, after
+key/audit writes, with explicit proof/session deadlines. The longer function is
+retained so locks, exact snapshots and rollback stay visible. Enrollment wait tests
+separate owner/audit timing from pending-row/uniqueness waits; longer matrix cases
+keep observed-lock/action/assert ordering together. AUTH-54 tracks the analogous
+mailbox-flow review independently rather than silently expanding this fix.

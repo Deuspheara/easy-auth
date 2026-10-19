@@ -47,7 +47,12 @@ binding and exact verified state under locks, then atomically consumes the cerem
 inserts an RP-wide unique credential and audits enrollment. Limits bound pending
 state, credentials and verification admission. Protocol failures do not become
 success events; audit failure rolls back credential and state changes. Deletion
-cascades credential/state and clears owned admission/audit attribution. Upstream
+cascades credential/state and clears owned admission/audit attribution. Final enrollment consumption now checks ceremony expiry and original live/fresh
+session time after credential/audit writes, including unchanged pending-row and
+RP-wide uniqueness waits. Regression tests reproduce the former audit-wait gap
+and prove rollback for both mailbox and stronger-account policy. A separate
+AUTH-54 audit tracks analogous final-write surfaces in older mailbox workflows;
+those paths are not claimed verified by the enrollment fix. Upstream
 payload tracing is suppressed within synchronous verifier calls. No ordinary HTTP
 composition enables this boundary yet. Experimental authentication and method
 provenance now exist; stronger-account recovery policy, real-device/other-browser

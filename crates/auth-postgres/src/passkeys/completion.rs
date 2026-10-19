@@ -46,11 +46,11 @@ pub(super) async fn commit(
     credential_limit(&mut tx, request.realm, user, credential.rp_id()).await?;
     let label: String = sqlx::query_scalar(
         r#"
-        DELETE FROM auth_passkey_enrollments
+        SELECT label FROM auth_passkey_enrollments
         WHERE realm_id=$1 AND id=$2 AND user_id=$3 AND session_id=$4
           AND browser_hash=$5 AND expires_at>clock_timestamp()
           AND rp_id=$6 AND private_state=$7
-        RETURNING label
+        FOR UPDATE
         "#,
     )
     .bind(request.realm)
@@ -94,6 +94,38 @@ pub(super) async fn commit(
         },
     )
     .await?;
+    // User, initiating session and pending row remain locked. Authorization and
+    // exact state were checked above, but key uniqueness/audit writes can block.
+    // Consume only after those writes, with both deadlines evaluated now. Any
+    // miss rolls back credential, audit and proof consumption together.
+    let consumed = sqlx::query(
+        r#"
+        DELETE FROM auth_passkey_enrollments p USING auth_sessions s
+        WHERE p.realm_id=$1 AND p.id=$2 AND p.user_id=$3 AND p.session_id=$4
+          AND p.browser_hash=$5 AND p.rp_id=$6 AND p.private_state=$7
+          AND p.expires_at>clock_timestamp()
+          AND s.realm_id=p.realm_id AND s.id=p.session_id AND s.user_id=p.user_id
+          AND s.token_hash=$8 AND s.revoked_at IS NULL
+          AND s.authenticated_at>clock_timestamp()-interval '5 minutes'
+          AND s.authenticated_at<=clock_timestamp()
+          AND s.expires_at>clock_timestamp()
+          AND s.last_seen_at>clock_timestamp()-interval '30 minutes'
+        "#,
+    )
+    .bind(request.realm)
+    .bind(request.transaction)
+    .bind(user)
+    .bind(session)
+    .bind(request.browser.as_slice())
+    .bind(credential.rp_id())
+    .bind(expected_state)
+    .bind(request.session.as_slice())
+    .execute(&mut *tx)
+    .await
+    .map_err(unavailable)?;
+    if consumed.rows_affected() != 1 {
+        return Err(Error::Unauthorized);
+    }
     tx.commit().await.map_err(unavailable)?;
     Ok(id)
 }

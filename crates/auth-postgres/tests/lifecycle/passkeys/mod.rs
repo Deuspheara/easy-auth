@@ -6,6 +6,7 @@ mod limits;
 mod protocol;
 mod signup;
 mod waiting;
+mod waiting_completion;
 
 use crate::support::{realm, signed_in};
 use auth_core::{
