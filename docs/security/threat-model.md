@@ -42,4 +42,15 @@ scoping, replay, a true cross-origin request's HTTP 403 and missing browser bind
 These checks neither enable ordinary server enrollment nor establish real-device,
 passkey authentication or recovery assurance.
 
+AUTH-19 now has optional core/PostgreSQL authentication: admission precedes lookup,
+private ceremonies bind browser/realm/RP/purpose, and verified proofs carry exact
+ceremony/credential snapshots. User -> credential -> ceremony locking and a new
+post-lock expiry statement prevent stale or expired proof commits. Consume, key
+update, session issuance and fixed-schema audit commit atomically; tests cover
+replay, rollback, competing snapshots, expiry during unchanged-row waits and deletion.
+Session methods are explicit and rotation preserves provenance. This metadata does
+not yet enforce stronger-account recovery/sensitive-action policy. HTTP account
+selection, native assertion/discovery evidence and that policy remain gates;
+ordinary composition is disabled. See the [authentication review](../research/passkey-authentication.md).
+
 The alpha now includes opt-in password enrollment and sign-in (AUTH-12). Fresh verified sessions, a configured blocklist, bounded Argon2id, shared admission, transactional enrollment/session replacement and stale-hash rechecks are required; see ../guides/passwords.md. AUTH-13 adds browser/purpose-bound password recovery, credential versions, atomic session/proof invalidation and durable non-secret notifications. AUTH-14 adds both-address verified email changes, fresh-session/mailbox-confirmed deletion, authentication-time provenance, scoped cleanup and audit deidentification. AUTH-15 adds bounded owned-session inventory, fresh-authenticated individual/all-session revocation, proof cancellation and transactional audit. Deterministic database lock tests cover concurrent logins/revoke-all and freshness revalidation after waiting. AUTH-16 adds typed, fixed-schema audit attribution with composite ownership constraints, in-transaction recording, explicit historical provenance and scoped deidentification. Logout follows user-before-session lock order. Provider linking still requires fresh current-account proof plus a separately verified identity transaction; no matching-email merge or linking-success event is enabled. Stronger-factor recovery, queue monitoring/retention and authenticated password change remain incomplete. Linking, native tokens, external callbacks and issuer routes remain excluded. Full initial release remains blocked on their milestones. Baselines and external normative references are in ../research/protocol-dependencies.md. Every implementation ticket must state tests and residual risks; update this document when boundaries change.

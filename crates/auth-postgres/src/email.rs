@@ -125,7 +125,7 @@ impl Postgres {
         };
         let session_id = Uuid::new_v4();
         sqlx::query(
-            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash) VALUES ($1,$2,$3,$4)",
+            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authentication_method) VALUES ($1,$2,$3,$4,'email')",
         )
         .bind(realm)
         .bind(session_id)

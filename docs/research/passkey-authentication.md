@@ -1,8 +1,9 @@
 # Passkey assertion boundary
 
-AUTH-19, 2026-10-19. This checkpoint implements an optional protocol verifier;
-it does not implement login, a durable authentication transaction or session issuance.
-AUTH-19 and M03 remain in progress. Ordinary server composition remains gated.
+AUTH-19, 2026-10-19. Optional core/PostgreSQL sign-in now persists ceremonies and
+atomically issues sessions after verified proof. No HTTP login route or native
+browser assertion flow enables it yet. AUTH-19 and M03 remain in progress;
+ordinary server composition stays gated on the remaining policy and browser work.
 
 ## Reviewed source and policy
 
@@ -45,18 +46,42 @@ custom assertion parsing or signature implementation is introduced.
   Backup state can change for previously eligible credentials using the library's
   update method. Signed BE-upgrade/BS-transition browser cases remain required.
 
-Private state is versioned, bounded to 128 KiB, explicitly encoded only for trusted
+Private state is versioned, bounded to 1 MiB, explicitly encoded only for trusted
 database storage and has no public Serialize implementation. Stored credential
 objects are bounded to 64 KiB and checked against separately loaded ownership/ID
 metadata. All new sensitive wrappers redact Debug. Synchronous library calls use
 the existing scoped tracing suppression and restore caller logging immediately.
+The private-state cap accommodates ten stored credentials of up to 64 KiB each
+plus the library and ownership snapshots; it is not an HTTP response/body limit.
 
-The returned proof carries the expected original credential bytes and the library's
-updated credential. It is not a session or permission to write unconditionally.
-The repository must compare both exact ceremony and credential snapshots under
-locks, recheck expiry and ownership, and atomically consume state, update the key,
-issue a new session with genuine method provenance and record its audit fact.
-These transactions are the next implementation boundary, not claimed here.
+The returned proof carries the actual loaded ceremony bytes, original credential
+bytes and the library's updated credential. It is not a session or permission to
+write unconditionally. `PasskeySignIn` calls the PostgreSQL authentication repository,
+which locks owner, credential and ceremony in that order; compares both exact proof
+snapshots; then checks expiry in a separate statement after any ceremony-row wait.
+It atomically consumes state, updates credential/last-use metadata, inserts a fresh
+256-bit verifier-only session and records the owned `passkey_authenticated` audit
+fact. Any failure rolls everything back. Different pending challenges verified from
+one old credential snapshot cannot both overwrite it; start a new ceremony after
+the losing attempt. The existing session idle/absolute/revocation rules apply.
+
+Migration 0008 adds two-minute, browser/realm/RP/purpose-bound private ceremonies,
+three pending per browser and separate start/finish admission: 20 per browser and
+40 per source per ten-minute window. Admission commits before lookup/verification,
+including invalid attempts. Account-bound starts currently accept an opaque account
+ID lookup hint; no email-to-credential lookup is exposed. The HTTP account-selection
+experience still needs privacy review before enabling this flow. Discoverable
+ceremonies have no claimed owner until the actual key and handle verify.
+
+Session authentication methods are stored as `email`, `password`, `passkey` or
+`legacy_unknown`. Existing methods are not inferred during migration; password
+enrollment rotations copy their initiating method and authentication time. This
+metadata does not yet enforce stronger-account recovery or sensitive-action policy.
+Revoke-all cancels account-bound pending ceremonies. Anonymous discovery has no
+owner to cancel: a new valid private-key proof can log in after revocation, serialized
+on the owner lock like password login. Account deletion cascades owned ceremonies
+and credentials and deidentifies the new audit fact. Anonymous expired-state/bucket
+retention remains part of the existing operational hardening work.
 
 ## Evidence and remaining gates
 
@@ -70,9 +95,15 @@ residence and supplies its handle; it proves server verification and handle poli
 not discovery or native browser interoperability. No private token snapshots are
 written to disk or logs.
 
-Before AUTH-19 is Done: real PostgreSQL challenge expiry, browser/realm/purpose
-binding, admission, concurrent consume/update/session/audit rollback and deletion
-races; safe account selection without email enumeration; method provenance and
-reviewed stronger-account boundaries; HTTP contracts and native platform/roaming
-assertion plus real discovery tests. AUTH-53 owns genuine email-free enrollment;
+Twelve real PostgreSQL tests additionally cover successful session/key/audit commit,
+browser/realm/handle binding, replay, concurrent completion and different-challenge
+snapshot races, audit rollback with a valid retry, proof/ceremony mismatch, changed
+credentials, owner-lock expiry, expiry after an unchanged ceremony-row lock wait,
+pending/source/browser admission, revoke-all/deletion and method migration/rotation.
+The database discovery signer has the same residence limitation as the protocol
+fixture; these are not native discovery checks.
+
+Before AUTH-19 is Done: safe account selection without email enumeration, enforcement
+of reviewed stronger-account boundaries, HTTP contracts and native platform/roaming
+assertion plus real discovery and backup/zero-counter tests. AUTH-53 owns genuine email-free enrollment;
 AUTH-20 owns management/recovery. None of those gates is replaced by this verifier.

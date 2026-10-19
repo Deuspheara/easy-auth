@@ -48,6 +48,7 @@ impl PasskeyService {
             options,
             PrivatePasskeyAuthentication {
                 realm,
+                source_encoding: None,
                 origin: self.origin.as_str().to_owned(),
                 ceremony: AuthenticationCeremony::AccountBound {
                     owner,
@@ -74,6 +75,7 @@ impl PasskeyService {
             options,
             PrivatePasskeyAuthentication {
                 realm,
+                source_encoding: None,
                 origin: self.origin.as_str().to_owned(),
                 ceremony: AuthenticationCeremony::Discoverable { state },
             },
@@ -120,6 +122,7 @@ impl PasskeyService {
         state: PrivatePasskeyAuthentication,
         stored: StoredPasskey,
     ) -> Result<VerifiedPasskeyAuthentication> {
+        let expected_state = state.encode_for_database()?;
         let id = self.authentication_credential_id(response)?;
         if state.realm != stored.realm
             || state.origin != self.origin.as_str()
@@ -178,6 +181,7 @@ impl PasskeyService {
         Ok(VerifiedPasskeyAuthentication {
             original: stored,
             updated,
+            expected_state,
         })
     }
 }

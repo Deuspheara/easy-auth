@@ -78,6 +78,7 @@ impl Postgres {
             "auth_email_changes",
             "auth_account_deletions",
             "auth_passkey_enrollments",
+            "auth_passkey_authentications",
         ] {
             sqlx::query(&format!(
                 "DELETE FROM {table} WHERE realm_id=$1 AND user_id=$2"

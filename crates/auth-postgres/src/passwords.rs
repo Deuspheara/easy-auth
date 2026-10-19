@@ -124,7 +124,7 @@ impl Postgres {
             .map_err(unavailable)?;
         let session_id = Uuid::new_v4();
         sqlx::query(
-            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authenticated_at) SELECT $1,$2,$3,$4,authenticated_at FROM auth_sessions WHERE realm_id=$1 AND token_hash=$5",
+            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authenticated_at,authentication_method) SELECT $1,$2,$3,$4,authenticated_at,authentication_method FROM auth_sessions WHERE realm_id=$1 AND token_hash=$5",
         )
         .bind(realm)
         .bind(session_id)
@@ -175,7 +175,7 @@ impl Postgres {
         }
         let session_id = Uuid::new_v4();
         sqlx::query(
-            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash) VALUES ($1,$2,$3,$4)",
+            "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authentication_method) VALUES ($1,$2,$3,$4,'password')",
         )
         .bind(realm)
         .bind(session_id)

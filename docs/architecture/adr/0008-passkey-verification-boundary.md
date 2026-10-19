@@ -53,8 +53,9 @@ detail during ceremonies. Public errors contain no underlying verifier payloads.
 
 AUTH-19 adds the optional [assertion protocol boundary](../../research/passkey-authentication.md),
 including trusted credential decoding, owner/realm/origin checks, immutable backup
-eligibility, counter updates and private authentication state. It issues no sessions
-and has no durable login transaction or HTTP route yet. This decision does not
+eligibility, counter updates and private authentication state. Optional core/PostgreSQL
+sign-in now has a durable atomic consume/update/session/audit transaction with method
+provenance (migration 0008). There is no HTTP login route yet. This decision does not
 establish discoverability, account login, recovery assurance or assertion browser
 interoperability. The source reviews record those remaining gates.
 Do not enable ordinary server enrollment until

@@ -42,6 +42,12 @@ async fn session_management_upgrade_preserves_existing_sessions_and_audit(pool: 
     .execute(&pool)
     .await
     .unwrap();
+    sqlx::raw_sql(include_str!(
+        "../../../migrations/0008_passkey_authentication.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     assert_eq!(
         store
             .list_sessions(realm, current.verifier(), None)

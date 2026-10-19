@@ -89,9 +89,12 @@ fn private_state_and_envelope_are_bounded_versioned_and_redacted() {
     assert_eq!(format!("{:?}", p.stored()), "StoredPasskey([REDACTED])");
     let mut unknown: serde_json::Value = serde_json::from_slice(&encoded).unwrap();
     unknown["version"] = json!(2);
+    let mut oversized = encoded.clone();
+    // Valid JSON with whitespace proves the size guard, rather than just malformed JSON rejection.
+    oversized.resize(1024 * 1024 + 1, b' ');
     for invalid in [
         serde_json::to_vec(&unknown).unwrap(),
-        vec![0; 131_073],
+        oversized,
         b"{}".to_vec(),
     ] {
         assert!(matches!(

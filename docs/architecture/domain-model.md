@@ -12,11 +12,20 @@ Session holds a public opaque ID, user+realm composite FK, SHA-256 verifier of a
 
 Refresh/token families are separate future native/OAuth entities: short access lifetimes, atomic refresh rotation, family replay detection and OS secure storage. JWT expiration is not revocation. SigningKey records public metadata and protected key reference; never put plaintext private keys into logs/config dumps. AuditEvent is a closed set of committed lifecycle facts with bounded kinds and opaque user/actor/affected-session references. Version 1 shapes and composite foreign keys enforce ownership; there is no arbitrary payload, token, verifier or email field. Deletion clears every subject/session reference. Historical version 0 attribution remains explicitly unknown. See the [audit guide](../guides/audit-events.md).
 
-The optional passkey enrollment core/PostgreSQL boundary now persists RP-scoped
-verified credential state and short-lived, session/browser-bound private enrollment
-transactions. It does not yet expose HTTP or passkey sign-in. See the
-[implemented enrollment boundary](../guides/passkey-enrollment.md) for uniqueness,
-admission, atomicity and remaining assurance/browser gates. Normal server
-composition remains disabled until those gates are met.
+The optional passkey boundary persists RP-scoped verified credential state and
+short-lived enrollment and authentication transactions. Experimental HTTP enrollment
+is available; optional core/PostgreSQL sign-in now atomically consumes browser-bound
+proof state, updates the credential and last-use time, issues an owned session and
+audits authentication. See the [enrollment guide](../guides/passkey-enrollment.md)
+and [authentication review](../research/passkey-authentication.md). HTTP sign-in,
+safe account selection and stronger-account policy remain unfinished; ordinary
+server composition stays gated.
+
+Migration 0008 records session authentication method separately from time: email,
+password, passkey or legacy_unknown. Existing sessions retain unknown method;
+password enrollment preserves the initiating method and time during rotation.
+Freshness alone does not establish passkey proof. Method metadata is currently
+internal; enforcement for stronger-account recovery and sensitive actions remains
+required before ordinary passkey activation. No MFA/AAL certification is inferred.
 
 Planned entities are not implemented tables until their milestone. Account deletion now transactionally removes implemented credentials/sessions/proofs and deidentifies live audit subjects; future external identities must join this same lifecycle. A subject-free deletion notice temporarily retains the established recipient for delivery.

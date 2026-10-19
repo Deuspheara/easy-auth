@@ -106,3 +106,10 @@ policy together in `verify_authentication`. It exceeds the function-size review
 trigger to retain that proof boundary in one place. Private ceremony encoding and
 stored credential decoding have separate owning modules; no SQL or HTTP behavior
 is added to the verifier.
+
+Passkey sign-in use cases and their repository port are separate from assertion
+verification. PostgreSQL `passkeys/authentication/` owns admission, preparation and
+completion. Its `save` and `commit` exceed the function-size trigger to keep browser
+count locking and user/key/ceremony lock order, exact snapshot and post-wait expiry
+checks, credential mutation, session/audit insertion and rollback visible. Tests
+group binding, concurrency, migration and unchanged-row wait invariants separately.

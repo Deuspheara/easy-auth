@@ -81,6 +81,7 @@ impl fmt::Debug for StoredPasskey {
 pub struct VerifiedPasskeyAuthentication {
     pub(super) original: StoredPasskey,
     pub(super) updated: Vec<u8>,
+    pub(super) expected_state: Vec<u8>,
 }
 
 impl VerifiedPasskeyAuthentication {
@@ -102,6 +103,10 @@ impl VerifiedPasskeyAuthentication {
 
     pub fn expected_credential_for_database(&self) -> &[u8] {
         &self.original.encoded
+    }
+
+    pub fn expected_state_for_database(&self) -> &[u8] {
+        &self.expected_state
     }
 
     pub fn updated_credential_for_database(&self) -> &[u8] {

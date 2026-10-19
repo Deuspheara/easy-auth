@@ -20,11 +20,13 @@ pub use identity::User;
 pub use notifications::{SecurityNotice, SecurityNoticeKind};
 #[cfg(feature = "passkeys")]
 pub use passkeys::{
-    MAX_PASSKEYS_PER_ACCOUNT, PasskeyAuthenticationOptions, PasskeyAuthenticationResponse,
+    MAX_PASSKEYS_PER_ACCOUNT, PasskeyAuthenticationOptions, PasskeyAuthenticationRepository,
+    PasskeyAuthenticationRequest, PasskeyAuthenticationResponse, PasskeyAuthenticationStart,
     PasskeyCreationOptions, PasskeyEnrollment, PasskeyEnrollmentContext, PasskeyEnrollmentOptions,
     PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRegistrationResponse,
-    PasskeyRepository, PasskeyService, PrivatePasskeyAuthentication, PrivatePasskeyRegistration,
-    StoredPasskey, VerifiedPasskey, VerifiedPasskeyAuthentication,
+    PasskeyRepository, PasskeyService, PasskeySignIn, PasskeySignInOptions,
+    PrivatePasskeyAuthentication, PrivatePasskeyRegistration, StoredPasskey, VerifiedPasskey,
+    VerifiedPasskeyAuthentication,
 };
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};

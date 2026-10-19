@@ -10,8 +10,9 @@ Planned and required before the first feature-complete release: passkeys, Apple,
 
 An explicit [experimental passkey-enrollment boundary](docs/guides/passkey-enrollment.md)
 now has core/PostgreSQL, HTTP and Chromium virtual-authenticator evidence. It is
-disabled in normal server composition and does not yet provide passkey sign-in,
-passkey-first accounts or reviewed stronger-account recovery. See the
+disabled in normal server composition. Optional [core/PostgreSQL passkey sign-in](docs/research/passkey-authentication.md)
+now verifies proof and atomically issues sessions; HTTP login, passkey-first accounts
+and reviewed stronger-account policy remain unfinished. See the
 [reproducible browser checks](tests/browser/passkeys/README.md); virtual tests are
 separate from real-device/provider interoperability.
 

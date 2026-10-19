@@ -5,7 +5,9 @@ use uuid::Uuid;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyAuthentication};
 
 const STATE_VERSION: u8 = 1;
-const MAX_AUTHENTICATION_STATE_BYTES: usize = 128 * 1024;
+// The bound library state embeds up to ten credentials of at most 64 KiB, plus
+// challenge/ownership snapshots. Keep the cap above that valid account envelope.
+const MAX_AUTHENTICATION_STATE_BYTES: usize = 1024 * 1024;
 
 /// Private server persistence only. The adapter must enforce browser binding, expiry,
 /// purpose and atomic consumption. This deliberately does not implement Serialize.
@@ -13,6 +15,7 @@ pub struct PrivatePasskeyAuthentication {
     pub(super) realm: Uuid,
     pub(super) origin: String,
     pub(super) ceremony: AuthenticationCeremony,
+    pub(super) source_encoding: Option<Vec<u8>>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -47,8 +50,27 @@ impl PrivatePasskeyAuthentication {
         self.realm
     }
 
+    pub fn owner(&self) -> Option<Uuid> {
+        match &self.ceremony {
+            AuthenticationCeremony::AccountBound { owner, .. } => Some(*owner),
+            AuthenticationCeremony::Discoverable { .. } => None,
+        }
+    }
+
+    pub fn purpose(&self) -> &'static str {
+        match self.ceremony {
+            AuthenticationCeremony::AccountBound { .. } => "account_bound",
+            AuthenticationCeremony::Discoverable { .. } => "discoverable",
+        }
+    }
+
     /// Encode for trusted database storage, never a response or cookie.
     pub fn encode_for_database(&self) -> Result<Vec<u8>> {
+        // Preserve the actual loaded bytes for optimistic commit checks, including
+        // harmless JSON formatting differences. Protocol state has no public mutators.
+        if let Some(encoded) = &self.source_encoding {
+            return Ok(encoded.clone());
+        }
         let encoded = serde_json::to_vec(&StoredAuthentication {
             version: STATE_VERSION,
             realm: self.realm,
@@ -76,6 +98,7 @@ impl PrivatePasskeyAuthentication {
             realm: stored.realm,
             origin: stored.origin,
             ceremony: stored.ceremony,
+            source_encoding: Some(encoded.to_vec()),
         })
     }
 }
