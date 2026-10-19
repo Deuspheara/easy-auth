@@ -279,3 +279,9 @@ closed POST contract with explicit sign-out/retention/consumption/replacement an
 cancellation consent, transient proof fields, same-browser resume and normal
 replacement-key sign-in after a lost finish response. Other constructors and
 ordinary server composition retain their existing routes.
+
+AUTH-28 adds the optional core/server-library document API described in the
+[egress guide](../guides/oidc-egress.md). It adds no HTTP/OpenAPI route, provider
+callback, token endpoint or authentication grant. Normal `configured_auth`
+composition remains unchanged. Documents are backend input to a future reviewed
+verifier; callers cannot treat fetch success as authentication or authorization.

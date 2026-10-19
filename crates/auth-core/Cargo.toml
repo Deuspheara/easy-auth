@@ -10,10 +10,12 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-egress = ["oauth-transactions", "dep:ipnet", "dep:serde_json"]
 oauth-transactions = ["dep:url"]
 passkeys = ["dep:webauthn-rs", "dep:serde_json", "dep:url", "dep:tracing"]
 
 [dependencies]
+ipnet = { workspace = true, optional = true }
 async-trait.workspace = true
 argon2.workspace = true
 base64.workspace = true
@@ -29,3 +31,6 @@ webauthn-rs = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 url = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

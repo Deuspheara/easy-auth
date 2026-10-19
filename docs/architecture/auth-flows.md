@@ -82,12 +82,15 @@ sequenceDiagram
 
 ## Social and external OIDC (M04/M05)
 
-Only the optional AUTH-22 core/PostgreSQL browser-bound transaction boundary is
+The optional AUTH-22 core/PostgreSQL browser-bound transaction boundary is
 implemented: [guide](../guides/oauth-transactions.md),
 [ADR 0013](adr/0013-oauth-state-transactions.md). It consumes state once and returns
 exchange context without authenticating a user. The provider exchange, claim
 verification, identity resolution and session issuance below remain target design.
-Their final local transaction must recheck original deadline, enabled configuration
+AUTH-28 additionally implements constrained discovery/JWKS fetching with no
+authentication grant: [document guide](../guides/oidc-egress.md),
+[ADR 0014](adr/0014-oidc-egress.md). Provider verification remains unimplemented.
+The final local transaction must recheck original deadline, enabled configuration
 revision and linking authority after network exchange.
 
 ```mermaid

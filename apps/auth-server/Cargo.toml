@@ -10,13 +10,19 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-egress = ["auth-core/oidc-egress", "auth-postgres/oidc-egress", "dep:reqwest", "dep:rustls", "dep:webpki-roots"]
 experimental-passkey-recovery = ["experimental-passkeys", "auth-axum/passkey-recovery"]
 experimental-passkeys = ["auth-axum/passkey-recovery-setup", "auth-core/passkeys", "auth-postgres/passkeys"]
 
 [dev-dependencies]
 serde_json.workspace = true
+rcgen = { version = "=0.14.10", default-features = false, features = ["ring", "zeroize"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
 
 [dependencies]
+reqwest = { workspace = true, optional = true }
+rustls = { workspace = true, optional = true }
+webpki-roots = { workspace = true, optional = true }
 zeroize.workspace = true
 auth-core.workspace = true
 auth-postgres.workspace = true

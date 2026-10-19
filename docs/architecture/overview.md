@@ -23,3 +23,10 @@ Arrows into core denote compile-time dependency, not a network RPC. Runtime core
 Inbound OIDC clients and SAML SPs resolve verified external identities. Outbound OIDC issuer/client registration is a distinct module and release gate; no discovery endpoint is advertised until implemented and tested. Secrets are never part of public user/session DTOs.
 
 See domain-model, auth-flows, api-contract, deployment and the threat model. Authentication release is blocked on the six method categories, issuer interoperability and security review, even if alpha email works.
+
+The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
+current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`
+adapter in the server library. Embedded consumers share that adapter. Short registry
+transactions commit before DNS/HTTPS; cached or fetched documents confer no identity
+authority. No provider route is activated. [ADR 0014](adr/0014-oidc-egress.md) records
+pinning, resource bounds and the native resolver limitation.

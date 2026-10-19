@@ -317,3 +317,19 @@ cases live in `tests/browser/passkeys/recovery/prompt-errors.cjs`, invoked befor
 the retained-authenticator case's actual successful signatures. The longer ordered
 negative scenario keeps its abort/restore/no-request assertions visible together;
 both modules remain under 120 lines.
+
+AUTH-28 uses `auth-core/src/oidc/` for public-address/URL policy, metadata, ports,
+document caches and feature-specific tests. `auth-server/src/oidc_http/` separates
+transport ownership/native DNS, client construction, bounded response handling and
+cache headers. Its entry module only declares/reexports. Private component tests
+are included from the owning transport module so fixture roots/addresses remain
+private without widening production APIs. PostgreSQL delegates to the existing
+exact configuration lock/check; no new persistence model or crate is introduced.
+Database cases live under `tests/lifecycle/oidc/`.
+
+All new implementation/test modules are below 300 lines. The longer response
+download and cache-header functions retain ordered bounds, closed rejection
+categories and freshness calculations together. Longer TLS and observed-database
+cases retain setup, a valid control, ordered interruption and exact assertions in
+one scenario. These are reviewed function-size exceptions with cohesive purposes.
+No unrelated structural cleanup is deferred.

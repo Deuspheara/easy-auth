@@ -10,14 +10,16 @@ AUTH-23 Google exchange now explicitly depends on AUTH-28's constrained discover
 JWKS network boundary as well as AUTH-22. Provider transports must share the reviewed
 egress policy; the milestone labels do not permit a separate permissive Google
 client. This dependency is recorded in Huly and synchronized to the planning export.
-It does not claim that AUTH-28 or provider verification is already implemented.
+AUTH-28 now implements the optional document-fetch boundary described in
+[ADR 0014](../architecture/adr/0014-oidc-egress.md); provider verification remains
+unimplemented.
 
-Assessment date: 2026-10-18. Candidates require lockfile/advisory and license review when actually introduced; version numbers are observations rather than authorization to upgrade blindly.
+Assessment updated: 2026-10-19. Candidates require lockfile/advisory and license review when actually introduced; version numbers are observations rather than authorization to upgrade blindly.
 
 | Boundary | Candidate/evidence | Decision and gate |
 |---|---|---|
 | Passkeys | [webauthn-rs 0.5.5](https://docs.rs/crate/webauthn-rs/0.5.5), native OpenSSL dependency | Prefer high-level safe API; persist private challenge state server-side only; verify UV, origin/RP and discoverable-flow support with browser tests. Do not switch on dangerous credential internals without a reviewed need. MPL-2.0 library license must be recorded; using it does not relicense independent application files. |
-| External OIDC | [openidconnect 4.0.1](https://docs.rs/openidconnect/4.0.1/openidconnect/) | Prefer typed claim verification. Disable redirects and restrict DNS/IP/ports at every outbound hop. Validate discovery issuer, audience/azp, nonce and signature; permit only explicit algorithms. Key refresh is bounded; no arbitrary URL fetch on token input. Review transitive RSA advisory reachability. |
+| External OIDC | [openidconnect 4.0.1](https://docs.rs/openidconnect/4.0.1/openidconnect/) | Not selected: an isolated defaults-disabled normal/build graph selects rsa 0.9.10 and fails the compiled advisory gate (RUSTSEC-2023-0071). No ignore or custom verifier is permitted. A reviewed typed verifier must still validate signature, exact issuer, audience/azp and nonce with explicit algorithms; reuse AUTH-28 egress. This selection blocker does not establish Marvin exploitability in public-signature verification. |
 | Apple | [Apple Sign in REST API](https://developer.apple.com/documentation/signinwithapplerestapi) | Separate provider adapter: ES256 client-secret JWT from protected key; Apple ID-token algorithm/key policy separate. App/Services IDs and nonce-bound native code exchanges require real account tests. |
 | Google | [Google OIDC](https://developers.google.com/identity/openid-connect/openid-connect) | Code + S256 + nonce. Trusted issuer/sub identity; email_verified is an attribute, never auto-link authority. Native uses system browser per RFC 8252. |
 | SAML native | [samael 0.0.22](https://docs.rs/crate/samael/0.0.22), [source](https://github.com/njaremko/samael) | Evaluate xmlsec-enabled path, libxml2/entity policy and extraction of verified signed content. Native xmlsec1/OpenSSL/libclang requirements accepted if justified. The docs.rs build failure is an integration risk, not a vulnerability claim. No safe production selection yet. |
@@ -45,3 +47,31 @@ Baselines: [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700), [RFC 8252](https:
 The 2026-10-18 full-lockfile cargo-audit run reports RUSTSEC-2023-0071 in rsa 0.9.10, resolved for SQLx's inactive optional MySQL path. `cargo tree -i rsa --target all` and `cargo tree -i sqlx-mysql --target all` show no compiled dependency. Cargo metadata's resolver nodes include optional inactive packages and must not alone be used as build-reachability evidence. `scripts/audit.py` retains the full-lockfile finding and independently derives all-platform normal/build/dev compiled reachability on every CI run; any compiled advisory is fatal. cargo-deny provides a second graph-based check. No global RSA advisory ignore is configured. Adding an OIDC/JOSE feature must rerun and review this gate.
 
 License policy additionally admits [0BSD](https://spdx.org/licenses/0BSD.html) for quoted_printable and [CDLA-Permissive-2.0](https://cdla.dev/permissive-2-0/) for webpki-roots certificate data. Distributions must include applicable third-party notices/license texts, including the CDLA text for redistributed root data. This does not change original-code MIT OR Apache-2.0 licensing.
+
+
+## AUTH-28 selected document transport
+
+The optional feature selects reqwest **0.13.5**, defaults disabled with
+`rustls-no-provider`; rustls **0.23.46**, defaults disabled with ring/std/tls12;
+webpki-roots **1.0.9**; and ipnet **2.12.2**. Transport/IP/TLS implementation
+licenses are MIT OR Apache-2.0; root certificate data uses CDLA-Permissive-2.0,
+whose text is already retained under `docs/security/third-party-licenses/`.
+Test-only rcgen **0.14.10** and tokio-rustls **0.26.6** use ring with defaults
+disabled and MIT OR Apache-2.0 licenses. Fixture private keys remain in memory.
+Current Rust 1.95 satisfies reqwest's 1.85 and rcgen's 1.88 minimum versions.
+
+Pinned-source review and a cold-process experiment established that the HTTP
+feature must receive an explicit per-client crypto provider. The implementation
+uses standard rustls safe defaults, ring and public roots without installing a
+global provider. reqwest still selects platform-verifier helper dependencies;
+these are included in graph/license checks even though requests use explicit roots.
+No existing locked package version is removed or upgraded by this addition.
+
+Compiled advisory checks, all-feature cargo-deny licenses/sources/bans and native
+TLS component tests pass. No advisory exception was added; SQLx's inactive MySQL
+RSA finding stays visible. The separate openidconnect candidate experiment does
+not modify the project graph. JOSE selection remains a prerequisite for provider
+verification, rather than a reason to weaken the existing advisory gate.
+See the [document guide](../guides/oidc-egress.md) for runtime bounds, public-network
+restrictions and the uncancellable native DNS limitation. This selects a document
+transport, not a provider verifier or production interoperability claim.

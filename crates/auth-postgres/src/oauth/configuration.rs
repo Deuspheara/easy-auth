@@ -87,3 +87,10 @@ pub(super) async fn lock(tx: &mut Transaction<'_, Pg>, connection: &OAuthConnect
     }
     Ok(())
 }
+
+#[cfg(feature = "oidc-egress")]
+pub(super) async fn check(pool: &sqlx::PgPool, connection: &OAuthConnection) -> Result<()> {
+    let mut tx = pool.begin().await.map_err(unavailable)?;
+    lock(&mut tx, connection).await?;
+    tx.commit().await.map_err(unavailable)
+}

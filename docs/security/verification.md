@@ -1473,3 +1473,74 @@ dependency, HTTP/OpenAPI route, ordinary activation or provider conformance clai
 Native suites were not rerun locally for this core/SQL-only change; exact-head hosted
 CI remains a separate publication gate and runs the existing browser/SMTP pipeline.
 AUTH-20's Safari/Dashlane failure and independent recovery review remain open.
+
+
+## AUTH-28 constrained document egress (2026-10-19)
+
+The optional document client implements configured HTTPS origins/ports, conservative
+public IPv4/IPv6 admission, whole-answer DNS checks, pinned addresses with original
+Host/SNI and normal certificate validation, no proxies/redirects/retries, bounded
+input/deadlines/concurrency and two exact-configuration cache slots. See
+[ADR 0014](../architecture/adr/0014-oidc-egress.md) and the
+[guide](../guides/oidc-egress.md). No provider identity/session, JOSE verifier,
+new HTTP route or migration is added; migrations 0001–0016 remain unchanged.
+
+Final local checks use `CARGO_INCREMENTAL=0`, PostgreSQL 17.11 and four test workers,
+with default/all-feature workspace suites run sequentially:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+python3 scripts/audit.py
+cargo deny --all-features check
+npm audit --audit-level=low --prefix tests/browser/passkeys
+```
+
+Results: **93 default**, **320 unique all-feature tests**, no final failures or
+ignored cases. All-feature totals are 2 Axum unit, 55 HTTP/database, 23 core,
+232 PostgreSQL and 8 server transport tests; the logging child repeats one included
+core case. Formatting, both strict Clippy variants, compiled dependency advisory,
+license/source/bans and npm checks pass. SQLx's inactive MySQL RSA advisory remains
+visible without an ignore. Full staged changes receive redacted Gitleaks scanning
+before publication. Hosted exact-head CI is a separate publication gate.
+
+Eleven new core cases cover exact issuer, malformed/private JWKS input, cache aging,
+miss throttling, overload, timeouts, mixed/private/link-local/special-use IPv4/IPv6,
+ports/literals and rebinding. Five new real-PG cases cover current revision, cache
+isolation, disable during held network I/O, infrastructure failure and an identical
+connection/revision relocated to another realm. No DB locks span network work and
+no user/session/OAuth-transaction/audit records are created by fetching.
+
+Eight server cases use owned TLS fixtures: positive Host/SNI/address pinning,
+zero fallback DNS/proxy calls, trusted/untrusted-root and wrong-hostname controls,
+closed size/status/encoding/header/type/timeout failures, peer mismatch, body-age
+reduction, cache headers, canceled native DNS permit ownership and a cold child
+without a process-global TLS provider. A separate socket reset must remain Network,
+not Certificate. Infrastructure failure cannot count as certificate rejection.
+Fixture roots/loopback addresses are private to component tests; production policy
+has no bypass. No user credential or system proxy/security setting is changed.
+
+An initial certificate-specific assertion exposed generic network classification:
+`io::Error::source` skipped the boxed rustls error. Typed payload inspection fixed
+attribution without raw message matching; the strict certificate and socket-reset
+controls pass afterward. Preliminary mock resolver type and missing locked-registry
+archive failures were setup/build failures, not application security evidence.
+One automatic approval review timed out before execution; the approved retry and
+normal locked dependency fetch completed. No final operation remains policy-blocked.
+
+Maintainability review preserves feature ownership, thin entry modules, private
+adapter/test internals and reuse of the exact existing PostgreSQL registry check.
+All new modules are below 300 lines; longer ordered response validation and fixture
+scenarios are justified in code-organization.md. No unrelated cleanup is deferred.
+
+Native passkey/SMTP suites were not rerun locally for this optional backend feature;
+hosted CI runs the existing browser/SMTP/recovery pipeline. These tests establish
+component behavior, not real-provider interoperability or independent security
+review. Uncancellable native DNS retains bounded permits and may delay shutdown.
+Private-network/private-CA IdPs are unsupported. JOSE selection, token exchange,
+claims/key rotation, final identity transactions, provider tests, SAML and outbound
+issuer remain gates. AUTH-20's Safari/Dashlane failure remains unresolved and does
+not justify further provider/security-setting changes or an activation claim.

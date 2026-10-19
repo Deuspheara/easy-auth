@@ -255,3 +255,28 @@ both resolved and rejected operations, and maps native failures to finite operat
 category text without retaining raw messages or causes. Synthetic browser failures
 validate those diagnostics separately from real native signature tests; neither
 category nor UI feedback can authorize registration, sign-in or recovery.
+
+AUTH-28's optional metadata boundary rejects non-HTTPS or unlisted origins/ports,
+all mixed/private/link-local/special-use DNS answers, redirects and ambient proxies.
+Checked addresses are pinned while hostname/SNI/certificate checks remain standard;
+peer matching adds a second check. Exact issuer, bounded body/header/type/encoding,
+whole-operation deadlines, shared capacity and two revision-bound cache slots limit
+untrusted input and amplification. Failed/non-cacheable attempts spend a short
+fetch interval; stale documents never substitute for a failed refresh. Registry
+failure remains Unavailable, distinct from disabled/stale configuration rejection.
+
+Real TLS fixtures test certificate-specific failures separately from socket errors,
+Host/SNI/pinning and zero proxy/fallback resolution. Database tests prove realm and
+revision rejection even on cache hits, and disable commits while network I/O waits.
+No DB lock spans the network. Native DNS cannot be killed by timeout: its owned
+permit remains held until completion, bounding detached work while allowing capacity
+exhaustion or shutdown delay. Conservative public-address policy and public roots
+do not support private-network/private-CA IdPs. No token-controlled URL is fetched.
+
+Discovery and JWKS are untrusted verifier input, not authentication. Known private/
+symmetric key fields are rejected structurally; JOSE/claims/rotation policy remains
+unimplemented. Future final identity/session commit must recheck enabled revision,
+original transaction expiry and linking authority under locks. No account linking,
+provider credential handling or permission grant is added. See
+[ADR 0014](../architecture/adr/0014-oidc-egress.md) for explicit limits and remaining
+provider, operational, independent review and release gates.

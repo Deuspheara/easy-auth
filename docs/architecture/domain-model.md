@@ -78,3 +78,11 @@ ordinary credential lookup until a genuine assertion commits. Completion revokes
 old owner keys/sessions/proofs, consumes the claim and records an owned issued
 session/claim-target audit fact atomically. Cancel/rotation/deletion remove private
 state. No raw code/browser/session secret is persisted, and policy is unchanged.
+
+AUTH-28's optional `OidcDocuments` binds two in-memory cache slots to one immutable
+persisted realm/connection/client/revision and an explicit HTTPS origin policy.
+`OidcDiscovery` carries validated endpoint metadata; `OidcJwksDocument` contains a
+bounded public-key JSON envelope with redacted Debug and an explicit byte accessor.
+Neither is a verified external identity, key, token or session proof. Configuration
+is rechecked before reuse/fetch and after network validation. No document table or
+new migration is introduced; published migrations 0001–0016 remain unchanged.

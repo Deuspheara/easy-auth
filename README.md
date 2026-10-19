@@ -37,6 +37,10 @@ persists and consumes browser-bound state with real PostgreSQL regression covera
 It provides exchange context only; provider login/linking and their HTTP/native
 transports remain unimplemented.
 
+The optional [OIDC document client](docs/guides/oidc-egress.md) adds constrained
+HTTPS discovery/JWKS fetching with exact issuer checks, pinned public addresses
+and bounded caches. It creates no identity or session and enables no provider route.
+
 ## Run locally
 
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).

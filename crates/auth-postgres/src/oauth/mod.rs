@@ -19,3 +19,11 @@ impl OAuthTransactionRepository for Postgres {
         transactions::take(&self.pool, request).await.map(|_| ())
     }
 }
+
+#[cfg(feature = "oidc-egress")]
+#[async_trait]
+impl auth_core::OidcConnectionRepository for Postgres {
+    async fn check_oidc_connection(&self, connection: &auth_core::OAuthConnection) -> Result<()> {
+        configuration::check(&self.pool, connection).await
+    }
+}

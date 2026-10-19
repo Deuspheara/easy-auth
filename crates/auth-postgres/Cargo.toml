@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-egress = ["oauth-transactions", "auth-core/oidc-egress"]
 oauth-transactions = ["auth-core/oauth-transactions"]
 passkeys = ["auth-core/passkeys"]
 

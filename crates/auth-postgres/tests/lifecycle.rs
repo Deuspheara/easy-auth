@@ -14,6 +14,9 @@ mod notifications;
 #[cfg(feature = "oauth-transactions")]
 #[path = "lifecycle/oauth/mod.rs"]
 mod oauth;
+#[cfg(feature = "oidc-egress")]
+#[path = "lifecycle/oidc/mod.rs"]
+mod oidc;
 #[cfg(feature = "passkeys")]
 #[path = "lifecycle/passkeys/mod.rs"]
 mod passkeys;

@@ -7,6 +7,8 @@ mod identity;
 mod notifications;
 #[cfg(feature = "oauth-transactions")]
 mod oauth;
+#[cfg(feature = "oidc-egress")]
+mod oidc;
 #[cfg(feature = "passkeys")]
 mod passkeys;
 mod password;
@@ -25,6 +27,11 @@ pub use oauth::{
     OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthExchange, OAuthIntent,
     OAuthMixupDefense, OAuthPurpose, OAuthRequest, OAuthStart, OAuthTransactionRepository,
     OAuthTransactions,
+};
+#[cfg(feature = "oidc-egress")]
+pub use oidc::{
+    MAX_OIDC_DNS_ANSWERS, MAX_OIDC_DOCUMENT_BYTES, OIDC_FETCH_TIMEOUT, OidcConnectionRepository,
+    OidcDiscovery, OidcDocuments, OidcHttp, OidcHttpResponse, OidcJwksDocument, OidcTarget,
 };
 #[cfg(feature = "passkeys")]
 pub use passkeys::{
