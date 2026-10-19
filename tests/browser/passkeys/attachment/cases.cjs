@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const {post, withAuthenticator} = require('../browser.cjs');
 const {profile, assertion, startLogin, complete} = require('../assertions.cjs');
 const {signupAssertion, successfulSignup} = require('../signup/ceremony.cjs');
+const {manage} = require('./management.cjs');
 const START = '/v1/account/email/attachment/start';
 const FINISH = '/v1/account/email/attachment/finish';
 
@@ -47,9 +48,9 @@ async function runCases(browser, origin, mail) {
     const name = `native-signup-smtp-contact-${transport}`;
     console.log(JSON.stringify({case: name, status: 'running'}));
     try {
-      await withAuthenticator(browser, origin, undefined, transport, async ({page, context}) => {
+      await withAuthenticator(browser, origin, undefined, transport, async ({page, context, cdp, authenticatorId}) => {
         assert.equal((await context.cookies()).some(cookie => cookie.name === 'auth-session'), false);
-        const {pending, assertionOptions} = await signupAssertion(page);
+        const {pending, creation, assertionOptions} = await signupAssertion(page);
         const owner = await successfulSignup(page, pending, assertionOptions, await assertion(page, assertionOptions));
         const old = (await context.cookies()).find(cookie => cookie.name === 'auth-session');
         const peer = await browser.newContext();
@@ -75,6 +76,7 @@ async function runCases(browser, origin, mail) {
           assert.equal((await peer.request.get(origin + '/v1/session')).status(), 401, 'old session revoked');
           assert.equal((await post(page, FINISH, {token: proof.token})).status, 401, 'proof cannot replay');
           await denyWeakPaths(page, address);
+          await manage({page, context, peer, cdp, authenticatorId, transport, origin, owner, initialCredential: creation, mail, address});
           assert.equal((await post(page, '/v1/logout', {})).status, 204);
           for (const mode of ['account_bound', 'discoverable']) {
             const login = await startLogin(page, mode, mode === 'account_bound' ? owner.id : undefined);
@@ -88,7 +90,7 @@ async function runCases(browser, origin, mail) {
       });
     } catch (error) { error.caseName = name; throw error; }
     results.push({name, transport, status: 'passed', native_signup: true, smtp_contact: true,
-      later_account_bound_and_discoverable: true, ...(index ? {occupied_target_rejected: true} : {})});
+      later_account_bound_and_discoverable: true, management_and_real_notices: true, ...(index ? {occupied_target_rejected: true} : {})});
     console.log(JSON.stringify({case: name, status: 'passed'}));
   }
   return results;

@@ -197,5 +197,16 @@ port delegation. Entry files declare/reexport only. The removal transaction exce
 and ceremony invalidation, typed target audit, notice and final deadline/commit
 in one place. It adds no unrelated responsibility or generic credential engine.
 Management tests separate boundaries, concurrency, rollback, observed final-write
-waits and schema upgrades. Recovery and HTTP management remain unfinished AUTH-20
-work and are not claimed complete by these modules.
+waits and schema upgrades. Recovery and activation remain unfinished AUTH-20 work. Experimental HTTP management
+uses focused routing, handlers, transport DTOs and full-schema modules. It composes
+the extracted signup route builder rather than duplicate base routes or policy.
+HTTP tests group boundary, contract and lifecycle invariants; native management
+steps and owned-mail access stay separate from the existing SMTP case orchestration.
+
+The experimental management constructor retains its explicit aligned service
+checks, shared route composition, browser guards and configured full schema in one
+function. Its formatted length crosses the approximate 50-line trigger; keeping
+this ordered composition visible avoids hiding startup/route ownership in a generic
+builder. It contains no SQL or duplicated authentication policy. Native management
+likewise keeps the virtual-device selection/action/assert sequence together while
+using a separate fixture module from mail access and case orchestration.

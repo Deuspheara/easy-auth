@@ -38,6 +38,22 @@ async fn collect(pool: &sqlx::PgPool) -> Result<serde_json::Value, Box<dyn Error
             "SELECT count(*) FROM auth_audit WHERE kind='passkey_authenticated'",
         ),
         (
+            "management_renames",
+            "SELECT count(*) FROM auth_audit WHERE kind='passkey_renamed' AND passkey_id IS NOT NULL",
+        ),
+        (
+            "management_removals",
+            "SELECT count(*) FROM auth_audit WHERE kind='passkey_removed' AND passkey_id IS NOT NULL",
+        ),
+        (
+            "management_notices_pending",
+            "SELECT count(*) FROM auth_security_notifications WHERE kind='passkeys_changed'",
+        ),
+        (
+            "unproven_remaining_keys",
+            "SELECT count(*) FROM auth_passkeys WHERE last_used_at IS NULL",
+        ),
+        (
             "weak_sessions",
             "SELECT count(*) FROM auth_sessions WHERE authentication_method<>'passkey'",
         ),

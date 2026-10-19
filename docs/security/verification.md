@@ -640,3 +640,72 @@ pre-enrolled all-keys-lost recovery with delay/cancellation/expiry/notification,
 ordinary embedded/standalone activation policy, and physical-device/other-browser
 acceptance. No completion, production-readiness, independent security review,
 assurance-level or conformance claim follows from this checkpoint.
+
+## AUTH-20 experimental management HTTP/native checkpoint — 2026-10-19
+
+AUTH-20 remains **In Progress**. The separate `passkey-management` feature and
+explicit management constructor compose base, enrollment, sign-in, signup and
+contact routes with GET inventory and expected-version rename/remove endpoints.
+Older constructors and schemas remain unchanged. The new
+[full OpenAPI](../architecture/openapi-passkey-management.json) is compared with the
+live response and all prior schemas/routes. No ordinary server route is enabled.
+
+Local verification at this checkpoint:
+
+- Formatting, strict locked default/all-feature workspace/all-target Clippy, diff
+  checks and native JavaScript syntax checks pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 tests** pass
+  (2 Axum unit, 12 HTTP/database, 4 core, 75 PostgreSQL).
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **182 tests** pass (2 Axum unit, 30 HTTP/database, 10 core, 140 PostgreSQL).
+  The isolated core logging subprocess counts once; no failed or ignored tests in
+  the final successful runs.
+- Seven new HTTP/database tests include genuine registration/assertion controls,
+  nullable contact and exact public metadata, opt-in/startup/full-schema compatibility,
+  strict Origin/duplicate-cookie/closed-JSON/query/media/body bounds, weak/legacy/
+  stale authority denial, foreign target/version denial, proven-last-key protection,
+  all-session invalidation and all seven action/auth cookie removals. Injected notice
+  persistence failure returns generic 503 without success cookies or state mutation;
+  the exact operation retries after removing the injected failure.
+- The existing **31 native Chromium regressions** pass. The **two platform/USB SMTP
+  cases** now also perform inventory, rename/stale-version rejection, last-working-key
+  denial, independent resident spare-device enrollment and actual spare assertion
+  before removal. Removal clears cookies and invalidates the peer session; an actual
+  removed-key signature fails, then a real surviving-key signature completes the same
+  challenge. Later account-bound/discoverable login works with the remaining key.
+- The fixture uses the real `configured_auth`, private SMTP adapter and production
+  `notification_worker`. Four management notices reach the exact owned recipients
+  without credential links or untrusted labels. Aggregate facts: two remaining proven
+  keys, two rename/two removal facts, eight passkey authentication facts, zero weak
+  sessions, changed contact provenance or pending management notices. Owned DB removal
+  and deletion of exactly **seven** owned messages are confirmed; unrelated mail is
+  retained. Earlier native artifacts remain immutable. Final sanitized fingerprints:
+  [browser](../../tests/browser/passkeys/results/2026-10-19/chromium-management-http.json),
+  [management/SMTP](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-management-http.json).
+- Both standalone and embedded `scripts/smoke.py --password --recovery --sessions
+  --lifecycle` flows pass with real SMTP, each in an owned disposable database which
+  is removed. The ordinary compositions retain the mailbox/password contract.
+- Compiled dependency advisory gate, all-feature cargo-deny, npm audit and staged
+  redacted Gitleaks pass. Only a pinned, already-resolved software-authenticator
+  dev dependency edge was added for actual assertion controls; versions and scanner
+  policy are unchanged. The inactive SQLx/MySQL RSA advisory remains visible.
+
+The first HTTP cookie assertion used an incorrect shorthand for the existing
+email-change cookie; it was corrected to the actual fixed cookie name, preserving
+all seven checks. Early native attempts correctly rejected reusing an authenticator
+present in excludeCredentials; those are failed fixture attempts, not application
+success evidence. The final fixture uses independent native virtual authenticators
+and CDP presence selection without exporting keys or changing stored credentials.
+Registration preserves original exclusion/residence/UV options. Assertion selection
+narrows a returned allowed ID for the positive proof; the signed negative deliberately
+requests the removed ID with server state unchanged. The valid retry uses that same
+challenge with the surviving key. Fixed stage labels diagnose failures without
+printing assertion data, cookie values, message bodies or addresses.
+
+Handlers delegate to core; transport types, routing and schema each have owning
+modules, all below 300 lines. Longer composition/test functions retain explicit
+ordered boundaries as documented in code organization. ADR 0011's heading was
+corrected to match its filename. Recovery, stronger additional-enrollment/activation
+policy, ordinary activation and required physical-device/other-browser evidence
+remain unfinished; this checkpoint does not establish their completion or any
+production, independent-review, assurance-level or conformance claim.

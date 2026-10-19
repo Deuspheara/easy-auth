@@ -69,11 +69,15 @@ async function main() {
   for (const field of ['users', 'strong_verified_users', 'credentials', 'signup_audits', 'attachment_audits']) {
     assert.equal(database[field], 2, field);
   }
-  assert.equal(database.authentication_audits, 4);
+  assert.equal(database.authentication_audits, 8);
+  assert.equal(database.management_renames, 2);
+  assert.equal(database.management_removals, 2);
+  assert.equal(database.management_notices_pending, 0);
+  assert.equal(database.unproven_remaining_keys, 0);
   for (const field of ['weak_sessions', 'invalid_attachment_provenance', 'attachment_pending', 'signup_pending']) {
     assert.equal(database[field], 0, field);
   }
-  assert.equal(cleanup.messages_removed, 3, 'real SMTP messages including occupied target');
+  assert.equal(cleanup.messages_removed, 7, 'real SMTP messages including occupied target and four management notices');
   const sources = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {cwd: root})
     .toString().split('\0').filter(name => name && !name.includes('/results/') &&
       (/\.(rs|sql|toml|cjs|js|html|json|yml|yaml)$/.test(name) || name === 'Cargo.lock'));
@@ -92,6 +96,6 @@ async function main() {
 }
 main().catch(error => {
   // Never echo assertion values, message bodies, proof URLs, cookies or child output.
-  console.error('SMTP browser suite failed:', error.caseName || 'startup/cleanup', error.name);
+  console.error('SMTP browser suite failed:', error.caseName || 'startup/cleanup', error.stageName || 'case', error.name);
   process.exitCode = 1;
 });

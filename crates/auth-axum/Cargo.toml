@@ -13,6 +13,7 @@ workspace = true
 passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
 passkey-authentication = ["passkey-enrollment"]
 passkey-signup = ["passkey-authentication"]
+passkey-management = ["passkey-signup"]
 
 [dependencies]
 auth-core.workspace = true
@@ -32,6 +33,7 @@ async-trait.workspace = true
 http-body-util = "0.1"
 sqlx.workspace = true
 tower = { version = "0.5", features = ["util"] }
+webauthn-authenticator-rs = { version = "=0.5.5", default-features = false, features = ["softtoken"] }
 
 [[example]]
 name = "passkey-browser"
@@ -49,3 +51,7 @@ required-features = ["passkey-authentication"]
 [[example]]
 name = "export_passkey_signup_openapi"
 required-features = ["passkey-signup"]
+
+[[example]]
+name = "export_passkey_management_openapi"
+required-features = ["passkey-management"]

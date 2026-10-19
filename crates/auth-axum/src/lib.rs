@@ -18,3 +18,6 @@ pub use passkeys::{experimental_passkey_router, passkey_authentication_openapi};
 #[cfg(feature = "passkey-signup")]
 pub use passkeys::{experimental_passkey_signup_router, passkey_signup_openapi};
 pub use router::router;
+
+#[cfg(feature = "passkey-management")]
+pub use passkeys::{experimental_passkey_management_router, passkey_management_openapi};

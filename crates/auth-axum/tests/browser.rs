@@ -27,3 +27,7 @@ mod passkey_signup;
 #[cfg(feature = "passkey-enrollment")]
 #[path = "browser/passkeys.rs"]
 mod passkeys;
+
+#[cfg(feature = "passkey-management")]
+#[path = "browser/passkey_management/mod.rs"]
+mod passkey_management;

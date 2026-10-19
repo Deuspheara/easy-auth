@@ -1,4 +1,7 @@
-use auth_core::{PasskeyEnrollment, PasskeyService, PasskeySignIn, PasskeySignup, PasswordService};
+use auth_core::{
+    PasskeyEnrollment, PasskeyManagement, PasskeyService, PasskeySignIn, PasskeySignup,
+    PasswordService,
+};
 use auth_postgres::Postgres;
 use sqlx::postgres::PgPoolOptions;
 use std::{error::Error, net::SocketAddr, sync::Arc};
@@ -37,13 +40,20 @@ pub(super) async fn serve() -> Result<(), Box<dyn Error>> {
         service.clone(),
         store.clone(),
     ));
-    let signup = Arc::new(PasskeySignup::new(auth.realm(), service, store));
-    let app = auth_axum::experimental_passkey_signup_router(
+    let signup = Arc::new(PasskeySignup::new(
+        auth.realm(),
+        service.clone(),
+        store.clone(),
+    ));
+    let management = Arc::new(PasskeyManagement::new(auth.realm(), service, store));
+    let notifications = easy_auth_server::notification_worker(auth.clone());
+    let app = auth_axum::experimental_passkey_management_router(
         auth,
         browser.clone(),
         enrollment,
         sign_in,
         signup,
+        management,
     )?;
     let listener = TcpListener::bind(bind).await?;
     println!("{}", serde_json::json!({"origin":browser.origin()}));
@@ -52,5 +62,6 @@ pub(super) async fn serve() -> Result<(), Box<dyn Error>> {
         app.into_make_service_with_connect_info::<SocketAddr>(),
     )
     .await?;
+    notifications.abort();
     Ok(())
 }

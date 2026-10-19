@@ -1,7 +1,8 @@
-# Native signup and real SMTP contact attachment
+# Native signup, contact attachment and passkey management
 
 This suite composes the real `configured_auth` server SMTP adapter with the explicit
-experimental signup router. The normal server binary stays unchanged. It creates
+experimental management router, including signup/contact routes and the real
+notification worker. The normal server binary stays unchanged. It creates
 an owned random PostgreSQL database, starts a child server using private process
 environment, and drops that database after stopping the child. No HTTP fixture
 mutation or seeded sessions, users or credential metadata are provided.
@@ -33,8 +34,9 @@ occupied target receives the same initiation response and email path but cannot
 merge either independently created account.
 
 The fixture collects only aggregate database facts after child shutdown: two
-verified stronger users/credentials/signup facts/attachment facts, four later
-passkey sign-ins, no weak-method sessions, no changed attachment authentication
+verified stronger users/remaining proven credentials/signup facts/attachment facts,
+eight later passkey sign-ins, two rename facts, two removal facts, zero pending
+management notices, no weak-method sessions, no changed attachment authentication
 provenance and no pending signup/attachment state. No raw proofs, cookies, private
 keys, addresses, browser storage or mail bodies are logged or saved.
 
@@ -48,4 +50,34 @@ is retained. No real-device, other-browser or production assurance is implied.
 If the runner is forcibly killed before cleanup, owned resources may remain; a
 reported timeout is a failed run, not proof of cleanup. Ordinary test failures run
 cleanup before returning nonzero. Neither the fixture nor these tests implement
-stronger-account recovery or last-key policy; those remain AUTH-20 work.
+stronger-account recovery or ordinary activation; those remain AUTH-20 work.
+
+
+Each case also renames its initial key, rejects stale versions and last-working-
+key removal, then enrolls an independent spare device using unmodified required-
+residence/UV/exclusion options. CDP presence simulation selects which native
+virtual device answers; no key is exported and no credential metadata is seeded.
+The spare must actually sign in before removal succeeds. Removal clears all
+browser auth/action cookies and rejects a peer's prior session. A genuine signature
+from the removed key is rejected, while the same pending challenge accepts a real
+surviving-key assertion. Later bound/discoverable login uses the surviving key.
+
+The private production SMTP adapter delivers two fixed management notices per
+account. The runner checks their exact owned recipients and absence of credential
+links or untrusted labels. Cleanup deletes exactly seven owned messages: three
+contact proofs (including the occupied-target attempt) and four management notices.
+The prior published two-case records remain immutable. Their earlier four-sign-in/
+three-message totals describe earlier producers, not this extended run. Safe fixed
+stage names diagnose failures without reflecting assertion values or mail bodies.
+
+
+Registration uses the complete original server options. To select a particular
+native device, positive assertion requests narrow the returned allowed credential
+IDs to the known spare; the removed-key negative deliberately requests the old
+native credential ID against a server challenge whose stored state is unchanged.
+Only public selection data changes, while RP/origin/challenge/UV and actual private-
+key signatures remain enforced. The same pending challenge then accepts a fresh
+surviving-key signature. This is explicit signed-negative fixture setup, not a
+change to production verification or a private-key/metadata export.
+Presence selection follows the official
+[CDP WebAuthn protocol](https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/pdl/domains/WebAuthn.pdl).

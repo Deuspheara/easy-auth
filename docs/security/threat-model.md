@@ -111,3 +111,13 @@ cleared with subject erasure, and fixed notices use only verified contacts.
 This is a partial management boundary, not recovery or ordinary activation.
 All-keys-lost proof/delay/cancellation/notification and physical-device/browser
 acceptance remain required; email-free notification limits must be explicit.
+
+Experimental AUTH-20 HTTP management adds no alternate policy path: handlers call
+the shared management use cases, accept closed versioned inputs and no owner/RP/
+realm selectors, retain the exact-Origin/host-cookie/no-store boundary, and clear
+all auth/action cookies only after committed removal. The full OpenAPI preserves
+prior schemas/routes. Native tests use independent virtual authenticators with
+original exclusion/residence/UV options and actual signatures, including a removed
+key rejection and valid surviving-key retry. Fixed verified-contact notifications
+now have real SMTP worker evidence. Recovery, activation and physical-device/
+other-browser acceptance remain open; these tests do not prove them.

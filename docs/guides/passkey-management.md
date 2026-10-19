@@ -1,8 +1,8 @@
 # Experimental passkey management
 
-AUTH-20 is in progress. The optional core/PostgreSQL management boundary provides
-bounded inventory, rename and removal; it does not yet provide HTTP management,
-all-keys-lost recovery, stronger-policy activation or ordinary server enablement.
+AUTH-20 is in progress. Optional core/PostgreSQL and explicit experimental HTTP
+management provide bounded inventory, rename and removal. All-keys-lost recovery,
+stronger-policy activation and ordinary server enablement remain incomplete.
 Those and required physical-device/browser evidence remain acceptance gates.
 See [ADR 0011](../architecture/adr/0011-passkey-management-and-recovery.md).
 
@@ -53,3 +53,39 @@ recovery; recovery notification limits remain explicit unfinished AUTH-20 work.
 Migration 0012 adds management versions and bounded target/audit/notice schema.
 Existing key encodings, metadata, owner IDs and session provenance are preserved;
 upgrade does not invent successful key use. Published migrations remain immutable.
+
+## Experimental HTTP contract
+
+Enable `easy-auth-axum/passkey-management` and explicitly construct
+`experimental_passkey_management_router` with aligned Auth, BrowserConfig,
+enrollment, sign-in, signup and management services. Every service must share the
+configured realm/origin; mismatches fail startup. Earlier constructors and the
+ordinary server do not expose these management endpoints. Its full
+[OpenAPI document](../architecture/openapi-passkey-management.json) includes all
+prior base/enrollment/authentication/signup/contact routes unchanged.
+
+| Route | Input | Committed result |
+| --- | --- | --- |
+| `GET /v1/passkeys` | Session cookie; no query fields | 200 `{passkeys:[...]}`; at most ten public metadata records |
+| `POST /v1/passkeys/rename` | `{id,version,label}` plus session and exact Origin | 200 `{version}`; label/version changed |
+| `POST /v1/passkeys/remove` | `{id,version}` plus session and exact Origin | 204; all auth/action cookies cleared after removal/session invalidation |
+
+Management uses an 8 KiB body limit, closed JSON objects, existing host-cookie
+parsing and generic errors. Invalid/stale/foreign/last-working-key targets and
+weak/stale method authority return the same 401. Invalid fields/labels/queries
+return 400, wrong Origin 403, large/wrong-media bodies 413/415, admission 429 and
+storage or delivery-queue persistence failures 503. SMTP delivery happens after
+commit through the leased worker; a later transport failure remains retryable and
+does not change a committed management response. All responses use no-store/CSP and the shared
+browser boundary. A rejected or rolled-back operation returns no success cookies.
+There is no management-cookie, arbitrary owner/RP selection, HTTP policy engine
+or application permission system.
+
+The native SMTP fixture now exercises management using independent resident
+platform and USB virtual authenticators. CDP presence selection models choosing
+one device; it neither exports private keys nor modifies stored credentials.
+The server's original exclusion/residence/required-UV options remain intact.
+It verifies actual removed-key signatures are rejected and the same challenge can
+still complete with a surviving key. Four fixed notices pass through the real
+SMTP worker. Virtual-device results do not establish physical-device or other-
+browser interoperability, recovery safety or general activation readiness.

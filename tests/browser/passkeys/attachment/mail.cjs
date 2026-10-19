@@ -30,7 +30,7 @@ function mailbox(base, namespace) {
     const deadline = Date.now() + 10000;
     while (Date.now() < deadline) {
       for (const summary of await messages(address)) {
-        if (seen.has(summary.ID)) continue;
+        if (summary.Subject !== 'Confirm contact email' || seen.has(summary.ID)) continue;
         seen.add(summary.ID);
         const message = await (await request(`/api/v1/message/${encodeURIComponent(summary.ID)}`)).json();
         assert.equal(message.Subject, 'Confirm contact email');
@@ -48,6 +48,26 @@ function mailbox(base, namespace) {
     }
     throw new Error('owned SMTP proof timeout');
   }
+  async function notices(address, expected) {
+    const deadline = Date.now() + 10000;
+    while (Date.now() < deadline) {
+      const summaries = (await messages(address)).filter(message => message.Subject === 'Your passkeys changed');
+      if (summaries.length >= expected) {
+        assert.equal(summaries.length, expected, 'exact owned passkey notices');
+        for (const summary of summaries) {
+          const message = await (await request(`/api/v1/message/${encodeURIComponent(summary.ID)}`)).json();
+          assert.equal(message.Subject, 'Your passkeys changed');
+          assert.equal(message.To.length, 1);
+          assert.equal(message.To[0].Address === address, true, 'verified owned notice recipient');
+          assert.equal(message.Text.includes('A passkey on your authentication account was renamed or removed'), true);
+          assert.equal(/https?:\/\/|#token|Native managed key|Spare browser key/.test(message.Text), false, 'no credential link or untrusted label');
+        }
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw new Error('owned passkey notice timeout');
+  }
   async function cleanup() {
     const ids = new Set();
     for (const address of recipients) for (const message of await messages(address)) ids.add(message.ID);
@@ -60,6 +80,6 @@ function mailbox(base, namespace) {
   async function version() {
     return (await (await request('/api/v1/info')).json()).Version;
   }
-  return {recipient, proof, cleanup, version};
+  return {recipient, proof, notices, cleanup, version};
 }
 module.exports = {mailbox};

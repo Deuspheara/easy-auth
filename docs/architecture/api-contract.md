@@ -161,9 +161,20 @@ idempotent. See [ADR 0010](adr/0010-final-transaction-deadlines.md) for the prec
 transaction boundary; this does not authorize consuming-application actions.
 
 AUTH-20's optional core/PostgreSQL `PasskeyManagement` provides bounded public key
-metadata, expected-version rename and last-proven-key-protected removal. No HTTP
-management route or ordinary activation is supplied by this checkpoint. Core port
+metadata, expected-version rename and last-proven-key-protected removal. No
+ordinary activation is supplied by this checkpoint. Experimental management HTTP
+is available only through its additional explicit constructor. Core port
 consumers must implement `EmailDelivery::passkeys_changed` for non-secret queued
 notices. See the [management guide](../guides/passkey-management.md) and
 [ADR 0011](adr/0011-passkey-management-and-recovery.md); recovery and the full
 stronger-account management/activation contract remain in progress.
+
+The `passkey-management` feature exports `experimental_passkey_management_router`
+and [the complete management OpenAPI](openapi-passkey-management.json). It reuses
+all prior route builders and adds GET `/v1/passkeys` (no query selectors, bounded
+public metadata), POST `/v1/passkeys/rename` (`{id,version,label}` -> `{version}`)
+and POST `/v1/passkeys/remove` (`{id,version}` -> 204 with all auth/action cookies
+cleared after commit). All require genuinely fresh passkey-method authority;
+mutations require exact Origin and closed JSON within 8 KiB. Stale/foreign/last-
+working-key targets use generic 401; storage failure uses generic 503 and returns
+no success cookie. Ordinary and earlier experimental constructors remain unchanged.

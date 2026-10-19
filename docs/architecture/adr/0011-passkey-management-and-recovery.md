@@ -1,4 +1,4 @@
-# ADR 0012: Passkey management and recovery authority
+# ADR 0011: Passkey management and recovery authority
 
 Status: management boundary accepted for implementation in AUTH-20, 2026-10-19.
 Recovery design and ordinary activation remain incomplete; this is not acceptance
@@ -38,7 +38,7 @@ must remain explicit; general recovery needs an independently reviewed policy.
 AUTH-20 retains pre-enrolled independent recovery proof, single-use/expiry,
 explicit delay/cancellation, notifications where a verified channel exists, audit,
 additional-enrollment authority, safe stronger-policy activation and complete
-HTTP/native/physical-device evidence. Mere denial of fallback does not fulfill it.
+remaining HTTP/native/physical-device evidence. Mere denial of fallback does not fulfill it.
 A remaining strong key supports normal authentication and replacement enrollment;
 it is not a claim of all-keys-lost recovery.
 
@@ -61,3 +61,13 @@ version and RP/realm/owner isolation, concurrent removal/rename/sign-in, observe
 lock/audit/notice expiry, rollback, upgrade and notification retries. Existing
 mailbox/signup/sign-in/native behavior must remain covered. Ordinary composition
 stays gated until all AUTH-20 and remaining M03 evidence is satisfied.
+
+
+The explicit experimental management HTTP constructor composes the existing
+base/enrollment/sign-in/signup/contact builders and the management use cases.
+Earlier constructors and ordinary server routes remain unchanged. Closed JSON,
+configured realm/origin startup checks, 8 KiB bodies, shared browser guards and
+post-commit cookie clearing preserve the existing trust boundary. Native platform/
+USB cases now cover independent spare-device proof, original exclusion/residence/
+UV policy, removal and real queued SMTP notices. Recovery design, physical-device/
+other-browser evidence and ordinary activation remain incomplete.
