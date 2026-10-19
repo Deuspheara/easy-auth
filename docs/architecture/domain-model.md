@@ -30,3 +30,10 @@ internal; enforcement for stronger-account recovery and sensitive actions remain
 required before ordinary passkey activation. No MFA/AAL certification is inferred.
 
 Planned entities are not implemented tables until their milestone. Account deletion now transactionally removes implemented credentials/sessions/proofs and deidentifies live audit subjects; future external identities must join this same lifecycle. A subject-free deletion notice temporarily retains the established recipient for delivery.
+
+AUTH-53's accepted [email-free identity design](adr/0009-passkey-first-identity.md)
+separates optional verified contact information from account authentication policy.
+Its pending-only registration/assertion bootstrap and verified-mailbox attachment
+are planned, not implemented by the session-locking extraction. Current user/email
+contracts and schema remain unchanged until their explicit migration and regression
+tests land. AUTH-20 still owns stronger-account management and recovery closure.

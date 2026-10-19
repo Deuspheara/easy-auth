@@ -22,6 +22,15 @@ Created 2026-10-18. Not a security audit. Assets: user identity, credential veri
 
 A database writer or compromised server can mint/change identities; verifier hashing protects against read-only database theft, not a compromised verifier. Mailbox-only authentication has limited assurance and must not serve as an invisible bypass for stronger credentials. A stolen live cookie is a bearer credential. In-flight requests may finish after revocation; critical application actions require domain-level authorization/transaction policies.
 
+AUTH-53's [email-free identity design](../architecture/adr/0009-passkey-first-identity.md)
+adds planned gates for anonymous signup and optional contact attachment: no durable
+account/session before a verified assertion, no client-selected owner, bounded
+pending state, atomic one-use completion and post-lock expiry checks. Attaching a
+mailbox must preserve passkey-required policy and deny weaker login/reset paths,
+including concurrent mailbox signup and preissued proofs. These are implementation
+and test requirements, not current support claims; ordinary composition remains
+gated through AUTH-20 and the remaining M03 evidence.
+
 AUTH-18's optional enrollment boundary now rechecks fresh session/browser/realm
 binding and exact verified state under locks, then atomically consumes the ceremony,
 inserts an RP-wide unique credential and audits enrollment. Limits bound pending
