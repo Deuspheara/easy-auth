@@ -15,6 +15,9 @@ pub(crate) struct Mail {
 }
 #[async_trait]
 impl EmailDelivery for Mail {
+    async fn passkey_recovery_changed(&self, email: &str) -> auth_core::Result<()> {
+        self.passkeys_changed(email).await
+    }
     async fn passkeys_changed(&self, _email: &str) -> auth_core::Result<()> {
         if *self.fail_notices.lock().unwrap() {
             return Err(auth_core::Error::Unavailable);

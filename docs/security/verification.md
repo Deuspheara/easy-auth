@@ -769,3 +769,83 @@ visible, following the documented size review exceptions. No structural cleanup
 is deferred by this change. Reviewed recovery proof/delay/cancellation, notification
 limits, safe stronger-policy activation, ordinary composition and physical-device/
 other-browser evidence remain open. These results do not complete AUTH-20 or M03.
+
+
+## AUTH-20 experimental saved-code configuration — 2026-10-19
+
+AUTH-20 remains **In Progress**. [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md)
+separates implemented saved-code configuration from the proposed delayed/cancellable
+all-keys-lost protocol. No recovery login, new HTTP endpoint, policy activation or
+ordinary enablement is implemented or claimed. Independent recovery review and
+physical-device/other-browser evidence remain acceptance work.
+
+Core uses the existing 256-bit `Secret` primitive; PostgreSQL stores only verifiers.
+Known genuinely fresh passkey-method authority and an owned proven configured-RP
+key are required. Preparation replaces only a bounded exact-session pending setup,
+retaining any active saved code. Confirmation atomically replaces its version,
+consumes pending state, records actor-owned `passkey_recovery_configured` audit and
+queues a fixed `passkey_recovery_changed` notice to an existing verified contact.
+Original proof/session caps follow all writes. Email-free users have no fabricated
+recipient or independent email alert. Configuration changes neither account policy
+nor authentication method/time. Active saved codes currently have no age expiry;
+recovery consumption remains unimplemented. This is not usable all-keys-lost recovery.
+
+A separate behavior-preserving extraction shares locked passkey-method authority;
+all **11 existing management cases** passed after it. The new **12 real-PostgreSQL
+configuration cases** cover confirmation/rotation with preserved old code, replay,
+one-winner concurrency, genuine other-owner denial, exact session/realm/RP/code
+binding, weak/legacy/stale/future/idle/absolute/revoked authority, configured-RP use
+evidence, durable failed-attempt admission, audit/notice rollback and retry,
+additive migration constraints, account-deletion erasure and realm isolation.
+An observed-wait matrix crosses original deadlines during preparation, audit,
+notification and final consumption. It requires exact Unauthorized, an actual
+pre-expiry lock wait and unchanged durable state; infrastructure errors cannot
+satisfy authorization assertions. This is new-functionality evidence, not a claimed
+pre-fix exploit reproduction. Published migrations are unchanged; migration 0013
+creates no saved code or stronger provenance for existing accounts.
+
+Final local checks:
+
+- `cargo fmt --all -- --check`; strict locked workspace/all-target Clippy with
+  default and all features pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **202 pass** (2 Axum unit, 31 HTTP/database, 10 core, 159 PostgreSQL).
+  A logging subprocess repeats one included core case. No failures or ignored
+  tests in successful full suites.
+- The changed required `EmailDelivery::passkey_recovery_changed` port is implemented
+  in SMTP and all repository fixtures/adoption probe. A locked `cargo check
+  --manifest-path benchmarks/adoption/Cargo.toml --features easy --bin probe-easy`
+  passes; no adoption performance measurement is claimed.
+- Fresh native builds pass **31 Chromium and 2 real-SMTP cases** on PostgreSQL 17.11.
+  Saved [browser](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-setup.json)
+  and [SMTP](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-recovery-setup.json)
+  source/binary fingerprints match the final source. Both owned databases and the
+  native SMTP suite's seven owned messages are removed. These exercise the existing
+  enrollment/sign-in/signup/contact/management regression boundary, not recovery login.
+- Standalone and embedded full password/recovery/sessions/lifecycle SMTP smokes pass
+  with owned database cleanup.
+- `python3 scripts/smoke_recovery_notice.py` passes with both local Compose and the
+  explicit test-container mode used by CI. Each run owns one queue fixture, observes
+  the purpose-specific real SMTP message and queue acknowledgement, removes exactly
+  its one message and drops its disposable DB. This proves new-notice transport;
+  PostgreSQL tests separately prove authorized configuration enqueues it. The script
+  is added to CI with the job's PostgreSQL service container and loopback DB URL.
+- Compiled-dependency audit, all-feature cargo-deny and low-threshold npm audit pass.
+  The inactive SQLx/MySQL rsa advisory remains visible; no dependency change is made.
+  Redacted Gitleaks scanning of the complete staged diff also passes.
+
+The initial notice smoke reached SMTP/acknowledgement but its cleanup assumed a
+JSON DELETE response. Mailpit returned success text; the fixture now discards that
+body, retains safe ownership checks and reports infrastructure/assertion failures
+separately. Both final modes pass. A host Python cache permission error was resolved
+by using a writable temporary bytecode cache. Neither initial attempt counts as a
+successful full smoke. No application security assertion was weakened.
+
+New production/test files stay below 300 lines. The shared authority, recovery core
+flow/port and PostgreSQL configuration/delegation keep responsibilities separate.
+The longer confirmation transaction and owned-resource smoke main retain explicit
+lock/write/final-check/cleanup order; the organization guide documents these size
+exceptions. No structural cleanup is deferred. Proposed delay/receipt/cancellation,
+new-key proof, one-use recovery completion, HTTP integration, activation and M03
+external evidence remain incomplete; these checks do not establish their safety.

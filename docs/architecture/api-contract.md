@@ -186,3 +186,13 @@ are rejected. All repository stages recheck under owner/session locks and retain
 original deadlines through final writes/consumption. Registration does not change
 account policy or issue stronger session provenance. Existing generic 401 responses
 and wire schemas are unchanged. See the [enrollment guide](../guides/passkey-enrollment.md).
+
+
+Optional `PasskeyRecoverySetup` currently exposes core/PostgreSQL prepare/confirm
+configuration only. It requires genuine fresh passkey-method authority plus an
+owned proven key in the configured RP, stores only a saved-code verifier and binds
+confirmation to the original session/realm/owner/RP/pending ID. No new HTTP route,
+OpenAPI schema, recovery session or stronger-policy activation is exposed.
+`EmailDelivery::passkey_recovery_changed` is required for the new purpose-specific
+queued notice. See [ADR 0012](adr/0012-saved-passkey-recovery.md) and the
+[management guide](../guides/passkey-management.md#experimental-saved-code-configuration).

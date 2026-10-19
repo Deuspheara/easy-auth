@@ -31,6 +31,10 @@ pub enum AuditEvent {
         user_id: Uuid,
         actor_session_id: Uuid,
     },
+    PasskeyRecoveryConfigured {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+    },
     PasskeyAuthenticated {
         user_id: Uuid,
         session_id: Uuid,
@@ -82,6 +86,7 @@ impl AuditEvent {
             Self::PasskeyEnrolled { .. } => "passkey_enrolled",
             Self::PasskeyRenamed { .. } => "passkey_renamed",
             Self::PasskeyRemoved { .. } => "passkey_removed",
+            Self::PasskeyRecoveryConfigured { .. } => "passkey_recovery_configured",
             Self::PasskeyAuthenticated { .. } => "passkey_authenticated",
             Self::PasskeySignedUp { .. } => "passkey_signed_up",
             Self::PasswordReset { .. } => "password_reset",
@@ -100,6 +105,7 @@ impl AuditEvent {
             | Self::PasskeyEnrolled { user_id, .. }
             | Self::PasskeyRenamed { user_id, .. }
             | Self::PasskeyRemoved { user_id, .. }
+            | Self::PasskeyRecoveryConfigured { user_id, .. }
             | Self::PasskeyAuthenticated { user_id, .. }
             | Self::PasskeySignedUp { user_id, .. }
             | Self::PasswordReset { user_id }
@@ -122,6 +128,9 @@ impl AuditEvent {
                 actor_session_id, ..
             }
             | Self::PasskeyRemoved {
+                actor_session_id, ..
+            }
+            | Self::PasskeyRecoveryConfigured {
                 actor_session_id, ..
             }
             | Self::SessionRevoked {
@@ -157,6 +166,7 @@ impl AuditEvent {
             | Self::PasskeyEnrolled { .. }
             | Self::PasskeyRenamed { .. }
             | Self::PasskeyRemoved { .. }
+            | Self::PasskeyRecoveryConfigured { .. }
             | Self::AllSessionsRevoked { .. }
             | Self::EmailChanged { .. }
             | Self::AccountDeleted => None,

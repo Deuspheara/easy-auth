@@ -218,3 +218,14 @@ Tests under `passkeys/enrollment_authority/` separate stage/realm/provenance
 boundaries, the bootstrap race and observed write/owner waits. Positive fixtures
 retain their software authenticator and perform real assertions; they do not
 fabricate stronger session provenance to continue enrollment.
+
+
+Genuine fresh passkey-method ownership is shared by management/recovery setup in
+`passkeys/authority.rs`; enrollment retains its distinct first-key bootstrap policy.
+Saved-code core flow/port and PostgreSQL configuration/delegation have separate
+`passkeys/recovery_setup/` modules. Confirmation keeps replacement, pending
+consumption, audit/notice and final deadlines in one visible transaction. Its length
+is a reviewed cohesive transaction exception. Feature tests separate binding/method
+boundaries, isolation/erasure, concurrency/rollback, migration and observed expiry.
+The local notice smoke retains create/start/assert/stop/owned cleanup together;
+its longer main function makes those resource boundaries explicit.

@@ -5,5 +5,6 @@ mod enrollment_authority;
 mod management;
 mod policy;
 mod preparation;
+mod recovery_setup;
 mod repository;
 mod signup;

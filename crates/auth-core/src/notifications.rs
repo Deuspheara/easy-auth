@@ -4,6 +4,7 @@ use uuid::Uuid;
 pub enum SecurityNoticeKind {
     PasswordReset,
     PasskeysChanged,
+    PasskeyRecoveryChanged,
     EmailChanged,
     AccountDeleted,
 }

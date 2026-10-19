@@ -25,6 +25,9 @@ impl Smtp {
 }
 #[async_trait]
 impl EmailDelivery for Smtp {
+    async fn passkey_recovery_changed(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email, "Your passkey recovery configuration changed", "A saved recovery code was configured or replaced after a fresh passkey sign-in. The code is never sent by email. If this was not you, sign in with an existing key and replace the recovery configuration through the service. This notice contains no code, credential or sign-in link.".to_owned()).await
+    }
     async fn passkeys_changed(&self, email: &str) -> auth_core::Result<()> {
         self.send(email, "Your passkeys changed", "A passkey on your authentication account was renamed or removed after a fresh passkey sign-in. Removal invalidates existing sessions. If this was not you, sign in with a remaining key and contact the service operator through a trusted channel. This notice contains no credential, recovery code or sign-in link.".to_owned()).await
     }

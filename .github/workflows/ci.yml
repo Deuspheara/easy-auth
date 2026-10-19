@@ -47,6 +47,10 @@ jobs:
       - run: node tests/browser/passkeys/run.cjs
       - run: cargo build --locked -p easy-auth-server --example passkey-smtp-browser --features experimental-passkeys
       - run: node tests/browser/passkeys/attachment/run.cjs
+      - run: cargo build --locked -p easy-auth-server --bin easy-auth
+      - run: python3 scripts/smoke_recovery_notice.py
+        env:
+          EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
       - run: cargo install cargo-audit --locked
       - run: python3 scripts/audit.py
       - run: cargo install cargo-deny --locked

@@ -131,3 +131,15 @@ one initial-bootstrap winner. Original session/proof caps follow preparation,
 admission and final consumption writes. This closes enrollment authority only;
 reviewed recovery, stronger-policy activation and physical-device evidence remain
 AUTH-20 acceptance work.
+
+
+Experimental saved-code preparation/confirmation requires actual fresh passkey
+method and proven configured-RP key evidence under shared owner/session locks.
+Pending setup binds the exact session/realm/owner/RP; only a verifier is stored.
+Preparation cannot invalidate a confirmed code, and confirmation replacement,
+consumption, audit and fixed verified-contact notice roll back on any failure or
+original-deadline expiry after final writes. The saved code is a bearer secret and
+is not phishing resistant; offline storage is the user's responsibility. No recovery
+login or stronger-policy activation is implemented. Email-free accounts have no
+independent email notification. The delayed/cancellable recovery design and its
+remaining security review are explicitly proposed in [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).

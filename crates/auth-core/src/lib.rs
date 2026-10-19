@@ -24,10 +24,11 @@ pub use passkeys::{
     PasskeyAuthenticationRequest, PasskeyAuthenticationResponse, PasskeyAuthenticationStart,
     PasskeyCreationOptions, PasskeyEnrollment, PasskeyEnrollmentContext, PasskeyEnrollmentOptions,
     PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyInfo, PasskeyManagement,
-    PasskeyManagementRepository, PasskeyManagementRequest, PasskeyRegistrationResponse,
+    PasskeyManagementRepository, PasskeyManagementRequest, PasskeyRecoverySetup,
+    PasskeyRecoverySetupRepository, PasskeyRecoverySetupRequest, PasskeyRegistrationResponse,
     PasskeyRepository, PasskeyService, PasskeySignIn, PasskeySignInOptions, PasskeySignup,
     PasskeySignupAssertion, PasskeySignupCreation, PasskeySignupRegistrationContext,
-    PasskeySignupRepository, PasskeySignupRequest, PasskeySignupStart,
+    PasskeySignupRepository, PasskeySignupRequest, PasskeySignupStart, PreparedPasskeyRecoveryCode,
     PrivatePasskeyAuthentication, PrivatePasskeyRegistration, StoredPasskey, VerifiedPasskey,
     VerifiedPasskeyAuthentication, VerifiedPasskeySignupRegistration, authorize_passkey_enrollment,
 };

@@ -14,6 +14,7 @@ Both server compositions record the same committed lifecycle facts through the s
 | `passkey_enrolled` | fresh initiating session | none | Optional core/PostgreSQL registration verified, state consumed and unique credential inserted; no new authenticated session |
 | `passkey_renamed` | fresh passkey-method session | none | Owned key label/version changed; public `passkey_id` retains the target |
 | `passkey_removed` | fresh passkey-method session | none | Owned key removed with proven-key guard and session invalidation; `passkey_id` retains the target |
+| `passkey_recovery_configured` | fresh passkey-method session | none | Saved-code configuration confirmed/replaced and pending setup consumed; no recovery session or policy activation |
 | `passkey_authenticated` | none | newly issued session | Experimental verified assertion, exact-state consume, credential update and new session committed atomically |
 | `passkey_signed_up` | none | newly issued session | Optional core/PostgreSQL signup verified separate assertion and atomically created email-free user/key/session and consumed pending state |
 | `password_reset` | none | none | Current recovery proof consumed, credential replaced and sessions/proofs invalidated |
@@ -61,6 +62,14 @@ Subject erasure clears the target with all other attribution. The optional
 management boundary also queues a fixed non-secret notice to a verified contact;
 email-free users have no fabricated contact. Recovery and ordinary activation
 remain unfinished AUTH-20 work.
+
+Migration `0013_passkey_recovery_setup.sql` adds the closed recovery-configuration
+fact without new audit columns. Actor ownership is required; `session_id` and
+`passkey_id` remain NULL. No code, verifier, pending ID or arbitrary recovery data
+enters audit. Configuration replacement, pending consumption and a purpose-specific
+verified-contact notice commit atomically after final original-deadline checks.
+Email-free users receive no fabricated email. This event proves configuration,
+not recovery completion or independent review of the proposed protocol.
 
 ## Operator reads and linking
 

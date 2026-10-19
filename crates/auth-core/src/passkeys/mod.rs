@@ -8,6 +8,7 @@ mod enrollment;
 mod enrollment_policy;
 mod logging;
 mod management;
+mod recovery_setup;
 mod registration;
 mod repository;
 mod sign_in;
@@ -25,6 +26,10 @@ pub use enrollment::{PasskeyEnrollment, PasskeyEnrollmentOptions};
 pub use enrollment_policy::authorize_passkey_enrollment;
 pub use management::{
     PasskeyInfo, PasskeyManagement, PasskeyManagementRepository, PasskeyManagementRequest,
+};
+pub use recovery_setup::{
+    PasskeyRecoverySetup, PasskeyRecoverySetupRepository, PasskeyRecoverySetupRequest,
+    PreparedPasskeyRecoveryCode,
 };
 pub use repository::{
     PasskeyEnrollmentContext, PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRepository,

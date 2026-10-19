@@ -89,3 +89,47 @@ It verifies actual removed-key signatures are rejected and the same challenge ca
 still complete with a surviving key. Four fixed notices pass through the real
 SMTP worker. Virtual-device results do not establish physical-device or other-
 browser interoperability, recovery safety or general activation readiness.
+
+
+## Experimental saved-code configuration
+
+The optional `PasskeyRecoverySetup` core service and
+`PasskeyRecoverySetupRepository` adapter prepare and confirm a saved recovery code.
+This configuration has no HTTP route or recovery authentication endpoint yet and
+must not be advertised as a working all-keys-lost recovery flow. It never changes
+account policy or ordinary server enablement. See
+[ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md) for the implemented
+configuration boundary and separately proposed delayed recovery protocol.
+
+`prepare(session, source)` requires actual fresh passkey-method authority and an
+owned key with assertion-use evidence in the configured RP. It returns a pending
+ID and a `Secret` exactly once after persistence. Show the code only through a
+protected non-cacheable boundary; have the user save it offline and reenter it.
+Do not log, serialize implicitly, email, put it in URLs or persistent browser
+storage. `confirm(session, source, id, code)` must use the exact initiating session
+and pending ID/code before both original authentication and setup deadlines.
+
+Only verifiers are stored. Re-preparing replaces one pending setup but preserves
+the active code; confirmation atomically replaces the active version, consumes the
+pending setup, records actor-owned audit and queues a fixed verified-contact notice.
+A rejected or failed confirmation retains the old code and pending retry. Known
+weaker/legacy/stale/future/revoked methods, foreign owners/realms/RPs/sessions and
+wrong/replayed codes fail closed. Failed attempts consume the shared sensitive
+admission budget. Rotation changes neither session method/time nor account policy.
+
+`EmailDelivery::passkey_recovery_changed` is a required delivery-port addition.
+The SMTP adapter supplies a purpose-specific message without credentials or links;
+failed delivery remains queued for retry. Email-free users have no fabricated
+address or independent email alert. Physical-device/browser and independently
+reviewed delayed recovery/activation remain acceptance gates. Migration 0013 is
+additive and creates no saved codes for existing accounts.
+
+
+For the dedicated local notice transport check, start the documented PostgreSQL and
+Mailpit services, then run `cargo build --locked -p easy-auth-server --bin easy-auth`
+and `python3 scripts/smoke_recovery_notice.py`. The script creates an owned random
+database/recipient and queues one fixed notice fixture through the normal worker;
+it does not fabricate an authenticated session or exercise recovery login. It
+verifies SMTP content and acknowledgement, removes only its exact owned mail and
+drops its database. CI supplies its PostgreSQL service container explicitly through
+`EASY_AUTH_SMOKE_POSTGRES_CONTAINER`; database URLs must remain loopback test URLs.

@@ -47,3 +47,13 @@ completion preserves UUID, stronger policy and authentication provenance, with
 transactional session/proof invalidation and a typed audit fact. Native platform/USB
 signup-to-SMTP confirmation and later passkey login now have separate evidence. AUTH-20 still owns full stronger-account
 management and recovery closure.
+
+
+Optional saved-code configuration uses one `auth_passkey_recovery_codes` row per
+realm/owner/RP, containing only a verifier and version, plus one expiring
+`auth_passkey_recovery_setups` row bound to the exact initiating owned session.
+Preparation preserves an existing active verifier; confirmation consumes pending
+state and replaces the active version atomically with actor-owned audit and a
+non-secret verified-contact notice. User deletion cascades both tables. Neither
+record is an ordinary authentication session, new key or policy upgrade; recovery
+consumption is not implemented. See [ADR 0012](adr/0012-saved-passkey-recovery.md).

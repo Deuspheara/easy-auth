@@ -2,7 +2,8 @@
 
 Status: experimental management and additional-enrollment boundaries implemented
 in AUTH-20, 2026-10-19.
-Recovery design and ordinary activation remain incomplete; this is not acceptance
+Saved-code configuration is described in [ADR 0012](0012-saved-passkey-recovery.md).
+The full recovery protocol and ordinary activation remain incomplete; this is not acceptance
 of the full ticket or an assurance/conformance claim.
 
 ## Credential management
