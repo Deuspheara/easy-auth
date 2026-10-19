@@ -1222,3 +1222,40 @@ cleanup is deferred. ADR 0012, API/organization/threat-model docs and the manage
 and native guides document the implementation and limits. Independent recovery
 review, physical-device/other-browser evidence and safe ordinary activation remain
 required. This checkpoint does not complete AUTH-20 or its release/security gates.
+
+## AUTH-20 ordered configuration/completion contention (2026-10-19)
+
+Two additional real-PostgreSQL regressions run both email-free and verified-contact
+accounts through actual candidate registration/assertion before arranging contention.
+A final-audit advisory gate proves the first transaction already holds the owner;
+an independent one-connection observer identifies its backend and requires a second
+backend actually blocked by it before release. Bounded observation/action timeouts
+fail as infrastructure problems. Each losing operation must return exactly
+`Unauthorized`; storage errors cannot pass as policy evidence.
+
+When saved-code confirmation commits first, the waiting preverified replacement
+cannot install a key or session. Its old claim/candidate disappear, the new code
+remains unconsumed, the original session and actual original-key assertion work,
+and the new code can start a distinct claim. When recovery commits first, waiting
+confirmation from the revoked original session cannot revive its pending setup or
+replace the consumed generation. Exactly one active replacement session remains;
+the original session is rejected, and a rejected confirmation retry leaves the
+full durable state unchanged. Production behavior already enforces both orders;
+this change adds regression evidence without changing APIs, policy, SQL, migrations
+or dependencies.
+
+Final checks pass: formatting, strict locked default/all-feature workspace/all-target
+Clippy, **93 default workspace tests**, **270 all-feature workspace tests** (2 Axum
+unit, 55 HTTP/database, 10 core, **203 PostgreSQL**; logging subprocess repeats an
+included core case), compiled-dependency audit, all-feature cargo-deny and npm audit.
+No failed/ignored tests. The inactive SQLx/MySQL RSA advisory remains visible.
+The complete staged diff receives redacted Gitleaks scanning before publication.
+The 42 native cases and SMTP evidence in the preceding checkpoint apply to the
+unchanged application/fixture behavior; they were not rerun for this test-only
+extension, and their historical source reports remain immutable.
+
+The new feature-specific test module is under 300 lines and shares the existing
+claim write gate. Its two longer scenario functions retain proof preparation,
+observed ordering and outcome assertions together as a justified test-size exception.
+No structural cleanup is deferred. AUTH-20 remains In Progress; independent review,
+physical-device/other-browser evidence and safe activation remain open.

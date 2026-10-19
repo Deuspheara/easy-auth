@@ -3,6 +3,7 @@ mod boundaries;
 mod invalidation;
 mod lifecycle;
 mod migration;
+mod rotation;
 mod waiting;
 mod waiting_rows;
 

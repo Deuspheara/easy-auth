@@ -263,7 +263,8 @@ under `recovery_claims/replacement/`. Completion's longer transaction deliberate
 keeps email-before-owner, exact candidate checks, RP uniqueness, revoke/install,
 audit/notice, consumption and final deadline visible; invalidation is a named
 transaction-bound operation, not independent policy. Tests separate lifecycle,
-boundary/protocol, invalidation, rollback/races, migration and observed row/final-write
+boundary/protocol, invalidation, rollback/races, ordered code-rotation contention,
+migration and observed row/final-write
 waits. Longer scenarios preserve arranged authority and full rollback assertions.
 
 
