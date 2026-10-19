@@ -29,6 +29,15 @@ creation or unsigned client extension results as verified residence metadata.
 No session secret,
 browser secret or state belongs in a URL or application log.
 
+Every enrollment stage revalidates the exact live/fresh session under the owner
+lock. A first credential may bootstrap from a known email or password method;
+`legacy_unknown` cannot bootstrap from a recent timestamp alone. Once the owner
+has any passkey in the realm, including another RP, additional enrollment requires
+a genuine passkey-method session. A previously prepared or verified mailbox ceremony
+cannot bypass that change. Sign in with the initial key before enrolling another.
+Registration preserves the account policy and original method/time; it neither
+activates stronger policy nor proves possession for a later authentication.
+
 `finish` loads only the current session/browser/realm-bound transaction, verifies
 the authenticator response with the high-level library, and then revalidates under
 user-before-session locks. It compares the exact verified state encoding, checks
@@ -49,7 +58,10 @@ ceremony locked through credential/audit writes. Final one-use consumption check
 exact ceremony binding/state and current database time **after** those writes,
 including credential-uniqueness and audit waits. It independently rechecks original
 session authentication freshness, idle/absolute expiry and revocation. Deadline
-failure rolls back the new key, audit fact and consumption together. Policy is
+failure rolls back the new key, audit fact and consumption together. A table-free
+check follows consumption itself, retaining original proof/session deadlines even
+if the final delete waits. Preparation and verification admission also recheck the
+original session deadline after their writes. Policy is
 validated under the held owner/session locks; rotation never refreshes proof time.
 
 ## Limits and lifecycle
@@ -82,9 +94,9 @@ follows from ordinary no-attestation enrollment.
 
 Enrollment preserves the initiating session's existing assurance and authentication
 time. It does not silently upgrade a mailbox session to passkey assurance. Normal
-server composition stays disabled until sign-in and the stronger-account policy
-prevent mailbox/password recovery from bypassing a stronger account. Passkey-first
-accounts require a real account-model/enrollment change, not a placeholder email.
+server composition stays disabled pending reviewed recovery/activation and the
+remaining M03 evidence. Email-free passkey-required signup is a separate implemented
+flow; it never fabricates an address.
 
 ## Verification and remaining work
 

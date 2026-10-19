@@ -2,6 +2,7 @@ mod authentication;
 mod authentication_protocol;
 mod concurrency;
 mod enrollment;
+mod enrollment_authority;
 mod limits;
 mod management;
 mod protocol;
@@ -19,7 +20,9 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use url::Url;
 use uuid::Uuid;
-use webauthn_authenticator_rs::{WebauthnAuthenticator, softtoken::SoftToken};
+use webauthn_authenticator_rs::{
+    AuthenticatorBackend, WebauthnAuthenticator, softtoken::SoftToken,
+};
 
 const ORIGIN: &str = "https://login.example.com";
 const SOURCE: &str = "127.0.0.1";
@@ -61,12 +64,43 @@ impl Fixture {
     }
 
     async fn begin(&self) -> (Uuid, PasskeyRegistrationResponse) {
+        let (id, response, _) = self.begin_with_token().await;
+        (id, response)
+    }
+
+    async fn begin_with_token(&self) -> (Uuid, PasskeyRegistrationResponse, SoftToken) {
         let pending = self
             .enrollment
             .begin(&self.session, &self.browser, SOURCE, "Security key")
             .await
             .unwrap();
-        (pending.transaction, register(pending.options, ORIGIN, true))
+        let (mut token, _) = SoftToken::new(true).unwrap();
+        let response = token
+            .perform_register(ORIGIN.parse().unwrap(), pending.options.public_key, 120_000)
+            .unwrap();
+        (pending.transaction, response, token)
+    }
+
+    async fn sign_in_with_key(&self, token: &mut SoftToken) -> Secret {
+        use auth_core::Repository;
+        let owner = self
+            .store
+            .authenticate(self.realm, self.session.verifier())
+            .await
+            .unwrap()
+            .id;
+        let flow =
+            auth_core::PasskeySignIn::new(self.realm, self.service.clone(), self.store.clone());
+        let pending = flow
+            .begin_account(owner, &self.browser, SOURCE)
+            .await
+            .unwrap();
+        let response = token
+            .perform_auth(ORIGIN.parse().unwrap(), pending.options.public_key, 120_000)
+            .unwrap();
+        flow.finish(&self.browser, SOURCE, pending.transaction, &response)
+            .await
+            .unwrap()
     }
 }
 

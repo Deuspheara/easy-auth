@@ -30,21 +30,29 @@ pub struct PasskeyEnrollmentStart {
 
 #[async_trait]
 pub trait PasskeyRepository: Send + Sync {
+    /// Lock the exact live/fresh owner/session and call the shared enrollment
+    /// authority policy using its stored method and realm-wide key presence.
+    /// Known mailbox/password methods bootstrap only the first key; unknown
+    /// methods never bind a key. Finish-time checks must repeat this decision.
     async fn enrollment_context(
         &self,
         realm: Uuid,
         session: Verifier,
         rp_id: &str,
     ) -> Result<PasskeyEnrollmentContext>;
-    /// Revalidate fresh ownership, enforce admission and persist private state with database expiry.
+    /// Revalidate method/ownership under locks, enforce admission, persist private
+    /// state and recheck the original authentication deadline after all writes.
     async fn save_enrollment(&self, pending: PasskeyEnrollmentStart) -> Result<()>;
-    /// Admit verification and load only a fresh, session/browser/realm-bound unexpired ceremony.
+    /// Admit verification and load only a fresh, appropriately authenticated,
+    /// session/browser/realm-bound unexpired ceremony; cap the final read/admission.
     async fn load_enrollment(
         &self,
         request: &PasskeyEnrollmentRequest,
     ) -> Result<PrivatePasskeyRegistration>;
     /// Recheck the exact verified state, ownership, freshness, expiry and limits under locks;
-    /// consume, insert the RP-unique credential and record audit in one transaction.
+    /// repeat additional-enrollment authority, consume, insert the RP-unique key
+    /// and record audit atomically. Original proof/session deadlines cap all final
+    /// writes, including proof consumption itself.
     async fn commit_enrollment(
         &self,
         request: &PasskeyEnrollmentRequest,

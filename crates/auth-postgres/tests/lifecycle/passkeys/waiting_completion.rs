@@ -25,7 +25,7 @@ async fn unchanged_pending_row_wait_cannot_extend_enrollment_expiry(pool: PgPool
     });
     wait_for_lock(
         &pool,
-        "%SELECT label FROM auth_passkey_enrollments%FOR UPDATE%",
+        "%SELECT label,%FROM auth_passkey_enrollments%FOR UPDATE%",
     )
     .await;
     wait_expired(&pool, id).await;

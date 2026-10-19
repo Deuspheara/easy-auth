@@ -54,8 +54,14 @@ async fn rp_wide_duplicate_in_another_realm_rolls_back_consumption(pool: PgPool)
 
 #[sqlx::test(migrations = "./migrations")]
 async fn concurrent_last_slot_cannot_exceed_account_credential_limit(pool: PgPool) {
-    let f = Fixture::new(pool.clone()).await;
-    for _ in 0..9 {
+    let mut f = Fixture::new(pool.clone()).await;
+    let (first, response, mut token) = f.begin_with_token().await;
+    f.enrollment
+        .finish(&f.session, &f.browser, SOURCE, first, &response)
+        .await
+        .unwrap();
+    f.session = f.sign_in_with_key(&mut token).await;
+    for _ in 0..8 {
         let (id, response) = f.begin().await;
         f.enrollment
             .finish(&f.session, &f.browser, SOURCE, id, &response)
@@ -89,12 +95,13 @@ async fn concurrent_last_slot_cannot_exceed_account_credential_limit(pool: PgPoo
 
 #[sqlx::test(migrations = "./migrations")]
 async fn deletion_cascades_credentials_state_and_audit_attribution(pool: PgPool) {
-    let f = Fixture::new(pool.clone()).await;
-    let (id, response) = f.begin().await;
+    let mut f = Fixture::new(pool.clone()).await;
+    let (id, response, mut token) = f.begin_with_token().await;
     f.enrollment
         .finish(&f.session, &f.browser, SOURCE, id, &response)
         .await
         .unwrap();
+    f.session = f.sign_in_with_key(&mut token).await;
     f.begin().await;
     let proof = Secret::generate().unwrap();
     f.store

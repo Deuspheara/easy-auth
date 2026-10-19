@@ -187,3 +187,45 @@ async fn failed_notice_write_returns_generic_unavailable_without_cookie_or_sessi
         StatusCode::UNAUTHORIZED
     );
 }
+
+#[sqlx::test(migrations = "../auth-postgres/migrations")]
+async fn an_existing_key_requires_passkey_proof_for_additional_http_enrollment(pool: PgPool) {
+    let f = Fixture::new(pool, false).await;
+    let body = serde_json::json!({"label":"Additional key"}).to_string();
+    assert_eq!(
+        f.get("/v1/session", &f.mailbox_cookie).await.status(),
+        StatusCode::OK,
+        "mailbox account policy remains unchanged"
+    );
+    let denied = f
+        .app
+        .clone()
+        .oneshot(post(
+            "/v1/passkeys/enrollment/start",
+            &body,
+            Some(&f.mailbox_cookie),
+            Some(ORIGIN),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(denied.status(), StatusCode::UNAUTHORIZED);
+    assert!(denied.headers().get(header::SET_COOKIE).is_none());
+    assert_eq!(
+        json(denied).await,
+        serde_json::json!({"code":"authentication_required"})
+    );
+    assert_eq!(
+        f.app
+            .clone()
+            .oneshot(post(
+                "/v1/passkeys/enrollment/start",
+                &body,
+                Some(&f.cookie()),
+                Some(ORIGIN)
+            ))
+            .await
+            .unwrap()
+            .status(),
+        StatusCode::OK
+    );
+}

@@ -3,8 +3,8 @@ use auth_core::{Error, PasskeyRepository, Repository};
 
 #[sqlx::test(migrations = "./migrations")]
 async fn valid_signed_enrollment_is_bound_single_use_and_audited(pool: PgPool) {
-    let f = Fixture::new(pool.clone()).await;
-    let (id, response) = f.begin().await;
+    let mut f = Fixture::new(pool.clone()).await;
+    let (id, response, mut token) = f.begin_with_token().await;
     let wrong_browser = Secret::generate().unwrap();
     assert!(matches!(
         f.enrollment
@@ -60,12 +60,26 @@ async fn valid_signed_enrollment_is_bound_single_use_and_audited(pool: PgPool) {
     let event: (i16, bool, bool) = sqlx::query_as("SELECT schema_version,actor_session_id IS NOT NULL,session_id IS NULL FROM auth_audit WHERE realm_id=$1 AND kind='passkey_enrolled'")
         .bind(f.realm).fetch_one(&pool).await.unwrap();
     assert_eq!(event, (1, true, true));
+    let mailbox = Secret::parse(f.session.expose().to_owned()).unwrap();
+    assert!(matches!(
+        f.store
+            .enrollment_context(f.realm, mailbox.verifier(), f.service.rp_id())
+            .await,
+        Err(Error::Unauthorized)
+    ));
+    f.session = f.sign_in_with_key(&mut token).await;
     let context = f
         .store
         .enrollment_context(f.realm, f.session.verifier(), f.service.rp_id())
         .await
         .unwrap();
     assert_eq!(context.excluded_credentials.len(), 1);
+    assert!(
+        f.store
+            .authenticate(f.realm, mailbox.verifier())
+            .await
+            .is_ok()
+    );
     assert!(
         f.store
             .authenticate(f.realm, f.session.verifier())

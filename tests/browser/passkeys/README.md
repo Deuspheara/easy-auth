@@ -38,6 +38,11 @@ mail transport is explicitly unavailable. Passwords are configured so native
 passkey-required password-enrollment denial exercises policy rather than a disabled
 feature. All actual credential JSON goes through the shared core/PostgreSQL flow.
 
+The platform/USB registration cases also require a second enrollment start with
+the original mailbox session to return 401. The real SMTP management cases prove
+additional enrollment succeeds after a genuine assertion with the initial key.
+Neither fixture invents passkey-session provenance for these controls.
+
 After registration, twelve additional cases log out the seeded session, sign real
 assertions, complete the HTTP transaction and verify the protected session. They
 cover internal/USB nonresident account-bound login, modal resident discovery,

@@ -178,3 +178,11 @@ cleared after commit). All require genuinely fresh passkey-method authority;
 mutations require exact Origin and closed JSON within 8 KiB. Stale/foreign/last-
 working-key targets use generic 401; storage failure uses generic 503 and returns
 no success cookie. Ordinary and earlier experimental constructors remain unchanged.
+
+Additional passkey enrollment now requires genuine fresh passkey-method authority
+once the owner has any key in the realm, even for another configured RP. The first
+key may bootstrap from a known fresh email/password method; unknown legacy methods
+are rejected. All repository stages recheck under owner/session locks and retain
+original deadlines through final writes/consumption. Registration does not change
+account policy or issue stronger session provenance. Existing generic 401 responses
+and wire schemas are unchanged. See the [enrollment guide](../guides/passkey-enrollment.md).

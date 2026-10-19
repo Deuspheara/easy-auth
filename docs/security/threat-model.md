@@ -121,3 +121,13 @@ original exclusion/residence/UV options and actual signatures, including a remov
 key rejection and valid surviving-key retry. Fixed verified-contact notifications
 now have real SMTP worker evidence. Recovery, activation and physical-device/
 other-browser acceptance remain open; these tests do not prove them.
+
+Additional enrollment requires actual fresh passkey-method proof once any key
+exists for the realm/owner, including another RP. All four repository stages
+re-read this under owner/session locks; preflight or preverified mailbox ceremonies
+cannot bypass a newly committed key. Only known email/password methods can bootstrap
+a first key; legacy timestamps do not prove a method. Owner serialization permits
+one initial-bootstrap winner. Original session/proof caps follow preparation,
+admission and final consumption writes. This closes enrollment authority only;
+reviewed recovery, stronger-policy activation and physical-device evidence remain
+AUTH-20 acceptance work.

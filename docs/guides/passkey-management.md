@@ -23,8 +23,8 @@ ceremony bytes are exposed. Inventory does not refresh authentication time.
 Rename accepts the exact current version and a nonblank, bounded, control-free
 label. It returns a new version; concurrent/stale metadata requests cannot silently
 overwrite one another. Removal also requires the current version and leaves another
-key in that realm/account/RP which has actually authenticated. Register and then
-sign in with a replacement before removing the prior working key. Merely creating
+key in that realm/account/RP which has actually authenticated. Sign in with an existing key to authorize additional enrollment, then
+sign in with the replacement before removing the prior working key. Merely creating
 a credential is not evidence that its owner can use it. Last-proven-key removal
 is denied for both mailbox and passkey-required accounts.
 

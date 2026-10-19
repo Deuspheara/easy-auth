@@ -29,7 +29,7 @@ pub use passkeys::{
     PasskeySignupAssertion, PasskeySignupCreation, PasskeySignupRegistrationContext,
     PasskeySignupRepository, PasskeySignupRequest, PasskeySignupStart,
     PrivatePasskeyAuthentication, PrivatePasskeyRegistration, StoredPasskey, VerifiedPasskey,
-    VerifiedPasskeyAuthentication, VerifiedPasskeySignupRegistration,
+    VerifiedPasskeyAuthentication, VerifiedPasskeySignupRegistration, authorize_passkey_enrollment,
 };
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};

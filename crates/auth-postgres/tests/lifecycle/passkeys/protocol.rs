@@ -4,9 +4,9 @@ use serde_cbor_2::Value;
 
 #[sqlx::test(migrations = "./migrations")]
 async fn rejects_contradictory_or_oversized_public_envelopes(pool: PgPool) {
-    let f = Fixture::new(pool).await;
+    let mut f = Fixture::new(pool).await;
     for scenario in ["type", "raw-id", "id", "oversize"] {
-        let (id, good) = f.begin().await;
+        let (id, good, mut token) = f.begin_with_token().await;
         let mut bad = good.clone();
         match scenario {
             "type" => bad.type_ = "password".to_owned(),
@@ -31,6 +31,7 @@ async fn rejects_contradictory_or_oversized_public_envelopes(pool: PgPool) {
                 .is_ok(),
             "{scenario} positive control"
         );
+        f.session = f.sign_in_with_key(&mut token).await;
     }
 }
 
@@ -79,14 +80,21 @@ async fn unsigned_attestation_still_requires_user_presence(pool: PgPool) {
 
 #[sqlx::test(migrations = "./migrations")]
 async fn rejects_wrong_challenge_origin_rp_and_missing_verification(pool: PgPool) {
-    let f = Fixture::new(pool).await;
+    let mut f = Fixture::new(pool).await;
     for scenario in ["challenge", "origin", "rp", "uv"] {
         let pending = f
             .enrollment
             .begin(&f.session, &f.browser, SOURCE, "key")
             .await
             .unwrap();
-        let good = register(pending.options.clone(), ORIGIN, true);
+        let (mut token, _) = SoftToken::new(true).unwrap();
+        let good = token
+            .perform_register(
+                ORIGIN.parse().unwrap(),
+                pending.options.public_key.clone(),
+                120_000,
+            )
+            .unwrap();
         let mut options = pending.options;
         let bad = match scenario {
             "challenge" => {
@@ -122,6 +130,7 @@ async fn rejects_wrong_challenge_origin_rp_and_missing_verification(pool: PgPool
                 .is_ok(),
             "{scenario} positive control"
         );
+        f.session = f.sign_in_with_key(&mut token).await;
     }
 }
 

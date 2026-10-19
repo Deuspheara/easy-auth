@@ -1,6 +1,7 @@
 # ADR 0011: Passkey management and recovery authority
 
-Status: management boundary accepted for implementation in AUTH-20, 2026-10-19.
+Status: experimental management and additional-enrollment boundaries implemented
+in AUTH-20, 2026-10-19.
 Recovery design and ordinary activation remain incomplete; this is not acceptance
 of the full ticket or an assurance/conformance claim.
 
@@ -33,11 +34,26 @@ verified contact in the same transaction. Email-free users have audit/inventory
 visibility and no fabricated email delivery. This limited notification capability
 must remain explicit; general recovery needs an independently reviewed policy.
 
+## Additional enrollment authority
+
+Core owns the method rule; trusted PostgreSQL stages apply it after locking the
+exact owner/session and rereading realm-wide credential presence. Known email or
+password proof can bootstrap the first key. Any existing owned key requires genuine
+fresh passkey-method proof, including enrollment for another RP. Unknown legacy
+provenance never suffices. Context, save, load and commit share this rule; the owner
+lock serializes competing initial enrollments and credential mutations. Registration
+alone preserves policy/method/time. A retained initial key must perform an actual
+assertion before it authorizes adding another key.
+
+Each stage checks original session deadlines after its writes. Final completion
+also retains locked ceremony expiry and performs a table-free check after the
+conditional consumption itself; a write-trigger wait cannot extend either deadline.
+
 ## Remaining recovery and activation work
 
 AUTH-20 retains pre-enrolled independent recovery proof, single-use/expiry,
 explicit delay/cancellation, notifications where a verified channel exists, audit,
-additional-enrollment authority, safe stronger-policy activation and complete
+safe stronger-policy activation and complete
 remaining HTTP/native/physical-device evidence. Mere denial of fallback does not fulfill it.
 A remaining strong key supports normal authentication and replacement enrollment;
 it is not a claim of all-keys-lost recovery.

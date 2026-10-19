@@ -1,4 +1,7 @@
-use super::policy::{admit, credential_limit, fresh_owner};
+use super::{
+    enrollment_authority,
+    policy::{admit, credential_limit},
+};
 use crate::unavailable;
 use auth_core::{
     Error, MAX_PASSKEYS_PER_ACCOUNT, PasskeyEnrollmentContext, PasskeyEnrollmentStart, Result,
@@ -16,7 +19,8 @@ pub(super) async fn context(
     rp_id: &str,
 ) -> Result<PasskeyEnrollmentContext> {
     let mut tx = pool.begin().await.map_err(unavailable)?;
-    let (user_id, _, account_name) = fresh_owner(&mut tx, realm, session).await?;
+    let owner = enrollment_authority::lock(&mut tx, realm, session).await?;
+    let user_id = owner.user;
     credential_limit(&mut tx, realm, user_id, rp_id).await?;
     let excluded_credentials = sqlx::query_scalar(
         r#"
@@ -32,10 +36,11 @@ pub(super) async fn context(
     .fetch_all(&mut *tx)
     .await
     .map_err(unavailable)?;
+    owner.deadline.check(&mut tx).await?;
     tx.commit().await.map_err(unavailable)?;
     Ok(PasskeyEnrollmentContext {
         user_id,
-        account_name,
+        account_name: owner.account_name,
         excluded_credentials,
     })
 }
@@ -44,7 +49,8 @@ pub(super) async fn save(pool: &PgPool, pending: PasskeyEnrollmentStart) -> Resu
     let encoded = pending.state.encode_for_database()?;
     let request = pending.request;
     let mut tx = pool.begin().await.map_err(unavailable)?;
-    let (user, session, _) = fresh_owner(&mut tx, request.realm, request.session).await?;
+    let owner = enrollment_authority::lock(&mut tx, request.realm, request.session).await?;
+    let (user, session) = (owner.user, owner.session);
     if user != pending.user_id {
         return Err(Error::Unauthorized);
     }
@@ -90,5 +96,6 @@ pub(super) async fn save(pool: &PgPool, pending: PasskeyEnrollmentStart) -> Resu
     .execute(&mut *tx)
     .await
     .map_err(unavailable)?;
+    owner.deadline.check(&mut tx).await?;
     tx.commit().await.map_err(unavailable)
 }

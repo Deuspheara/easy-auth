@@ -210,3 +210,11 @@ this ordered composition visible avoids hiding startup/route ownership in a gene
 builder. It contains no SQL or duplicated authentication policy. Native management
 likewise keeps the virtual-device selection/action/assert sequence together while
 using a separate fixture module from mail access and case orchestration.
+
+Additional enrollment uses a small core method policy and PostgreSQL
+`passkeys/enrollment_authority.rs` for locked owner/session and realm-wide key
+state. Preparation/completion keep their transactions and final clock checks visible.
+Tests under `passkeys/enrollment_authority/` separate stage/realm/provenance
+boundaries, the bootstrap race and observed write/owner waits. Positive fixtures
+retain their software authenticator and perform real assertions; they do not
+fabricate stronger session provenance to continue enrollment.

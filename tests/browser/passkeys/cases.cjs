@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 const http = require('node:http');
-const {START, FINISH, start, create, goodCredential, finish, withAuthenticator, networkStatus} = require('./browser.cjs');
+const {START, FINISH, post, start, create, goodCredential, finish, withAuthenticator, networkStatus} = require('./browser.cjs');
 
 async function runCases(browser, origin, sessions) {
   const results = [];
@@ -19,6 +19,8 @@ async function runCases(browser, origin, sessions) {
       const credential = await goodCredential(page, pending);
       await finish(page, pending, credential);
       await finish(page, pending, credential, 401);
+      const denied = await post(page, START, {label: 'Unproved additional enrollment'});
+      assert.equal(denied.status, 401, 'recent mailbox session cannot add another key');
       const cookies = await context.cookies();
       const binding = cookies.find(cookie => cookie.name === 'auth-passkey');
       assert.equal(Boolean(binding), true, 'binding cookie set');

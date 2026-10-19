@@ -709,3 +709,63 @@ corrected to match its filename. Recovery, stronger additional-enrollment/activa
 policy, ordinary activation and required physical-device/other-browser evidence
 remain unfinished; this checkpoint does not establish their completion or any
 production, independent-review, assurance-level or conformance claim.
+
+
+## AUTH-20 additional-enrollment authority — 2026-10-19
+
+AUTH-20 remains **In Progress**. The core method rule now distinguishes known
+first-key bootstrap from adding keys to an existing realm/account. Any existing
+key, including another RP, requires a genuine fresh passkey-method session.
+Unknown legacy provenance is rejected even for bootstrap. Context, save, load and
+commit apply the same rule after owner/session locks and a new statement reads
+current key presence. Registration changes neither account policy nor method/time.
+Original session caps follow stage writes; completion retains proof expiry and
+checks database wall time after conditional consumption itself.
+
+Four controlled pre-fix cases failed at application assertions: weaker-method
+additional enrollment, another-RP bypass, concurrent first-key bootstrap and
+preparation expiry during an observed insert wait. This does not claim every
+later assertion in their multi-stage cases was independently reproduced red.
+The expanded seven PostgreSQL cases now also cover recent legacy denial, a key
+committed during an unchanged-owner wait and proof expiry during a final-delete
+trigger wait. The latter are added guard coverage, not independently recorded
+pre-fix reproductions. Exact Unauthorized is required; infrastructure errors are
+never accepted as race losers or authorization rejections.
+
+Existing protocol negatives, valid retries, last-slot races and deletion assertions
+remain intact. Their positive fixtures now retain their authenticator and perform
+actual signed authentication before additional enrollment. A new HTTP test keeps
+the original mailbox session valid for ordinary session retrieval while requiring
+401/no success cookie for additional enrollment, with a genuine passkey control.
+
+Final local verification with the documented real PostgreSQL 17.11/Mailpit setup:
+
+- `cargo fmt --all -- --check` and strict locked workspace/all-target Clippy with
+  default and all features pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 tests pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **190 tests pass** (2 Axum unit, 31 HTTP/database, 10 core, 147 PostgreSQL).
+  The logging subprocess repeats one already-counted core case. No failures or
+  ignored tests in the successful full suites.
+- Freshly rebuilt pinned native suites pass **31 Chromium cases and 2 real-SMTP
+  cases**, including mailbox-session denial and real assertion-authorized additional
+  enrollment. Source and binary hashes match the saved
+  [browser report](../../tests/browser/passkeys/results/2026-10-19/chromium-enrollment-authority.json)
+  and [SMTP report](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-enrollment-authority.json).
+  Both owned databases are removed; exactly seven owned SMTP messages are removed.
+  The SMTP aggregate retains two proven surviving keys, two renames/removals,
+  eight actual authentication facts and zero weaker sessions/pending notices.
+- Standalone and embedded `scripts/smoke.py --password --recovery --sessions
+  --lifecycle` pass with real SMTP and owned database cleanup.
+- Compiled dependency audit, all-feature cargo-deny and low-threshold npm audit
+  pass. The inactive SQLx/MySQL rsa advisory remains visible. No dependency or
+  migration changes are introduced by this enrollment-authority boundary. A redacted
+  Gitleaks scan of the complete staged diff also passes.
+
+The method policy and locked database state each have a focused module; existing
+preparation/completion retain transaction boundaries and final checks. New files
+remain under 300 lines. Longer tests/transactions keep their ordered invariants
+visible, following the documented size review exceptions. No structural cleanup
+is deferred by this change. Reviewed recovery proof/delay/cancellation, notification
+limits, safe stronger-policy activation, ordinary composition and physical-device/
+other-browser evidence remain open. These results do not complete AUTH-20 or M03.
