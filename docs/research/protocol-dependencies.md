@@ -6,6 +6,12 @@ no new JOSE/network dependency or custom cryptography is introduced. Provider to
 verification, actual PKCE support, egress and interoperability must still satisfy
 the assessment below. [Transaction ADR](../architecture/adr/0013-oauth-state-transactions.md).
 
+AUTH-23 Google exchange now explicitly depends on AUTH-28's constrained discovery/
+JWKS network boundary as well as AUTH-22. Provider transports must share the reviewed
+egress policy; the milestone labels do not permit a separate permissive Google
+client. This dependency is recorded in Huly and synchronized to the planning export.
+It does not claim that AUTH-28 or provider verification is already implemented.
+
 Assessment date: 2026-10-18. Candidates require lockfile/advisory and license review when actually introduced; version numbers are observations rather than authorization to upgrade blindly.
 
 | Boundary | Candidate/evidence | Decision and gate |
