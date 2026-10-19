@@ -5,3 +5,5 @@ mod types;
 
 pub use contract::passkey_recovery_setup_openapi;
 pub use routing::experimental_passkey_recovery_setup_router;
+
+pub(in crate::passkeys) use routing::setup_routes;

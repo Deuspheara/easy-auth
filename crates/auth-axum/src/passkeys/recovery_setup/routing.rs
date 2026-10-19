@@ -24,6 +24,24 @@ pub fn experimental_passkey_recovery_setup_router(
     management: Arc<PasskeyManagement>,
     setup: Arc<PasskeyRecoverySetup>,
 ) -> Result<Router> {
+    let routes = setup_routes(&auth, &browser, setup)?;
+    Ok(super::super::management::configured_management_router(
+        auth,
+        browser,
+        enrollment,
+        sign_in,
+        signup,
+        management,
+        passkey_recovery_setup_openapi(),
+    )?
+    .merge(routes))
+}
+
+pub(in crate::passkeys) fn setup_routes(
+    auth: &Auth,
+    browser: &BrowserConfig,
+    setup: Arc<PasskeyRecoverySetup>,
+) -> Result<Router> {
     if auth.realm() != setup.realm()
         || Url::parse(browser.origin())
             .map_err(|_| Error::InvalidInput)?
@@ -51,14 +69,5 @@ pub fn experimental_passkey_recovery_setup_router(
             setup,
             browser: browser.clone(),
         });
-    Ok(super::super::management::configured_management_router(
-        auth,
-        browser,
-        enrollment,
-        sign_in,
-        signup,
-        management,
-        passkey_recovery_setup_openapi(),
-    )?
-    .merge(routes))
+    Ok(routes)
 }
