@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oauth-transactions = ["dep:url"]
 passkeys = ["dep:webauthn-rs", "dep:serde_json", "dep:url", "dep:tracing"]
 
 [dependencies]

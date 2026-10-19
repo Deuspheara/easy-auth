@@ -1,5 +1,17 @@
 # Code organization
 
+AUTH-22's optional `oauth/` modules keep core configuration validation, transient
+proofs, repository contract and use cases separate. PostgreSQL `oauth/` owns
+administrative configuration, committed admission, shared fresh-owner/session
+validation and pending transactions. Thin entry modules declare/delegate only;
+the existing deadline type exposes a crate-private cap without duplicating session
+policy. Integration cases under `tests/lifecycle/oauth/` separate binding, linking,
+limits, configuration, concurrency, deterministic ordering, deadlines and upgrade.
+Longer save/take functions retain lock ordering, exact bindings, final clock checks
+and commit in one visible transaction. Ordered race tests retain setup/observation/
+release/assertions together. These are reviewed size exceptions; all new modules
+remain below 300 lines. No unrelated structural cleanup is deferred.
+
 Maintainability is part of correctness: authentication code must be easy to locate, understand and review. The mandatory rules live in [AGENTS.md](../../AGENTS.md#maintainability-and-clean-code) and apply to human and agent contributions.
 
 ## Responsibility boundaries

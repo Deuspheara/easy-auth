@@ -33,6 +33,13 @@ Initial same-origin browser contract. Realm is trusted router configuration. JSO
 
 Planned versioned endpoints: passkey registration/authentication/management, connection-specific OIDC/social start/callback/link/unlink and SAML metadata/ACS. These require concrete OpenAPI schemas and negative tests in their milestones; they are not available by virtue of this document.
 
+AUTH-22 adds an optional core/PostgreSQL OAuth transaction API, documented in the
+[transaction guide](../guides/oauth-transactions.md). It adds no HTTP/OpenAPI route
+or authentication grant. Future OAuth authorization requests carry protocol state,
+nonce and S256 challenge; raw PKCE/session/browser secrets must not enter URLs.
+The private proof transport and actual callback route/issuer parsing are mandatory
+adapter work before exposing provider flows.
+
 Only exact configured Origin is accepted on initial browser POST endpoints, including pre-authentication. Missing/null Origin fails closed, so command-line clients must explicitly send it. No wildcard credentialed CORS. SameSite=Lax, Secure in HTTPS production, HttpOnly, Path=/, no Domain; production session uses __Host- prefix. Dev HTTP is loopback-only and explicitly enabled. Duplicate cookie names/invalid token shapes must be rejected. An Origin guard is appropriate for this constrained same-origin contract; it is not a substitute for OAuth state or SAML correlation.
 
 Outbound issuer (M07) has a distinct protocol contract: registered clients, exact redirects, code + S256, client authentication where applicable, signing keys, discovery, JWKS, audience-bound ID/access tokens, revocation and introspection. First-party alpha session introspection does not constitute OIDC support. Native refresh credentials and cross-origin apps are unavailable until that gate passes.

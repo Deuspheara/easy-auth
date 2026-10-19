@@ -1,5 +1,17 @@
 # Threat model — alpha design, before credential flows
 
+AUTH-22's optional core/PostgreSQL OAuth transaction boundary binds realm,
+connection/client revision, purpose, original linking owner/session and independent
+state/browser/nonce/PKCE verifiers. Required-issuer versus unique dedicated callback
+defense is explicit; a present wrong issuer is always rejected. Raw PKCE is retained
+only by protected transient transport, not persisted in SQL or sent in authorization
+URLs. No HTTP transport exists yet. One-use state consumption grants only exchange
+context, never an identity/session. Configuration disable and final deadlines are
+checked under locks after blocking writes; actual provider identity commit must
+recheck them again after network exchange. Account policy, external token signature/
+nonce validation, final identity/session atomicity, reviewed egress and real-provider
+checks remain release gates. See [ADR 0013](../architecture/adr/0013-oauth-state-transactions.md).
+
 Created 2026-10-18. Not a security audit. Assets: user identity, credential verifiers, active sessions, provider secrets/signing keys, email delivery and audit integrity. Actors: unauthenticated remote attacker, malicious browser origin, malicious configured/unconfigured IdP, compromised mailbox, compromised application/tenant, operator and stolen database/backup. Trust boundaries: browser/HTTP, core/persistence, outbound provider network, SMTP, configuration and application authorization.
 
 | Threat | Required control | Evidence/release gate |

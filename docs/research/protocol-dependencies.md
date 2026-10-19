@@ -1,5 +1,11 @@
 # Protocol dependency assessment
 
+AUTH-22 implements only optional core/PostgreSQL state transactions using existing
+`Secret`, SHA-256/base64url and URL dependencies. The RFC 7636 S256 vector is tested;
+no new JOSE/network dependency or custom cryptography is introduced. Provider token
+verification, actual PKCE support, egress and interoperability must still satisfy
+the assessment below. [Transaction ADR](../architecture/adr/0013-oauth-state-transactions.md).
+
 Assessment date: 2026-10-18. Candidates require lockfile/advisory and license review when actually introduced; version numbers are observations rather than authorization to upgrade blindly.
 
 | Boundary | Candidate/evidence | Decision and gate |

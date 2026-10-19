@@ -1403,3 +1403,73 @@ and native instructions record the limits. Further device prompts or provider/
 security-setting changes were not requested or performed. The Safari/Dashlane
 creation cause, wider device evidence, independent review and safe activation
 remain open; AUTH-20 is still In Progress.
+
+## AUTH-22 OAuth state transaction boundary (2026-10-19)
+
+The optional `oauth-transactions` core/PostgreSQL boundary now has independent
+state/nonce/S256 generation, verifier-only persistence, browser/realm/connection/
+client/revision/purpose binding, explicit callback-issuer/dedicated-route policy,
+original linking-session checks, capacity/admission and atomic consume/cancel.
+It creates no provider identity, application session or authentication audit.
+See [ADR 0013](../architecture/adr/0013-oauth-state-transactions.md) and the
+[guide](../guides/oauth-transactions.md). Migration 0016 is additive; published
+migrations 0001–0015 are unchanged.
+
+Final local commands pass with `CARGO_INCREMENTAL=0` and the documented PostgreSQL
+17.11 setup, running feature variants sequentially:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-postgres --features oauth-transactions --test lifecycle oauth::
+python3 scripts/audit.py
+cargo deny --all-features check
+npm audit --audit-level=low --prefix tests/browser/passkeys
+```
+
+Results: **93 default** and **296 all-feature workspace tests**; the latter comprises
+2 Axum unit, 55 HTTP/database, 12 core and 227 PostgreSQL cases. The logging subprocess
+repeats one included core case. No final failures or ignored cases. The focused
+OAuth-only PostgreSQL run passes **24 cases** without enabling passkeys. Two new
+core cases cover the RFC 7636 S256 vector, secret redaction and exact configuration/
+callback policy. Compiled advisory, license/source/bans and npm checks pass; the
+inactive SQLx/MySQL RSA RUSTSEC-2023-0071 entry stays visible, without an advisory ignore.
+The complete staged change receives redacted Gitleaks scanning before publication.
+
+New PG tests preserve valid controls after wrong state/browser/nonce/PKCE/realm/
+connection/client/purpose and actual callback-route/issuer attempts. They distinguish
+Unauthorized, RateLimited and Unavailable, including an injected database failure.
+Single-winner callback, callback/cancel and concurrent capacity cases assert exact
+loser categories. Observed-lock tests establish both disable orderings and expiry
+during unchanged-row selection, final deletion, row insertion and before the insert
+clock is evaluated. The latter motivated filtering an expired insert rather than
+reporting a schema constraint as Unavailable. Deletion failure rolls back state;
+an upgrade preserves original identity/session/audit data. Linking storage-policy
+fixtures cover stale/revoked/foreign sessions and method rejection for stronger
+email-free users; they are not native authenticator evidence.
+
+Review also made configuration generations non-restorable: every configuration
+write returns a fresh persisted snapshot, disable rotates its revision, reconfiguration
+preserves disable, and explicit re-enable requires the current snapshot. A controlled
+sequence proves an old exchange/configuration cannot become current again afterward.
+Future provider identity commit must still recheck enabled revision and original
+deadline after network exchange. No state claim grants authentication authority.
+
+One preliminary test failed because an email-free fixture inherited the mailbox
+timestamp default. Explicit NULL corrected that fixture; the valid database
+constraint was retained. Independent one-connection lock observers and four test
+workers preserve the SQLx shared harness budget. Infrastructure timeouts cannot
+count as negative-security test successes.
+
+Maintainability review keeps feature configuration/proofs/use cases/port in core,
+configuration/admission/ownership/transactions in PostgreSQL and tests grouped by
+invariant. All new modules are below 300 lines. Longer ordered transactions/races
+retain visible locking, final deadlines, rollback and assertions; the size rationale
+is in code-organization.md. No unrelated structural cleanup is deferred. No new
+dependency, HTTP/OpenAPI route, ordinary activation or provider conformance claim.
+Native suites were not rerun locally for this core/SQL-only change; exact-head hosted
+CI remains a separate publication gate and runs the existing browser/SMTP pipeline.
+AUTH-20's Safari/Dashlane failure and independent recovery review remain open.

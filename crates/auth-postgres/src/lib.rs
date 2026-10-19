@@ -6,6 +6,8 @@ mod email;
 mod identity;
 mod locking;
 mod notifications;
+#[cfg(feature = "oauth-transactions")]
+mod oauth;
 #[cfg(feature = "passkeys")]
 mod passkeys;
 mod passwords;

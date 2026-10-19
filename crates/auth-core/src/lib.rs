@@ -5,6 +5,8 @@ mod email;
 mod error;
 mod identity;
 mod notifications;
+#[cfg(feature = "oauth-transactions")]
+mod oauth;
 #[cfg(feature = "passkeys")]
 mod passkeys;
 mod password;
@@ -18,6 +20,12 @@ pub use email::normalize_email;
 pub use error::{Error, Result};
 pub use identity::{AuthenticationPolicy, User};
 pub use notifications::{SecurityNotice, SecurityNoticeKind};
+#[cfg(feature = "oauth-transactions")]
+pub use oauth::{
+    OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthExchange, OAuthIntent,
+    OAuthMixupDefense, OAuthPurpose, OAuthRequest, OAuthStart, OAuthTransactionRepository,
+    OAuthTransactions,
+};
 #[cfg(feature = "passkeys")]
 pub use passkeys::{
     MAX_PASSKEYS_PER_ACCOUNT, PASSKEY_RECOVERY_DELAY_SECONDS, PASSKEY_RECOVERY_LIFETIME_SECONDS,

@@ -32,6 +32,11 @@ now exposes delayed browser-bound claims and signed replacement completion;
 reference setup/recovery pages now have native Chromium/SMTP coverage. Independent
 review, physical-device/other-browser evidence and ordinary activation remain open.
 
+The optional [OAuth transaction boundary](docs/guides/oauth-transactions.md) now
+persists and consumes browser-bound state with real PostgreSQL regression coverage.
+It provides exchange context only; provider login/linking and their HTTP/native
+transports remain unimplemented.
+
 ## Run locally
 
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).

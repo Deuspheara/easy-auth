@@ -9,6 +9,10 @@ use uuid::Uuid;
 pub(crate) struct Deadline(i64);
 
 impl Deadline {
+    #[cfg(feature = "oauth-transactions")]
+    pub(crate) fn expires_us(&self) -> i64 {
+        self.0
+    }
     /// Caller obtained this expiry from an exact, locked/consumed proof row.
     pub(crate) fn proof(expires_us: i64) -> Self {
         Self(expires_us)
