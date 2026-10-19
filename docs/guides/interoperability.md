@@ -84,3 +84,7 @@ counterless test's one trusted storage setup remains limited to its old seeded
 account; anonymous signup has no such setup or preissued session. No private key
 is exported. Physical authenticators, other browsers, verified contact attachment
 and stronger-account recovery remain separate gates.
+
+The [canonical signup record](../../tests/browser/passkeys/results/2026-10-19/chromium-signup.json)
+records producer `d217189ac92c0bc599ff304ab072551835ad1ee9`, 224 verified source
+hashes, the actual executable hash and successful exact database cleanup.

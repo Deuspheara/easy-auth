@@ -344,3 +344,54 @@ stage advancement and one visible atomic completion transaction. The deliberate
 transaction size exceptions are documented in code-organization.md. Default HTTP
 composition/OpenAPI remain unchanged by this core checkpoint. Hosted exact-head
 results and publication are tracked in Huly; release gates remain open.
+
+## AUTH-53 experimental HTTP/native signup — 2026-10-19
+
+Producer `d217189ac92c0bc599ff304ab072551835ad1ee9` adds explicit
+`passkey-signup` composition, three strict anonymous signup routes and the fourth
+full OpenAPI snapshot. Separate refactor `9009e74` passed the existing adapter
+tests, strict lint and 20 native regressions before behavior changes. Neither
+the ordinary server/router nor earlier experimental constructors enable signup
+implicitly. Verified-mailbox attachment and AUTH-20 recovery/management remain open.
+
+- Final default workspace **69** and all-feature workspace **134** unique cases
+  pass sequentially (all features: adapter unit 2, HTTP/database 20, core 10,
+  PostgreSQL 102). The logging body runs in its isolated child and counts once.
+  Three new HTTP cases cover exact Origin, malformed/unknown/duplicate session
+  cookies, closed inputs, no client owner/email/RP/residence override, distinct
+  32 KiB transport/256-byte label bounds, no pre-proof identity/session/fact,
+  stage/binding rejection, concrete live/published schema and startup binding.
+  The final focused boundary rerun and full all-feature rerun both pass.
+- The canonical [native signup record](../../tests/browser/passkeys/results/2026-10-19/chromium-signup.json)
+  has **31 passing Chromium 156.0.8078.4 / Playwright 1.64.1 cases**. Its 224 source
+  hashes match producer d217189, and its binary hash matches the newly checked
+  example build. Eleven new cases begin with NO seeded session and retain original
+  resident/required-UV options. Platform/internal and roaming/USB authenticators
+  prove signup, protected null-email retrieval and later bound/modal-discovery
+  login. The returned user UUID equals the server-selected creation handle.
+- New native negatives include registration challenge/origin/RP/UV, actual signed
+  assertion UP/UV/signature, replay after clearing the session, other-browser binding,
+  existing live-session confusion and genuine signed cross-origin iframe context.
+  Valid controls complete. Passwords are configured in the fixture so a stronger
+  user's password-enrollment 401 tests policy, not a disabled feature. Existing
+  mailbox lifecycle paths also deny the stronger account.
+- Database totals: 31 credentials, 20 existing enrollment audits, 11 email-free
+  passkey-required users/signup audits, 17 authentication audits, 28 total passkey
+  sessions, 27 authentication-finish and 33 signup-finish admissions, zero pending
+  enrollment/authentication/signup, one backed-up and one used-zero-counter key.
+  The old counterless storage fixture stays limited to its old seeded account;
+  anonymous signup has no such setup. Exact fixture database removal is reported
+  and independently confirmed by a zero browser-DB catalog count.
+- Fmt, strict all-target/all-feature Clippy, compiled-advisory and cargo-deny pass.
+  Source scans with Gitleaks 8.24.3 and 8.30.1 pass. No dependency versions/lockfile,
+  published migrations, prior browser artifacts or scanner/advisory policy changed.
+  CI now builds the example with its required signup feature and exercises the
+  same expanded native suite. Hosted exact-head status is tracked in Huly.
+
+Signup handlers/types/composition/contract live in a focused feature folder.
+Browser signup cases and ceremony helpers likewise have their own folder; fixture
+summary queries are separate. Canonical wire schemas are shared with narrow
+parent-feature visibility. HTTP-only cookie anonymity remains in transport, while
+proof, rate and transaction policy stays in core/PostgreSQL. Full M03, real hardware,
+other browsers, contact attachment, recovery and later release milestones remain
+unfinished; these results imply no production or conformance claim.
