@@ -46,7 +46,19 @@ pub(crate) async fn fresh_account(
             .await
             .map_err(unavailable)?
             .ok_or(Error::Unauthorized)?;
-    let session: Uuid = sqlx::query_scalar(
+    let session = fresh_session(tx, realm, user, current).await?;
+    Ok((user, session))
+}
+
+/// Caller must already hold this user's row lock. Keep user-before-session ordering
+/// and evaluate freshness only after waiting for the user lock.
+pub(crate) async fn fresh_session(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    realm: Uuid,
+    user: Uuid,
+    current: Verifier,
+) -> Result<Uuid> {
+    sqlx::query_scalar(
         r#"
         SELECT id
         FROM auth_sessions
@@ -68,6 +80,5 @@ pub(crate) async fn fresh_account(
     .fetch_optional(&mut **tx)
     .await
     .map_err(unavailable)?
-    .ok_or(Error::Unauthorized)?;
-    Ok((user, session))
+    .ok_or(Error::Unauthorized)
 }

@@ -1,4 +1,4 @@
-use crate::unavailable;
+use crate::{locking::fresh_session, unavailable};
 use auth_core::{Error, MAX_PASSKEYS_PER_ACCOUNT, Result, Verifier};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
@@ -27,24 +27,7 @@ pub(super) async fn fresh_owner(
     .await
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
-    let session = sqlx::query_scalar(
-        r#"
-        SELECT id FROM auth_sessions
-        WHERE realm_id=$1 AND user_id=$2 AND token_hash=$3 AND revoked_at IS NULL
-          AND expires_at>clock_timestamp()
-          AND last_seen_at>clock_timestamp()-interval '30 minutes'
-          AND authenticated_at>clock_timestamp()-interval '5 minutes'
-          AND authenticated_at<=clock_timestamp()
-        FOR UPDATE
-        "#,
-    )
-    .bind(realm)
-    .bind(user)
-    .bind(current.as_slice())
-    .fetch_optional(&mut **tx)
-    .await
-    .map_err(unavailable)?
-    .ok_or(Error::Unauthorized)?;
+    let session = fresh_session(tx, realm, user, current).await?;
     Ok((user, session, email))
 }
 
