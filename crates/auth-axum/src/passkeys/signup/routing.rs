@@ -22,6 +22,24 @@ pub fn experimental_passkey_signup_router(
     sign_in: Arc<PasskeySignIn>,
     signup: Arc<PasskeySignup>,
 ) -> Result<Router> {
+    let routes = signup_routes(&auth, &browser, signup)?;
+    let enrollment = super::super::routing::enrollment_routes(&auth, &browser, enrollment)?;
+    let authentication =
+        super::super::authentication::authentication_routes(&auth, &browser, sign_in)?;
+    let attachment = super::super::email_attachment::routes(&auth, &browser);
+    Ok(configured_router(auth, browser, passkey_signup_openapi())
+        .merge(enrollment)
+        .merge(authentication)
+        .merge(attachment)
+        .merge(routes))
+}
+
+/// Shared route composition; startup identity/origin validation stays explicit.
+pub(in crate::passkeys) fn signup_routes(
+    auth: &Auth,
+    browser: &BrowserConfig,
+    signup: Arc<PasskeySignup>,
+) -> Result<Router> {
     if auth.realm() != signup.realm()
         || Url::parse(browser.origin())
             .map_err(|_| Error::InvalidInput)?
@@ -30,15 +48,11 @@ pub fn experimental_passkey_signup_router(
     {
         return Err(Error::InvalidInput);
     }
-    let enrollment = super::super::routing::enrollment_routes(&auth, &browser, enrollment)?;
-    let authentication =
-        super::super::authentication::authentication_routes(&auth, &browser, sign_in)?;
     let base = AppState {
         auth: auth.clone(),
         browser: browser.clone(),
     };
-    let attachment = super::super::email_attachment::routes(&auth, &browser);
-    let routes = Router::new()
+    Ok(Router::new()
         .route("/v1/passkeys/signup/start", post(handlers::start))
         .route(
             "/v1/passkeys/signup/registration",
@@ -47,10 +61,5 @@ pub fn experimental_passkey_signup_router(
         .route("/v1/passkeys/signup/finish", post(handlers::finish))
         .layer(DefaultBodyLimit::max(32 * 1024))
         .layer(middleware::from_fn_with_state(base.clone(), boundary))
-        .with_state(SignupState { base, signup });
-    Ok(configured_router(auth, browser, passkey_signup_openapi())
-        .merge(enrollment)
-        .merge(authentication)
-        .merge(attachment)
-        .merge(routes))
+        .with_state(SignupState { base, signup }))
 }
