@@ -46,6 +46,11 @@ pub struct OidcDocuments {
 }
 
 impl OidcDocuments {
+    #[cfg(feature = "oidc-verification")]
+    pub(super) fn connection(&self) -> &OAuthConnection {
+        &self.connection
+    }
+
     pub fn new(
         connection: OAuthConnection,
         origins: &[&str],

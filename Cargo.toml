@@ -30,6 +30,7 @@ url = "2"
 unicode-normalization = "0.1.24"
 zeroize = "1"
 ipnet = "=2.12.2"
+josekit = { version = "=0.10.3", default-features = false }
 reqwest = { version = "=0.13.5", default-features = false, features = ["rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 webpki-roots = "1"

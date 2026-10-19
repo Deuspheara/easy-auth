@@ -28,8 +28,8 @@ assurance or choose a weaker flow. Missing S256 cannot justify a `plain` fallbac
 is redacted; use `as_bytes()` only at the reviewed backend verifier boundary. Known
 private/symmetric key parameters are rejected before caching. A successful fetch
 does not establish a valid algorithm/key/signature/claim or provider identity.
-The selected verifier must still reject ambiguity and validate all token claims,
-and final authentication commit must recheck current configuration/deadlines.
+The optional [signature/claim verifier](oidc-verification.md) rejects ambiguity and
+validates required token claims; final authentication commit must recheck current configuration/deadlines.
 Do not log response bodies, target URLs, headers or raw HTTP errors.
 
 Two cache slots are scoped to the immutable realm/connection/client/revision.

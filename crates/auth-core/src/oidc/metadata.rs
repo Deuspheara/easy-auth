@@ -6,7 +6,7 @@ use crate::{Error, OAuthConnection, OAuthMixupDefense, Result};
 use serde::Deserialize;
 use std::{fmt, sync::Arc};
 
-const MAX_JWKS_KEYS: usize = 64;
+pub(super) const MAX_JWKS_KEYS: usize = 64;
 const MAX_PKCE_METHODS: usize = 16;
 const MAX_PKCE_METHOD_BYTES: usize = 64;
 const PRIVATE_JWK_FIELDS: &[&str] = &["d", "p", "q", "dp", "dq", "qi", "oth", "k"];

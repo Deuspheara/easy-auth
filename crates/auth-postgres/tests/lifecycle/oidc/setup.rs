@@ -59,6 +59,29 @@ pub(super) struct Fixture {
     pub documents: Arc<OidcDocuments>,
 }
 impl Fixture {
+    #[cfg(feature = "oidc-verification")]
+    pub async fn exchange(&self, purpose: auth_core::OAuthPurpose) -> auth_core::OAuthExchange {
+        let browser = auth_core::Secret::generate().unwrap();
+        let intent = auth_core::OAuthIntent {
+            browser: &browser,
+            source: "oidc-owned-test",
+            purpose,
+        };
+        let flow = auth_core::OAuthTransactions::new(self.connection.clone(), self.store.clone());
+        let start = flow.begin(&intent).await.unwrap();
+        flow.consume(
+            &intent,
+            &start.state,
+            start.proof,
+            auth_core::OAuthCallback {
+                redirect: self.connection.redirect(),
+                issuer: Some(self.connection.issuer()),
+            },
+        )
+        .await
+        .unwrap()
+    }
+
     pub async fn new(pool: PgPool) -> Self {
         let (store, realm) = realm(pool.clone()).await;
         let id = Uuid::new_v4();

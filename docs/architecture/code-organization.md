@@ -343,3 +343,26 @@ post-network registry check and cache replacement together makes their ordering
 explicit. Refresh regressions live in named core and PostgreSQL feature modules.
 The longer core rotation scenario retains exact interval boundaries, coalescing and
 request-count controls together. All affected modules remain below 300 lines.
+
+AUTH-29 signature/claim work lives under core `oidc/verification/`: policy, bounded
+input/header parsing, typed claims, key selection, orchestration, repository port
+and opaque result each have a named module. Entry files only declare/reexport.
+PostgreSQL `oauth/verification.rs` reuses existing configuration and original-owner
+locking/freshness policy, then takes a single post-wait database clock observation.
+No independent account policy, generic crypto plugin or extra crate is introduced.
+Tests group validation, signed-header/key boundaries and rotation separately; PG
+cases group context/realm/revocation and observed lock-wait deadlines.
+
+All new Rust modules remain below 300 lines. The longer selected-key function keeps
+duplicate admission, exact key selection, validated public-component construction
+and the fixed established-library verifier choice visible together. Operation-use
+authorization is a named method, and claim time/audience/attribute checks are separate
+readable methods. Longer security matrices retain valid controls and exact failure
+assertions together; ordered PG cases retain arrange/observe/release/assert steps.
+These are reviewed function-size exceptions, not reason to widen private APIs.
+No unrelated cleanup is deferred.
+
+The native-worker regression uses an owned runtime/queue gate and the actual public
+verification API. It tests cancellation, prompt overload and recovered valid work
+without production hooks or wider implementation visibility. Its longer ordered
+function keeps queue ownership, cleanup and positive controls together.

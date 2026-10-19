@@ -13,3 +13,11 @@ pub use ports::{
     MAX_OIDC_DOCUMENT_BYTES, OIDC_FETCH_TIMEOUT, OidcConnectionRepository, OidcHttp,
     OidcHttpResponse,
 };
+
+#[cfg(feature = "oidc-verification")]
+mod verification;
+#[cfg(feature = "oidc-verification")]
+pub use verification::{
+    OidcExchangeRepository, OidcIdToken, OidcSigningAlgorithm, OidcTokenVerifier,
+    OidcVerificationPolicy, VerifiedOidcIdentity,
+};

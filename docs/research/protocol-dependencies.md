@@ -11,8 +11,8 @@ JWKS network boundary as well as AUTH-22. Provider transports must share the rev
 egress policy; the milestone labels do not permit a separate permissive Google
 client. This dependency is recorded in Huly and synchronized to the planning export.
 AUTH-28 now implements the optional document-fetch boundary described in
-[ADR 0014](../architecture/adr/0014-oidc-egress.md); provider verification remains
-unimplemented.
+[ADR 0014](../architecture/adr/0014-oidc-egress.md). The optional AUTH-29 signature/claim
+boundary is assessed below; code exchange and provider acceptance remain unfinished.
 
 Assessment updated: 2026-10-19. Candidates require lockfile/advisory and license review when actually introduced; version numbers are observations rather than authorization to upgrade blindly.
 
@@ -20,6 +20,7 @@ Assessment updated: 2026-10-19. Candidates require lockfile/advisory and license
 |---|---|---|
 | Passkeys | [webauthn-rs 0.5.5](https://docs.rs/crate/webauthn-rs/0.5.5), native OpenSSL dependency | Prefer high-level safe API; persist private challenge state server-side only; verify UV, origin/RP and discoverable-flow support with browser tests. Do not switch on dangerous credential internals without a reviewed need. MPL-2.0 library license must be recorded; using it does not relicense independent application files. |
 | External OIDC | [openidconnect 4.0.1](https://docs.rs/openidconnect/4.0.1/openidconnect/) | Not selected: an isolated defaults-disabled normal/build graph selects rsa 0.9.10 and fails the compiled advisory gate (RUSTSEC-2023-0071). No ignore or custom verifier is permitted. A reviewed typed verifier must still validate signature, exact issuer, audience/azp and nonce with explicit algorithms; reuse AUTH-28 egress. This selection blocker does not establish Marvin exploitability in public-signature verification. |
+| External JWS boundary | [josekit 0.10.3](https://docs.rs/crate/josekit/0.10.3) | Selected for optional AUTH-29 per-key signatures with mandatory typed core claim policy. Native OpenSSL; combined graph passes advisory/license gates. Code exchange, Keycloak and full provider acceptance remain unfinished. |
 | Apple | [Apple Sign in REST API](https://developer.apple.com/documentation/signinwithapplerestapi) | Separate provider adapter: ES256 client-secret JWT from protected key; Apple ID-token algorithm/key policy separate. App/Services IDs and nonce-bound native code exchanges require real account tests. |
 | Google | [Google OIDC](https://developers.google.com/identity/openid-connect/openid-connect) | Code + S256 + nonce. Trusted issuer/sub identity; email_verified is an attribute, never auto-link authority. Native uses system browser per RFC 8252. |
 | SAML native | [samael 0.0.22](https://docs.rs/crate/samael/0.0.22), [source](https://github.com/njaremko/samael) | Evaluate xmlsec-enabled path, libxml2/entity policy and extraction of verified signed content. Native xmlsec1/OpenSSL/libclang requirements accepted if justified. The docs.rs build failure is an integration risk, not a vulnerability claim. No safe production selection yet. |
@@ -69,9 +70,43 @@ No existing locked package version is removed or upgraded by this addition.
 
 Compiled advisory checks, all-feature cargo-deny licenses/sources/bans and native
 TLS component tests pass. No advisory exception was added; SQLx's inactive MySQL
-RSA finding stays visible. The separate openidconnect candidate experiment does
-not modify the project graph. JOSE selection remains a prerequisite for provider
-verification, rather than a reason to weaken the existing advisory gate.
+RSA finding stays visible. The separate openidconnect candidate experiment
+does not modify the project graph. AUTH-29 selects the per-verifier signature
+dependency below while retaining the existing advisory gate.
 See the [document guide](../guides/oidc-egress.md) for runtime bounds, public-network
 restrictions and the uncancellable native DNS limitation. This selects a document
 transport, not a provider verifier or production interoperability claim.
+
+
+## AUTH-29 selected signature boundary (2026-10-20)
+
+The optional `oidc-verification` feature selects **josekit 0.10.3**, default features
+disabled, MIT OR Apache-2.0, and its existing native OpenSSL family. The actual locked
+workspace retains all prior package versions and adds ten packages, including the
+crate's compression support; application code invokes only bounded compact JWS
+verification, never JWE, unsecured JWT or decompression. No native/crypto plugin,
+custom signature primitive or advisory/allowlist exception is added.
+
+Source review and isolated real RS256/PS256/ES256 controls led to a per-verifier API.
+The alternative jsonwebtoken 11.1.0 AWS-LC probe passed its isolated graph but its
+high-level API selects process-global crypto state. openidconnect 4.0.1 remains
+unselected because its default-disabled compiled graph selects RSA0.9.10 and fails
+the existing advisory gate. This does not establish Marvin exploitability for
+public-signature verification and does not justify an ignore or custom crypto.
+
+The combined workspace compiled advisory check and unchanged cargo-deny license/
+source/bans policy pass. No existing lockfile version is upgraded/removed. josekit's
+[MIT](../security/third-party-licenses/josekit-0.10.3-MIT.txt) and
+[Apache](../security/third-party-licenses/josekit-0.10.3-APACHE.txt) texts are retained
+verbatim; distributions still own applicable transitive/native notices and updates.
+No independent audit, FIPS, conformance or production interoperability is claimed.
+
+Generic payload validation is insufficient: this implementation checks required
+typed original signed claims, duplicate/nullable security members, exact issuer/
+audience/nonce/azp, key-use/algorithm bounds and final database context/deadlines.
+Only validated public components reach the library. Foreign errors are discarded
+without formatting input-derived causes. Native jobs retain bounded leases after
+cancellation; dependency temporary allocations prevent an absolute memory-erasure
+claim. See [ADR 0015](../architecture/adr/0015-oidc-token-verification.md).
+Code exchange, local Keycloak, final identity persistence and independent review
+remain gates; dependency adoption alone completes none of those.

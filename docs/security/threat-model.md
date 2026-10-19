@@ -274,8 +274,9 @@ exhaustion or shutdown delay. Conservative public-address policy and public root
 do not support private-network/private-CA IdPs. No token-controlled URL is fetched.
 
 Discovery and JWKS are untrusted verifier input, not authentication. Known private/
-symmetric key fields are rejected structurally; JOSE/claims/rotation policy remains
-unimplemented. Future final identity/session commit must recheck enabled revision,
+symmetric key fields are rejected structurally. The optional signature/claim layer
+is described below; provider exchange/acceptance remain unfinished. Future final
+identity/session commit must recheck enabled revision,
 original transaction expiry and linking authority under locks. No account linking,
 provider credential handling or permission grant is added. See
 [ADR 0014](../architecture/adr/0014-oidc-egress.md) for explicit limits and remaining
@@ -290,3 +291,27 @@ Refresh repeats realm/configuration checks and uses the same pinned transport wi
 no database lock spanning network work. Token signature/claim validation, one retry
 per consumed transaction and local provider rotation evidence remain required;
 fetching or refreshing a key envelope does not authenticate anyone.
+
+AUTH-29's optional verifier consumes original OAuth exchange authority, validates
+bounded compact JWT/header input, selects only configured asymmetric algorithms and
+exact non-ambiguous public keys, and uses established josekit/OpenSSL verification.
+Embedded keys and token-controlled key URLs are rejected. Critical extensions,
+encryption, compression, none/HMAC and duplicate known security members are rejected. Known-key signature or
+claim failure never refreshes keys; unknown kid gets one bounded refresh/retry.
+
+Required typed issuer/client/nonce/subject/time and audience/azp policy prevent
+issuer, client and transaction substitution. Additional audiences require explicit
+trust. Final database configuration, original expiry and linking-session checks
+follow network/crypto without holding their locks over I/O. Verified results retain
+the minimum original transaction, token expiry and token-age cap; current/future
+freshness cannot extend them. Provider iat is not auth_time, and provider email
+attributes are not local mailbox or linking authority. The result is not a session.
+
+Native crypto work has two shared leases and a whole-operation deadline; canceled
+blocking jobs retain their lease until completion. Raw foreign causes and token/
+claim/key/proof data stay out of diagnostics; temporary dependency buffers prevent
+a whole-process erasure claim. OpenSSL deployment/upgrade and strict clock sync
+remain operational responsibilities. Code+S256 exchange, local Keycloak/independent
+interoperability and final identity/session transactions remain required, as do
+independent review and ordinary activation. See
+[ADR 0015](../architecture/adr/0015-oidc-token-verification.md).

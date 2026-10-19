@@ -41,6 +41,10 @@ The optional [OIDC document client](docs/guides/oidc-egress.md) adds constrained
 HTTPS discovery/JWKS fetching with exact issuer checks, pinned public addresses
 and bounded caches. It creates no identity or session and enables no provider route.
 
+The experimental [OIDC token verifier](docs/guides/oidc-verification.md) now checks
+transaction-bound signatures and required claims. Code exchange, provider login
+and final identity/session issuance remain unfinished.
+
 ## Run locally
 
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).

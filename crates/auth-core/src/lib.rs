@@ -58,3 +58,9 @@ pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
+
+#[cfg(feature = "oidc-verification")]
+pub use oidc::{
+    OidcExchangeRepository, OidcIdToken, OidcSigningAlgorithm, OidcTokenVerifier,
+    OidcVerificationPolicy, VerifiedOidcIdentity,
+};

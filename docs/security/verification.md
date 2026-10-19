@@ -1601,3 +1601,89 @@ implementation's [CI39326434266](https://github.com/Deuspheara/easy-auth/actions
 passed all gates. A later checkpoint cannot inherit that run as proof of its own
 hosted result. Independent review, real provider verification and ordinary activation
 remain open, including the previously recorded Safari/Dashlane failure.
+
+
+## AUTH-29 optional signature/claim checkpoint (2026-10-20)
+
+The explicit `oidc-verification` core/PostgreSQL boundary now consumes a claimed
+OAuth exchange, verifies real compact signatures using pinned josekit0.10.3/OpenSSL,
+checks mandatory typed claims and exact context, and returns an opaque capped
+identity value. It adds no token endpoint exchange, callback, local session/linking
+grant or ordinary activation. AUTH-29 remains in progress pending its full code+
+S256, local Keycloak, provider and final acceptance work. See
+[ADR0015](../architecture/adr/0015-oidc-token-verification.md) and the
+[guide](../guides/oidc-verification.md).
+
+Final checks use `CARGO_INCREMENTAL=0`, the documented PostgreSQL setup and four test
+workers. Database suite variants run sequentially:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked -p easy-auth-core --features oidc-verification oidc::verification::
+cargo test --locked -p easy-auth-postgres --features oidc-verification --test lifecycle oidc::verification
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+python3 scripts/audit.py
+cargo deny --all-features check
+npm audit --audit-level=low --prefix tests/browser/passkeys
+```
+
+Passed: **93 default** and **349 unique all-feature tests** (2 Axum unit, 55 HTTP/DB,
+43 core, 241 PostgreSQL, 8 server). The logging child repeats one included core case.
+Focused verifier passes15 core scenarios; focused PostgreSQL passes7 context cases.
+All final added cases are confirmed by name in the full-suite output. No final
+failures or ignored tests. Formatting, strict default/all-feature all-target lint,
+compiled advisory, license/source/bans and npm gates pass. The all-feature suite was
+repeated after the key-use classification, email-optional and cancellation cases;
+default-feature source was unchanged after its passed run. Complete staged changes
+receive redacted secret scanning before publication. Hosted exact-head CI is a
+separate publication gate; it cannot be inherited from a predecessor.
+
+New15 core scenarios include actual generated RS256/PS256/ES256 positive and wrong-key
+controls, signature-valid original duplicate/extension header/claim bytes, exact
+issuer/client/nonce/audience/azp/time/type failures, explicit algorithm/key-use
+policy, duplicate/malformed key metadata, one real-signature rotation refresh and
+bounded unknown IDs. A controlled owned blocking queue proves canceled native jobs
+retain capacity: overload rejects promptly, then fresh valid work succeeds after
+release. No production hook, permissive verifier, global crypto provider installation
+or user/system security setting is introduced.
+
+Seven new real-PG cases cover exact revision and realm despite identical metadata,
+current database time without auth records, infrastructure failure as Unavailable,
+original linking-session revocation, original expiry after unchanged-configuration
+wait, freshness after unchanged-owner wait, and original linking cap despite a later
+freshness timestamp. Independent lock observation uses one connection; observation
+failure is an explicit infrastructure test failure. No DB lock spans network/crypto.
+
+Review found and fixed two authority distinctions before publication. Verified
+results retain the minimum original OAuth, token expiry and original token-age cap;
+verification cannot restart any window. Optional email is independent of subject
+identity: an absent address remains a valid signed identity but a standalone
+email_verified flag cannot produce a verified email attribute. Malformed flag types
+still reject. No signature, nonce, audience, issuer, context or freshness assertion
+was removed. Valid-but-incompatible key restrictions return Unauthorized, distinct
+from malformed provider material returning Unavailable; a mixed-algorithm negative
+and valid control prove that distinction without forcing refresh.
+
+Initial strict lint found a large private result enum and ignored must-use positive
+results. Claims are now boxed and controls assert the actual subject. Final strict
+lint passes; these were not successful security-negative test results. No final
+operation remains policy-blocked.
+
+The combined graph adds10 packages with no prior locked version removed/upgraded.
+No advisory ignore or license exception was added; SQLx's inactive MySQL RSA entry
+stays visible. josekit's upstream license texts are retained. Native OpenSSL upgrade/
+deployment and strict clock synchronization remain responsibilities. Component
+signatures generated/verified using one library are not independent interoperability
+or audit evidence; real Keycloak code exchange/rotation/replay remains mandatory.
+
+Maintainability: feature-specific policy/input/claims/keys/flow/port/result modules,
+thin entries, private constructors and reused PG configuration/owner policy. All new
+Rust modules remain below300 lines. Selected-key and ordered matrix/queue/wait
+function-size exceptions are justified in code-organization.md. No schema migration,
+HTTP/OpenAPI route, account-policy duplication or unrelated cleanup is introduced.
+Native browser/SMTP scripts were not rerun locally for this optional backend layer;
+hosted CI runs the existing pipeline. Final local identity/session transactions,
+independent review, SAML, outbound issuer and ordinary activation remain gates.

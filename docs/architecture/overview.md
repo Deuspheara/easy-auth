@@ -30,3 +30,11 @@ adapter in the server library. Embedded consumers share that adapter. Short regi
 transactions commit before DNS/HTTPS; cached or fetched documents confer no identity
 authority. No provider route is activated. [ADR 0014](adr/0014-oidc-egress.md) records
 pinning, resource bounds and the native resolver limitation.
+
+The optional `oidc-verification` feature builds on those documents and consumed
+OAuth state. Core uses fixed per-key josekit/OpenSSL verification with mandatory
+typed claim policy and bounded workers. PostgreSQL reuses configuration/owner/session
+locks and final database time before and after I/O. Its opaque verified identity
+retains original transaction/token caps and grants no local session or linking
+authority. Code exchange and final issuance remain open.
+[ADR 0015](adr/0015-oidc-token-verification.md) records the boundary.

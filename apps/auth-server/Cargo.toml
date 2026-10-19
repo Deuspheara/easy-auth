@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-verification = ["oidc-egress", "auth-core/oidc-verification", "auth-postgres/oidc-verification"]
 oidc-egress = ["auth-core/oidc-egress", "auth-postgres/oidc-egress", "dep:reqwest", "dep:rustls", "dep:webpki-roots"]
 experimental-passkey-recovery = ["experimental-passkeys", "auth-axum/passkey-recovery"]
 experimental-passkeys = ["auth-axum/passkey-recovery-setup", "auth-core/passkeys", "auth-postgres/passkeys"]

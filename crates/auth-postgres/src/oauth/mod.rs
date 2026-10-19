@@ -2,6 +2,8 @@ mod admission;
 mod configuration;
 mod ownership;
 mod transactions;
+#[cfg(feature = "oidc-verification")]
+mod verification;
 
 use crate::Postgres;
 use async_trait::async_trait;
@@ -25,5 +27,13 @@ impl OAuthTransactionRepository for Postgres {
 impl auth_core::OidcConnectionRepository for Postgres {
     async fn check_oidc_connection(&self, connection: &auth_core::OAuthConnection) -> Result<()> {
         configuration::check(&self.pool, connection).await
+    }
+}
+
+#[cfg(feature = "oidc-verification")]
+#[async_trait]
+impl auth_core::OidcExchangeRepository for Postgres {
+    async fn check_oidc_exchange(&self, exchange: &auth_core::OAuthExchange) -> Result<i64> {
+        verification::check(&self.pool, exchange).await
     }
 }
