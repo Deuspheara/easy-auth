@@ -1,4 +1,3 @@
-mod admission;
 mod authorization;
 mod inventory;
 mod mutation;

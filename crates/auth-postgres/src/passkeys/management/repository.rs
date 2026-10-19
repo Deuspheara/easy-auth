@@ -1,4 +1,5 @@
-use super::{admission, mutation};
+use super::super::sensitive_admission::admit_sensitive_action;
+use super::mutation;
 use crate::Postgres;
 use async_trait::async_trait;
 use auth_core::{PasskeyInfo, PasskeyManagementRepository, PasskeyManagementRequest, Result};
@@ -17,7 +18,7 @@ impl PasskeyManagementRepository for Postgres {
         version: Uuid,
         label: &str,
     ) -> Result<Uuid> {
-        admission::admit(self, request).await?;
+        admit_sensitive_action(self, request.realm, request.session, request.source).await?;
         mutation::rename(&self.pool, request, id, version, label).await
     }
 
@@ -27,7 +28,7 @@ impl PasskeyManagementRepository for Postgres {
         id: Uuid,
         version: Uuid,
     ) -> Result<()> {
-        admission::admit(self, request).await?;
+        admit_sensitive_action(self, request.realm, request.session, request.source).await?;
         mutation::remove(&self.pool, request, id, version).await
     }
 }

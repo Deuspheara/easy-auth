@@ -7,4 +7,5 @@ mod policy;
 mod preparation;
 mod recovery_setup;
 mod repository;
+mod sensitive_admission;
 mod signup;
