@@ -1,4 +1,5 @@
 mod authentication;
+mod authority;
 mod completion;
 mod enrollment_authority;
 mod management;

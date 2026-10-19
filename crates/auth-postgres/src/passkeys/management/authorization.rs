@@ -1,33 +1,13 @@
-use crate::{deadlines::Deadline, unavailable};
+use crate::unavailable;
 use auth_core::{Error, PasskeyManagementRequest, Result};
 use sqlx::Transaction;
 use uuid::Uuid;
 
-pub(super) struct Caller {
-    pub(super) user: Uuid,
-    pub(super) session: Uuid,
-    pub(super) deadline: Deadline,
-}
-
 pub(super) async fn caller(
     tx: &mut Transaction<'_, sqlx::Postgres>,
     request: &PasskeyManagementRequest,
-) -> Result<Caller> {
-    let (user, session, _) =
-        super::super::policy::fresh_owner(tx, request.realm, request.session).await?;
-    let passkey: bool = sqlx::query_scalar(
-        "SELECT authentication_method='passkey' FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND id=$3",
-    ).bind(request.realm).bind(user).bind(session)
-        .fetch_one(&mut **tx).await.map_err(unavailable)?;
-    if !passkey {
-        return Err(Error::Unauthorized);
-    }
-    let deadline = Deadline::fresh_session(tx, request.realm, user, session).await?;
-    Ok(Caller {
-        user,
-        session,
-        deadline,
-    })
+) -> Result<super::super::authority::Caller> {
+    super::super::authority::fresh_passkey_caller(tx, request.realm, request.session).await
 }
 
 pub(super) async fn lock_key(
