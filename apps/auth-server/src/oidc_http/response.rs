@@ -62,7 +62,16 @@ pub(super) async fn download(
     url: &Url,
     addresses: &[SocketAddr],
 ) -> Result<OidcHttpResponse, Failure> {
-    let mut response = client.get(url.clone()).send().await.map_err(network)?;
+    let response = client.get(url.clone()).send().await.map_err(network)?;
+    read(response, addresses).await
+}
+
+/// Shared bounded response boundary for configured document and token requests.
+/// Callers own request construction, credentials and the whole request deadline.
+pub(super) async fn read(
+    mut response: reqwest::Response,
+    addresses: &[SocketAddr],
+) -> Result<OidcHttpResponse, Failure> {
     let received = tokio::time::Instant::now();
     if !response
         .remote_addr()
