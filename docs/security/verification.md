@@ -467,3 +467,49 @@ AUTH-53 remains In Progress pending the final hosted acceptance audit. Stronger-
 account management/recovery/last-key policy, physical devices, other browsers and
 ordinary activation remain AUTH-20/M03 work. Full initial-release provider/native/
 issuer/security scope remains unfinished; no production or conformance claim.
+
+## AUTH-53 acceptance audit: enrollment final-write deadlines — 2026-10-19
+
+The audit found a gap in the older enrollment transaction: it consumed its proof
+before potentially blocking credential/audit writes. A deterministic test against
+the previous implementation reached the real audit insert before the deadline,
+then crossed challenge expiry and incorrectly committed. That test failed as
+expected. The fix retains the pending row lock and consumes only after all writes,
+with exact binding/state and original session freshness/idle/absolute/revocation
+checks in the final statement. User/session authorization stays protected by their
+held locks. A miss rolls back the credential, fact and consumption together.
+
+Three new PostgreSQL cases cover unchanged pending-row and RP-wide uniqueness
+waits plus a final audit matrix for challenge expiry/original freshness under both
+mailbox and passkey-required policy. The latter arranges stored policy/method
+explicitly; it is not native assertion provenance evidence. All pass after the fix,
+as does the existing owner-wait case. Tests observe PostgreSQL locks and database
+clock crossing, with positive before-deadline checks rather than guessed sleeps.
+Final workspace results: **84 default / 155 all-feature** unique cases (Axum2,
+HTTP23,core10,PG120; subprocess logging body counts once); strict all-target/all-
+feature Clippy,fmt,diff and JS checks pass.
+
+Both native suites were freshly rebuilt and rerun against immutable producer
+`5e526639452c171f5881735a5c74705ebb970914`:
+
+- [31-case native regression](../../tests/browser/passkeys/results/2026-10-19/chromium-enrollment-tail.json):
+  all247 source hashes checked against the producer, with actual executable hash.
+  Existing registration/assertion/signup and hostile-context cases retain their
+  original counts and zero pending state.
+- [2-case real SMTP regression](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-enrollment-tail.json):
+  all269 source hashes checked likewise. Two stronger verified users/keys/signup/
+  attachment facts, four later sign-ins, zero changed provenance/weak sessions/
+  pending state, and three owned messages removed.
+
+Both owned fixture DBs are reported removed and independently absent from the
+PostgreSQL catalog. Earlier published artifacts remain immutable; these refresh
+native regression evidence after the storage correction, without claiming that
+browser cases themselves induce the database timing failure. Dependency/scanner
+results and exact-head hosted state are recorded with this checkpoint in Huly.
+
+AUTH-54 now tracks the analogous final-write audit in older mailbox/password/
+lifecycle/session operations under M09. Source inspection suggests additional
+surfaces; this enrollment correction does not claim those paths fixed or verified.
+That separate work is a first-release security gate and should follow this scoped
+acceptance work. Full stronger-account management/recovery remains AUTH-20; ordinary
+activation and the rest of M03/later release scope remain gated.

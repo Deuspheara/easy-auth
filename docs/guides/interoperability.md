@@ -102,3 +102,10 @@ No seeded sessions, key metadata mutation or capturing mail adapter is used. Its
 owned DB and three messages are removed. This resolves the earlier attachment
 checkpoint; physical devices, other browsers and AUTH-20 recovery remain open.
 See the [reproduction guide](../../tests/browser/passkeys/attachment/README.md).
+
+After enrollment's final-write deadline correction, both suites were rebuilt and
+rerun against producer5e52663: [31 native cases](../../tests/browser/passkeys/results/2026-10-19/chromium-enrollment-tail.json)
+and [2 real-SMTP cases](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-enrollment-tail.json)
+pass. Their247/269 source hashes and executable hashes were checked; all owned DBs
+and test messages were removed. PostgreSQL tests separately induce the expiry
+waits; these native regressions do not claim to reproduce that timing scenario.
