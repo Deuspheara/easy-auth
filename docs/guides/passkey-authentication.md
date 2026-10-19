@@ -85,8 +85,9 @@ last-use update, new session and typed audit are one transaction, including roll
 
 Nonzero counters must increase. Two zero counters are allowed; a nonzero-to-zero
 reset is rejected. Backup eligibility is immutable; backup state may change for a
-previously eligible credential. Concurrent proofs from the same old snapshot have
-one winner; start a fresh ceremony after a stale attempt. Private state stays in
+previously eligible credential. Each challenge has one winner; snapshot checks
+prevent overwriting intervening credential changes. Start a fresh ceremony after
+a stale attempt. Separate valid ceremonies can create separate sessions. Private state stays in
 PostgreSQL, bounded to 1 MiB; there are at most three pending ceremonies per browser,
 with separate start/finish budgets of 20/browser and 40/source per ten minutes.
 

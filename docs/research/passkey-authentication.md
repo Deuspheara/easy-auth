@@ -75,9 +75,10 @@ which locks owner, credential and ceremony in that order; compares both exact pr
 snapshots; then checks expiry in a separate statement after any ceremony-row wait.
 It atomically consumes state, updates credential/last-use metadata, inserts a fresh
 256-bit verifier-only session and records the owned `passkey_authenticated` audit
-fact. Any failure rolls everything back. Different pending challenges verified from
-one old credential snapshot cannot both overwrite it; start a new ceremony after
-the losing attempt. The existing session idle/absolute/revocation rules apply.
+fact. Any failure rolls everything back. After a commit changes stored credential
+bytes, a proof verified against the previous bytes is rejected; start a new ceremony
+after that stale attempt. Every individual ceremony remains one-use, including
+counterless credentials. The existing session idle/absolute/revocation rules apply.
 
 Migration 0008 adds two-minute, browser/realm/RP/purpose-bound private ceremonies,
 three pending per browser and separate start/finish admission: 20 per browser and
