@@ -17,6 +17,10 @@ pub enum AuditEvent {
         actor_session_id: Uuid,
         session_id: Uuid,
     },
+    PasskeyEnrolled {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+    },
     PasswordReset {
         user_id: Uuid,
     },
@@ -43,6 +47,7 @@ impl AuditEvent {
             Self::EmailAuthenticated { .. } => "email_authenticated",
             Self::PasswordAuthenticated { .. } => "password_authenticated",
             Self::PasswordEnrolled { .. } => "password_enrolled",
+            Self::PasskeyEnrolled { .. } => "passkey_enrolled",
             Self::PasswordReset { .. } => "password_reset",
             Self::SessionRevoked { .. } => "session_revoked",
             Self::AllSessionsRevoked { .. } => "all_sessions_revoked",
@@ -55,6 +60,7 @@ impl AuditEvent {
             Self::EmailAuthenticated { user_id, .. }
             | Self::PasswordAuthenticated { user_id, .. }
             | Self::PasswordEnrolled { user_id, .. }
+            | Self::PasskeyEnrolled { user_id, .. }
             | Self::PasswordReset { user_id }
             | Self::SessionRevoked { user_id, .. }
             | Self::AllSessionsRevoked { user_id, .. }
@@ -65,6 +71,9 @@ impl AuditEvent {
     pub fn actor_session_id(&self) -> Option<Uuid> {
         match self {
             Self::PasswordEnrolled {
+                actor_session_id, ..
+            }
+            | Self::PasskeyEnrolled {
                 actor_session_id, ..
             }
             | Self::SessionRevoked {
@@ -89,6 +98,7 @@ impl AuditEvent {
             | Self::PasswordEnrolled { session_id, .. }
             | Self::SessionRevoked { session_id, .. } => Some(*session_id),
             Self::PasswordReset { .. }
+            | Self::PasskeyEnrolled { .. }
             | Self::AllSessionsRevoked { .. }
             | Self::EmailChanged { .. }
             | Self::AccountDeleted => None,

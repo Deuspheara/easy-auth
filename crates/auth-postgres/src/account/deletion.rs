@@ -92,6 +92,18 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        sqlx::query(
+            r#"
+            DELETE FROM auth_rate_buckets
+            WHERE realm_id=$1 AND dimension IN ('passkey_enroll_user','passkey_finish_user')
+              AND key_hash=sha256($2)
+            "#,
+        )
+        .bind(realm)
+        .bind(user.as_bytes().as_slice())
+        .execute(&mut *tx)
+        .await
+        .map_err(unavailable)?;
         audit::erase_subject(&mut tx, realm, user).await?;
         sqlx::query("DELETE FROM auth_users WHERE realm_id=$1 AND id=$2")
             .bind(realm)

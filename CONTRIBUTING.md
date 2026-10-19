@@ -6,6 +6,13 @@ Maintainability is required for acceptance. Follow the [clean-code rules in AGEN
 
 Use Rust 1.95 and Docker. Start development services with docker compose up -d --wait, load .env.example, then cargo fmt --all -- --check; cargo clippy --workspace --all-targets -- -D warnings; cargo test --workspace. Database tests create isolated test databases and require the development/CI DB role to have CREATEDB; production runtime roles should not.
 
+Also run strict Clippy with `--all-features`, then test default and all features
+sequentially. Do not overlap separate Cargo test runs against the same PostgreSQL
+server: SQLx derives fixture database names from test paths, so feature variants
+can reset each other's databases. Optional passkey tests need OpenSSL development
+libraries and pkg-config, including the test-only software authenticator. Audit
+all workspace features with `python3 scripts/audit.py` and `cargo deny --all-features check`.
+
 Schema changes require new migrations. Authentication/protocol changes need negative, replay, tenant and concurrency tests plus documentation. No custom cryptography or XML signature validation. Keep protocol-specific checks visible and avoid speculative abstractions. A release needs the full-lockfile/compiled-graph audit in scripts/audit.py, cargo deny, secret scans and conformance evidence.
 
 Original contributions are dual MIT OR Apache-2.0. Confirm third-party license compatibility and preserve attribution before introducing code/assets. Follow CODE_OF_CONDUCT.md; use SECURITY.md for vulnerabilities.

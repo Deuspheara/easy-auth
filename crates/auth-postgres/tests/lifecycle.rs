@@ -8,6 +8,9 @@ mod email;
 mod migration;
 #[path = "lifecycle/notifications.rs"]
 mod notifications;
+#[cfg(feature = "passkeys")]
+#[path = "lifecycle/passkeys/mod.rs"]
+mod passkeys;
 #[path = "lifecycle/passwords.rs"]
 mod passwords;
 #[path = "lifecycle/recovery.rs"]

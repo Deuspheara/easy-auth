@@ -47,7 +47,7 @@ crates/auth-core/src/
   auth/                     # Auth composition and feature use cases
   ports.rs                  # Repository and delivery contracts
   password.rs               # Bounded hashing and password policy
-  passkeys/                 # Optional protocol verifier/config/private state; enrollment wiring pending
+  passkeys/                 # Optional verifier, private state, enrollment use cases and repository port
   email.rs, secret.rs       # Input and secret policies, with unit tests
   audit.rs, error.rs, identity.rs, notifications.rs, sessions.rs
 crates/auth-postgres/src/
@@ -57,6 +57,7 @@ crates/auth-postgres/src/
   audit.rs                  # Typed transactional recording and scoped deidentification
   email.rs, passwords.rs, recovery.rs, notifications.rs
   sessions/                 # Validation, inventory and revocation transactions
+  passkeys/                 # Optional preparation/completion and locked admission/ownership policy
   account/                  # Email-change and deletion transactions
 crates/auth-axum/src/
   lib.rs                    # Public facade
@@ -73,6 +74,11 @@ apps/auth-server/src/
 
 The HTTP and PostgreSQL integration entry files declare feature modules under `tests/browser/` and `tests/lifecycle/`, respectively. Their `tests/support/` folders contain reusable setup; account-only proof fixtures stay in the account test module. The single test target per adapter preserves the existing SQLx test setup without duplicated fixture compilation across many integration binaries.
 
+Passkey integration scenarios live under `tests/lifecycle/passkeys/`, separated
+into protocol negatives, enrollment binding/admission, concurrency/rollback,
+credential limits/deletion and observed lock-wait cases. The software authenticator
+is a test-only dependency. Production protocol code does not implement a mock token.
+
 Rust permits one implementation of a trait for a type. PostgreSQL's `repository.rs` therefore delegates directly to crate-private feature methods. It adds no policy, SQL or generic framework. The public adapter and core APIs stay unchanged. OpenAPI's generated path descriptors are imported locally in `contract.rs` so moving a handler does not accidentally publish Rust module names as API tags.
 
 ## Reviewed size exceptions
@@ -80,3 +86,8 @@ Rust permits one implementation of a trait for a type. PostgreSQL's `repository.
 The PostgreSQL `finish_email`, `enroll_password`, `finish_password_reset`, `confirm_email_change`, `finish_account_deletion`, `list_sessions` and `revoke_all_sessions` functions exceed the approximate 50-line review trigger. Each keeps its lock acquisition, proof revalidation, identity/credential mutation, session invalidation, audit/notice write and commit in a single visible transaction. SQL and bind chains are laid out explicitly. Splitting these functions into arbitrary steps would hide ordering and rollback invariants; add a helper only for a meaningful operation whose dependencies remain clear.
 
 `configured_auth` likewise keeps the ordered, fail-closed startup composition together. Longer integration scenarios keep their arrange/action/assert sequence together to prove complete state transitions, isolation and rollback. They are now grouped by feature rather than collected in one large suite file. These are reasons for the current exceptions, not exemptions from reviewing future growth.
+
+Passkey enrollment `save` and `commit` likewise keep admission, ownership/freshness
+revalidation, state mutation, credential insertion, audit and commit visible in
+their owning transaction. Their SQL is laid out explicitly. They exceed the
+approximate function-size review trigger without adding unrelated responsibilities.

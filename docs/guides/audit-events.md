@@ -11,6 +11,7 @@ Both server compositions record the same committed lifecycle facts through the s
 | `email_authenticated` | none | newly issued session | Verified bound mailbox proof committed |
 | `password_authenticated` | none | newly issued session | Password verification and exact stored-credential recheck committed |
 | `password_enrolled` | fresh initiating session | replacement session | First credential enrollment and rotation committed |
+| `passkey_enrolled` | fresh initiating session | none | Optional core/PostgreSQL registration verified, state consumed and unique credential inserted; no new authenticated session |
 | `password_reset` | none | none | Current recovery proof consumed, credential replaced and sessions/proofs invalidated |
 | `session_revoked` | initiating owned session | revoked session | Logout or individual revocation changed an owned record |
 | `all_sessions_revoked` | fresh initiating session | none | Owned sessions and pending proofs canceled |
@@ -26,6 +27,12 @@ There are no passwords/PHC strings, bearer values/verifiers, mailbox addresses, 
 Deleting an account sets its old events' `subject_erased=true` and removes user, actor-session and affected-session references. The original kinds/times remain, followed by a subject-free deletion event. Other users and realms keep their attribution. This deidentifies the live store; timing, backups, previously exported data and delivered mail have separate privacy/retention policies.
 
 Migration `0006_safe_audit.sql` leaves old rows at version 0 with unknown actor/target fields. Valid subject ownership remains; dangling/cross-realm subjects and old deletion records are deidentified. It never attaches an old event to a guessed session. New writes use version 1 with kind-specific shapes. Stop old writers, apply migrations and upgrade all replicas together; mixed-version writing is unsupported for this alpha. Custom adapters must implement equivalent atomicity, ownership, redaction and deletion semantics.
+
+Migration `0007_passkey_enrollment.sql` adds the closed passkey-enrollment kind
+with an owned actor session and no affected session; the nine-column schema stays
+unchanged. Normal HTTP composition does not enable enrollment yet. The event is
+recorded only by the actual verified credential transaction, and follows the same
+rollback and deletion-deidentification rules as other kinds.
 
 The foreign keys deliberately retain referenced user/session rows until the audit references are handled. Use the normal account-deletion flow, which clears them transactionally. A future session/audit retention job must coordinate pruning; there is no automatic retention policy in this slice. A privileged database writer remains trusted, so these records are not tamper-proof or independently audited evidence.
 

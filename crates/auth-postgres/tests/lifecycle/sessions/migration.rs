@@ -34,6 +34,14 @@ async fn session_management_upgrade_preserves_existing_sessions_and_audit(pool: 
         .execute(&pool)
         .await
         .unwrap();
+    // Finish the schema upgrade before invoking current repository cleanup methods.
+    // The existing session and audit preservation assertions remain unchanged.
+    sqlx::raw_sql(include_str!(
+        "../../../migrations/0007_passkey_enrollment.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     assert_eq!(
         store
             .list_sessions(realm, current.verifier(), None)

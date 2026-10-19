@@ -118,10 +118,11 @@ source review.
 The optional `easy-auth-core/passkeys` feature now implements the protocol boundary
 in [ADR 0008](../architecture/adr/0008-passkey-verification-boundary.md): validated
 configuration, public creation options, private versioned database state and a
-verified-credential wrapper. It does not yet persist or consume ceremonies, perform
-account authorization, expose HTTP routes or demonstrate browser interoperability.
-No normal server composition enables it. Database/HTTP wiring and all enrollment
-acceptance tests above remain required for AUTH-18.
+verified-credential wrapper. The subsequent optional PostgreSQL boundary now
+persists and atomically consumes ceremonies with fresh ownership checks; see the
+[implementation guide](../guides/passkey-enrollment.md). HTTP routes and browser
+interoperability remain outstanding. No normal server composition enables it.
+The remaining enrollment acceptance tests above are still required for AUTH-18.
 
 Upstream TRACE logging of state and input is suppressed within synchronous library
 calls; a positive-control regression test proves the upstream event exists before

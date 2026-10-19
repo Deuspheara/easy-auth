@@ -1,9 +1,15 @@
 mod configuration;
+mod enrollment;
 mod logging;
+mod repository;
 mod state;
 #[cfg(test)]
 mod tests;
 
+pub use enrollment::{PasskeyEnrollment, PasskeyEnrollmentOptions};
+pub use repository::{
+    PasskeyEnrollmentContext, PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRepository,
+};
 pub use state::{PrivatePasskeyRegistration, VerifiedPasskey};
 pub use webauthn_rs::prelude::{
     CreationChallengeResponse as PasskeyCreationOptions,
@@ -11,20 +17,23 @@ pub use webauthn_rs::prelude::{
 };
 
 use crate::{Error, Result};
+use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use std::time::Duration;
 use url::Url;
 use uuid::Uuid;
 use webauthn_rs::prelude::{Webauthn, WebauthnBuilder};
 
 const CEREMONY_TIMEOUT: Duration = Duration::from_secs(120);
-const MAX_PASSKEYS_PER_ACCOUNT: usize = 10;
+pub const MAX_PASSKEYS_PER_ACCOUNT: usize = 10;
 const MAX_CREDENTIAL_ID_BYTES: usize = 1024;
+const MAX_REGISTRATION_RESPONSE_BYTES: usize = 16 * 1024;
 
 /// Protocol verification only. Repository use cases must separately enforce ownership,
 /// fresh authentication, expiry, admission and atomic single-use state consumption.
 pub struct PasskeyService {
     verifier: Webauthn,
     origin: Url,
+    rp_id: String,
 }
 
 impl PasskeyService {
@@ -50,7 +59,16 @@ impl PasskeyService {
             .timeout(CEREMONY_TIMEOUT)
             .build()
             .map_err(|_| Error::InvalidInput)?;
-        Ok(Self { verifier, origin })
+        let rp_id = rp_id.to_owned();
+        Ok(Self {
+            verifier,
+            origin,
+            rp_id,
+        })
+    }
+
+    pub fn rp_id(&self) -> &str {
+        &self.rp_id
     }
 
     pub fn begin_registration(
@@ -97,7 +115,7 @@ impl PasskeyService {
         response: &PasskeyRegistrationResponse,
         state: PrivatePasskeyRegistration,
     ) -> Result<VerifiedPasskey> {
-        if state.origin != self.origin.as_str() {
+        if state.origin != self.origin.as_str() || !bounded_response(response) {
             return Err(Error::Unauthorized);
         }
         let credential = logging::without_payload_events(|| {
@@ -108,9 +126,26 @@ impl PasskeyService {
         if credential.cred_id().is_empty() || credential.cred_id().len() > MAX_CREDENTIAL_ID_BYTES {
             return Err(Error::Unauthorized);
         }
+        // The verifier takes the credential ID from attested data. Reject contradictory
+        // public envelope identifiers rather than letting later adapters interpret them.
+        if response.raw_id.as_slice() != credential.cred_id().as_slice()
+            || response.id != URL_SAFE_NO_PAD.encode(credential.cred_id().as_slice())
+        {
+            return Err(Error::Unauthorized);
+        }
         Ok(VerifiedPasskey {
-            rp_id: self.origin.domain().ok_or(Error::Unavailable)?.to_owned(),
+            rp_id: self.rp_id.clone(),
             credential,
         })
     }
+}
+
+fn bounded_response(response: &PasskeyRegistrationResponse) -> bool {
+    let bytes = response
+        .id
+        .len()
+        .saturating_add(response.raw_id.len())
+        .saturating_add(response.response.attestation_object.len())
+        .saturating_add(response.response.client_data_json.len());
+    response.type_ == "public-key" && bytes <= MAX_REGISTRATION_RESPONSE_BYTES
 }

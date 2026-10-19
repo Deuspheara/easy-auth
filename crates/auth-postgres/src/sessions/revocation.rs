@@ -74,7 +74,11 @@ impl Postgres {
             .await
             .map_err(unavailable)?;
         }
-        for table in ["auth_email_changes", "auth_account_deletions"] {
+        for table in [
+            "auth_email_changes",
+            "auth_account_deletions",
+            "auth_passkey_enrollments",
+        ] {
             sqlx::query(&format!(
                 "DELETE FROM {table} WHERE realm_id=$1 AND user_id=$2"
             ))

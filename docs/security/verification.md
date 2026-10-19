@@ -2,6 +2,37 @@
 
 This is alpha implementation evidence, not an independent security audit or a production release.
 
+## AUTH-18 PostgreSQL enrollment checkpoint — 2026-10-19
+
+The optional core/PostgreSQL use case now persists private, realm/user/session/browser-bound
+two-minute enrollment ceremonies, verifies real authenticator responses, and atomically
+consumes state, inserts an RP-unique credential and records typed audit. Migration
+0007 adds the tables and closed audit kind; published migrations 0001–0006 are unchanged.
+Normal HTTP composition remains disabled. See the [implementation guide](../guides/passkey-enrollment.md).
+
+- Default workspace tests: 59 passed. All-feature workspace tests: 78 passed.
+  Both final runs were isolated and had zero failures/ignored tests. The fourteen
+  new real-PostgreSQL cases cover protocol rejection with positive controls, real
+  packed-attestation signature tampering, ownership/binding, replay, rollback,
+  concurrency, cross-realm RP uniqueness, bounded state/credential/admission,
+  deletion and freshness/expiry after an observed PostgreSQL lock wait.
+- Formatting and strict workspace/all-target/all-feature Clippy passed. Compiled
+  advisory and cargo-deny all-feature checks passed, retaining the reported inactive
+  SQLx MySQL/RSA finding. The exact-version software-authenticator MPL exception
+  and source/distribution notice accompany the test-only dependency. Production
+  graphs exclude that software token, and default production graphs exclude WebAuthn.
+- The first complete run exposed an upgrade fixture stopping at migration 0006
+  before invoking current cleanup. It now applies 0007, retaining preservation
+  assertions. A separate default run overlapped an all-features run and got HTTP
+  failures: SQLx hashes test paths into deterministic database names, confirmed in
+  its source. Both variants passed when rerun sequentially; no product check or
+  assertion was relaxed. CONTRIBUTING now records this constraint.
+
+These are software-authenticator and persistence results, not browser or real-device
+interoperability. HTTP/OpenAPI, browser tests, sign-in, stronger-account policy and
+passkey-first accounts remain outstanding. AUTH-18 and the M03 parent stay open;
+hosted checks for this local checkpoint are pending publication.
+
 ## AUTH-18 initial verifier checkpoint — 2026-10-19
 
 The optional core `passkeys` feature now wraps high-level webauthn-rs registration

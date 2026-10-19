@@ -14,6 +14,12 @@ Source, including notices, is available in the exact published crate archives:
 - [webauthn-attestation-ca 0.5.5](https://crates.io/api/v1/crates/webauthn-attestation-ca/0.5.5/download)
 - [base64urlsafedata 0.5.5](https://crates.io/api/v1/crates/base64urlsafedata/0.5.5/download)
 
+The PostgreSQL development tests additionally use unmodified
+[`webauthn-authenticator-rs` 0.5.5](https://crates.io/api/v1/crates/webauthn-authenticator-rs/0.5.5/download),
+also MPL-2.0, to generate signed software-authenticator fixtures. That package is
+a development dependency, not a runtime dependency. Test builds therefore require
+native OpenSSL even when the production passkey feature is disabled.
+
 The root Cargo.lock records archive checksums. The upstream repository is
 [kanidm/webauthn-rs](https://github.com/kanidm/webauthn-rs). No upstream source
 files were copied or modified for this integration.
@@ -32,7 +38,7 @@ and [Mozilla's FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/).
 This feature uses system OpenSSL through `openssl`/`openssl-sys`, without enabling
 vendoring. Packaged binaries and containers must also carry the notices for the
 actual linked OpenSSL distribution and every other included dependency. Default
-builds do not compile this optional WebAuthn stack. Release packaging and source
+production builds do not compile this optional WebAuthn stack. Release packaging and source
 availability verification remain M09 gates; this project has no supported binary
 release yet.
 

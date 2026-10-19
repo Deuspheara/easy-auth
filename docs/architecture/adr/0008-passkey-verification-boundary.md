@@ -1,7 +1,8 @@
 # ADR 0008: High-level passkey verification and private ceremony state
 
 Status: accepted for the initial protocol boundary, AUTH-18, 2026-10-19.
-Enrollment persistence, HTTP integration and browser evidence remain in progress.
+The optional core/PostgreSQL persistence boundary is implemented; HTTP integration
+and browser evidence remain in progress. See the [enrollment guide](../../guides/passkey-enrollment.md).
 
 Use `webauthn-rs` 0.5.5's high-level registration API. It fixes required user
 verification and supports platform/roaming selection without implementing custom
@@ -32,7 +33,8 @@ operational errors remain the owning use case's responsibility.
 An optional `passkeys` feature isolates native OpenSSL dependencies from default
 email/password builds. CI lints all features, tests default and all features, and
 audits all-platform normal/build/dev graphs with all workspace features. The five
-MPL-2.0 package exceptions are exact-name/version entries, with source availability
+production MPL-2.0 package exceptions, and a separate test-only software-authenticator
+exception, are exact-name/version entries, with source availability
 and distribution notices documented; no broad MPL allowlist or advisory ignore
 is introduced. Linux all-feature builds require `libssl-dev` and `pkg-config`;
 macOS requires discoverable OpenSSL development libraries, such as Homebrew's

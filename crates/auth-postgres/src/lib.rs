@@ -4,6 +4,8 @@ mod audit;
 mod email;
 mod locking;
 mod notifications;
+#[cfg(feature = "passkeys")]
+mod passkeys;
 mod passwords;
 mod recovery;
 mod repository;
