@@ -3,6 +3,7 @@ mod boundary;
 mod cancellation;
 mod claims;
 mod contract;
+mod pages;
 mod replacement;
 mod routing;
 mod types;

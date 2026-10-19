@@ -2,8 +2,9 @@
 
 Status: experimental saved-code configuration, claim scheduling/cancellation and
 core/PostgreSQL replacement-key completion implemented in AUTH-20, 2026-10-19.
-Explicit experimental HTTP transport is implemented; reference pages, native/physical
-recovery evidence and independent security review remain open. Ordinary enablement and stronger-policy activation
+Explicit experimental HTTP transport and reference pages are implemented. Native
+Chromium recovery uses actual signatures/SMTP plus an owned elapsed-time fixture;
+physical-device/other-browser evidence and independent security review remain open. Ordinary enablement and stronger-policy activation
 are not approved by this document. No AAL, MFA, conformance or production claim.
 
 ## Threat and authority
@@ -200,9 +201,9 @@ adapters must implement `passkey_recovery_completed`, with the same non-secret,
 retryable queue semantics as other notices.
 
 This core/PostgreSQL implementation has software-authenticator transaction evidence,
-not a usable browser recovery page, native recovery interoperability or independent
-policy approval. Reference pages, consent/usability, native/real-device/browser recovery
-proof and safe activation remain required.
+not physical-device interoperability or independent policy approval. The reference
+pages below now have native Chromium coverage; wider usability/device evidence and
+safe activation remain required.
 
 Stronger-policy activation must wait for implemented, reviewed recovery and real
 private-key proof. Before ordinary enablement, test rollback, one-use/race behavior,
@@ -252,6 +253,41 @@ which may bind another account's claim. Terminal database state prevents replay.
 Neither binding, delay metadata, registration, cancellation nor any error sets a
 session. Wrong/stale/cancelled proofs and persistence failures return generic errors
 without success cookies; a lost successful finish response uses normal key sign-in.
-Reference pages, usable consent/instructions and real recovery browser/device
-interoperability are separate remaining evidence, not properties established by
-software HTTP tests or by this experimental constructor.
+The reference pages below supply explicit consent/instructions. Physical-device/
+other-browser interoperability and independent policy approval remain separate gates,
+not properties established by software tests or this experimental constructor.
+
+
+## Reference pages and native evidence
+
+Only the recovery constructor serves `/passkey-recovery` and
+`/passkey-recovery/setup`, plus their same-origin module assets. They inherit CSP,
+no-store/no-referrer and the existing browser boundary. Static GET serving prepares
+no code or claim and issues no session. Earlier constructors remain unchanged.
+
+The setup page requires explicit offline-retention consent, shows a prepared code
+once, asks for reentry/retention confirmation, clears it after confirmation/navigation
+and displays the authenticated public account ID to retain with the offline copy.
+It does not claim to prove offline retention. A fresh working-key sign-in and
+current-request cancellation use separate deliberate actions. The recovery page
+requires explicit sign-out, code-consumption consent, manual same-browser resume/
+status and a separate replacement confirmation. It explains the 24-hour delay,
+seven-day cap, missing email-free alerts, SMTP/browser-loss limits and permanent
+code consumption on cancellation. It never infers authority from device time or
+metadata; every mutation still uses the unchanged backend proof boundary.
+
+Proofs enter only POST bodies or HttpOnly cookies, never page URLs or browser
+storage. The client strips unused URL query/fragment state, uses text/value DOM
+properties, aborts page-scoped network/native work on navigation and clears secret
+fields. It neither logs server errors/proofs nor loads third-party scripts. Lost
+start responses resume using the existing cookie; lost finish responses direct the
+owner to normal sign-in with the newly installed key and new saved-code configuration.
+Browser JSON WebAuthn support is feature-detected and fails closed without fallback.
+
+The owned native fixture uses the real server SMTP adapter and resident platform/
+USB browser signatures. It has no seeded sessions/keys or HTTP clock endpoint.
+Its local stdin command can backdate claim/linked timing only after an actual
+required worker receipt, preserving original expiry and all production policy.
+This proves browser/proof/transaction behavior across an arranged elapsed wait;
+it does not establish a real 24-hour test run, physical hardware, a security audit
+or general browser interoperability. Fixture executables must never be deployed.

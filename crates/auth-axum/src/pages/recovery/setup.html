@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saved passkey recovery code · easy-auth experimental</title>
+</head>
+<body>
+<main>
+<h1>Saved passkey recovery code</h1>
+<p>This reference client is experimental. Recovery policy and device support still require independent review before ordinary activation.</p>
+<p>Keep multiple working passkeys when possible. A saved code is a bearer secret: anyone who steals it can request recovery. It is not phishing resistant. Save it offline, separately from your passkeys. Confirmation cannot prove you retained an offline copy.</p>
+<form id="signin-form">
+<h2>Sign in freshly with a passkey</h2>
+<label for="account">Public account ID</label> <input id="account" required autocomplete="off" spellcheck="false">
+<button type="submit">Sign in with key</button>
+</form>
+<p>Signed-in account ID: <output id="owner">Not signed in</output>. Retain this ID with your offline code; a code-preparation ID is a different identifier.</p>
+<form id="prepare-form">
+<h2>Configure or replace a saved code</h2>
+<p>Preparing does not invalidate your confirmed code. Confirmation replaces it and cancels older recovery requests. A genuinely fresh passkey sign-in is required.</p>
+<label>
+<input id="prepare-consent" type="checkbox" required> I will save the public account ID and code offline, separately from my passkeys.</label>
+<p>
+<button type="submit">Prepare a new code</button>
+</p>
+</form>
+<section id="kit" hidden>
+<h2>Save this code now</h2>
+<p>This value is shown once. Do not email it or put it in a URL. If it is lost before confirmation, prepare another code.</p>
+<label for="saved-code">New saved code</label>
+<textarea id="saved-code" readonly autocomplete="off" spellcheck="false" rows="2" cols="48">
+</textarea>
+<form id="confirm-form">
+<p>
+<label for="reentered-code">Reenter the offline copy</label> <input id="reentered-code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43">
+</p>
+<label>
+<input id="saved-consent" type="checkbox" required> I retained the public account ID and this code offline.</label>
+<p>
+<button type="submit">Confirm saved code</button>
+</p>
+</form>
+</section>
+<form id="cancel-form">
+<h2>Stop a recovery request</h2>
+<p>If you received an unexpected alert, a genuinely fresh working-key sign-in can cancel your current request without its ID. The request's code remains unusable; configure a new code afterward.</p>
+<label>
+<input id="cancel-consent" type="checkbox" required> Cancel the current request; I understand its code will remain consumed.</label>
+<p>
+<button type="submit">Cancel current recovery</button>
+</p>
+</form>
+<p id="status" role="status" aria-live="polite">
+</p>
+<p>
+<a href="/passkey-recovery">Recover with a saved code</a>
+</p>
+</main>
+<script type="module" src="/passkey-recovery/setup.js">
+</script>
+</body>
+</html>

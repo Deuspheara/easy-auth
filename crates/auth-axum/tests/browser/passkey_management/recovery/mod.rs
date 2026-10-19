@@ -3,6 +3,7 @@ mod boundary;
 mod cancellation;
 mod contract;
 mod lifecycle;
+mod pages;
 mod rollback;
 
 use super::*;

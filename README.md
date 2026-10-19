@@ -29,7 +29,8 @@ and experimental HTTP tests plus native Chromium/SMTP confirmation evidence.
 Ordinary passkey composition stays gated. The optional
 [experimental recovery HTTP API](docs/guides/passkey-management.md#experimental-recovery-http)
 now exposes delayed browser-bound claims and signed replacement completion;
-reference pages, independent review and recovery device evidence remain open.
+reference setup/recovery pages now have native Chromium/SMTP coverage. Independent
+review, physical-device/other-browser evidence and ordinary activation remain open.
 
 ## Run locally
 

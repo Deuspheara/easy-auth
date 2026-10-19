@@ -1,4 +1,4 @@
-use super::{binding, cancellation, claims, passkey_recovery_openapi, replacement};
+use super::{binding, cancellation, claims, pages, passkey_recovery_openapi, replacement};
 use crate::{Auth, BrowserConfig, browser::boundary, router::AppState};
 use auth_core::{
     Error, PasskeyEnrollment, PasskeyManagement, PasskeyRecoveryClaims, PasskeyRecoveryReplacement,
@@ -51,6 +51,7 @@ pub fn experimental_passkey_recovery_router(
     };
     let recovery = claim_routes()
         .merge(ceremony_routes())
+        .merge(pages::routes())
         .layer(middleware::from_fn_with_state(state.base.clone(), boundary))
         .with_state(state);
     Ok(super::super::management::configured_management_router(

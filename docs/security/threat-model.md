@@ -192,7 +192,7 @@ consumption waits. Other-RP saved proof and old keys/sessions/bound proofs are
 invalidated without crossing realm/owner. Completion replay grants nothing; a lost
 successful response requires normal sign-in with the installed key. The saved code
 stays consumed and must be replaced after sign-in. No policy upgrade or contact
-change occurs. Independent review, reference-page/browser usability, physical devices and safe
+change occurs. Independent review, wider usability/browser evidence, physical devices and safe
 activation remain release gates; transaction tests do not establish them.
 
 
@@ -207,5 +207,19 @@ non-secret alerts actionable to an owner with a surviving key. No anonymous clai
 lookup or owner selector is added. Only actual committed replacement assertion sets
 a session; registration/readiness/cancellation/errors never do. Cookie retention
 cannot extend database deadlines, and losing the capability retains the documented
-fail-closed recovery limits. Independent review, usable reference pages, native/
-physical-device recovery evidence and ordinary activation remain open.
+fail-closed recovery limits. Reference pages and native Chromium recovery now exist; independent review, wider
+usability, physical-device/other-browser evidence and ordinary activation remain open.
+
+
+The opt-in reference pages use explicit offline/code-consumption/replacement and
+cancellation consent; confirmation cannot prove offline retention. Static GETs
+create no authority. Proofs are not imported from URLs, stored in browser storage,
+logged or interpolated as HTML. Page-scoped network/native operations abort on
+navigation and transient code fields clear, including invalid account input paths.
+The client never derives readiness from its local clock or silently signs out/
+switches an account. Native Chromium evidence uses original resident/UV options,
+actual old/replacement signatures and real SMTP. The owned development fixture
+backdates only linked claim timing after a required real receipt; it never seeds
+keys/sessions/receipts, extends original expiry or exposes a production clock API.
+Physical hardware, other browsers and independent recovery-policy review remain
+unverified; native emulation and self-review cannot satisfy those gates.

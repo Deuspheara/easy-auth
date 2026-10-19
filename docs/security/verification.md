@@ -1154,3 +1154,71 @@ public account-ID retention, prebinding, cancellation and lost-response steps.
 Reference pages/consent usability, native/physical-device/other-browser recovery
 proof, independent policy review and safe ordinary activation remain required.
 This checkpoint does not complete AUTH-20 or any release/security-review gate.
+
+## AUTH-20 reference recovery pages checkpoint (2026-10-19)
+
+AUTH-20 remains **In Progress**. Five static reference resources are available only
+through the explicit recovery constructor. Setup uses genuine fresh key sign-in,
+public account-ID retention and deliberate code preparation/reentry/confirmation.
+Recovery requires explicit logout, consumption/browser-retention consent and a
+separate replacement consent. Metadata controls presentation only; core/database
+policy still authorizes every operation. Transient proof clears on confirmation,
+failed input and navigation; page-scoped network/native operations abort and late
+results cannot repopulate secret fields. Requests reject redirects and never import
+proof from URLs or persist it in JavaScript storage. No dependency/migration or
+ordinary server activation changed.
+
+The owned SMTP lifecycle was extracted separately in `0d0c93b`; all four existing
+native SMTP cases passed before behavior extension. A new seven-case native suite
+uses actual resident internal/USB registration and signed assertions for contact
+and email-free recovery, plus browser/code/genuine-key cancellation. It removes the
+original virtual authenticator before replacement, checks original claim expiry,
+requires actual contact-notice acknowledgement before arranging elapsed time, and
+covers lost start/finish responses, reload/resume, new-key sign-in, old signed-proof
+rejection, independent browser denial, consent, redirect rejection, navigation
+clearing and page errors. The fixture's bounded inherited stdin clock command is
+restricted to its owned database; no HTTP or production clock override exists.
+It preserves original expiry and the production 24-hour policy. This is virtual-
+device evidence with arranged elapsed time, not physical-device or real-day proof.
+
+Expanded native assertions initially exposed stale previous-error feedback during
+a new request. The client now immediately displays an in-progress status. The
+original field-clearing assertion remains unchanged and passes on the final run;
+arbitrary infrastructure failures are never counted as authorization rejection.
+Both unsuccessful native runs also removed their owned resources.
+
+Final local checks with PostgreSQL 17.11 and Mailpit 1.27.11:
+
+- Formatting and strict locked workspace/all-target Clippy with default/all
+  features pass. The all-feature lint/suite were repeated after the UI fix.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **268 pass** (2 Axum unit, 55 HTTP/database, 10 core, 201 PostgreSQL).
+  The logging subprocess repeats one included core case; no failures or ignored
+  cases. One added HTTP/database case verifies all five assets, restrictive headers,
+  no mutation/cookie/echo and absence from older constructors. Adoption check passes.
+- Fresh pinned native runs pass **31 baseline + 4 SMTP + 7 recovery cases**.
+  All **389/420/420 source hashes**, respectively, and their fixed producer binary
+  hashes match the saved [baseline](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-pages-baseline.json),
+  [SMTP](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-recovery-pages-baseline.json)
+  and [recovery](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-pages.json)
+  reports. Final recovery aggregates show seven starts, four completions, three
+  cancellations, four unused newly configured codes, thirty source admissions and
+  zero pending candidates/claims/setups/notices or invalid/weak provenance. All
+  three owned databases and exactly eleven baseline/fourteen recovery messages
+  are removed.
+- Four-purpose normal-worker notice/receipt/delay smokes pass through both Compose
+  discovery and explicit container selection, removing four owned messages and the
+  database each time. Full standalone and embedded password/recovery/session/
+  lifecycle SMTP smokes pass with owned database cleanup.
+- Compiled-dependency audit, all-feature cargo-deny and low-threshold npm audit
+  pass; the inactive SQLx/MySQL rsa advisory remains visible. The complete staged
+  diff is scanned with redacted Gitleaks before publication.
+
+Source review keeps static assets, client transport/lifetime, setup and recovery
+controllers, fixture clock/database composition and native scenario groups in named
+modules below roughly 300 lines. No SQL/policy enters the production pages and no
+cleanup is deferred. ADR 0012, API/organization/threat-model docs and the management
+and native guides document the implementation and limits. Independent recovery
+review, physical-device/other-browser evidence and safe ordinary activation remain
+required. This checkpoint does not complete AUTH-20 or its release/security gates.

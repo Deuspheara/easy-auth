@@ -277,3 +277,16 @@ PostgreSQL authority/transaction path. Integration cases group binding, boundari
 contract, cancellation, lifecycle/concurrency and rollback/receipt behavior under
 the owning feature. Longer fixtures/scenarios retain actual proof and ordered
 resource/state assertions; new implementation modules remain below 300 lines.
+
+
+Recovery reference assets live under `pages/recovery/`, with separate setup and
+recovery controllers and scoped HTTP/WebAuthn/lifecycle transport functions. Their
+route declaration stays in `passkeys/recovery/pages.rs`; ordinary composition is
+unchanged. Native recovery scenarios/setup/cancellation and the owned runner live
+under `tests/browser/passkeys/recovery/`. The real-SMTP owned DB/process lifecycle
+is shared by the two server examples through `examples/support/smtp_fixture.rs`,
+extracted and verified before extension. The new example separates composition,
+clock-only trusted fixture control and aggregate DB assertions. No production
+clock configuration, mock key/session or generic workflow framework is introduced.
+Longer fixture orchestration retains ownership/cleanup ordering; feature modules
+and scripts remain below roughly 300 lines.

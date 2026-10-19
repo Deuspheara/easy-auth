@@ -86,6 +86,26 @@ function mailbox(base, namespace) {
     }
     throw new Error('owned recovery configuration notice timeout');
   }
+  async function recoveryEvent(address, kind, expected = 1) {
+    const subjects = {changed: 'Your passkey recovery configuration changed', started: 'Passkey recovery was requested',
+      completed: 'Passkey recovery completed', cancelled: 'Passkey recovery was cancelled'};
+    assert.equal(Object.hasOwn(subjects, kind), true);
+    const deadline = Date.now() + 10000;
+    while (Date.now() < deadline) {
+      const summaries = (await messages(address)).filter(message => message.Subject === subjects[kind]);
+      if (summaries.length >= expected) {
+        assert.equal(summaries.length, expected, 'exact purpose-specific owned recovery notices');
+        for (const summary of summaries) {
+          const message = await (await request(`/api/v1/message/${encodeURIComponent(summary.ID)}`)).json();
+          assert.equal(message.To.length === 1 && message.To[0].Address === address, true);
+          assert.equal(/https?:\/\/|#token|[A-Za-z0-9_-]{43}/.test(message.Text), false, 'no URL or bearer in recovery notice');
+        }
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw new Error('owned recovery notice timeout');
+  }
   async function cleanup() {
     const ids = new Set();
     for (const address of recipients) for (const message of await messages(address)) ids.add(message.ID);
@@ -98,6 +118,6 @@ function mailbox(base, namespace) {
   async function version() {
     return (await (await request('/api/v1/info')).json()).Version;
   }
-  return {recipient, proof, notices, recoveryNotice, cleanup, version};
+  return {recipient, proof, notices, recoveryNotice, recoveryEvent, cleanup, version};
 }
 module.exports = {mailbox};

@@ -230,9 +230,9 @@ grant. A failed transaction preserves the previous keys and candidate for a vali
 retry within the original two-minute ceremony and seven-day claim caps. Restarting
 candidate registration invalidates its prior challenge and does not reset the claim.
 
-The explicit HTTP transport below is available, with no reference recovery page
-yet. Independent policy review, native recovery/browser/device verification, usable
-consent/instructions and safe ordinary activation remain required.
+The explicit HTTP transport and reference pages below are available. Independent
+policy review, physical-device/other-browser verification, broader usability evidence
+and safe ordinary activation remain required.
 
 
 ## Experimental recovery HTTP
@@ -242,8 +242,8 @@ Enable `easy-auth-axum/passkey-recovery` and call
 with the seven explicitly aligned passkey services. Older constructors and ordinary
 embedded/standalone composition retain their existing routes. Use the
 [full HTTP contract](../architecture/openapi-passkey-recovery.json) and
-[endpoint table](../architecture/api-contract.md); no reference recovery page or
-production activation is provided by this feature.
+[endpoint table](../architecture/api-contract.md). The feature also serves the
+reference pages below; production activation is not provided.
 
 1. Explain the bearer-code, fixed delay, notification and browser-loss limits before
    consuming proof. A reserved code cannot restart after cancellation/expiry. Retain
@@ -288,3 +288,41 @@ only from its genuinely fresh session. A failing response never sets a success
 cookie. Custom claim repositories additionally implement
 `cancel_current_passkey_recovery_with_key` with the same locked policy; the existing
 explicit-ID core cancellation API remains supported.
+
+
+## Reference recovery client
+
+With the explicit recovery constructor mounted, open `/passkey-recovery/setup` to
+sign in freshly using a working key, prepare/reenter an offline code or deliberately
+cancel the current request. Record the displayed authenticated public account UUID
+with the offline code. The pending preparation UUID is not the account identifier.
+Preparing preserves a confirmed code until confirmation commits; after confirmation
+or navigation the page clears the displayed value. Do not put it in URLs/email or
+store it with the passkeys it is intended to recover.
+
+`/passkey-recovery` explains delay, notification, expiry and browser-loss limits.
+Explicitly sign out, enter the retained public account UUID/code and accept the
+single-use/browser-retention consent before starting. Resume after reload without
+reentering the code; refresh manually to avoid admission limits. Readiness only
+enables the client action: the server still authorizes every stage. Replacement
+requires separate consent plus actual creation and verification prompts. A code or
+browser cancellation grants no session. An alerted owner with a surviving key can
+use the setup page's fresh sign-in/current-request cancellation without knowing
+its UUID. Losing the browser or expired/cancelled proof does not enable a weaker
+fallback. After recovery, sign in with the installed key if a finish response was
+lost and configure a new offline code.
+
+These pages keep proof in transient fields/memory, use only same-origin modules and
+POST bodies/HttpOnly cookies, reject redirects, and clear/abort page-scoped state
+on navigation. They
+do not use local/session storage, import URL proofs, log server payloads, auto-switch
+accounts or auto-consume a code. Code retention confirmation is user consent, not
+proof of independent storage. Browser-native JSON WebAuthn support is required;
+unsupported clients fail closed. General usability, physical-device/other-browser
+support and independent recovery review remain gates before ordinary activation.
+
+The [native recovery suite](../../tests/browser/passkeys/recovery/README.md) runs
+actual resident internal/USB create/get operations and real SMTP notices, with a
+trusted owned-fixture elapsed-time arrangement after required acknowledgement.
+It is virtual-device evidence and must not be described as physical-device testing
+or a real 24-hour waiting-period run.

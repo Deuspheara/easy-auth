@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+experimental-passkey-recovery = ["experimental-passkeys", "auth-axum/passkey-recovery"]
 experimental-passkeys = ["auth-axum/passkey-recovery-setup", "auth-core/passkeys", "auth-postgres/passkeys"]
 
 [dev-dependencies]
@@ -38,3 +39,8 @@ path = "src/main.rs"
 name = "passkey-smtp-browser"
 path = "examples/passkey-smtp-browser/main.rs"
 required-features = ["experimental-passkeys"]
+
+[[example]]
+name = "passkey-recovery-browser"
+path = "examples/passkey-recovery-browser/main.rs"
+required-features = ["experimental-passkey-recovery"]

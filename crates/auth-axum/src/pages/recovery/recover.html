@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recover passkeys · easy-auth experimental</title>
+</head>
+<body>
+<main>
+<h1>Recover passkeys with a saved code</h1>
+<p>Experimental reference client; independent policy review and device evidence are still required. No mailbox/password fallback or automatic identity lookup is available.</p>
+<p>A code is reserved once for this browser. Keep this browser and its cookies for the whole wait. A lost cookie, cancelled request or expired request may require a working key to configure new proof. Your existing keys stay usable during the wait.</p>
+<p>The minimum wait is 24 hours and the request expires after seven days. With a verified contact, the wait begins only after SMTP acceptance, not proof you read the alert. Without a verified contact there is no independent email alert. A prolonged delivery outage can prevent completion before expiry.</p>
+<button id="logout" type="button">Sign out in this browser before recovery</button>
+<p>Do this explicitly if a session cookie exists, including an expired one. Recovery never silently switches your signed-in account.</p>
+<label for="account">Retained public account ID</label> <input id="account" autocomplete="off" spellcheck="false" required>
+<form id="start-form">
+<h2>Start a request</h2>
+<label for="code">Saved code</label> <input id="code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43">
+<p>
+<label>
+<input id="consume-consent" type="checkbox" required> Reserve this code once in this browser. I understand the delay, lack of email-free alerts, expiry and browser-loss limits.</label>
+</p>
+<button type="submit">Start recovery request</button>
+</form>
+<p>
+<button id="resume" type="button">Resume this browser's request</button> Use this after a reload or a lost start response. No code reentry is needed.</p>
+<section id="claim" hidden>
+<h2>Current request</h2>
+<p id="timing">
+</p>
+<p id="notification">
+</p>
+<button id="refresh" type="button">Refresh status</button>
+<p>Refresh manually; frequent attempts are limited. Device time cannot authorize recovery.</p>
+<form id="browser-cancel-form">
+<label>
+<input id="browser-cancel-consent" type="checkbox" required> Cancel this request permanently; the code stays consumed.</label>
+<button type="submit">Cancel this browser's request</button>
+</form>
+<form id="replace-form">
+<h2>Install a replacement passkey</h2>
+<p>Creating a key alone does not finish recovery. Complete the separate verification prompt. Committed completion invalidates all previous account passkeys and sessions.</p>
+<label>
+<input id="replace-consent" type="checkbox" required> Replace previous keys and sessions after proving the new key.</label>
+<p>
+<button id="replace" type="submit" disabled>Create and verify replacement key</button>
+</p>
+</form>
+</section>
+<form id="code-cancel-form">
+<h2>Stop an unexpected request with your retained code</h2>
+<p>This works from another anonymous browser and cancels only. It cannot transfer a request, sign you in or reopen a code. Never send the code by email.</p>
+<label for="cancel-code">Retained code</label> <input id="cancel-code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43">
+<p>
+<label>
+<input id="code-cancel-consent" type="checkbox" required> Cancel the current request; this code will remain unusable.</label>
+</p>
+<button type="submit">Cancel with retained code</button>
+</form>
+<p id="status" role="status" aria-live="polite">
+</p>
+<p>
+<a href="/passkey-recovery/setup">Sign in with a working or replacement key, configure a new code, or cancel with a key</a>
+</p>
+</main>
+<script type="module" src="/passkey-recovery/recover.js">
+</script>
+</body>
+</html>

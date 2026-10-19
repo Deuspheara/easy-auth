@@ -261,3 +261,14 @@ binding for other claims. Errors never return success cookies/proof values. Cook
 retention is seven days; original database deadlines remain authoritative. See
 [ADR 0012](adr/0012-saved-passkey-recovery.md) for cancellation, lost-response and
 remaining review/device/activation gates. This adds no ordinary server enablement.
+
+
+Only `experimental_passkey_recovery_router` serves the reference client GET resources
+`/passkey-recovery`, `/passkey-recovery/setup`, `/passkey-recovery/shared.js`,
+`/passkey-recovery/recover.js` and `/passkey-recovery/setup.js`. They inherit no-store,
+no-referrer/CSP and emit no success cookie or dynamic proof on GET. These static
+resources do not add protocol operations to OpenAPI. The client uses the unchanged
+closed POST contract with explicit sign-out/retention/consumption/replacement and
+cancellation consent, transient proof fields, same-browser resume and normal
+replacement-key sign-in after a lost finish response. Other constructors and
+ordinary server composition retain their existing routes.
