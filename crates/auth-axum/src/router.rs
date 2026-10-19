@@ -17,10 +17,24 @@ pub(crate) struct AppState {
 }
 
 pub fn router(auth: Auth, browser: BrowserConfig) -> Router {
+    configured_router(auth, browser, openapi())
+}
+
+pub(crate) fn configured_router(
+    auth: Auth,
+    browser: BrowserConfig,
+    spec: utoipa::openapi::OpenApi,
+) -> Router {
     let state = AppState { auth, browser };
     Router::new()
         .route("/healthz", get(health))
-        .route("/openapi.json", get(|| async { Json(openapi()) }))
+        .route(
+            "/openapi.json",
+            get(move || {
+                let spec = spec.clone();
+                async move { Json(spec) }
+            }),
+        )
         .route("/readyz", get(ready))
         .route("/v1/email/start", post(start))
         .route("/v1/email/finish", post(finish))

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Experimental passkey registration through the high-level verifier, atomic PostgreSQL ceremonies, explicit Axum opt-in, a concrete OpenAPI extension and reproducible Chromium platform/USB virtual-authenticator checks. Ordinary server enrollment remains disabled pending passkey sign-in and stronger-account policy (AUTH-18).
+
 - Reproducible native PostgreSQL adoption probes with pinned RustAuth/lucid-auth sources, resolved feature graphs, binary/RSS measurements and post-return revocation checks under sustained other-user load; corrected RustAuth's maintenance status in the research and build decision (AUTH-5).
 
 - Typed lifecycle audit facts with owned actor/session attribution, historical provenance, transactional deletion redaction and an explicit two-identity linking policy; logout lock order aligned with audit ownership checks (AUTH-16).

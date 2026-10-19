@@ -9,6 +9,9 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
+
 [dependencies]
 auth-core.workspace = true
 axum.workspace = true
@@ -27,3 +30,12 @@ async-trait.workspace = true
 http-body-util = "0.1"
 sqlx.workspace = true
 tower = { version = "0.5", features = ["util"] }
+
+[[example]]
+name = "passkey-browser"
+path = "examples/passkey-browser/main.rs"
+required-features = ["passkey-enrollment"]
+
+[[example]]
+name = "export_passkey_openapi"
+required-features = ["passkey-enrollment"]

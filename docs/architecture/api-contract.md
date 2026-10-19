@@ -41,3 +41,43 @@ Lifecycle policy, proof ordering, freshness and privacy scope: [guide](../guides
 Session inventory fields, freshness, pagination, cookie effects and concurrent-login semantics: [guide](../guides/sessions.md), [ADR 0006](adr/0006-session-management.md).
 
 Audit facts are transaction-internal with no public append/read route. HTTP/OpenAPI remain unchanged by AUTH-16. [Audit schema, attribution and linking policy](../guides/audit-events.md), [ADR 0007](adr/0007-safe-audit-and-linking.md).
+
+## Explicit experimental passkey enrollment
+
+The `easy-auth-axum/passkey-enrollment` feature exposes
+`experimental_passkey_enrollment_router`. The ordinary router and standalone
+server never enable it automatically. Composition rejects mismatched realms or
+origins before mounting. This is registration only: it issues no passkey session
+and does not implement sign-in, passkey-first accounts or stronger-account recovery.
+
+| Method/path | Input | Output / behavior |
+| --- | --- | --- |
+| POST /v1/passkeys/enrollment/start | `{label}`, fresh session cookie and exact Origin | 200 `{transaction_id, options: {publicKey: ...}}`; sets/reuses two-minute HttpOnly passkey-browser binding |
+| POST /v1/passkeys/enrollment/finish | `{transaction_id, credential}`, same session/binding cookies and exact Origin | 201 `{id}` after verified, atomic single-use registration; no new authenticated session |
+
+Only these two experimental endpoints use a 32 KiB encoded JSON body bound;
+ordinary routes retain 8 KiB. Core decoded ceremony buffers are additionally
+bounded to 16 KiB. Start/finish outer objects reject unknown fields. `credential`
+uses standard browser WebAuthn JSON: canonical base64url `id`, encoded `rawId`,
+type `public-key`, `response.attestationObject` and `response.clientDataJSON`,
+with optional transport/extensions fields. Only the high-level verifier's attested
+credential data is authoritative; browser convenience public-key fields are not.
+
+The private serialized verification state is absent from options, cookies and
+response JSON. The binding cookie is `__Host-auth-passkey` under HTTPS, otherwise
+`auth-passkey` in explicit localhost development; HttpOnly, SameSite=Lax, Path=/,
+no Domain, Max-Age=120, Secure under HTTPS. It is retained after one completion so
+other pending ceremonies in the same browser can finish, and is cleared on logout
+or current/all-session revocation when the feature is compiled.
+
+Errors use the existing redacted codes: 400 invalid input/JSON, 401 invalid,
+expired, replayed or misbound authentication/proof, 403 rejected Origin, 413 body
+bound, 415 unsupported media, 429 admission/credential/pending limits, 503 unavailable
+persistence and 504 request timeout. Rejected and rolled-back operations create no
+success audit fact. The experimental router serves the complete combined schema at
+`/openapi.json`; its [generated snapshot](openapi-passkey-enrollment.json) is checked
+against live output. Default [OpenAPI](../openapi.json) remains unchanged.
+
+See the [enrollment guide](../guides/passkey-enrollment.md) and
+[browser test instructions](../../tests/browser/passkeys/README.md) for verified
+boundaries and remaining M03 release gates.

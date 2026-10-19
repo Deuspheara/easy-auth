@@ -120,9 +120,11 @@ in [ADR 0008](../architecture/adr/0008-passkey-verification-boundary.md): valida
 configuration, public creation options, private versioned database state and a
 verified-credential wrapper. The subsequent optional PostgreSQL boundary now
 persists and atomically consumes ceremonies with fresh ownership checks; see the
-[implementation guide](../guides/passkey-enrollment.md). HTTP routes and browser
-interoperability remain outstanding. No normal server composition enables it.
-The remaining enrollment acceptance tests above are still required for AUTH-18.
+[implementation guide](../guides/passkey-enrollment.md). Explicit experimental HTTP
+routes and eight Chromium virtual-authenticator cases now exercise the same
+boundary. No normal server composition enables it. Real-device, other-browser,
+discoverable, passkey-first, sign-in and stronger-account recovery gates remain M03
+requirements; they are not inferred from these registration checks.
 
 Upstream TRACE logging of state and input is suppressed within synchronous library
 calls; a positive-control regression test proves the upstream event exists before

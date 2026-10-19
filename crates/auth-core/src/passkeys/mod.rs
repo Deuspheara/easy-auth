@@ -71,6 +71,10 @@ impl PasskeyService {
         &self.rp_id
     }
 
+    pub fn origin(&self) -> &str {
+        self.origin.as_str()
+    }
+
     pub fn begin_registration(
         &self,
         owner: Uuid,

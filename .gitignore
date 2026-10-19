@@ -5,3 +5,5 @@
 *.pem
 *.key
 .DS_Store
+/tests/browser/passkeys/node_modules/
+/tests/browser/passkeys/results/local/

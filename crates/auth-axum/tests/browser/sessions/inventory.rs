@@ -89,7 +89,17 @@ async fn inventory_and_individual_revocation_never_expose_secrets_or_select_othe
         .await
         .unwrap();
     assert_eq!(own.status(), StatusCode::NO_CONTENT);
-    assert_eq!(own.headers().get_all(header::SET_COOKIE).iter().count(), 5);
+    assert_eq!(
+        own.headers().get_all(header::SET_COOKIE).iter().count(),
+        5 + usize::from(cfg!(feature = "passkey-enrollment"))
+    );
+    #[cfg(feature = "passkey-enrollment")]
+    assert!(
+        own.headers()
+            .get_all(header::SET_COOKIE)
+            .iter()
+            .any(|value| value.to_str().unwrap().starts_with("__Host-auth-passkey=;"))
+    );
     assert!(
         own.headers()
             .get_all(header::SET_COOKIE)

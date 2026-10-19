@@ -21,6 +21,12 @@ pub struct PasskeyEnrollment {
 }
 
 impl PasskeyEnrollment {
+    pub fn realm(&self) -> Uuid {
+        self.realm
+    }
+    pub fn origin(&self) -> &str {
+        self.service.origin()
+    }
     pub fn new(
         realm: Uuid,
         service: Arc<PasskeyService>,

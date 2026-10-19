@@ -1,8 +1,10 @@
 # ADR 0008: High-level passkey verification and private ceremony state
 
 Status: accepted for the initial protocol boundary, AUTH-18, 2026-10-19.
-The optional core/PostgreSQL persistence boundary is implemented; HTTP integration
-and browser evidence remain in progress. See the [enrollment guide](../../guides/passkey-enrollment.md).
+The optional core/PostgreSQL boundary, explicit experimental HTTP composition and
+Chromium virtual-authenticator registration checks are implemented. Ordinary server
+enrollment stays disabled pending sign-in and stronger-account policy. See the
+[enrollment guide](../../guides/passkey-enrollment.md).
 
 Use `webauthn-rs` 0.5.5's high-level registration API. It fixes required user
 verification and supports platform/roaming selection without implementing custom

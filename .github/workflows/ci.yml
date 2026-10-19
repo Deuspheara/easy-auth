@@ -29,6 +29,19 @@ jobs:
       - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - run: cargo test --locked --workspace
       - run: cargo test --locked --workspace --all-features
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tests/browser/passkeys/package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: tests/browser/passkeys
+      - run: npm audit --audit-level=low
+        working-directory: tests/browser/passkeys
+      - run: npx --no-install playwright install --with-deps chromium
+        working-directory: tests/browser/passkeys
+      - run: cargo build --locked -p easy-auth-axum --example passkey-browser --features passkey-enrollment
+      - run: node tests/browser/passkeys/run.cjs
       - run: cargo install cargo-audit --locked
       - run: python3 scripts/audit.py
       - run: cargo install cargo-deny --locked

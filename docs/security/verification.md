@@ -2,6 +2,45 @@
 
 This is alpha implementation evidence, not an independent security audit or a production release.
 
+## AUTH-18 experimental HTTP/browser checkpoint — 2026-10-19
+
+The explicit experimental Axum composition adds typed enrollment start/finish,
+startup realm/origin alignment, a two-minute HttpOnly browser binding and a concrete
+combined OpenAPI snapshot. Ordinary server composition stays disabled. The default
+API/schema remains unchanged. Enrollment returns a credential UUID, not a new
+passkey-authenticated session; stronger-account policy and the remaining M03 work
+are still release gates.
+
+- Final default workspace run: 59 passed; all-features: 80 passed; zero failures or
+  ignored tests. Strict all-target/all-feature Clippy, formatting, compiled advisory
+  and cargo-deny checks passed. The npm lock installs with scripts disabled and
+  `npm audit --audit-level=low` reports no vulnerabilities.
+- Eight Chromium 151.0.7922.34 virtual-authenticator cases passed through real HTTP
+  and PostgreSQL: internal/platform and USB/roaming registration/replay, tampered
+  challenge/origin, browser RP scoping, required UV, real cross-origin POST rejection
+  and another browser lacking binding. Bad UV reached the server and was rejected.
+  Each case completed a valid registration control: eight credentials, eight audit
+  facts, zero pending ceremonies. The exact disposable database was removed, and
+  an independent PostgreSQL query found zero browser-fixture databases afterward.
+- Cross-origin status uses CDP response-extra-info because CORS blocks page access
+  and can suppress Playwright response events. The assertion still requires the
+  actual POST's HTTP 403. No CORS protection or product behavior was weakened.
+- Adding the known binding cookie intentionally makes feature-enabled logout/
+  revocation clear six cookies. Regression checks now explicitly require that name
+  and retain zero-Max-Age checks, while default builds still require five cookies.
+- Contract review caught the experimental finish DTO sharing the existing email
+  `FinishInput` schema name. Unique passkey DTO names and regression checks now
+  preserve every base schema and require the new credential/transaction body.
+
+The runner records sanitized tool versions, source hashes, binary hash, named
+outcomes and cleanup, without cookies, protocol payloads, browser storage/traces or
+virtual private keys. Its loopback fixture seeds verified sessions through the
+existing repository proof transaction; it does not claim SMTP/signup coverage.
+See the [browser reproduction instructions](../../tests/browser/passkeys/README.md)
+and [enrollment guide](../guides/passkey-enrollment.md). Other browsers, real
+devices/providers, discoverable/passkey-first accounts, sign-in and reviewed
+stronger-account recovery remain unverified. Hosted execution is pending publication.
+
 ## AUTH-18 PostgreSQL enrollment checkpoint — 2026-10-19
 
 The optional core/PostgreSQL use case now persists private, realm/user/session/browser-bound

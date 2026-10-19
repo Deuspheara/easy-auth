@@ -8,6 +8,13 @@ Available: same-browser email magic-link sign-in, verified email identity creati
 
 Planned and required before the first feature-complete release: passkeys, Apple, Google, enterprise OIDC, SAML SP, outbound OIDC issuer, account/credential management and native integration. See the [Huly backlog export](docs/planning/backlog.json). Verified email changes and confirmed account deletion are available through the [lifecycle API](docs/guides/account-lifecycle.md). SAML validator review and issuer interoperability are release blockers. Password recovery and notification operations are documented in the [recovery guide](docs/guides/password-recovery.md).
 
+An explicit [experimental passkey-enrollment boundary](docs/guides/passkey-enrollment.md)
+now has core/PostgreSQL, HTTP and Chromium virtual-authenticator evidence. It is
+disabled in normal server composition and does not yet provide passkey sign-in,
+passkey-first accounts or reviewed stronger-account recovery. See the
+[reproducible browser checks](tests/browser/passkeys/README.md); virtual tests are
+separate from real-device/provider interoperability.
+
 ## Run locally
 
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).

@@ -18,6 +18,10 @@ pub struct Auth {
     passwords: Option<Arc<PasswordService>>,
 }
 impl Auth {
+    /// Trusted composition identity; request input never selects the realm.
+    pub fn realm(&self) -> Uuid {
+        self.realm
+    }
     pub fn new(
         realm: Uuid,
         repository: Arc<dyn Repository>,

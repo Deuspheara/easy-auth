@@ -57,7 +57,15 @@ async fn revoke_all_clears_cookies_sessions_and_pending_mail_proof_in_only_its_r
     assert_eq!(result.status(), StatusCode::NO_CONTENT);
     assert_eq!(
         result.headers().get_all(header::SET_COOKIE).iter().count(),
-        5
+        5 + usize::from(cfg!(feature = "passkey-enrollment"))
+    );
+    #[cfg(feature = "passkey-enrollment")]
+    assert!(
+        result
+            .headers()
+            .get_all(header::SET_COOKIE)
+            .iter()
+            .any(|value| value.to_str().unwrap().starts_with("__Host-auth-passkey=;"))
     );
     assert!(
         result

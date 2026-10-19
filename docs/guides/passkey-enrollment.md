@@ -1,8 +1,9 @@
 # Passkey enrollment implementation boundary
 
 AUTH-18 is in progress. The optional core/PostgreSQL enrollment path now persists
-and verifies registration ceremonies, but normal embedded/server HTTP composition
-does not enable it. Passkey sign-in, discoverable/passkey-first accounts, credential
+and verifies registration ceremonies. An explicit experimental HTTP composition
+and Chromium virtual-authenticator tests are implemented; normal embedded/server
+composition does not enable it. Passkey sign-in, discoverable/passkey-first accounts, credential
 management and reviewed recovery are still required in M03. This guide is not a
 passkey-login quick start or evidence of browser interoperability.
 
@@ -89,9 +90,21 @@ ownership, concurrent last-slot completion, deletion and freshness/expiry change
 after an observed PostgreSQL lock wait. Positive controls retain the valid response
 for each protocol negative. No custom cryptographic primitive or verifier is used.
 
-These fixtures do not establish browser or real-device interoperability. HTTP
-endpoints/OpenAPI, actual `navigator.credentials.create` tests with virtual platform
-and roaming authenticators, and the rest of AUTH-18's acceptance criteria remain
-outstanding. See [ADR 0008](../architecture/adr/0008-passkey-verification-boundary.md),
+The separate [Chromium suite](../../tests/browser/passkeys/README.md) exercises
+actual `navigator.credentials.create` with platform/internal and roaming/USB virtual
+authenticators through the experimental HTTP endpoints. Its eight cases cover
+registration/replay, tampered client challenge/origin, RP scoping, required UV,
+an actual cross-origin POST and another browser missing the binding cookie.
+Each case has a successful registration control; aggregate credentials and audit
+facts must match, pending state must be empty, and the disposable database must be
+removed. This establishes that specific virtual-browser boundary, not real-device,
+Safari/Firefox, discoverable, authentication or recovery interoperability.
+
+The `passkey-enrollment` Axum feature exports an explicitly named experimental
+router. It validates matching configured realm/origin, retains the base API and
+serves a combined OpenAPI document. Start sets/reuses an HttpOnly binding cookie;
+finish returns only the credential UUID. It is not wired into the ordinary server.
+See the [concrete HTTP contract](../architecture/api-contract.md#explicit-experimental-passkey-enrollment),
+[ADR 0008](../architecture/adr/0008-passkey-verification-boundary.md),
 the [source review](../research/passkey-enrollment.md) and
 [dependency notices](../security/third-party-licenses/webauthn.md).

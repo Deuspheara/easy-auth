@@ -64,6 +64,7 @@ crates/auth-axum/src/
   router.rs                 # Routes and state composition
   browser/                  # Validated origin/cookies and request boundary
   handlers/                 # Feature handlers and transport types
+  passkeys/                 # Experimental enrollment router, thin handlers and concrete schemas
   contract.rs, error.rs     # Generated OpenAPI and public error mapping
   pages/                    # Optional reference HTML and JavaScript
 apps/auth-server/src/
@@ -91,3 +92,10 @@ Passkey enrollment `save` and `commit` likewise keep admission, ownership/freshn
 revalidation, state mutation, credential insertion, audit and commit visible in
 their owning transaction. Their SQL is laid out explicitly. They exceed the
 approximate function-size review trigger without adding unrelated responsibilities.
+
+The browser fixture lives under `examples/passkey-browser/`, with separate database
+lifecycle, configured fixture and explicitly disabled mail modules. Its Node runner
+keeps child/browser ownership and normal-completion cleanup in one visible try/finally;
+case bodies live in a separate test module. These longer orchestration/test functions
+retain ordered setup/action/assert/cleanup rather than hiding secret handling or
+resource ownership in generic helpers.
