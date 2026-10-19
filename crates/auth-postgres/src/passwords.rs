@@ -50,6 +50,7 @@ impl Postgres {
             AND u.id=c.user_id
             WHERE u.realm_id=$1
             AND u.email=$2
+            AND u.authentication_policy='mailbox'
             "#,
         )
         .bind(realm)
@@ -75,6 +76,7 @@ impl Postgres {
             AND s.user_id=u.id
             WHERE s.realm_id=$1
             AND s.token_hash=$2
+            AND u.email IS NOT NULL AND u.authentication_policy='mailbox'
             FOR
             UPDATE OF u
             "#,
@@ -155,7 +157,7 @@ impl Postgres {
     ) -> Result<()> {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         let user: Option<Uuid> = sqlx::query_scalar(
-            "SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 FOR UPDATE",
+            "SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 AND authentication_policy='mailbox' FOR UPDATE",
         )
         .bind(realm)
         .bind(email)

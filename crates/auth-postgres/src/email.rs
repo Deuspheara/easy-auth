@@ -1,6 +1,6 @@
-use crate::audit;
 use crate::locking::lock_email;
 use crate::{Postgres, unavailable};
+use crate::{audit, identity::user_from_row};
 use auth_core::AuditEvent;
 use auth_core::User;
 use auth_core::{Error, Result, Verifier};
@@ -109,7 +109,7 @@ impl Postgres {
             ON CONFLICT (realm_id,email) DO
             UPDATE
             SET email=EXCLUDED.email
-            RETURNING id
+            RETURNING id,email,display_name,authentication_policy
             "#,
         )
         .bind(realm)
@@ -118,11 +118,10 @@ impl Postgres {
         .fetch_one(&mut *tx)
         .await
         .map_err(unavailable)?;
-        let user = User {
-            id: row.get("id"),
-            realm_id: realm,
-            email,
-        };
+        let user = user_from_row(realm, &row)?;
+        if user.authentication_policy != auth_core::AuthenticationPolicy::Mailbox {
+            return Err(Error::Unauthorized);
+        }
         let session_id = Uuid::new_v4();
         sqlx::query(
             "INSERT INTO auth_sessions(realm_id,id,user_id,token_hash,authentication_method) VALUES ($1,$2,$3,$4,'email')",

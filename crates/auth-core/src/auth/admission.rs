@@ -9,12 +9,18 @@ impl Auth {
         source: &str,
     ) -> Result<()> {
         let user = self.authenticate(current).await?;
-        self.repository
-            .admit_password(
-                self.realm,
-                &user.email,
-                Sha256::digest(source.as_bytes()).into(),
-            )
-            .await
+        let source = Sha256::digest(source.as_bytes()).into();
+        match user.email.as_deref() {
+            Some(email) => {
+                self.repository
+                    .admit_password(self.realm, email, source)
+                    .await
+            }
+            None => {
+                self.repository
+                    .admit_user_action(self.realm, user.id, source)
+                    .await
+            }
+        }
     }
 }

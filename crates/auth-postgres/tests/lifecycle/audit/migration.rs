@@ -46,6 +46,15 @@ async fn audit_upgrade_keeps_unknown_provenance_and_erases_invalid_legacy_subjec
     let erased:i64=sqlx::query_scalar("SELECT count(*) FROM auth_audit WHERE realm_id=$1 AND user_id IS NULL AND subject_erased AND schema_version=0")
         .bind(realm).fetch_one(&pool).await.unwrap();
     assert_eq!(erased, 3);
+    // Preserve migration-6 assertions, then complete the schema for current reads.
+    for source in [
+        include_str!("../../../migrations/0007_passkey_enrollment.sql"),
+        include_str!("../../../migrations/0008_passkey_authentication.sql"),
+        include_str!("../../../migrations/0009_optional_mailbox.sql"),
+    ] {
+        sqlx::raw_sql(source).execute(&pool).await.unwrap();
+    }
+
     assert!(
         store
             .authenticate(realm, old.secret.verifier())

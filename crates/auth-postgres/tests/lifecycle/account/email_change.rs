@@ -58,8 +58,9 @@ async fn email_change_requires_both_mailboxes_and_same_fresh_session(pool: PgPoo
             .authenticate(realm, current.verifier())
             .await
             .unwrap()
-            .email,
-        "alice@example.com"
+            .email
+            .as_deref(),
+        Some("alice@example.com")
     );
     assert!(
         store

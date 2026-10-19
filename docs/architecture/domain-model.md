@@ -2,7 +2,7 @@
 
 A realm is an authentication security partition; it is not a workspace/business organization. A registered client belongs to a realm and has exact redirects, origin policy and audience. The first slice binds one realm per server/router in trusted configuration; no request body may select it.
 
-User has opaque random UUID, realm, verified email and lifecycle status. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. ExternalIdentity is unique by (realm, connection, trusted issuer, subject); matching emails never merge users. Linking proves current fresh session and a new provider transaction. Unlinking cannot remove the last usable credential/recovery path. Merges are disabled until separately reviewed.
+User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. ExternalIdentity is unique by (realm, connection, trusted issuer, subject); matching emails never merge users. Linking proves current fresh session and a new provider transaction. Unlinking cannot remove the last usable credential/recovery path. Merges are disabled until separately reviewed.
 
 Password credentials now store a salted Argon2id PHC string under a realm/user composite key, with single-enrollment uniqueness. Enrollment requires a fresh verified session and replaces existing sessions atomically. Credentials (password, passkey) are distinct from provider accounts and user records. The optional passkey enrollment boundary stores RP-scoped credential/public-key state, counter/backup state, last-use metadata and a user label; ordinary activation and credential management remain unfinished. Planned discoverable enrollment must provision a passkey-first user under a reviewed enrollment transaction. Recovery cannot silently replace stronger assurance with email; explicit policy, delays/notifications and audit required.
 
@@ -25,15 +25,17 @@ composition gated.
 Migration 0008 records session authentication method separately from time: email,
 password, passkey or legacy_unknown. Existing sessions retain unknown method;
 password enrollment preserves the initiating method and time during rotation.
-Freshness alone does not establish passkey proof. Method metadata is currently
-internal; enforcement for stronger-account recovery and sensitive actions remains
-required before ordinary passkey activation. No MFA/AAL certification is inferred.
+Freshness alone does not establish passkey proof. Method metadata is internal. Migration 0009's passkey-required policy now rejects
+weaker sessions and mailbox/password fallback, with fresh-method enforcement for
+session controls and additional enrollment. Full stronger-account recovery and
+lifecycle operations remain required before ordinary activation. No MFA/AAL
+certification is inferred.
 
 Planned entities are not implemented tables until their milestone. Account deletion now transactionally removes implemented credentials/sessions/proofs and deidentifies live audit subjects; future external identities must join this same lifecycle. A subject-free deletion notice temporarily retains the established recipient for delivery.
 
 AUTH-53's accepted [email-free identity design](adr/0009-passkey-first-identity.md)
 separates optional verified contact information from account authentication policy.
-Its pending-only registration/assertion bootstrap and verified-mailbox attachment
-are planned, not implemented by the session-locking extraction. Current user/email
-contracts and schema remain unchanged until their explicit migration and regression
-tests land. AUTH-20 still owns stronger-account management and recovery closure.
+The optional-email model, migration 0009, nullable public contract and initial
+passkey-required policy gates are implemented. Pending-only registration/assertion
+signup and verified-mailbox attachment remain planned. AUTH-20 still owns the
+full stronger-account management and recovery closure.

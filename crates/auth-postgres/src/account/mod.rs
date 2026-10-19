@@ -1,3 +1,4 @@
+mod admission;
 mod deletion;
 mod email_change;
 
@@ -15,6 +16,7 @@ impl Postgres {
             AND s.user_id=u.id
             WHERE s.realm_id=$1
             AND s.token_hash=$2
+            AND u.email IS NOT NULL AND u.authentication_policy='mailbox'
             "#,
         )
         .bind(realm)

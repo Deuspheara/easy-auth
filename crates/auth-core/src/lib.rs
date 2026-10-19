@@ -16,7 +16,7 @@ pub use audit::AuditEvent;
 pub use auth::Auth;
 pub use email::normalize_email;
 pub use error::{Error, Result};
-pub use identity::User;
+pub use identity::{AuthenticationPolicy, User};
 pub use notifications::{SecurityNotice, SecurityNoticeKind};
 #[cfg(feature = "passkeys")]
 pub use passkeys::{

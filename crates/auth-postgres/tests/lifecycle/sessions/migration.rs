@@ -48,6 +48,12 @@ async fn session_management_upgrade_preserves_existing_sessions_and_audit(pool: 
     .execute(&pool)
     .await
     .unwrap();
+    sqlx::raw_sql(include_str!(
+        "../../../migrations/0009_optional_mailbox.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     assert_eq!(
         store
             .list_sessions(realm, current.verifier(), None)

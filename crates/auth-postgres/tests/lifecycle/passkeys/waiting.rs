@@ -32,7 +32,7 @@ async fn revalidates_freshness_and_challenge_expiry_after_waiting_for_owner(pool
         // Observe a real PostgreSQL lock wait before changing expiry; no guessed sleep.
         tokio::time::timeout(Duration::from_secs(5),async {
             loop {
-                let waiting:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%SELECT u.id,u.email FROM auth_users u%FOR UPDATE OF u%')")
+                let waiting:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%SELECT u.id,coalesce(u.email,u.display_name) FROM auth_users u%FOR UPDATE OF u%')")
                     .fetch_one(&pool).await.unwrap();
                 if waiting { break; }
                 tokio::time::sleep(Duration::from_millis(10)).await;

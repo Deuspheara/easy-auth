@@ -1,6 +1,8 @@
 # ADR 0009: Email-free identity and proof-completed passkey signup
 
-Status: accepted design for AUTH-53, 2026-10-19; not yet implemented.
+Status: accepted for AUTH-53, 2026-10-19. Optional-mailbox model/migration,
+nullable user contract and initial policy enforcement are implemented. Signup and
+mailbox attachment below remain design requirements, not implemented workflows.
 AUTH-19's experimental sign-in is verified at `84d11a9`. AUTH-53 remains
 In Progress. This decision does not enable ordinary passkey composition or
 complete AUTH-20's credential-management and recovery requirements.

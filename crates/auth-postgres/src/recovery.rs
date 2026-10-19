@@ -23,7 +23,7 @@ impl Postgres {
             JOIN auth_users u ON u.realm_id=c.realm_id
             AND u.id=c.user_id
             WHERE u.realm_id=$1
-            AND u.email=$2))
+            AND u.email=$2 AND u.authentication_policy='mailbox'))
             "#,
         )
         .bind(realm)
@@ -54,6 +54,7 @@ impl Postgres {
             AND r.token_hash=$2
             AND r.browser_hash=$3
             AND r.expires_at>clock_timestamp()
+            AND u.authentication_policy='mailbox'
             "#,
         )
         .bind(realm)
@@ -75,7 +76,7 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         lock_email(&mut tx, realm, &email).await?;
         let user: Uuid = sqlx::query_scalar(
-            "SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 FOR UPDATE",
+            "SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 AND authentication_policy='mailbox' FOR UPDATE",
         )
         .bind(realm)
         .bind(&email)

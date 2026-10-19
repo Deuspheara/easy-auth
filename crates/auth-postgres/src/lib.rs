@@ -2,6 +2,7 @@
 mod account;
 mod audit;
 mod email;
+mod identity;
 mod locking;
 mod notifications;
 #[cfg(feature = "passkeys")]

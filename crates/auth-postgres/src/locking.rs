@@ -39,7 +39,7 @@ pub(crate) async fn fresh_account(
     email: &str,
 ) -> Result<(Uuid, Uuid)> {
     let user: Uuid =
-        sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 FOR UPDATE")
+        sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND email=$2 AND authentication_policy='mailbox' FOR UPDATE")
             .bind(realm)
             .bind(email)
             .fetch_optional(&mut **tx)
@@ -70,6 +70,11 @@ pub(crate) async fn fresh_session(
         AND last_seen_at>clock_timestamp()-interval '30 minutes'
         AND authenticated_at>clock_timestamp()-interval '5 minutes'
         AND authenticated_at<=clock_timestamp()
+        AND EXISTS (SELECT 1 FROM auth_users owner
+            WHERE owner.realm_id=$1 AND owner.id=$2
+              AND (owner.authentication_policy='mailbox'
+                OR (owner.authentication_policy='passkey_required'
+                    AND auth_sessions.authentication_method='passkey')))
         FOR
         UPDATE
         "#,

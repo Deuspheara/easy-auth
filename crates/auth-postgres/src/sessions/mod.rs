@@ -1,13 +1,13 @@
 mod listing;
+mod ownership;
 mod revocation;
 
 use crate::audit;
 use auth_core::AuditEvent;
 
-use crate::{Postgres, unavailable};
+use crate::{Postgres, identity::user_from_row, unavailable};
 use auth_core::User;
 use auth_core::{Error, Result, Verifier};
-use sqlx::Row;
 use uuid::Uuid;
 
 impl Postgres {
@@ -22,8 +22,13 @@ impl Postgres {
             AND revoked_at IS NULL
             AND expires_at > statement_timestamp()
             AND last_seen_at > statement_timestamp()-interval '30 minutes'
+            AND EXISTS (SELECT 1 FROM auth_users owner
+                WHERE owner.realm_id=$1 AND owner.id=auth_sessions.user_id
+                  AND (owner.authentication_policy='mailbox'
+                    OR (owner.authentication_policy='passkey_required'
+                        AND auth_sessions.authentication_method='passkey')))
             RETURNING user_id)
-            SELECT u.id,u.email
+            SELECT u.id,u.email,u.display_name,u.authentication_policy
             FROM auth_users u
             JOIN active a ON a.user_id=u.id
             WHERE u.realm_id=$1
@@ -35,11 +40,7 @@ impl Postgres {
         .await
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
-        Ok(User {
-            id: row.get("id"),
-            realm_id: realm,
-            email: row.get("email"),
-        })
+        user_from_row(realm, &row)
     }
     pub(crate) async fn revoke(&self, realm: Uuid, session: Verifier) -> Result<()> {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;

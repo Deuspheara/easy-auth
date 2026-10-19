@@ -20,6 +20,11 @@ impl Postgres {
             WHERE realm_id=$1 AND token_hash=$2 AND revoked_at IS NULL
               AND expires_at>statement_timestamp()
               AND last_seen_at>statement_timestamp()-interval '30 minutes'
+              AND EXISTS (SELECT 1 FROM auth_users owner
+                WHERE owner.realm_id=$1 AND owner.id=auth_sessions.user_id
+                  AND (owner.authentication_policy='mailbox'
+                    OR (owner.authentication_policy='passkey_required'
+                        AND auth_sessions.authentication_method='passkey')))
             RETURNING id,user_id
             "#,
         )
@@ -43,6 +48,9 @@ impl Postgres {
             WHERE realm_id=$1 AND user_id=$2 AND revoked_at IS NULL
               AND expires_at>statement_timestamp()
               AND last_seen_at>statement_timestamp()-interval '30 minutes'
+              AND (authentication_method='passkey' OR EXISTS (
+                SELECT 1 FROM auth_users owner WHERE owner.realm_id=$1 AND owner.id=$2
+                  AND owner.authentication_policy='mailbox'))
               AND ($4::uuid IS NULL OR id>$4)
             ORDER BY id LIMIT $5
         "#)

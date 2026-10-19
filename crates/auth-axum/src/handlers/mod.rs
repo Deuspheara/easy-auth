@@ -29,7 +29,10 @@ pub(crate) struct Accepted {
 pub(crate) struct UserResponse {
     pub(crate) id: Uuid,
     pub(crate) realm_id: Uuid,
-    pub(crate) email: String,
+    #[schema(required = true)]
+    pub(crate) email: Option<String>,
+    #[schema(required = true)]
+    pub(crate) display_name: Option<String>,
 }
 
 pub(super) fn source_key(source: Option<Extension<ConnectInfo<SocketAddr>>>) -> String {

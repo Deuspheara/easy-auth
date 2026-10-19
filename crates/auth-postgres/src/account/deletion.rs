@@ -95,7 +95,7 @@ impl Postgres {
         sqlx::query(
             r#"
             DELETE FROM auth_rate_buckets
-            WHERE realm_id=$1 AND dimension IN ('passkey_enroll_user','passkey_finish_user')
+            WHERE realm_id=$1 AND dimension IN ('passkey_enroll_user','passkey_finish_user','sensitive_user')
               AND key_hash=sha256($2)
             "#,
         )

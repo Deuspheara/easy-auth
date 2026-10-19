@@ -4,6 +4,12 @@ These headless APIs work for email-only and password accounts. They derive the u
 
 After migration 0004, existing sessions still verify normally but cannot authorize sensitive operations until a fresh email/password login. The migration intentionally does not guess authentication time from session creation. Password-enrollment rotation preserves authentication time. Deploy the new binary and schema together across all replicas; mixed old/new workers and sensitive-operation implementations are unsupported during this alpha transition.
 
+These mailbox-policy operations reject email-free and passkey-required accounts,
+even with a fresh passkey session or proofs issued before a policy change. This
+prevents a weaker lifecycle path while AUTH-20's stronger-account operations remain
+unfinished. Optional contact attachment is a separate AUTH-53 workflow, still
+pending; see the [optional-mailbox guide](optional-mailbox.md).
+
 ## Change email
 
 1. Sign in freshly. POST `/v1/account/email/start` with `{email}` and your session cookie. A 202 sets a distinct HttpOnly email-change binding cookie and sends separate confirmation links to the current and proposed mailboxes. An occupied proposed address follows the same request/delivery path and will not be merged or overwritten at completion. No address changes yet.

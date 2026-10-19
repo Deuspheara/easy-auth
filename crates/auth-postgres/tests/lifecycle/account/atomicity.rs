@@ -37,8 +37,9 @@ async fn lifecycle_notice_failure_rolls_back_all_changes(pool: PgPool) {
             .authenticate(realm, current.verifier())
             .await
             .unwrap()
-            .email,
-        "alice@example.com"
+            .email
+            .as_deref(),
+        Some("alice@example.com")
     );
     sqlx::query("ALTER TABLE auth_security_notifications DROP CONSTRAINT injected_change_failure")
         .execute(&pool)

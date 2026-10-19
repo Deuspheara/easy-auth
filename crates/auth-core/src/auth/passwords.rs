@@ -1,5 +1,5 @@
 use super::Auth;
-use crate::{Error, Password, Result, Secret, normalize_email};
+use crate::{AuthenticationPolicy, Error, Password, Result, Secret, normalize_email};
 use sha2::{Digest, Sha256};
 
 impl Auth {
@@ -11,12 +11,12 @@ impl Auth {
     ) -> Result<Secret> {
         let policy = self.passwords.as_ref().ok_or(Error::Unavailable)?;
         let user = self.authenticate(current).await?;
+        if user.authentication_policy != AuthenticationPolicy::Mailbox {
+            return Err(Error::Unauthorized);
+        }
+        let email = user.email.as_deref().ok_or(Error::Unauthorized)?;
         self.repository
-            .admit_password(
-                self.realm,
-                &user.email,
-                Sha256::digest(source.as_bytes()).into(),
-            )
+            .admit_password(self.realm, email, Sha256::digest(source.as_bytes()).into())
             .await?;
         let hash = policy.enroll(password).await?;
         let replacement = Secret::generate()?;

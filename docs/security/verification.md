@@ -243,3 +243,51 @@ Published commit `ffe0b3dc1ae95803a4f93fb40e2450d2e6145f6a` passed [hosted run 3
 - Hosted run [39219868778](https://github.com/Deuspheara/easy-auth/actions/runs/39219868778) passed its complete Rust job for the initial published snapshot, including 59 tests, formatting, strict Clippy, the compiled advisory gate and cargo-deny. Its secret job failed only on the checksum/version compatibility issue described above. Subsequent corrected-head publication and hosted status are tracked in Huly AUTH-5; this failed job is not represented as green.
 
 The SQL transaction uses database time and conditional updates. Revocation applies on the next validation; requests already authorized may finish. Email-only sign-in assumes mailbox control and is not phishing-resistant. Cross-device link redemption and unrelated-domain app integrations are intentionally unavailable in this slice.
+
+## AUTH-53 optional-mailbox checkpoint — 2026-10-19
+
+The model/policy boundary is implemented; anonymous signup and verified-mailbox
+attachment remain in progress. Migration 0009 preserves existing mailbox identities,
+verification times and historical session provenance while allowing email-free
+passkey-required users. The core and generated HTTP contracts now explicitly allow
+absent email and display labels. This is an alpha API/schema change, not completed
+passkey-first signup or stronger-account recovery.
+
+- Default workspace: **69 tests** passed (2 adapter unit, 12 HTTP/database, 4 core,
+  51 PostgreSQL). All-feature workspace: **112 tests** passed (2 adapter unit,
+  17 HTTP/database, 10 core, 83 PostgreSQL). No failed or ignored tests in the final
+  runs. Feature variants ran sequentially against PostgreSQL 17.11.
+- Nine new PostgreSQL cases cover upgrade/constraints, null-contact ownership,
+  weak-method and password/email/reset/lifecycle denial, preissued proofs,
+  user/source admission, policy changes during observed user-lock waits, and
+  NULL-to-email snapshot invalidation before revocation. The new HTTP case verifies
+  exact null/display-label JSON, safe mail/password route denial and no-email
+  revocation. Storage-seeded method fixtures are explicitly not private-key proof.
+- Existing lock-wait observers now accept leading SQL whitespace and the updated
+  account-name projection. The first default run exposed two observers that only
+  matched a query starting at column zero; their timeout was corrected without
+  replacing observed lock waits with sleeps or weakening the freshness assertions.
+  The final default and all-feature suites pass, including those original races.
+- Formatting, strict locked all-target/all-feature Clippy, compiled-advisory and
+  cargo-deny gates pass. Gitleaks 8.24.3 and 8.30.1 pass a snapshot of all tracked
+  and nonignored new source files; ignored build/dependency caches are excluded.
+  No dependency or lockfile changed. The inactive optional SQLx MySQL/RSA finding
+  remains reported, without an advisory ignore.
+- A newly built experimental fixture passes all **20 existing Chromium WebAuthn
+  cases**, with Chromium 156.0.8078.4/Playwright 1.64.1. Counts remain 20 credentials/
+  enrollment audits, 13 passkey sessions/authentication audits, 23 admitted finishes,
+  zero pending, one backed-up and one used-zero-counter credential. All 195 source
+  fingerprints and the fresh binary hash match the local regression report; exact
+  fixture database removal is reported and an independent catalog query finds zero
+  browser fixture databases. This is regression evidence for existing registration/
+  sign-in, not anonymous signup, native counterless enrollment or real-device proof.
+
+The implementation remains in the four existing packages: typed core user/policy,
+private PostgreSQL row decoding, focused account admission and session ownership,
+and thin HTTP nullable DTOs. Policy is rechecked under user locks before weaker
+session/credential/lifecycle mutations. Owned session controls revalidate the nullable
+contact snapshot without acquiring email locks after the owner lock. Published
+migrations 0001–0008 and prior browser artifacts remain unchanged. Full M03,
+AUTH-20 recovery/management, other-browser/real-device evidence and the later
+provider/native/issuer/security release gates remain open. Hosted exact-head
+results and commit links are tracked in Huly AUTH-53.

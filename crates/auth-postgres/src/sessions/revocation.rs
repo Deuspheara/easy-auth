@@ -1,5 +1,5 @@
+use super::ownership::Owner;
 use crate::audit;
-use crate::locking::{fresh_account, lock_email};
 use crate::{Postgres, unavailable};
 use auth_core::AuditEvent;
 use auth_core::{Result, Verifier};
@@ -12,9 +12,10 @@ impl Postgres {
         current: Verifier,
         target: Uuid,
     ) -> Result<bool> {
-        let email = self.current_email(realm, current).await?;
+        let owner = Owner::load(&self.pool, realm, current).await?;
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        let (user, caller) = fresh_account(&mut tx, realm, current, &email).await?;
+        let caller = owner.lock_fresh(&mut tx, realm, current).await?;
+        let user = owner.user;
         let revoked: Option<Uuid> = sqlx::query_scalar(
             r#"
             UPDATE auth_sessions SET revoked_at=clock_timestamp()
@@ -47,11 +48,10 @@ impl Postgres {
     }
 
     pub(crate) async fn revoke_all_sessions(&self, realm: Uuid, current: Verifier) -> Result<()> {
-        let email = self.current_email(realm, current).await?;
+        let owner = Owner::load(&self.pool, realm, current).await?;
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        // Issuers and lifecycle mutations use this same email -> user -> session ordering.
-        lock_email(&mut tx, realm, &email).await?;
-        let (user, actor_session_id) = fresh_account(&mut tx, realm, current, &email).await?;
+        let actor_session_id = owner.lock_fresh(&mut tx, realm, current).await?;
+        let user = owner.user;
         sqlx::query(
             r#"
             UPDATE auth_sessions SET revoked_at=clock_timestamp()
@@ -69,7 +69,7 @@ impl Postgres {
                 "DELETE FROM {table} WHERE realm_id=$1 AND email=$2"
             ))
             .bind(realm)
-            .bind(&email)
+            .bind(&owner.email)
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;

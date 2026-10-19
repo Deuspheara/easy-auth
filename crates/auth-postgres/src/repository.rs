@@ -48,6 +48,9 @@ impl Repository for Postgres {
     async fn admit_password(&self, realm: Uuid, email: &str, source: Verifier) -> Result<()> {
         Postgres::admit_password(self, realm, email, source).await
     }
+    async fn admit_user_action(&self, realm: Uuid, user: Uuid, source: Verifier) -> Result<()> {
+        Postgres::admit_user_action(self, realm, user, source).await
+    }
     async fn password_hash(&self, realm: Uuid, email: &str) -> Result<Option<String>> {
         Postgres::password_hash(self, realm, email).await
     }

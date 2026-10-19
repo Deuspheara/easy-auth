@@ -1,5 +1,6 @@
 mod boundary;
 mod inventory;
+mod optional_mailbox;
 mod revocation;
 
 use axum::{

@@ -18,6 +18,11 @@ stronger-account policy remain unfinished. See the
 [reproducible browser checks](tests/browser/passkeys/README.md); virtual tests are
 separate from real-device/provider interoperability.
 
+The [optional-mailbox model](docs/guides/optional-mailbox.md) now preserves existing
+mailbox accounts while supporting null email, display labels and passkey-required
+policy without weaker login/reset fallback. Anonymous passkey signup and verified
+contact attachment are still in progress; ordinary passkey composition stays gated.
+
 ## Run locally
 
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).

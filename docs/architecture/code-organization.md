@@ -53,10 +53,11 @@ crates/auth-core/src/
 crates/auth-postgres/src/
   lib.rs                    # Adapter construction and startup provisioning
   repository.rs             # Explicit core-port delegation
-  locking.rs                # Email lock order and fresh-account locking
+  locking.rs                # Email lock order and shared locked fresh-session validation
+  identity.rs               # Private SQL-row decoding into the core user contract
   audit.rs                  # Typed transactional recording and scoped deidentification
   email.rs, passwords.rs, recovery.rs, notifications.rs
-  sessions/                 # Validation, inventory and revocation transactions
+  sessions/                 # Validation, inventory, optional-mailbox ownership locking and revocation
   passkeys/                 # Optional preparation/completion and locked admission/ownership policy
   account/                  # Email-change and deletion transactions
 crates/auth-axum/src/
@@ -121,3 +122,11 @@ context and the fixed counterless storage fixture each own their setup. The long
 fixture/runner functions retain ordered resource ownership, safe output and cleanup;
 no test HTTP sign-in/proof bypass is added. The stdin setup changes only one unused
 fixture credential's trusted counter metadata and cancels its prior test challenge.
+
+AUTH-53 keeps optional-mailbox row decoding in the PostgreSQL identity module,
+user/source admission under account operations and snapshot/lock ownership under
+sessions. The ownership helper revalidates nullable email after taking the user
+lock; it never acquires email locks afterward. Core user policy and HTTP nullable
+fields stay in their owning model/transport modules. Integration cases under
+`tests/lifecycle/identity/` separate migration, admission, policy, session and
+observed-wait invariants. No generic identity engine or new crate is introduced.

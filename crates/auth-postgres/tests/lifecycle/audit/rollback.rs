@@ -178,8 +178,9 @@ async fn email_change_audit_failure_leaves_second_proof_retryable_and_first_conf
             .authenticate(realm, current.verifier())
             .await
             .unwrap()
-            .email,
-        "alice@example.com"
+            .email
+            .as_deref(),
+        Some("alice@example.com")
     );
     assert!(store.claim_security_notice(realm).await.unwrap().is_none());
     allow(&pool).await;

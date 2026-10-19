@@ -20,3 +20,6 @@ mod sessions;
 
 #[path = "lifecycle/audit/mod.rs"]
 mod audit;
+
+#[path = "lifecycle/identity/mod.rs"]
+mod identity;

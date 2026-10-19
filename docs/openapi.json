@@ -1884,11 +1884,21 @@
         "required": [
           "id",
           "realm_id",
-          "email"
+          "email",
+          "display_name"
         ],
         "properties": {
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "email": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "type": "string",

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Optional verified mailbox and display-label model, nullable user API/OpenAPI,
+  explicit passkey-required account policy, no-email session controls and locked
+  denial of weaker login/reset/lifecycle paths. Anonymous signup and contact
+  attachment remain in progress (AUTH-53).
+
 - Experimental passkey HTTP sign-in and atomic PostgreSQL challenge/key/session/audit transactions, with owner/realm/browser binding, counter/backup/context policy and explicit session methods. Twenty Chromium cases cover registration, real assertions and modal resident discovery; stronger-account policy and passkey-first enrollment remain unfinished (AUTH-19).
 
 - Experimental passkey registration through the high-level verifier, atomic PostgreSQL ceremonies, explicit Axum opt-in, a concrete OpenAPI extension and reproducible Chromium platform/USB virtual-authenticator checks. Ordinary server enrollment remains disabled pending passkey sign-in and stronger-account policy (AUTH-18).

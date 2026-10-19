@@ -13,9 +13,9 @@ pub(super) async fn fresh_owner(
     realm: Uuid,
     current: Verifier,
 ) -> Result<(Uuid, Uuid, String)> {
-    let (user, email): (Uuid, String) = sqlx::query_as(
+    let (user, account_name): (Uuid, String) = sqlx::query_as(
         r#"
-        SELECT u.id,u.email FROM auth_users u
+        SELECT u.id,coalesce(u.email,u.display_name) FROM auth_users u
         JOIN auth_sessions s ON s.realm_id=u.realm_id AND s.user_id=u.id
         WHERE s.realm_id=$1 AND s.token_hash=$2
         FOR UPDATE OF u
@@ -28,7 +28,7 @@ pub(super) async fn fresh_owner(
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
     let session = fresh_session(tx, realm, user, current).await?;
-    Ok((user, session, email))
+    Ok((user, session, account_name))
 }
 
 pub(super) async fn credential_limit(

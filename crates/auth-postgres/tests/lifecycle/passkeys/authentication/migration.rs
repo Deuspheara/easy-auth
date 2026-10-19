@@ -34,6 +34,12 @@ async fn upgrade_preserves_unknown_methods_and_rotations_do_not_upgrade_assuranc
             .await
             .unwrap();
     assert_eq!(method, "legacy_unknown");
+    sqlx::raw_sql(include_str!(
+        "../../../../migrations/0009_optional_mailbox.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     assert!(
         store
             .authenticate(realm, old.secret.verifier())

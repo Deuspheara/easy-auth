@@ -35,6 +35,8 @@ pub trait Repository: Send + Sync {
     /// Revoke all sessions and outstanding proofs atomically, including the initiating session.
     async fn revoke_all_sessions(&self, realm: Uuid, current: Verifier) -> Result<()>;
     async fn admit_password(&self, realm: Uuid, email: &str, source: Verifier) -> Result<()>;
+    /// User/source budgets for authenticated operations without a mailbox identity.
+    async fn admit_user_action(&self, realm: Uuid, user: Uuid, source: Verifier) -> Result<()>;
     async fn password_hash(&self, realm: Uuid, email: &str) -> Result<Option<String>>;
     /// Validate fresh session, insert credential once, revoke previous sessions and issue replacement atomically.
     async fn enroll_password(

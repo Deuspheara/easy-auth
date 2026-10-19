@@ -58,8 +58,12 @@ ceremony/credential snapshots. User -> credential -> ceremony locking and a new
 post-lock expiry statement prevent stale or expired proof commits. Consume, key
 update, session issuance and fixed-schema audit commit atomically; tests cover
 replay, rollback, competing snapshots, expiry during unchanged-row waits and deletion.
-Session methods are explicit and rotation preserves provenance. This metadata does
-not yet enforce stronger-account recovery/sensitive-action policy. Experimental
+Session methods are explicit and rotation preserves provenance. AUTH-53 now uses
+account policy to reject weaker sessions and mailbox/password fallback, including
+preissued proofs and policy changes during observed user-lock waits. Fresh
+passkey session controls work without email; inventory omits unusable weaker-method
+sessions. Stronger-account recovery and general lifecycle remain AUTH-20 work.
+Experimental
 HTTP now has native platform/USB assertions and modal resident discovery, plus
 signed cross-origin context rejection and backup/counter evidence. The context
 projection rejects topOrigin and true/null/duplicate crossOrigin; the pinned

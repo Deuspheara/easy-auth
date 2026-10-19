@@ -92,9 +92,12 @@ PostgreSQL, bounded to 1 MiB; there are at most three pending ceremonies per bro
 with separate start/finish budgets of 20/browser and 40/source per ten minutes.
 
 Session method provenance records real email/password/passkey proof and preserves
-unknown historical methods and rotation time/method. It does not yet enforce
-stronger-account recovery or sensitive-action policy. Normal activation remains
-gated; email-free bootstrap belongs to AUTH-53 and management/recovery to AUTH-20.
+unknown historical methods and rotation time/method. AUTH-53's initial account
+policy now rejects weak-method sessions and mailbox/password fallback for
+passkey-required users; fresh passkey session controls also work without email.
+Normal activation remains gated; email-free bootstrap and mailbox attachment are
+still AUTH-53 work, with full management/recovery in AUTH-20. See the
+[optional-mailbox guide](optional-mailbox.md).
 Other browsers, real devices/provider-backed passkeys and operational retention
 remain release work. See the [source review](../research/passkey-authentication.md)
 and [browser evidence](../../tests/browser/passkeys/README.md), including the explicit

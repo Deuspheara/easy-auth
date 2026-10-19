@@ -24,7 +24,7 @@ Initial same-origin browser contract. Realm is trusted router configuration. JSO
 | POST /v1/account/delete/start | {confirmation: "delete my account"}, fresh session + Origin | 202; current-mailbox deletion proof and binding; no mutation yet |
 | POST /v1/account/delete/finish | {token,confirmation}, same fresh session + deletion binding + Origin | 204; auth account cleanup/deidentified audit, cleared cookies; generic 401 stale/invalid proof |
 | GET /email-change and /account-delete | fragment handled only by browser | reference confirmation pages; GET does not consume proof |
-| GET /v1/session | session cookie | public user ID/realm/email; 401 invalid or expired |
+| GET /v1/session | session cookie | public user ID/realm, required nullable email/display_name; 401 invalid, expired or method rejected by account policy |
 | GET /v1/sessions | session cookie, optional after UUID | at most 50 owned active session metadata entries, next cursor; invalid caller 401 even on empty pages |
 | POST /v1/sessions/revoke | {id}, fresh session + Origin | 204 owned target revoked; foreign/unknown/inactive targets are the same no-op; current target clears cookies |
 | POST /v1/sessions/revoke-all | {}, fresh session + Origin | 204 all owned sessions and pending proofs canceled atomically, caller included; cookies cleared; new sign-in allowed |
@@ -46,6 +46,18 @@ Lifecycle policy, proof ordering, freshness and privacy scope: [guide](../guides
 Session inventory fields, freshness, pagination, cookie effects and concurrent-login semantics: [guide](../guides/sessions.md), [ADR 0006](adr/0006-session-management.md).
 
 Audit facts are transaction-internal with no public append/read route. HTTP/OpenAPI remain unchanged by AUTH-16. [Audit schema, attribution and linking policy](../guides/audit-events.md), [ADR 0007](adr/0007-safe-audit-and-linking.md).
+
+## Optional mailbox contract
+
+Migration 0009 changes Rust `User.email` to `Option<String>` and adds
+`display_name` plus typed account policy. The HTTP user response has required,
+nullable `email` and `display_name`; existing verified emails remain strings.
+Default and experimental OpenAPI snapshots include this shared contract change.
+Passkey-required accounts reject weak-method sessions, email/password login and
+password recovery; mail-only lifecycle operations are unavailable pending
+AUTH-20. Fresh passkey session controls work without email. Anonymous signup and
+verified-mailbox attachment remain AUTH-53 implementation work. See the
+[model/migration guide](../guides/optional-mailbox.md).
 
 ## Explicit experimental passkey enrollment
 
@@ -82,7 +94,8 @@ bound, 415 unsupported media, 429 admission/credential/pending limits, 503 unava
 persistence and 504 request timeout. Rejected and rolled-back operations create no
 success audit fact. The experimental router serves the complete combined schema at
 `/openapi.json`; its [generated snapshot](openapi-passkey-enrollment.json) is checked
-against live output. Default [OpenAPI](../openapi.json) remains unchanged.
+against live output. Default [OpenAPI](../openapi.json) excludes experimental
+routes while sharing the optional-mailbox user contract described above.
 
 See the [enrollment guide](../guides/passkey-enrollment.md) and
 [browser test instructions](../../tests/browser/passkeys/README.md) for verified

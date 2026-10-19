@@ -79,7 +79,7 @@ async fn wait_for_advisory(pool: &PgPool) {
     wait_for(pool, "SELECT EXISTS(SELECT 1 FROM pg_locks WHERE locktype='advisory' AND objid=150015 AND database=(SELECT oid FROM pg_database WHERE datname=current_database()) AND NOT granted)").await;
 }
 async fn wait_for_user_lock(pool: &PgPool) {
-    wait_for(pool, "SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE 'SELECT id FROM auth_users%FOR UPDATE%')").await;
+    wait_for(pool, "SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%SELECT id FROM auth_users%FOR UPDATE%')").await;
 }
 async fn wait_for(pool: &PgPool, query: &str) {
     tokio::time::timeout(Duration::from_secs(5), async {
