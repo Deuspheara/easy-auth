@@ -1,5 +1,5 @@
 use super::{
-    super::{client, response::Failure, token},
+    super::{client, response::Failure},
     tls_fixture::Fixture,
 };
 use async_trait::async_trait;
@@ -147,7 +147,7 @@ impl OidcTokenHttp for Http {
             builder
         };
         let client = builder.build().unwrap();
-        token::send(&client, &self.url, &[self.address], request)
+        super::super::super::post::send(&client, &self.url, &[self.address], request)
             .await
             .map_err(|failure| {
                 *self.failure.lock().unwrap() = Some(failure);
