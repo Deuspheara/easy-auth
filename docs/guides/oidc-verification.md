@@ -65,8 +65,9 @@ cargo test --locked -p easy-auth-postgres --features oidc-verification --test li
 ```
 
 Full default/all-feature workspace suites run sequentially. Signature fixtures are
-component evidence; local Keycloak code exchange/rotation/replay, provider acceptance,
-independent review and ordinary activation remain required.
+component evidence. The owned Keycloak suite below provides bounded provider
+evidence; broader provider acceptance, independent review and ordinary activation
+remain required.
 
 
 ## Protected code exchange
@@ -113,5 +114,18 @@ cargo test --locked -p easy-auth-server --features oidc-verification oidc_http
 ```
 
 The loopback/private-root mapping exists only in private test code. Production
-remains public-address/public-root HTTPS only. Keycloak code exchange/rotation/replay
-acceptance is still pending; these component results do not establish interoperability.
+remains public-address/public-root HTTPS only. The separate
+[owned Keycloak suite](../../tests/browser/oidc/README.md) passes code/S256/RS256,
+actual key rotation, invalid claims/signatures, provider-code and PostgreSQL-state
+replay, fresh controls and disable-before-POST. It uses the actual shared production
+HTTPS request/reader sources with a private fixture certificate/address mapping.
+This is specific local-provider evidence, not general production interoperability.
+
+Run its explicit build/Node commands after the documented Docker, PostgreSQL and
+pinned browser setup. CI runs it after browser dependencies; it is not an ignored
+Cargo test. No production-provider credentials or user-device interaction is needed.
+The test preserves actual provider cache headers, scopes and client configuration;
+controlled proxy faults are labeled separately from provider-signed claims. It
+requires normal owned resource cleanup and creates no local user/session/contact.
+Final identity mapping/JIT and session issuance remain separate work; AUTH-30
+owns the mapping/JIT policy boundary.

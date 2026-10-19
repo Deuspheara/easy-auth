@@ -51,3 +51,8 @@ required-features = ["experimental-passkeys"]
 name = "passkey-recovery-browser"
 path = "examples/passkey-recovery-browser/main.rs"
 required-features = ["experimental-passkey-recovery"]
+
+[[example]]
+name = "oidc-keycloak"
+path = "examples/oidc-keycloak/main.rs"
+required-features = ["oidc-verification"]

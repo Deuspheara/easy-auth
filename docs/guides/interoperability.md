@@ -13,7 +13,7 @@
 | Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
-| Enterprise OIDC client | None yet | None | M05 required; unavailable |
+| Enterprise OIDC verification/code exchange | Actual asymmetric signature/claim/refresh corpus, real PostgreSQL context/realm/deadline tests and 11 owned Keycloak/browser code+S256/RS256/rotation/replay cases using shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend proof boundary; local mapping/JIT/session issuance and ordinary provider routes unfinished |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
 
@@ -109,3 +109,19 @@ and [2 real-SMTP cases](../../tests/browser/passkeys/results/2026-10-19/chromium
 pass. Their247/269 source hashes and executable hashes were checked; all owned DBs
 and test messages were removed. PostgreSQL tests separately induce the expiry
 waits; these native regressions do not claim to reproduce that timing scenario.
+
+
+## AUTH-29 owned Keycloak boundary — 2026-10-20
+
+The [sanitized provider record](../../tests/browser/oidc/results/2026-10-20/keycloak-code-rotation.json)
+and [reproduction guide](../../tests/browser/oidc/README.md) distinguish actual
+provider-generated signatures/claims and key rotation from controlled proxy faults.
+The real PostgreSQL state/context boundary is used throughout; no local identity or
+session is issued. Rust uses the exact production TLS builder/GET/POST/readers with
+only a private fixture certificate/address mapping. Browser certificate tolerance
+and resolver/proxy arguments stay in its disposable process. Actual no-store headers
+are preserved; the real provider rotation case does not establish the forced-refresh
+cached-key branch. Dedicated real-signature cache tests own that separate evidence.
+This is bounded local interoperability evidence, not production/provider-wide or
+independent security-review acceptance. Hosted exact-commit results are tracked
+separately; broader provider/JIT/ordinary activation remains unfinished.

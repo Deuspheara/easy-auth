@@ -377,3 +377,15 @@ for tests. Core exchange scenarios separate binding, response errors, authority/
 concurrency and non-cacheable metadata. Longer ordered tests/fixture setup and form
 construction keep exact input/output and redaction invariants together; all new
 modules stay below 300 lines. No unrelated structural cleanup is deferred.
+
+
+Keycloak acceptance has its own owned example: database lifecycle, composition/
+command/proof state, and private transport each have a focused module. It includes
+existing production TLS/cache/GET/POST/response modules by private source path,
+without widening an application API or duplicating protocol/SQL policy. The POST
+helper extraction was verified and committed separately before fixture behavior.
+Node separates provider provisioning, TLS proxy/faults, browser callback, private
+IPC ownership, scenarios and runner/provenance. All new modules remain below300lines.
+Longer ordered composition, callbacks and resource try/finally functions keep proof,
+cleanup and fixed diagnostic boundaries visible as reviewed size exceptions. No
+unrelated structural cleanup, generic test engine or shared plugin is introduced.

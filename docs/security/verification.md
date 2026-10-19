@@ -1759,3 +1759,77 @@ migration, dependency version, public HTTP schema or ordinary composition change
 no unrelated structural cleanup is deferred. Previous signature checkpoint
 `b100462` has completed successful hosted CI39334677522. New exchange publication
 and hosted acceptance are recorded separately; the ticket is not complete here.
+
+## AUTH-29 owned Keycloak acceptance — 2026-10-20
+
+The [immutable sanitized record](../../tests/browser/oidc/results/2026-10-20/keycloak-code-rotation.json)
+passes **11 named cases** on Node24.21.0, Playwright1.64.1 and
+Chromium156.0.8078.4 using official Keycloak26.8.1 pinned to the previously recorded
+image digest. All **521 source fingerprints** match the final sources and the fixed
+producer executable hash matches the actual binary. This is run/source provenance,
+not a reproducible-binary or general provider/compliance/production-readiness claim.
+The [reproduction guide](../../tests/browser/oidc/README.md) describes the boundary.
+
+The owned example uses actual PostgreSQL begin/consume/context checks and core
+code/S256/RS256 verification. It includes the same private production TLS builder,
+GET/POST and bounded response readers by source path, without widening their public
+API. A private fixture alone supplies the owned TLS root/address mapping. Rust still
+validates hostname/SNI, certificate, peer, timeout, MIME/encoding/body limits and
+redirect/proxy behavior; actual certificate/transport negatives remain separate.
+Fresh browser contexts contact only the owned provider/callback using process-only
+resolver/proxy arguments and fixture certificate tolerance. No user/device/system
+setting, credential manager or production public-root/address policy is changed.
+
+Actual Keycloak browser login and code+S256 produces verified identity proof with
+matching subject/configuration/original cap and omitted email, without creating a
+local account/contact/session. Exact PostgreSQL state replay and the provider's
+original code/form/verifier replay reject. Actual provider-signed wrong nonce and
+untrusted additional audience reject, as does wrong S256. Controlled proxy byte
+corruption and substitution of an earlier genuinely signed token are separately
+labeled; claim/signature negatives require an actual successful provider token
+envelope and exact Unauthorized, never arbitrary infrastructure failure. An actual
+new provider RSA signing key becomes active and verifies. A fresh valid control
+succeeds after all negatives; disabled PostgreSQL context sends no code/client secret.
+
+Aggregate facts are **8 application token POSTs**, **7 successful provider token
+responses**, one deliberate signature fault and one deliberate old-token fault.
+Administrative provisioning and exact code replay use the owned loopback provider
+backend; application document/code requests use the shared HTTPS code through its
+owned TLS proxy. Keycloak's actual no-store discovery/JWKS headers are preserved;
+the real rotation case is not evidence for the forced-refresh cache branch, which
+retains separate bounded actual-signature regressions. The fixture's full provider
+user profile is not a local verified contact; this client requests only openid/profile.
+
+Final database counts are zero users/sessions/audits/pending transactions. Native
+exit0, normal exact-owned database removal, owner-labeled provider removal and
+private-file removal are required and pass, with no unexpected diagnostics or
+emergency cleanup. Proof-bearing IPC stays in private process pipes, never ordinary
+logs/reports/traces/browser storage. Earlier failed runs identified an undefined IPC
+match and a redirect-hop callback DNS failure in Playwright routing. Request-event
+capture plus a real owned callback listener corrected those fixture defects. A
+failed-run PostgreSQL55006 cleanup exposed residual fixture connections; pool
+closure now precedes terminating connections only in its validated random-owned
+database. None of those failures counts as application denial evidence, and no
+application policy or meaningful regression assertion was relaxed.
+
+The behavior-preserving POST-source extraction is separate `12ba9d8`, verified with
+all10 prior TLS cases, strict all-feature lint and redacted staged scanning before
+fixture extension. Named database/composition/transport and provider/proxy/browser/
+IPC/scenario/runner modules remain below300lines. Longer ordered composition and
+resource try/finally functions keep proof, cleanup and fixed-error boundaries
+visible as documented size exceptions; no unrelated structural cleanup is deferred.
+No migration, dependency version, public HTTP schema or ordinary composition changes.
+The new explicit CI command follows pinned browser dependency setup; ordinary Cargo
+suites remain independent of provider tooling, without ignored acceptance tests.
+
+Final local commands pass: formatting; strict locked workspace/all-target Clippy
+with default/all features; sequential default93 and all-feature362 unique cases
+(2 Axum unit/55 HTTP-PG/54 core/241 PostgreSQL/10 server; the logging subprocess
+repeats one included core case); compiled advisory audit, all-feature cargo-deny,
+existing browser npm audit and JS syntax/diff checks. Inactive SQLx/MySQL RSA advisory
+remains visible and compiled findings remain fatal. The complete staged diff receives
+redacted Gitleaks scanning before publication. Prior exchange CI39337567832 at
+`b206d0f` is completed SUCCESS; new exact-head publication/hosted evidence is tracked
+separately. Final mapping/JIT/local session issuance, broader provider/native
+acceptance, independent review, ordinary activation, SAML and outbound issuer remain
+separate open gates. No ticket/project completion follows from local results alone.

@@ -37,6 +37,8 @@ typed claim policy and bounded workers. PostgreSQL reuses configuration/owner/se
 locks and final database time before and after I/O. Its opaque verified identity
 retains original transaction/token caps and grants no local session or linking
 authority. Its optional code exchange uses original S256 proof and explicit
-registered client authentication through the same pinned HTTPS adapter. Local
-Keycloak acceptance and final issuance remain open.
+registered client authentication through the same pinned HTTPS adapter. An owned
+local Keycloak/browser/PostgreSQL suite verifies that boundary using a private
+fixture certificate/address mapping and shared production request code. Final
+identity mapping/JIT/session issuance and ordinary provider activation remain open.
 [ADR 0015](adr/0015-oidc-token-verification.md) records the boundary.

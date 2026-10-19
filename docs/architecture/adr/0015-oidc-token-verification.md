@@ -1,8 +1,9 @@
 # ADR 0015: Transaction-bound OIDC token verification
 
 Date: 2026-10-20. Status: accepted for AUTH-29's optional core/PostgreSQL
-verification and code-exchange boundary. AUTH-29 remains in progress.
-Local Keycloak acceptance and final local identity/session issuance remain gates;
+verification and code-exchange boundary.
+Owned local Keycloak acceptance is implemented below; hosted publication is
+tracked separately. Final local identity/session issuance remains a separate gate;
 this decision activates no provider route or ordinary authentication composition.
 
 ## Context and dependency choice
@@ -111,15 +112,15 @@ original signed duplicate/extension header and claim bytes, exact errors, bounde
 rotation and real PostgreSQL context/deadline ownership alongside the existing
 OAuth state-replay regressions. These are component
 regressions; generating and verifying with one library is not independent protocol
-interoperability evidence. The required local Keycloak flow must still exercise real
-code+S256 exchange, key rotation, invalid signatures/claims and replay with the
-configured production boundary or a clearly identified private component fixture.
+interoperability evidence. The owned local Keycloak fixture below exercises real
+code+S256 exchange, key rotation, invalid signatures/claims and replay with a
+clearly identified private component transport.
 No production-provider credentials belong in CI.
 
 No migration or HTTP/OpenAPI route is added. Native browser/passkey/SMTP checks and
 hosted publication remain separate gates. Real provider web/native acceptance,
 final identity resolution/linking/issuance, independent review, SAML and outbound
-issuer remain open. AUTH-29 must not be marked Done on this partial boundary.
+issuer remain open. Local/provider proof does not complete those separate gates.
 
 ## Code and S256 exchange
 
@@ -170,5 +171,47 @@ Component evidence includes actual signed successes through every configured
 client-authentication method, exact proof/form binding, replay and post-DNS expiry,
 provider/infrastructure error separation and actual TLS POST negatives. Private TLS
 fixtures substitute only their owned address/root at the internal adapter boundary;
-production IP/TLS rules and opaque request constructors remain intact. These checks
-are not the required independent local Keycloak acceptance or final session issuance.
+production IP/TLS rules and opaque request constructors remain intact. These
+component checks are distinct from local Keycloak acceptance and final session issuance.
+
+
+## Owned Keycloak acceptance boundary
+
+The explicit [native suite](../../../tests/browser/oidc/README.md) uses the pinned
+Keycloak26.8.1 image and real PostgreSQL begin/consume/context checks. It imports the
+same private production TLS builder, GET, POST and bounded response reader sources
+into an owned development example. No production visibility/root/IP override is
+added. Only that private example maps the checked fixture hostname to its owned
+TLS listener and certificate. Hostname/SNI, certificate, peer, timeout, type/body
+and redirect/proxy checks remain enabled. Existing actual TLS negatives stay intact.
+
+The Node runner owns the TLS proxy, intercepted callback, fresh browser contexts,
+random admin/client/user credentials, container and random PostgreSQL database.
+Browser-only resolver/proxy arguments and fixture-certificate tolerance change no
+user device/system setting. IPC transports proof privately between owned processes;
+it must never be attached to a terminal, log, trace or persisted artifact. Native
+stdout is a private pipe; ordinary runner output is finite case/count/cleanup data.
+No ordinary callback, local session or provider login route is implemented.
+
+Eleven named cases cover real provider code+S256/RS256 and rotation, provider code/
+verifier replay, PostgreSQL consumed-state replay, actual signed wrong nonce and
+untrusted audience, wrong PKCE, controlled signature corruption and old-token
+substitution, a fresh valid control after negatives and disable before any code POST.
+Claim/signature negatives require an actual successful provider token envelope and
+exact Unauthorized; broken transport is not acceptable denial evidence. The client
+requests only openid/profile, preserving a valid omitted-email case. Public/Post
+client methods and broader claim/key matrices retain separate component evidence.
+
+Keycloak's actual no-store discovery/JWKS headers remain unchanged. Distinct
+operations observe existing miss admission; real rotation therefore does not prove
+the forced-refresh cached-key branch, whose bounded real-signature tests remain
+separate. Controlled corruption/replay occurs at the owned proxy, not in Keycloak.
+These limits preclude a general provider/compliance/production interoperability claim.
+
+Cleanup requires normal native exit and zero local users/sessions/audits/pending,
+then removal of the exact generated database, owner-labeled container and private
+files. Pool closure is followed by terminating residual connections only in that
+exact owned database. Emergency cleanup never converts a failed suite into a pass.
+The explicit CI command runs after browser dependency setup; ordinary Cargo tests
+do not silently skip or require provider tooling. No external production credentials,
+new dependency/version, migration or authentication-policy change is introduced.

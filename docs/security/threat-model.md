@@ -328,4 +328,9 @@ is distinct from provider configuration, malformed response or network failures.
 Unused access/refresh tokens confer no authority and are discarded. Protected
 values redact Debug and zeroize owned storage, without promising whole-process
 memory erasure. Private TLS component mappings add no production network/root
-bypass. Independent Keycloak/review and final local session issuance remain gates.
+bypass. Independent review and final local session issuance remain gates. The owned
+Keycloak/browser/PostgreSQL suite proves only its named code/signature/rotation/
+replay cases with private fixture TLS/address mapping and shared production request
+code. It preserves actual cache headers and distinguishes signed invalid claims
+from deliberate proxy faults. No user/device settings, production root/IP policy or
+ordinary routes change; private IPC and generated credentials never become logs.
