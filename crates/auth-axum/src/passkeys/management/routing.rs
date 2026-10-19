@@ -31,6 +31,26 @@ pub fn experimental_passkey_management_router(
     signup: Arc<PasskeySignup>,
     management: Arc<PasskeyManagement>,
 ) -> Result<Router> {
+    configured_management_router(
+        auth,
+        browser,
+        enrollment,
+        sign_in,
+        signup,
+        management,
+        passkey_management_openapi(),
+    )
+}
+
+pub(in crate::passkeys) fn configured_management_router(
+    auth: Auth,
+    browser: BrowserConfig,
+    enrollment: Arc<PasskeyEnrollment>,
+    sign_in: Arc<PasskeySignIn>,
+    signup: Arc<PasskeySignup>,
+    management: Arc<PasskeyManagement>,
+    document: utoipa::openapi::OpenApi,
+) -> Result<Router> {
     if auth.realm() != management.realm()
         || Url::parse(browser.origin())
             .map_err(|_| Error::InvalidInput)?
@@ -58,12 +78,10 @@ pub fn experimental_passkey_management_router(
             management,
             browser: browser.clone(),
         });
-    Ok(
-        configured_router(auth, browser, passkey_management_openapi())
-            .merge(enrollment)
-            .merge(authentication)
-            .merge(signup)
-            .merge(attachment)
-            .merge(routes),
-    )
+    Ok(configured_router(auth, browser, document)
+        .merge(enrollment)
+        .merge(authentication)
+        .merge(signup)
+        .merge(attachment)
+        .merge(routes))
 }
