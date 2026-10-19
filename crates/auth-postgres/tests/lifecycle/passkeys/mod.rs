@@ -1,3 +1,4 @@
+mod authentication_protocol;
 mod concurrency;
 mod enrollment;
 mod limits;

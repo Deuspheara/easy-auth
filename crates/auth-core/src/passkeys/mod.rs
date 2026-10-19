@@ -1,4 +1,7 @@
+mod authentication;
+mod authentication_state;
 mod configuration;
+mod credential;
 mod enrollment;
 mod logging;
 mod registration;
@@ -7,6 +10,8 @@ mod state;
 #[cfg(test)]
 mod tests;
 
+pub use authentication_state::PrivatePasskeyAuthentication;
+pub use credential::{StoredPasskey, VerifiedPasskeyAuthentication};
 pub use enrollment::{PasskeyEnrollment, PasskeyEnrollmentOptions};
 pub use repository::{
     PasskeyEnrollmentContext, PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRepository,
@@ -14,7 +19,9 @@ pub use repository::{
 pub use state::{PrivatePasskeyRegistration, VerifiedPasskey};
 pub use webauthn_rs::prelude::{
     CreationChallengeResponse as PasskeyCreationOptions,
+    PublicKeyCredential as PasskeyAuthenticationResponse,
     RegisterPublicKeyCredential as PasskeyRegistrationResponse,
+    RequestChallengeResponse as PasskeyAuthenticationOptions,
 };
 
 use crate::{Error, Result};

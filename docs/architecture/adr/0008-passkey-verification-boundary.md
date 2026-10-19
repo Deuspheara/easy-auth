@@ -9,8 +9,10 @@ enrollment stays disabled pending sign-in and stronger-account policy. See the
 Use `webauthn-rs` 0.5.5's high-level registration API. It fixes required user
 verification and supports platform/roaming selection without implementing custom
 signature or attestation verification. Disable default optional attestation APIs;
-ordinary passkey registration still uses the library's verifier. Enable only
-state serialization, for PostgreSQL storage of the private registration object.
+ordinary passkey registration still uses the library's verifier. Enable state
+serialization for PostgreSQL storage of private ceremony objects. AUTH-19 also
+enables conditional UI for its high-level discoverable assertion boundary;
+preserve the library's conditional mediation.
 No credential-internals or user-presence-only feature is enabled.
 
 The protocol service accepts an exact HTTPS origin and derives RP ID from that
@@ -49,9 +51,13 @@ and hiding optional dependencies from security gates. Tradeoffs are a native
 dependency, covered-source distribution obligations and reduced upstream debugging
 detail during ceremonies. Public errors contain no underlying verifier payloads.
 
-This decision does not establish discoverability, account authentication, recovery
-assurance or browser interoperability. The [source review](../../research/passkey-enrollment.md)
-records those remaining gates. Do not enable ordinary server enrollment until
+AUTH-19 adds the optional [assertion protocol boundary](../../research/passkey-authentication.md),
+including trusted credential decoding, owner/realm/origin checks, immutable backup
+eligibility, counter updates and private authentication state. It issues no sessions
+and has no durable login transaction or HTTP route yet. This decision does not
+establish discoverability, account login, recovery assurance or assertion browser
+interoperability. The source reviews record those remaining gates.
+Do not enable ordinary server enrollment until
 registered credentials are usable and mailbox/password flows cannot bypass the
 reviewed stronger-account policy. Passkey-first accounts remain required and need
 an account model without fabricated email addresses.

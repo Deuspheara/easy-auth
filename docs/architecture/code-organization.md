@@ -47,7 +47,7 @@ crates/auth-core/src/
   auth/                     # Auth composition and feature use cases
   ports.rs                  # Repository and delivery contracts
   password.rs               # Bounded hashing and password policy
-  passkeys/                 # Optional verifier, private state, enrollment use cases and repository port
+  passkeys/                 # Separate registration/assertion verification, private state, enrollment use cases and port
   email.rs, secret.rs       # Input and secret policies, with unit tests
   audit.rs, error.rs, identity.rs, notifications.rs, sessions.rs
 crates/auth-postgres/src/
@@ -99,3 +99,10 @@ keeps child/browser ownership and normal-completion cleanup in one visible try/f
 case bodies live in a separate test module. These longer orchestration/test functions
 retain ordered setup/action/assert/cleanup rather than hiding secret handling or
 resource ownership in generic helpers.
+
+The assertion verifier keeps trusted ownership/snapshot checks, its explicit
+account-bound/discoverable branch, high-level signature verification and backup
+policy together in `verify_authentication`. It exceeds the function-size review
+trigger to retain that proof boundary in one place. Private ceremony encoding and
+stored credential decoding have separate owning modules; no SQL or HTTP behavior
+is added to the verifier.

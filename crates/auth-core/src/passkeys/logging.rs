@@ -1,4 +1,4 @@
-/// Upstream trace/debug events include registration state and credential payloads.
+/// Upstream trace/debug events include ceremony state and credential payloads.
 /// These calls are synchronous: a scoped empty dispatcher suppresses only their
 /// events and restores the caller's dispatcher before returning. Never use this
 /// around a future or task spawn, where the work could escape the scope.

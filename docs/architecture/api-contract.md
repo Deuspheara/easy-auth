@@ -1,5 +1,10 @@
 # HTTP contract v1
 
+AUTH-19's optional Rust assertion verifier has no login HTTP routes or OpenAPI
+extension yet. Its proof result is not a session; durable transaction/session
+issuance and the browser contract remain in progress. See the
+[assertion boundary review](../research/passkey-authentication.md).
+
 Initial same-origin browser contract. Realm is trusted router configuration. JSON bodies are bounded at 8 KiB. Auth responses use Cache-Control: no-store. Errors expose stable codes; internal database/SMTP details never reach the caller. Authentication secrets never appear in query parameters or response JSON.
 
 | Method/path | Input | Output / behavior |
