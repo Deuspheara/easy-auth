@@ -37,6 +37,7 @@ async fn optional_mailbox_upgrade_preserves_identity_verification_and_unknown_pr
     ] {
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }
+    crate::support::schema::finish_upgrade_after(&pool, 12).await;
     let user = store
         .authenticate(realm, old.secret.verifier())
         .await

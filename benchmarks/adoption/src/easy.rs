@@ -9,6 +9,8 @@ use uuid::Uuid;
 struct Mailbox(Mutex<Option<String>>);
 #[async_trait]
 impl EmailDelivery for Mailbox {
+    async fn passkey_recovery_started(&self, _: &str) -> auth_core::Result<()> { Err(auth_core::Error::Unavailable) }
+    async fn passkey_recovery_cancelled(&self, _: &str) -> auth_core::Result<()> { Err(auth_core::Error::Unavailable) }
     async fn passkey_recovery_changed(&self, _: &str) -> auth_core::Result<()> {
         Err(auth_core::Error::Unavailable)
     }

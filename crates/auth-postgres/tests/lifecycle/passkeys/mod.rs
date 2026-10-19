@@ -6,6 +6,7 @@ mod enrollment_authority;
 mod limits;
 mod management;
 mod protocol;
+mod recovery_claims;
 mod recovery_setup;
 mod signup;
 mod waiting;

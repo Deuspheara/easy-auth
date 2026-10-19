@@ -5,6 +5,8 @@ pub enum SecurityNoticeKind {
     PasswordReset,
     PasskeysChanged,
     PasskeyRecoveryChanged,
+    PasskeyRecoveryStarted,
+    PasskeyRecoveryCancelled,
     EmailChanged,
     AccountDeleted,
 }

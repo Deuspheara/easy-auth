@@ -1,8 +1,8 @@
 # ADR 0012: Saved-code passkey recovery
 
-Status: experimental saved-code configuration implemented in AUTH-20, 2026-10-19.
-The delayed recovery protocol below is a proposal, pending implementation and
-independent security review. Ordinary enablement and stronger-policy activation
+Status: experimental saved-code configuration and claim scheduling/cancellation
+implemented in AUTH-20, 2026-10-19. Replacement-key recovery remains proposed,
+pending implementation and independent security review. Ordinary enablement and stronger-policy activation
 are not approved by this document. No AAL, MFA, conformance or production claim.
 
 ## Threat and authority
@@ -47,7 +47,8 @@ audit and notification. Failure retains the former confirmed code and makes vali
 pending confirmation retryable. Replays and competing confirmations have one
 winner. The existing sensitive user/source admission budget remains durable even
 when confirmation fails. Active saved codes have no age expiry in this schema;
-rotation replaces them, and the proposed recovery consumption is not implemented.
+rotation replaces them. A claim now consumes/reserves its code once at start;
+replacement-key completion remains unimplemented.
 
 The active version is intended to invalidate requests authorized by an older
 configuration. Setup does not revoke working keys/sessions or change policy. User
@@ -80,41 +81,86 @@ separate real-SMTP contact proof. Existing management cases keep their own accou
 and all assertions, avoiding dilution of the shared admission policy. This proves
 configuration transport, not the proposed recovery protocol below.
 
-## Proposed recovery protocol — not implemented
+## Implemented claim scheduling and cancellation
 
-1. Admit by trusted source before lookup and by realm/account before verification.
-   Require the saved code and an explicit public account identifier; never resolve
-   ownership by a matching email. Bind the claim to configured realm/RP, current
-   saved-code version, a separate HttpOnly browser secret and purpose-specific state.
-   A code authorizes one claim only; a different browser cannot replay it. Specify
-   same-browser retry after a lost response without creating another claim or
-   storing a raw claim secret. Reject cross-purpose use as ordinary authentication.
-2. Keep existing keys usable while a claim waits. Queue start notices to the existing
-   verified channel and record audit. Proposed minimum delay: 24 hours after SMTP
-   acceptance when a verified channel exists; delivery failure must not silently
-   count as notification. Persist a delivery receipt for the exact claim/version.
-   Email-free accounts need an explicit reviewed offline-only policy and honest
-   absence of independent alerts; a waiting period does not compensate for that
-   absence. No new address may be supplied during recovery to redirect notices.
-3. Allow deliberate cancellation by genuine fresh existing-key authentication and
-   by the exact claiming browser capability. Cancellation invalidates the claim and
-   its provisional key, never revives a used code. Generation rotation invalidates
-   prior claims. Cancellation races and delayed delivery must fail closed under
-   the same owner lock. Specify claim expiry (proposed seven days), bounded pending
-   state and durable failed-attempt budgets. Neither a queued notice nor a worker
-   retry may restart or extend authorization deadlines.
-4. After delay, use a short-lived private registration ceremony for one replacement
-   key, followed by an actual signed assertion. Keep the candidate out of ordinary
-   credential inventory/sign-in until final completion. Recheck exact owner/code
-   generation/claim/browser/RP/state, absence of cancellation, notification receipt,
-   delay and original deadlines after waits and final writes. Enforce RP-wide key
-   uniqueness and existing protocol negatives through the reviewed verifier.
-5. Commit replacement, code consumption, invalidation of prior keys/sessions/bound
-   proofs, typed audit and completion notice atomically. Issue a passkey-method
-   session only from the new key's actual fresh assertion; neither saved-code
-   presentation nor waiting grants that method. Require replacement saved-code
-   preparation/confirmation from the new key. Resolve lost-response retry without
-   returning a new unrestricted grant or exposing a stored raw secret.
+The optional `PasskeyRecoveryClaims` core/PostgreSQL boundary exposes begin,
+resume/status and cancellation only. There is no HTTP claim endpoint, replacement
+credential or authenticated session. Public readiness metadata is not verified
+proof and must never authorize an application session or key binding.
+
+A correct current saved code reserves one claim under owner/code locks. The claim
+binds realm/owner/RP/code generation and a separately generated browser-secret
+verifier. The server returns an opaque public claim ID and non-secret timing
+metadata, never a raw browser capability. Same-browser begin retry returns the same
+claim without changing its expiry or emitting duplicate audit/notice. A separate
+resume operation retrieves that bound claim without its response ID or resubmitting
+the code, so loss of the initial response does not lose progress. A different
+browser cannot use the consumed code to resume or start another claim.
+
+The fixed experimental policy is a 24-hour delay and seven-day claim lifetime.
+Both use database time; the original delay is persisted with the claim. If a verified
+contact exists at start, its fixed notice is queued atomically with reservation
+and typed audit. The delay stays unset until successful SMTP acknowledgement under
+the exact current, unexpired queue lease. Receipt completion locks owner, claim and
+notice in that order, validates generation/cancellation, and rechecks original
+claim and lease deadlines after final writes. The first receipt fixes the delay;
+failed/stale/expired leases and late acknowledgements cannot create or restart it.
+SMTP acknowledgement is transport acceptance, not proof the owner read the message.
+
+For email-free accounts the delay starts at claim creation, with no independent
+alert. Metadata states that limitation explicitly. This does not make saved codes
+phishing resistant or compensate for absence of an independent notification channel.
+Existing keys remain usable during the wait. Receipt delay may extend beyond the
+original expiry after a long transport outage; recovery then stays unavailable.
+Retries never extend that expiry or silently substitute another channel.
+
+Cancellation is available before completion through the exact bound browser, a
+genuine fresh passkey session, or the retained reserved saved code. The last path
+lets an alerted owner who lost all keys deny a fraudulent claim. It grants denial
+only: it cannot resume a different browser, reopen a code, bind a key or sign in.
+The notice instructs the owner to use the service with an existing key or retained
+code, never send the code by email. Messages contain no code/capability/link.
+Cancellation invalidates queued start work and records typed attribution; a
+session actor exists only for genuine-key cancellation. The code stays consumed.
+New confirmed configuration invalidates old claims and their queued notices;
+preparation alone preserves them. In-flight SMTP may arrive after cancellation,
+but acknowledgement cannot restore authority. User deletion cascades code/claim/
+notice state and erases historical claim attribution.
+
+Source admission precedes lookup for every operation (40 per ten minutes). Code
+verification also has a ten-attempt account budget. Continuation has a separate
+ten-attempt owner/RP/browser budget: code guessing against a public account ID
+cannot suppress a valid browser's progress. Its key includes the owner and RP even
+when a browser capability is reused. Genuine-key cancellation uses independent
+sensitive-action admission. Saved-code cancellation uses source admission only;
+an account/submitted-code budget could be pre-exhausted before a claim to suppress
+an alerted owner's denial. This high-entropy proof can only cancel, never grant
+access. None of these paths remove source/resource bounds or weaken code-verification
+limits. Account erasure removes its known account/current-capability buckets;
+unlinked invalid-capability and source abuse metadata remains separately retained.
+
+The application must retain its independently generated browser secret before
+beginning and keep it through the wait. If that capability is lost, a consumed code
+can cancel but cannot transfer recovery to another browser. After cancellation or
+expiry, another claim requires newly configured proof under a working key; there
+is no mailbox/password fallback. These explicit usability/compromise limits require
+independent review and clear consent/instructions before activation.
+
+## Remaining key-replacement protocol — proposed, not implemented
+
+After delay, a short-lived private registration ceremony must create one provisional
+replacement key and require an actual signed assertion. Keep it out of ordinary
+inventory/sign-in until final completion. Under owner locks, recheck exact current
+code generation/claim/browser/RP/state, cancellation, notification receipt, delay
+and original deadlines after every wait/final write. Preserve RP-wide credential
+uniqueness and all reviewed protocol negatives.
+
+Commit replacement, invalidation of prior keys/sessions/bound proofs, final claim
+consumption, typed audit and completion notice atomically. Issue a passkey-method
+session only from the new key's actual fresh assertion; saved-code presentation,
+waiting and public metadata grant no such method. Require replacement saved-code
+preparation/confirmation. Resolve completion lost-response retry without returning
+another unrestricted grant or storing raw bearer material.
 
 Stronger-policy activation must wait for implemented, reviewed recovery and real
 private-key proof. Before ordinary enablement, test rollback, one-use/race behavior,

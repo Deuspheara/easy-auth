@@ -30,6 +30,7 @@ async fn lifecycle_migration_requires_reauthentication_for_legacy_sessions(pool:
     ] {
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }
+    crate::support::schema::finish_upgrade_after(&pool, 12).await;
     assert!(store.authenticate(realm, legacy.verifier()).await.is_ok());
     assert!(
         store

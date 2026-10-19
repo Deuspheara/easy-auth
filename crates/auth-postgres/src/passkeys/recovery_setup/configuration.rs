@@ -87,12 +87,23 @@ pub(super) async fn confirm(
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
     let deadline = caller.deadline.with_proof(expires);
+    // A newly confirmed generation invalidates prior recovery authority and
+    // its queued start notices. Preparation alone never cancels a valid claim.
+    sqlx::query(
+        "DELETE FROM auth_passkey_recovery_claims WHERE realm_id=$1 AND user_id=$2 AND rp_id=$3",
+    )
+    .bind(request.realm)
+    .bind(caller.user)
+    .bind(&request.rp_id)
+    .execute(&mut *tx)
+    .await
+    .map_err(unavailable)?;
     sqlx::query(
         r#"
         INSERT INTO auth_passkey_recovery_codes(realm_id,user_id,rp_id,version,code_hash)
         VALUES ($1,$2,$3,$4,$5)
         ON CONFLICT (realm_id,user_id,rp_id) DO UPDATE
-        SET version=EXCLUDED.version,code_hash=EXCLUDED.code_hash,confirmed_at=EXCLUDED.confirmed_at
+        SET version=EXCLUDED.version,code_hash=EXCLUDED.code_hash,confirmed_at=EXCLUDED.confirmed_at,consumed_at=NULL
         "#,
     )
     .bind(request.realm)

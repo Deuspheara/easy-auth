@@ -58,6 +58,7 @@ async fn upgrade_preserves_unknown_methods_and_rotations_do_not_upgrade_assuranc
     .execute(&pool)
     .await
     .unwrap();
+    crate::support::schema::finish_upgrade_after(&pool, 12).await;
     assert!(
         store
             .authenticate(realm, old.secret.verifier())

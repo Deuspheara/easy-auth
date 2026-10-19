@@ -25,6 +25,12 @@ impl Smtp {
 }
 #[async_trait]
 impl EmailDelivery for Smtp {
+    async fn passkey_recovery_started(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email, "Passkey recovery was requested", "A saved recovery code was used to request passkey recovery. Existing keys remain usable during the waiting period. If this was not you, cancel through the service using an existing key or your saved recovery code. Never send that code by email. This notice contains no recovery code, browser capability or sign-in link.".to_owned()).await
+    }
+    async fn passkey_recovery_cancelled(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email, "Passkey recovery was cancelled", "A passkey recovery request was cancelled. Its saved code remains invalid and cannot start another request. Existing keys remain usable; sign in with a working key to configure a replacement saved code. This notice contains no credential or sign-in link.".to_owned()).await
+    }
     async fn passkey_recovery_changed(&self, email: &str) -> auth_core::Result<()> {
         self.send(email, "Your passkey recovery configuration changed", "A saved recovery code was configured or replaced after a fresh passkey sign-in. The code is never sent by email. If this was not you, sign in with an existing key and replace the recovery configuration through the service. This notice contains no code, credential or sign-in link.".to_owned()).await
     }

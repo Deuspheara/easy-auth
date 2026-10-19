@@ -31,6 +31,15 @@ pub enum AuditEvent {
         user_id: Uuid,
         actor_session_id: Uuid,
     },
+    PasskeyRecoveryStarted {
+        user_id: Uuid,
+        claim_id: Uuid,
+    },
+    PasskeyRecoveryCancelled {
+        user_id: Uuid,
+        claim_id: Uuid,
+        actor_session_id: Option<Uuid>,
+    },
     PasskeyRecoveryConfigured {
         user_id: Uuid,
         actor_session_id: Uuid,
@@ -69,6 +78,14 @@ pub enum AuditEvent {
 }
 
 impl AuditEvent {
+    pub fn recovery_claim_id(&self) -> Option<Uuid> {
+        match self {
+            Self::PasskeyRecoveryStarted { claim_id, .. }
+            | Self::PasskeyRecoveryCancelled { claim_id, .. } => Some(*claim_id),
+            _ => None,
+        }
+    }
+
     pub fn passkey_id(&self) -> Option<Uuid> {
         match self {
             Self::PasskeyRenamed { passkey_id, .. } | Self::PasskeyRemoved { passkey_id, .. } => {
@@ -86,6 +103,8 @@ impl AuditEvent {
             Self::PasskeyEnrolled { .. } => "passkey_enrolled",
             Self::PasskeyRenamed { .. } => "passkey_renamed",
             Self::PasskeyRemoved { .. } => "passkey_removed",
+            Self::PasskeyRecoveryStarted { .. } => "passkey_recovery_started",
+            Self::PasskeyRecoveryCancelled { .. } => "passkey_recovery_cancelled",
             Self::PasskeyRecoveryConfigured { .. } => "passkey_recovery_configured",
             Self::PasskeyAuthenticated { .. } => "passkey_authenticated",
             Self::PasskeySignedUp { .. } => "passkey_signed_up",
@@ -106,6 +125,8 @@ impl AuditEvent {
             | Self::PasskeyRenamed { user_id, .. }
             | Self::PasskeyRemoved { user_id, .. }
             | Self::PasskeyRecoveryConfigured { user_id, .. }
+            | Self::PasskeyRecoveryStarted { user_id, .. }
+            | Self::PasskeyRecoveryCancelled { user_id, .. }
             | Self::PasskeyAuthenticated { user_id, .. }
             | Self::PasskeySignedUp { user_id, .. }
             | Self::PasswordReset { user_id }
@@ -118,6 +139,9 @@ impl AuditEvent {
     }
     pub fn actor_session_id(&self) -> Option<Uuid> {
         match self {
+            Self::PasskeyRecoveryCancelled {
+                actor_session_id, ..
+            } => *actor_session_id,
             Self::PasswordEnrolled {
                 actor_session_id, ..
             }
@@ -148,6 +172,7 @@ impl AuditEvent {
             Self::EmailAuthenticated { .. }
             | Self::PasskeyAuthenticated { .. }
             | Self::PasskeySignedUp { .. }
+            | Self::PasskeyRecoveryStarted { .. }
             | Self::PasswordAuthenticated { .. }
             | Self::PasswordReset { .. }
             | Self::AccountDeleted => None,
@@ -167,6 +192,8 @@ impl AuditEvent {
             | Self::PasskeyRenamed { .. }
             | Self::PasskeyRemoved { .. }
             | Self::PasskeyRecoveryConfigured { .. }
+            | Self::PasskeyRecoveryStarted { .. }
+            | Self::PasskeyRecoveryCancelled { .. }
             | Self::AllSessionsRevoked { .. }
             | Self::EmailChanged { .. }
             | Self::AccountDeleted => None,

@@ -6,6 +6,12 @@ use auth_core::{EmailDelivery, Error, Result, Secret};
 pub(super) struct DisabledMail;
 #[async_trait]
 impl EmailDelivery for DisabledMail {
+    async fn passkey_recovery_started(&self, _: &str) -> auth_core::Result<()> {
+        Err(auth_core::Error::Unavailable)
+    }
+    async fn passkey_recovery_cancelled(&self, _: &str) -> auth_core::Result<()> {
+        Err(auth_core::Error::Unavailable)
+    }
     async fn passkey_recovery_changed(&self, _: &str) -> auth_core::Result<()> {
         Err(auth_core::Error::Unavailable)
     }

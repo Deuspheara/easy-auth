@@ -11,13 +11,7 @@ impl Postgres {
         delivered: bool,
     ) -> Result<()> {
         if delivered {
-            sqlx::query("DELETE FROM auth_security_notifications WHERE realm_id=$1 AND id=$2 AND lease_id=$3")
-                .bind(realm)
-                .bind(id)
-                .bind(lease)
-                .execute(&self.pool)
-                .await
-                .map_err(unavailable)?;
+            super::recovery_receipt::delivered(&self.pool, realm, id, lease).await?;
         } else {
             sqlx::query(r#"
     UPDATE auth_security_notifications

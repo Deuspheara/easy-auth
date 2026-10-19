@@ -97,7 +97,7 @@ impl Postgres {
         sqlx::query(
             r#"
             DELETE FROM auth_rate_buckets
-            WHERE realm_id=$1 AND dimension IN ('passkey_enroll_user','passkey_finish_user','sensitive_user')
+            WHERE realm_id=$1 AND dimension IN ('passkey_enroll_user','passkey_finish_user','sensitive_user','passkey_recovery_user')
               AND key_hash=sha256($2)
             "#,
         )
@@ -106,6 +106,14 @@ impl Postgres {
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
+        // Only current owned claim-capability buckets can be linked to this
+        // subject; independent invalid-capability/source abuse metadata remains.
+        sqlx::query(r#"
+            DELETE FROM auth_rate_buckets b USING auth_passkey_recovery_claims c
+            WHERE b.realm_id=$1 AND c.realm_id=$1 AND c.user_id=$2
+              AND b.dimension='passkey_recovery_browser'
+              AND b.key_hash=sha256(uuid_send(c.user_id)||c.browser_hash||convert_to(c.rp_id,'UTF8'))
+        "#).bind(realm).bind(user).execute(&mut *tx).await.map_err(unavailable)?;
         audit::erase_subject(&mut tx, realm, user).await?;
         sqlx::query("DELETE FROM auth_users WHERE realm_id=$1 AND id=$2")
             .bind(realm)

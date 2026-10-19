@@ -70,6 +70,7 @@ async fn session_management_upgrade_preserves_existing_sessions_and_audit(pool: 
     .execute(&pool)
     .await
     .unwrap();
+    crate::support::schema::finish_upgrade_after(&pool, 12).await;
     assert_eq!(
         store
             .list_sessions(realm, current.verifier(), None)

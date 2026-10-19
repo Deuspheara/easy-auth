@@ -129,9 +129,10 @@ additive and creates no saved codes for existing accounts.
 For the dedicated local notice transport check, start the documented PostgreSQL and
 Mailpit services, then run `cargo build --locked -p easy-auth-server --bin easy-auth`
 and `python3 scripts/smoke_recovery_notice.py`. The script creates an owned random
-database/recipient and queues one fixed notice fixture through the normal worker;
-it does not fabricate an authenticated session or exercise recovery login. It
-verifies SMTP content and acknowledgement, removes only its exact owned mail and
+database/recipient and queues configuration/start/cancellation fixtures through the normal worker;
+its dummy verifier/claim rows do not represent authorization or a recovery login.
+It verifies SMTP content, acknowledgement and the full receipt delay, removes
+only its three exact owned messages and
 drops its database. CI supplies its PostgreSQL service container explicitly through
 `EASY_AUTH_SMOKE_POSTGRES_CONTAINER`; database URLs must remain loopback test URLs.
 
@@ -165,3 +166,41 @@ never activate policy. Existing sessions remain unchanged; confirmation after a
 session rotation must restart setup under the new genuine fresh session. SMTP
 transport failure after commit remains queued/retryable and does not undo the
 configuration response. Email-free confirmation sends no fabricated email.
+
+
+## Experimental recovery claim state
+
+`PasskeyRecoveryClaims` currently provides core/PostgreSQL `begin`, `resume`,
+`status`, `cancel`, `cancel_with_key` and `cancel_with_code`. No HTTP claim endpoint,
+replacement key or recovery session exists. These methods must not be advertised
+as working all-keys-lost login. See [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
+
+Begin supplies the explicit public account ID, saved code and a separate browser
+secret retained before the request. A code authorizes one browser-bound claim in
+the configured realm/RP. Same-browser retry preserves its ID/times and single audit/
+notice; resume can recover a lost response ID using the bound browser without
+rechecking the code. Status returns metadata only, with a 24-hour wait and original
+seven-day expiry. With a verified contact, the wait starts only after a current
+unexpired SMTP lease is acknowledged. Email-free claims start their wait at creation
+and explicitly have no independent notification. SMTP failure never becomes a
+successful receipt, fallback channel or extended claim deadline.
+
+A bound browser or genuine fresh key can cancel. An alerted owner without a key
+may also use the retained saved code to cancel only the existing claim, including
+from a different browser. No cancellation reopens the code or authenticates a user.
+Keep the code until completion/cancellation instructions are resolved; never email
+it. New confirmed code configuration invalidates older claims, while preparing
+an unconfirmed replacement preserves them. Loss of the original browser capability,
+expiry or cancellation may require a working key to configure new recovery proof;
+there is no hidden mailbox/password recovery. Activation awaits independent review
+of these limits and a fully implemented replacement-key flow.
+
+Source admission remains 40 attempts per ten minutes. Begin also spends a ten-attempt
+account code-verification budget; continuation spends a separate ten-attempt
+owner/RP/browser budget. A known account ID cannot exhaust a valid browser's budget.
+Fresh-key cancellation has independent sensitive-action admission. Deny-only
+saved-code cancellation has source admission without an account/code counter that
+could be pre-exhausted to protect a fraudulent claim. `EmailDelivery` additionally
+requires `passkey_recovery_started` and `passkey_recovery_cancelled`; the real SMTP
+adapter supplies fixed non-secret messages, and failure remains retryable. A receipt
+proves SMTP acceptance rather than human receipt or independent security review.

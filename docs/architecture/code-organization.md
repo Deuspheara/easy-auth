@@ -241,3 +241,16 @@ cases use separate accounts and preserve earlier management assertions/admission
 The seven-argument explicit constructor and longer test/fixture composition retain
 visible service alignment/resource ownership; no generic routing framework or
 independent transport policy is introduced.
+
+
+Claim state uses core `passkeys/recovery_claims/` flow/port/metadata and PostgreSQL
+beginning, ownership/projection, cancellation, admission and delegation modules.
+Notification leasing/completion and recovery receipt handling now have focused
+`notifications/` modules; the entry file contains declarations only. Shared
+passkey-sensitive admission selects a bucket from a session snapshot and never
+authorizes. Receipt completion and claim creation/cancellation keep their longer
+owner/claim/notice transaction and final original deadline checks visible; these
+are cohesive size exceptions rather than scattered transaction helpers. Test
+modules separate admission, lifecycle/binding, cancellation/rollback, receipt,
+concurrency, migration and observed waits. Shared migration setup finishes later
+schema before current-adapter flows; historical target assertions remain explicit.

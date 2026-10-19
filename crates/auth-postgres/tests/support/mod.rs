@@ -1,4 +1,5 @@
 pub(crate) mod legacy;
+pub(crate) mod schema;
 
 use auth_core::{Repository, Secret};
 use easy_auth_postgres::Postgres;

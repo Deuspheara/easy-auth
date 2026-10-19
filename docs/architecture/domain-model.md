@@ -57,3 +57,14 @@ state and replaces the active version atomically with actor-owned audit and a
 non-secret verified-contact notice. User deletion cascades both tables. Neither
 record is an ordinary authentication session, new key or policy upgrade; recovery
 consumption is not implemented. See [ADR 0012](adr/0012-saved-passkey-recovery.md).
+
+
+`auth_passkey_recovery_claims` holds one claim per realm/owner/RP: code generation,
+browser verifier, original creation/expiry/delay, notification requirement/receipt,
+not-before time and cancellation. Starting consumes the configured code for new
+claims. Same-browser resume does not extend it; reserved-code cancellation can only
+deny it. A start notice has a composite-owned claim reference and is removed on
+claim invalidation. Current leased SMTP acceptance records the first receipt before
+starting contact-based delay; stale/failed/late acknowledgements cannot revive state.
+Public metadata is not authentication. Account erasure removes claim/code state and
+known owned abuse buckets and clears the public historical claim target in audit.

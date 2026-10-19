@@ -58,6 +58,7 @@ async fn audit_upgrade_keeps_unknown_provenance_and_erases_invalid_legacy_subjec
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }
 
+    crate::support::schema::finish_upgrade_after(&pool, 12).await;
     assert!(
         store
             .authenticate(realm, old.secret.verifier())

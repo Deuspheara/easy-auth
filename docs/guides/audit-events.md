@@ -4,7 +4,7 @@ Both server compositions record the same committed lifecycle facts through the s
 
 ## Version 1 fields
 
-`auth_audit` has ten fixed columns after migration 0012: `id`, `realm_id`, `user_id`, `kind`, `occurred_at`, `schema_version`, `actor_session_id`, `session_id`, `subject_erased` and nullable `passkey_id`. IDs are opaque identifiers, not authentication credentials. Runtime event time uses the database clock when the fact is recorded, after lock waits; it is not the transaction-start or exact commit timestamp. No free-form metadata column exists.
+`auth_audit` has eleven fixed columns after migration 0014: `id`, `realm_id`, `user_id`, `kind`, `occurred_at`, `schema_version`, `actor_session_id`, `session_id`, `subject_erased` and nullable `passkey_id` and `recovery_claim_id`. IDs are opaque identifiers, not authentication credentials. Runtime event time uses the database clock when the fact is recorded, after lock waits; it is not the transaction-start or exact commit timestamp. No free-form metadata column exists.
 
 | Kind | Actor session | Issued/affected session | Meaning |
 | --- | --- | --- | --- |
@@ -15,6 +15,8 @@ Both server compositions record the same committed lifecycle facts through the s
 | `passkey_renamed` | fresh passkey-method session | none | Owned key label/version changed; public `passkey_id` retains the target |
 | `passkey_removed` | fresh passkey-method session | none | Owned key removed with proven-key guard and session invalidation; `passkey_id` retains the target |
 | `passkey_recovery_configured` | fresh passkey-method session | none | Saved-code configuration confirmed/replaced and pending setup consumed; no recovery session or policy activation |
+| `passkey_recovery_started` | none | none | One saved code reserved for a browser-bound claim; public `recovery_claim_id` identifies the claim, not a login grant |
+| `passkey_recovery_cancelled` | genuine fresh key session, or none for browser/reserved-code denial | none | Current claim invalidated without reviving its code or issuing a session |
 | `passkey_authenticated` | none | newly issued session | Experimental verified assertion, exact-state consume, credential update and new session committed atomically |
 | `passkey_signed_up` | none | newly issued session | Optional core/PostgreSQL signup verified separate assertion and atomically created email-free user/key/session and consumed pending state |
 | `password_reset` | none | none | Current recovery proof consumed, credential replaced and sessions/proofs invalidated |
@@ -29,7 +31,7 @@ There are no passwords/PHC strings, bearer values/verifiers, mailbox addresses, 
 
 ## Deletion and upgrades
 
-Deleting an account sets its old events' `subject_erased=true` and removes user, actor-session affected-session and passkey-target references. The original kinds/times remain, followed by a subject-free deletion event. Other users and realms keep their attribution. This deidentifies the live store; timing, backups, previously exported data and delivered mail have separate privacy/retention policies.
+Deleting an account sets its old events' `subject_erased=true` and removes user, actor-session affected-session and passkey/claim-target references. The original kinds/times remain, followed by a subject-free deletion event. Other users and realms keep their attribution. This deidentifies the live store; timing, backups, previously exported data and delivered mail have separate privacy/retention policies.
 
 Migration `0006_safe_audit.sql` leaves old rows at version 0 with unknown actor/target fields. Valid subject ownership remains; dangling/cross-realm subjects and old deletion records are deidentified. It never attaches an old event to a guessed session. New writes use version 1 with kind-specific shapes. Stop old writers, apply migrations and upgrade all replicas together; mixed-version writing is unsupported for this alpha. Custom adapters must implement equivalent atomicity, ownership, redaction and deletion semantics.
 
@@ -70,6 +72,16 @@ enters audit. Configuration replacement, pending consumption and a purpose-speci
 verified-contact notice commit atomically after final original-deadline checks.
 Email-free users receive no fabricated email. This event proves configuration,
 not recovery completion or independent review of the proposed protocol.
+
+Migration `0014_passkey_recovery_claims.sql` adds the public historical claim target
+for started/cancelled facts only. Subject erasure clears it alongside every other
+reference. There is no live-claim foreign key that would block cancellation or
+configuration rotation; the exact owned claim is validated in the locked owning
+transaction. Start and non-session cancellation do not invent a session actor or
+record passkey authentication. Only genuine fresh-key cancellation records its
+owned actor session. A notification receipt is separate database delivery state,
+not proof of authentication, user readership or completed recovery. No code,
+browser verifier, recipient or arbitrary recovery context enters audit.
 
 ## Operator reads and linking
 

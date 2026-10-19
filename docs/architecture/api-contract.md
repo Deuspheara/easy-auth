@@ -203,3 +203,17 @@ session or stronger-policy activation is exposed.
 `EmailDelivery::passkey_recovery_changed` is required for the new purpose-specific
 queued notice. See [ADR 0012](adr/0012-saved-passkey-recovery.md) and the
 [management guide](../guides/passkey-management.md#experimental-saved-code-configuration).
+
+
+Optional `PasskeyRecoveryClaims` adds core/PostgreSQL claim begin/resume/status
+and browser, fresh-key or reserved-code cancellation. There is no HTTP claim route
+or schema change in this stage, and its non-secret readiness metadata is never
+session/key authority. It reserves a saved code once, binds its exact generation
+and browser to the configured realm/owner/RP, preserves same-browser retry timing,
+and enforces a 24-hour delay plus seven-day expiry using database time. Verified-
+contact delay requires a current unexpired notification-lease acknowledgement;
+email-free metadata explicitly reports the absence of an independent alert.
+Reserved-code cancellation is deny-only and cannot transfer a browser or revive
+proof. The required delivery port adds started/cancelled notices. See
+[ADR 0012](adr/0012-saved-passkey-recovery.md) for rate scopes, lost-response handling,
+original deadline/receipt rules and unimplemented replacement/activation gates.

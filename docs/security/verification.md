@@ -917,3 +917,81 @@ deferred by this change. Recovery claim/delay/notification receipts/cancellation
 new-key proof and one-use recovery completion remain proposed, not implemented;
 independent review, safe activation, ordinary composition and physical-device/
 other-browser acceptance remain open. This checkpoint does not complete AUTH-20.
+
+## AUTH-20 recovery claim scheduling and cancellation checkpoint (2026-10-19)
+
+AUTH-20 remains **In Progress**. The experimental core/PostgreSQL service now
+supports starting, resuming, inspecting and cancelling an owner/RP/browser-bound
+claim with a reserved saved-code generation. Additive migration 0014 records
+single consumption, a seven-day original expiry and a fixed 24-hour delay. With a
+verified contact, only an accepted current SMTP lease starts that delay; without
+a mailbox, it starts at creation and no alert is fabricated. Readiness is metadata,
+not authority. There is no claim HTTP route, replacement-key completion, recovery
+session issuance or stronger-account activation in this checkpoint.
+
+The separate notification/sensitive-admission extraction passed **84 existing
+PostgreSQL passkey cases and one default notification case** before behavior
+changes. The new **23 real-PostgreSQL cases** cover exact realm/owner/RP/browser/
+code-generation bindings, same-browser retries and lost-response resume, one-winner
+claim races, immutable delay/expiry, source/account/browser admission, rollback,
+fresh-key cancellation, reserved-code denial after all sessions are revoked,
+current/stale/failed/expired SMTP leases, first receipt timing, rotation/deletion
+races and erasure, schema upgrade constraints and observed post-write deadline
+waits. Cancellation and receipts share owner-before-claim-before-notice locking.
+Source-only admission for reserved-code cancellation prevents anonymous account
+budget exhaustion from suppressing an alerted owner's denial; that proof grants
+no access, new claim, browser transfer or ordinary authentication.
+
+A controlled failing regression reproduced `RateLimited` when bad-code account
+traffic blocked a legitimate bound browser's continuation. Continuation now uses
+an owner/RP/browser capability budget distinct from code guessing, preserving the
+source limit. The regression passes without weakening assertions. Initial full
+default checks also exposed three historical migration fixtures that stopped at
+schema 0012 before calling today's audit adapter. Seven affected upgrade fixtures
+now explicitly finish later migrations after their historical setup/assertions;
+published migrations and assertions are unchanged. A test-only expiry trigger
+leaking into the next matrix setup was also fixed rather than accepting generic
+infrastructure errors as authorization rejection.
+
+Final checks with PostgreSQL 17.11 and the documented Mailpit setup:
+
+- `cargo fmt --all -- --check`; locked workspace/all-target Clippy with default
+  and all features and `-D warnings` pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **233 pass** (2 Axum unit, 39 HTTP/database, 10 core, 182 PostgreSQL). The
+  logging subprocess repeats one included core case. Successful full suites have
+  no failed or ignored tests. The focused claim suite independently passes all
+  **23** cases.
+- The locked adoption benchmark's `easy` binary check passes, including the new
+  explicit delivery-port methods. No dependency versions changed.
+- Fresh pinned native runs pass **31 Chromium and 4 real-SMTP cases**. These verify
+  existing signup/authentication/management/code-configuration behavior, not a
+  nonexistent claim HTTP flow. Fixed owned producer copies were made after Cargo
+  builds/checks; all recorded source/binary hashes match the immutable
+  [browser report](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-claims.json)
+  and [SMTP report](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-recovery-claims.json).
+  Existing assertions and limits remain intact. Both owned native databases and
+  exactly eleven owned SMTP messages are removed. These are virtual-device results.
+- The expanded normal-server notice smoke passes configuration, claim-start and
+  cancellation delivery plus accepted-lease receipt/24-hour delay, both through
+  local Compose discovery and an explicitly selected PostgreSQL container as in
+  CI. Each run removes exactly three owned messages and its database. Its dummy
+  schema-only claim/verifier fixtures prove transport/worker behavior, not claim
+  authorization or recovery login. Newly built standalone and embedded full
+  password/recovery/session/lifecycle SMTP smokes also pass with owned cleanup.
+- Compiled-dependency audit, all-feature cargo-deny and low-threshold npm audit
+  pass. The inactive SQLx/MySQL rsa advisory remains visible. The complete staged
+  diff passes redacted Gitleaks scanning before publication.
+
+Source review keeps claim flow/port/types, admission, ownership, creation,
+cancellation and receipt responsibilities in named modules with narrow visibility.
+New Rust modules stay below roughly 300 lines. Longer creation/cancellation/
+receipt transactions and observed-wait scenarios retain explicit lock, mutation,
+deadline and rollback order as documented size exceptions. No generic recovery
+engine or deferred structural cleanup is introduced. Required delivery methods
+are documented for custom adapters. Independent recovery-policy review, private
+replacement-key proof and one-use completion, claim HTTP boundaries, safe
+activation and physical-device/other-browser evidence remain open. Browser loss,
+claim expiry and prolonged SMTP outage fail closed; a consumed code cannot silently
+restart recovery. This checkpoint does not complete AUTH-20 or its release gates.

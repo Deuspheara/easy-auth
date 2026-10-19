@@ -155,3 +155,26 @@ SMTP notices; test code is never persisted in browser storage or reports. Existi
 negative protocol/management assertions remain intact in separate owned accounts.
 This transport addition does not implement delayed/cancellable recovery or activate
 ordinary routes; independent review and physical-device/browser gates remain.
+
+
+Experimental recovery claims reserve a saved code once for a realm/owner/RP/
+generation/browser, without issuing any session or key. Source admission precedes
+lookup; account code-verification and owner/RP/browser continuation budgets differ
+so a public ID cannot suppress an already-bound browser. Same-browser resume handles
+lost begin responses without changing time/audit/notice. The original seven-day
+claim cap and 24-hour wait use database time. Verified-contact delay starts only
+from a current unexpired leased SMTP acknowledgement. Receipt locking follows
+owner -> claim -> notice; final claim/lease caps follow all writes. Failed, stale,
+expired, cancelled or superseded work cannot create/restart eligibility.
+
+Existing keys remain usable. Cancellation requires the bound browser, a genuine
+fresh key, or the retained reserved code for denial only. The latter lets an alerted
+all-keys-lost owner stop a stolen-code claim; it cannot resume another browser or
+create any grant. It has source admission without a pre-exhaustible account/code
+cancellation counter. There is no mailbox-only cancellation/login authority. Code
+rotation invalidates claims atomically, deletion erases owned state/audit targets,
+and source/unlinked abuse metadata remains separately retained. Email-free users
+lack independent alerts; lost browser capability, expired/cancelled proof and
+long SMTP outages have explicit recovery limits. No claim HTTP endpoint or key
+replacement/session completion exists yet. Independent review, consent/usability,
+full replacement/cancellation races and physical-device evidence remain gates.

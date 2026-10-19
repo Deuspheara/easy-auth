@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local transport check: an owned queue fixture through the real SMTP worker.
 
-This checks delivery, not saved-code configuration or all-keys-lost recovery.
+This checks delivery/receipt transport, not claim authorization or recovery login.
 Use the documented Docker PostgreSQL/Mailpit services and a freshly built server.
 Only this run's disposable database and exact random recipient are removed.
 """
@@ -30,9 +30,9 @@ def psql(database):
     return command + ["psql", "-U", "auth", "-d", database, "-v", "ON_ERROR_STOP=1"]
 
 
-def sql(statement):
+def sql(statement, database="auth"):
     subprocess.run(
-        psql("auth") + ["-c", statement],
+        psql(database) + ["-c", statement],
         cwd=ROOT, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
 
@@ -55,18 +55,18 @@ def owned_messages(address):
     return [m for m in result["messages"] if len(m["To"]) == 1 and m["To"][0]["Address"] == address]
 
 
-def wait_notice(address):
+def wait_notice(address, subject, expected_text):
     deadline = time.monotonic() + 15
     while time.monotonic() < deadline:
-        messages = owned_messages(address)
+        messages = [m for m in owned_messages(address) if m["Subject"] == subject]
         if messages:
             assert len(messages) == 1, "exactly one owned notice"
             message = mail_request("/api/v1/message/" + urllib.parse.quote(messages[0]["ID"], safe=""))
-            assert message["Subject"] == "Your passkey recovery configuration changed", "purpose-specific SMTP subject"
+            assert message["Subject"] == subject, "purpose-specific SMTP subject"
             assert message["To"][0]["Address"] == address, "owned verified recipient"
             text = message["Text"]
-            assert "configured or replaced after a fresh passkey sign-in" in text, "configuration notice"
-            assert "The code is never sent by email" in text, "no mailed recovery credential"
+            assert expected_text in text, "purpose-specific recovery notice"
+            assert not re.search(r"[A-Za-z0-9_-]{43}", text), "no bearer value in notice"
             assert not any(v in text for v in ["https://", "http://", "#token=", "code="]), "no recovery/sign-in URL or bearer value"
             return
         time.sleep(0.1)
@@ -115,11 +115,53 @@ def wait_ready(child, port):
     raise AssertionError("test infrastructure: owned server readiness timeout")
 
 
+
+def seed_transport_fixture(database, realm, user, address, claim, version):
+    # Schema-only rows use unusable dummy verifiers, with no corresponding raw
+    # code/browser capability. No session or key is seeded. Authorization has PG tests.
+    sql(
+        f"INSERT INTO auth_users(realm_id,id,email) VALUES ('{realm}','{user}','{address}'); "
+        "INSERT INTO auth_passkey_recovery_codes(realm_id,user_id,rp_id,version,code_hash,consumed_at) "
+        f"VALUES ('{realm}','{user}','localhost','{version}',decode(repeat('00',32),'hex'),clock_timestamp()); "
+        "WITH instant AS (SELECT clock_timestamp() AS now) "
+        "INSERT INTO auth_passkey_recovery_claims(realm_id,user_id,rp_id,id,code_version,browser_hash,created_at,expires_at,delay_seconds,notification_required) "
+        f"SELECT '{realm}','{user}','localhost','{claim}','{version}',decode(repeat('01',32),'hex'),now,now+interval '7 days',86400,true FROM instant;",
+        database,
+    )
+
+
+def check_recovery_notices(database, realm, user, address, claim):
+    for kind, subject, expected in [
+        ("passkey_recovery_changed", "Your passkey recovery configuration changed", "configured or replaced after a fresh passkey sign-in"),
+        ("passkey_recovery_started", "Passkey recovery was requested", "Existing keys remain usable during the waiting period"),
+        ("passkey_recovery_cancelled", "Passkey recovery was cancelled", "Its saved code remains invalid"),
+    ]:
+        notice = str(uuid.uuid4())
+        association = f"'{claim}'" if kind == "passkey_recovery_started" else "NULL"
+        if kind == "passkey_recovery_cancelled":
+            sql(f"UPDATE auth_passkey_recovery_claims SET cancelled_at=clock_timestamp() WHERE realm_id='{realm}' AND id='{claim}'", database)
+        sql(
+            "INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind,recovery_claim_id) "
+            f"VALUES ('{realm}','{notice}','{user}','{address}','{kind}',{association});", database,
+        )
+        wait_notice(address, subject, expected)
+        wait_acknowledgement(database, notice)
+        if kind == "passkey_recovery_started":
+            receipt = subprocess.check_output(
+                psql(database) + ["-At", "-c",
+                    "SELECT notified_at>=created_at AND not_before=notified_at+interval '24 hours' "
+                    f"AND not_before>clock_timestamp() FROM auth_passkey_recovery_claims WHERE realm_id='{realm}' AND id='{claim}'"],
+                cwd=ROOT, stderr=subprocess.DEVNULL,
+            ).strip()
+            assert receipt == b"t", "real SMTP acknowledgement fixes the full waiting period"
+    assert len(owned_messages(address)) == 3, "three exact purpose-specific owned messages"
+
+
 def main():
     namespace = uuid.uuid4().hex
     database = "easy_auth_recovery_notice_" + namespace
     address = "recovery-notice-" + namespace + "@example.test"
-    realm, user, notice = (str(uuid.uuid4()) for _ in range(3))
+    realm, user, claim, version = (str(uuid.uuid4()) for _ in range(4))
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
@@ -132,20 +174,9 @@ def main():
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
         wait_ready(child, port)
-        # Fixed test SQL and internally generated UUID/recipient namespace only.
-        # No authentication/session/proof is fabricated or returned by this fixture.
-        statement = (
-            f"INSERT INTO auth_users(realm_id,id,email) VALUES ('{realm}','{user}','{address}'); "
-            "INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) "
-            f"VALUES ('{realm}','{notice}','{user}','{address}','passkey_recovery_changed');"
-        )
-        subprocess.run(
-            psql(database) + ["-c", statement], cwd=ROOT, check=True,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        )
-        wait_notice(address)
-        wait_acknowledgement(database, notice)
-        print("PASS: purpose-specific queued notice through the real SMTP worker")
+        seed_transport_fixture(database, realm, user, address, claim, version)
+        check_recovery_notices(database, realm, user, address, claim)
+        print("PASS: configuration/start/cancellation SMTP notices and accepted-lease receipt")
     finally:
         if child is not None:
             child.terminate()

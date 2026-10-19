@@ -20,11 +20,14 @@ pub use identity::{AuthenticationPolicy, User};
 pub use notifications::{SecurityNotice, SecurityNoticeKind};
 #[cfg(feature = "passkeys")]
 pub use passkeys::{
-    MAX_PASSKEYS_PER_ACCOUNT, PasskeyAuthenticationOptions, PasskeyAuthenticationRepository,
-    PasskeyAuthenticationRequest, PasskeyAuthenticationResponse, PasskeyAuthenticationStart,
-    PasskeyCreationOptions, PasskeyEnrollment, PasskeyEnrollmentContext, PasskeyEnrollmentOptions,
+    MAX_PASSKEYS_PER_ACCOUNT, PASSKEY_RECOVERY_DELAY_SECONDS, PASSKEY_RECOVERY_LIFETIME_SECONDS,
+    PasskeyAuthenticationOptions, PasskeyAuthenticationRepository, PasskeyAuthenticationRequest,
+    PasskeyAuthenticationResponse, PasskeyAuthenticationStart, PasskeyCreationOptions,
+    PasskeyEnrollment, PasskeyEnrollmentContext, PasskeyEnrollmentOptions,
     PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyInfo, PasskeyManagement,
-    PasskeyManagementRepository, PasskeyManagementRequest, PasskeyRecoverySetup,
+    PasskeyManagementRepository, PasskeyManagementRequest, PasskeyRecoveryClaimInfo,
+    PasskeyRecoveryClaimRepository, PasskeyRecoveryClaimRequest, PasskeyRecoveryClaims,
+    PasskeyRecoveryCodeCancellation, PasskeyRecoveryKeyCancellation, PasskeyRecoverySetup,
     PasskeyRecoverySetupRepository, PasskeyRecoverySetupRequest, PasskeyRegistrationResponse,
     PasskeyRepository, PasskeyService, PasskeySignIn, PasskeySignInOptions, PasskeySignup,
     PasskeySignupAssertion, PasskeySignupCreation, PasskeySignupRegistrationContext,
