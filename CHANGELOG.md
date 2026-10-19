@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Experimental verified contact attachment for email-free passkey-required accounts:
+  independent mailbox proof plus fresh passkey session, preserved identity/policy,
+  atomic session rotation and typed audit, with PostgreSQL race/rollback/expiry and
+  HTTP captured-mail tests. SMTP/native attachment evidence remains pending (AUTH-53).
+
 - Experimental anonymous passkey signup HTTP routes and complete OpenAPI, with
   session-confusion guards and eleven Chromium resident platform/USB signup cases,
   later bound/discoverable login and native negative proofs. Verified-mailbox

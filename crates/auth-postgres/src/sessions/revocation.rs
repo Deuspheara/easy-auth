@@ -76,6 +76,7 @@ impl Postgres {
         }
         for table in [
             "auth_email_changes",
+            "auth_email_attachments",
             "auth_account_deletions",
             "auth_passkey_enrollments",
             "auth_passkey_authentications",

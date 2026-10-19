@@ -4,8 +4,10 @@ The optional core/PostgreSQL signup flow creates an account without email, but
 only after registration **and** an independently verified assertion. Explicit
 experimental Axum composition now exposes this flow, with real Chromium platform/
 roaming virtual-authenticator signup and subsequent account-bound/discoverable login.
-Verified-mailbox attachment and AUTH-20's stronger-account management/recovery
-remain required before ordinary standalone/server activation. No real-device or
+Verified contact attachment now has shared-core/PostgreSQL and experimental HTTP
+implementation with database and captured-mail tests. Actual SMTP/native attachment
+evidence and AUTH-20's stronger-account management/recovery remain required before
+ordinary standalone/server activation. No real-device or
 production claim.
 
 ## HTTP composition and contract
@@ -51,7 +53,7 @@ legitimate signup ceremonies have separate server-owned prospective identities.
 ## Shared-core sequence
 
 Enable `easy-auth-core/passkeys` and `easy-auth-postgres/passkeys`, migrate through
-`0010_passkey_signup.sql`, and explicitly compose `PasskeySignup::new` with the
+`0011_email_attachment.sql`, and explicitly compose `PasskeySignup::new` with the
 trusted realm, configured `PasskeyService` and PostgreSQL repository. The service
 uses the same exact RP/origin and high-level verifier as existing enrollment/login.
 Generate a browser-binding `Secret` on the server; never accept a proposed user,
@@ -131,7 +133,8 @@ RP/UV, assertion UP/UV/signature, replay, cross-browser/session confusion and an
 actually signed cross-origin iframe context; valid controls still complete. They
 are part of the 31-case [browser suite](../../tests/browser/passkeys/README.md).
 
-Mailbox attachment is the next AUTH-53 boundary and still requires fresh passkey
-control plus a separate verified
-target-mailbox proof without weakening account policy. General lifecycle/recovery,
+The [contact attachment API](email-attachment.md) requires fresh passkey control
+plus a separate verified target-mailbox proof without weakening account policy.
+Its PostgreSQL/HTTP tests currently use controlled storage sessions and captured
+mail; they do not establish native signup-to-SMTP attachment interoperability. General lifecycle/recovery,
 other browsers and real devices remain open. See [ADR 0009](../architecture/adr/0009-passkey-first-identity.md).

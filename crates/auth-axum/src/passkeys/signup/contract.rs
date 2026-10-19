@@ -21,5 +21,6 @@ struct SignupApi;
 pub fn passkey_signup_openapi() -> utoipa::openapi::OpenApi {
     let mut api = super::super::passkey_authentication_openapi();
     api.merge(SignupApi::openapi());
+    super::super::email_attachment::extend(&mut api);
     api
 }

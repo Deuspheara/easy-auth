@@ -34,6 +34,12 @@ async fn signup_upgrade_preserves_existing_identity_and_provenance_and_supports_
     .execute(&pool)
     .await
     .unwrap();
+    sqlx::raw_sql(include_str!(
+        "../../../../migrations/0011_email_attachment.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     let mut f = Signup::new(pool.clone()).await;
     let (id, response) = f.assertion().await;
     assert!(

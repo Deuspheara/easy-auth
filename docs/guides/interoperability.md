@@ -9,7 +9,8 @@
 | Embedded vs standalone | Same Auth use cases/router; compiled custom protected-route example | Fresh contributor walkthrough pending | Implemented shared composition |
 | Passkey registration | Real PostgreSQL attack/concurrency/rollback corpus; experimental HTTP boundary/contract; eight real Chromium virtual-authenticator cases | No real-device evidence | Experimental opt-in only; ordinary composition disabled |
 | Passkey sign-in and modal discoverability | Real signed protocol/database corpus, experimental HTTP contract and native Chromium platform/USB assertions, resident discovery, signed context/backup/counter checks | No real-device evidence | Explicit experimental composition; ordinary activation gated |
-| Passkey-first accounts and stronger-account recovery | Not implemented yet | None | Remaining M03 work; ordinary activation blocked |
+| Stronger-account management and recovery | Not implemented yet | None | AUTH-20; ordinary activation blocked |
+| Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests and 3 captured-mail HTTP cases | No actual SMTP/native attachment evidence yet | Experimental signup composition only; AUTH-53 remains open |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; contact attachment and full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
 | Enterprise OIDC client | None yet | None | M05 required; unavailable |

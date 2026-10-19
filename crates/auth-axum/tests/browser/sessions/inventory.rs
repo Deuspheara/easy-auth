@@ -92,6 +92,7 @@ async fn inventory_and_individual_revocation_never_expose_secrets_or_select_othe
     assert_eq!(
         own.headers().get_all(header::SET_COOKIE).iter().count(),
         5 + usize::from(cfg!(feature = "passkey-enrollment"))
+            + usize::from(cfg!(feature = "passkey-signup"))
     );
     #[cfg(feature = "passkey-enrollment")]
     assert!(

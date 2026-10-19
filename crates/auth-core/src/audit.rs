@@ -45,6 +45,11 @@ pub enum AuditEvent {
         user_id: Uuid,
         actor_session_id: Uuid,
     },
+    EmailAttached {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+        session_id: Uuid,
+    },
     /// Deletion keeps the fact, after erasing subject/session attribution.
     AccountDeleted,
 }
@@ -62,6 +67,7 @@ impl AuditEvent {
             Self::SessionRevoked { .. } => "session_revoked",
             Self::AllSessionsRevoked { .. } => "all_sessions_revoked",
             Self::EmailChanged { .. } => "email_changed",
+            Self::EmailAttached { .. } => "email_attached",
             Self::AccountDeleted => "account_deleted",
         }
     }
@@ -77,6 +83,7 @@ impl AuditEvent {
             | Self::SessionRevoked { user_id, .. }
             | Self::AllSessionsRevoked { user_id, .. }
             | Self::EmailChanged { user_id, .. } => Some(*user_id),
+            Self::EmailAttached { user_id, .. } => Some(*user_id),
             Self::AccountDeleted => None,
         }
     }
@@ -96,6 +103,9 @@ impl AuditEvent {
             }
             | Self::EmailChanged {
                 actor_session_id, ..
+            }
+            | Self::EmailAttached {
+                actor_session_id, ..
             } => Some(*actor_session_id),
             Self::EmailAuthenticated { .. }
             | Self::PasskeyAuthenticated { .. }
@@ -112,6 +122,7 @@ impl AuditEvent {
             | Self::PasskeySignedUp { session_id, .. }
             | Self::PasswordAuthenticated { session_id, .. }
             | Self::PasswordEnrolled { session_id, .. }
+            | Self::EmailAttached { session_id, .. }
             | Self::SessionRevoked { session_id, .. } => Some(*session_id),
             Self::PasswordReset { .. }
             | Self::PasskeyEnrolled { .. }

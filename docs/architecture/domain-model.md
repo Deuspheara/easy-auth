@@ -41,5 +41,9 @@ registration/assertion signup in core/PostgreSQL: only verified assertion comple
 creates the user/key/session and typed signup audit, with final expiry checking
 after all writes. [Experimental HTTP/native signup](../guides/passkey-signup.md)
 now verifies anonymous platform/roaming enrollment, assertion and later account-bound/
-discoverable login. Verified-mailbox attachment remains required. AUTH-20 still owns full stronger-account
+discoverable login. Migration 0011 adds one pending contact attachment per owner,
+bound to the initiating session, realm and independent browser proof. Verified
+completion preserves UUID, stronger policy and authentication provenance, with
+transactional session/proof invalidation and a typed audit fact. SMTP/native
+attachment evidence remains required. AUTH-20 still owns full stronger-account
 management and recovery closure.

@@ -6,6 +6,26 @@ use uuid::Uuid;
 
 #[async_trait]
 impl Repository for Postgres {
+    async fn begin_email_attachment(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        email: &str,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<()> {
+        Postgres::begin_email_attachment(self, realm, current, email, token, browser).await
+    }
+    async fn finish_email_attachment(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+        replacement: Verifier,
+    ) -> Result<()> {
+        Postgres::finish_email_attachment(self, realm, current, token, browser, replacement).await
+    }
     async fn begin_email(
         &self,
         realm: Uuid,

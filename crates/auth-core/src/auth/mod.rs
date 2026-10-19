@@ -1,6 +1,7 @@
 mod account;
 mod admission;
 mod email;
+mod email_attachment;
 mod notifications;
 mod passwords;
 mod recovery;

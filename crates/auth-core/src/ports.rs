@@ -91,6 +91,24 @@ pub trait Repository: Send + Sync {
         new: Verifier,
         browser: Verifier,
     ) -> Result<String>;
+    /// First verified contact only: fresh passkey session, one pending proof per owner.
+    async fn begin_email_attachment(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        email: &str,
+        token: Verifier,
+        browser: Verifier,
+    ) -> Result<()>;
+    /// Preserve owner/policy and authentication provenance; rotate sessions and consume atomically.
+    async fn finish_email_attachment(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        token: Verifier,
+        browser: Verifier,
+        replacement: Verifier,
+    ) -> Result<()>;
     async fn confirm_email_change(
         &self,
         realm: Uuid,
@@ -116,6 +134,7 @@ pub trait Repository: Send + Sync {
 }
 #[async_trait]
 pub trait EmailDelivery: Send + Sync {
+    async fn email_attachment(&self, email: &str, token: &Secret) -> Result<()>;
     async fn sign_in(&self, email: &str, token: &Secret) -> Result<()>;
     async fn password_reset(&self, email: &str, token: &Secret) -> Result<()>;
     async fn password_changed(&self, email: &str) -> Result<()>;

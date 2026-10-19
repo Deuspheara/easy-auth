@@ -37,6 +37,7 @@ pub fn experimental_passkey_signup_router(
         auth: auth.clone(),
         browser: browser.clone(),
     };
+    let attachment = super::super::email_attachment::routes(&auth, &browser);
     let routes = Router::new()
         .route("/v1/passkeys/signup/start", post(handlers::start))
         .route(
@@ -50,5 +51,6 @@ pub fn experimental_passkey_signup_router(
     Ok(configured_router(auth, browser, passkey_signup_openapi())
         .merge(enrollment)
         .merge(authentication)
+        .merge(attachment)
         .merge(routes))
 }

@@ -4,6 +4,8 @@ use std::sync::Mutex;
 
 #[derive(Default)]
 pub(crate) struct Mail {
+    pub(crate) attachments: Mutex<Vec<(String, String)>>,
+    pub(crate) fail_attachments: Mutex<bool>,
     pub(crate) sign_ins: Mutex<Vec<String>>,
     pub(crate) resets: Mutex<Vec<String>>,
     pub(crate) notices: Mutex<usize>,
@@ -13,6 +15,16 @@ pub(crate) struct Mail {
 }
 #[async_trait]
 impl EmailDelivery for Mail {
+    async fn email_attachment(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
+        if *self.fail_attachments.lock().unwrap() {
+            return Err(auth_core::Error::Unavailable);
+        }
+        self.attachments
+            .lock()
+            .unwrap()
+            .push((email.to_owned(), token.expose().to_owned()));
+        Ok(())
+    }
     async fn email_change(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
         self.changes
             .lock()

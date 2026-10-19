@@ -1,5 +1,6 @@
 mod boundary;
 mod contract;
+mod email_attachment;
 
 use crate::support::{Mail, cookie, post};
 use auth_core::{Auth, PasskeyEnrollment, PasskeyService, PasskeySignIn, PasskeySignup, Secret};
@@ -23,6 +24,11 @@ const REGISTRATION: &str = "/v1/passkeys/signup/registration";
 const FINISH: &str = "/v1/passkeys/signup/finish";
 
 async fn app(pool: PgPool) -> (Router, Auth, Arc<Postgres>) {
+    let (app, auth, store, _) = app_with_mail(pool).await;
+    (app, auth, store)
+}
+
+async fn app_with_mail(pool: PgPool) -> (Router, Auth, Arc<Postgres>, Arc<Mail>) {
     let store = Arc::new(Postgres::new(pool));
     store.migrate().await.unwrap();
     let realm = Uuid::new_v4();
@@ -35,7 +41,10 @@ async fn app(pool: PgPool) -> (Router, Auth, Arc<Postgres>) {
     ));
     let sign_in = Arc::new(PasskeySignIn::new(realm, service.clone(), store.clone()));
     let signup = Arc::new(PasskeySignup::new(realm, service, store.clone()));
-    let auth = Auth::new(realm, store.clone(), Arc::new(Mail::default()));
+    let mail = Arc::new(Mail::default());
+    let auth = Auth::new(realm, store.clone(), mail.clone()).with_passwords(Arc::new(
+        auth_core::PasswordService::new("a compromised fixture password").unwrap(),
+    ));
     let app = experimental_passkey_signup_router(
         auth.clone(),
         BrowserConfig::new(ORIGIN, false).unwrap(),
@@ -44,7 +53,7 @@ async fn app(pool: PgPool) -> (Router, Auth, Arc<Postgres>) {
         signup,
     )
     .unwrap();
-    (app, auth, store)
+    (app, auth, store, mail)
 }
 
 async fn json(response: Response) -> serde_json::Value {

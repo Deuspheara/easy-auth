@@ -3,9 +3,9 @@
 AUTH-53's identity/storage boundary supports users without email. Optional
 [core/PostgreSQL passkey signup](passkey-signup.md) now requires verified assertion
 before account/session creation, now with explicit experimental HTTP and native
-Chromium resident signup/login. Verified-mailbox attachment is still being implemented;
-this model change does not expose either workflow or enable ordinary passkey
-composition. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
+Chromium resident signup/login. [Contact attachment](email-attachment.md) has
+core/PostgreSQL and experimental HTTP tests; actual SMTP/native attachment evidence
+remains pending. Ordinary passkey composition stays disabled. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
 
 ## User contract
 
@@ -20,7 +20,7 @@ Rust `User.email` is now `Option<String>`, with `display_name: Option<String>`
 and a typed `authentication_policy`. This is an explicit alpha API change for
 embedded consumers. Handle absence instead of substituting a placeholder email.
 The HTTP user response does not expose policy or authentication-method metadata.
-All three generated OpenAPI snapshots declare the nullable fields as required.
+All four generated OpenAPI snapshots declare the nullable fields as required.
 
 ## Authority is separate from contact
 
@@ -62,9 +62,9 @@ both email fields as NULL.
 Deploy the schema and binary together across all alpha replicas. Older workers
 do not enforce stronger-account policy or understand nullable user fields; mixed
 versions are unsupported. Do not provision email-free accounts manually as a
-replacement for the pending proof-completed signup flow. The public signup path
+replacement for the proof-completed signup flow. The public signup path
 uses the core requirement for registration and genuine assertion before identity/
-session creation; mailbox attachment will require fresh passkey and mailbox proof.
+session creation; contact attachment requires fresh passkey and mailbox proof.
 See [ADR 0009](../architecture/adr/0009-passkey-first-identity.md).
 
 Real PostgreSQL tests cover upgrade preservation, nullable/uniqueness constraints,
@@ -72,5 +72,6 @@ weak-method and fallback denial, preissued proofs, post-lock policy changes,
 no-email session controls and NULL-to-email snapshot races. An HTTP/storage
 fixture verifies exact null serialization and route rejection. Separately, eleven
 native anonymous-signup cases now prove resident registration, genuine assertion
-and later bound/discoverable login without email. Verified contact attachment and
+and later bound/discoverable login without email. Attachment storage/captured-mail
+HTTP tests preserve policy after verification; actual SMTP/native attachment and
 other-browser/real-device gates remain AUTH-53/M03 acceptance work.

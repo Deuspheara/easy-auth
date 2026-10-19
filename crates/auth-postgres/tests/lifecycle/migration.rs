@@ -24,6 +24,8 @@ async fn lifecycle_migration_requires_reauthentication_for_legacy_sessions(pool:
         include_str!("../../migrations/0007_passkey_enrollment.sql"),
         include_str!("../../migrations/0008_passkey_authentication.sql"),
         include_str!("../../migrations/0009_optional_mailbox.sql"),
+        include_str!("../../migrations/0010_passkey_signup.sql"),
+        include_str!("../../migrations/0011_email_attachment.sql"),
     ] {
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }

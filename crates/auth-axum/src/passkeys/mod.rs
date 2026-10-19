@@ -11,6 +11,8 @@ mod authentication;
 #[cfg(feature = "passkey-authentication")]
 pub use authentication::{experimental_passkey_router, passkey_authentication_openapi};
 #[cfg(feature = "passkey-signup")]
+mod email_attachment;
+#[cfg(feature = "passkey-signup")]
 mod signup;
 #[cfg(feature = "passkey-signup")]
 pub use signup::{experimental_passkey_signup_router, passkey_signup_openapi};

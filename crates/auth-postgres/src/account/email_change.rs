@@ -191,6 +191,12 @@ impl Postgres {
             },
         )
         .await?;
+        sqlx::query("DELETE FROM auth_email_attachments WHERE realm_id=$1 AND user_id=$2")
+            .bind(realm)
+            .bind(user)
+            .execute(&mut *tx)
+            .await
+            .map_err(unavailable)?;
         sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) VALUES ($1,$2,$3,$4,'email_changed')")
             .bind(realm)
             .bind(Uuid::new_v4())

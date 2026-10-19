@@ -40,6 +40,18 @@ async fn upgrade_preserves_unknown_methods_and_rotations_do_not_upgrade_assuranc
     .execute(&pool)
     .await
     .unwrap();
+    sqlx::raw_sql(include_str!(
+        "../../../../migrations/0010_passkey_signup.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
+    sqlx::raw_sql(include_str!(
+        "../../../../migrations/0011_email_attachment.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     assert!(
         store
             .authenticate(realm, old.secret.verifier())

@@ -25,6 +25,11 @@ impl Smtp {
 }
 #[async_trait]
 impl EmailDelivery for Smtp {
+    async fn email_attachment(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
+        self.send(email, "Confirm contact email", format!(
+            "A contact email was requested for your passkey account. Confirm only if you requested it, in the same browser while your passkey sign-in is still fresh. This link expires within five minutes and works once. It does not enable email sign-in or mailbox-only recovery.\n\n{}/email-attach#token={}\n\nIf you did not request this, ignore the message. No account has been merged or moved.",
+            self.origin, token.expose())).await
+    }
     async fn email_change(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
         self.send(email,"Confirm email change",format!("An email change was requested for your authentication account. Confirm the separate links sent to both the current and proposed addresses in the requesting browser. Complete them promptly after signing in; each link expires within five minutes.\n\n{}/email-change#token={}\n\nIf you did not request this, do not confirm it and secure your account.",self.origin,token.expose())).await
     }

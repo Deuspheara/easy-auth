@@ -1,5 +1,6 @@
 mod admission;
 mod deletion;
+mod email_attachment;
 mod email_change;
 
 use crate::{Postgres, unavailable};

@@ -150,3 +150,12 @@ limits and persistence remain core/PostgreSQL responsibilities. Browser signup c
 and ceremony helpers live in `tests/browser/passkeys/signup/`; fixture summary
 queries have a separate module. No public verification internals or duplicate
 business policy were introduced.
+
+Contact attachment uses `auth/email_attachment.rs`, PostgreSQL
+`account/email_attachment/` (preparation, locked ownership and completion), and
+experimental HTTP `passkeys/email_attachment/`. Its final transaction exceeds the
+function-size trigger to keep target-email/user/session/proof lock order, exact
+bindings, session rotation, audit and final post-write expiry consumption visible
+together. Integration cases separate binding, atomicity, concurrency, observed
+waits and migration. Test mail state has named fields in `tests/support/mail.rs`;
+no positional tuple or public production delivery internals are added.

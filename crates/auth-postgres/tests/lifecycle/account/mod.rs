@@ -1,6 +1,7 @@
 mod atomicity;
 mod binding;
 mod deletion;
+mod email_attachment;
 mod email_change;
 
 use auth_core::{Repository, Secret};

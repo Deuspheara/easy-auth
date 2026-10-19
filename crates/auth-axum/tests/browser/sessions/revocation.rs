@@ -58,6 +58,7 @@ async fn revoke_all_clears_cookies_sessions_and_pending_mail_proof_in_only_its_r
     assert_eq!(
         result.headers().get_all(header::SET_COOKIE).iter().count(),
         5 + usize::from(cfg!(feature = "passkey-enrollment"))
+            + usize::from(cfg!(feature = "passkey-signup"))
     );
     #[cfg(feature = "passkey-enrollment")]
     assert!(

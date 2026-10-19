@@ -6,6 +6,9 @@ use auth_core::{EmailDelivery, Error, Result, Secret};
 pub(super) struct DisabledMail;
 #[async_trait]
 impl EmailDelivery for DisabledMail {
+    async fn email_attachment(&self, _: &str, _: &Secret) -> Result<()> {
+        Err(Error::Unavailable)
+    }
     async fn sign_in(&self, _: &str, _: &Secret) -> Result<()> {
         Err(Error::Unavailable)
     }

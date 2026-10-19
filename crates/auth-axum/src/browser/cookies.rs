@@ -41,6 +41,8 @@ pub(crate) fn clear_auth_cookies(browser: &BrowserConfig) -> Response {
         browser.deletion_name(),
         #[cfg(feature = "passkey-enrollment")]
         browser.passkey_name(),
+        #[cfg(feature = "passkey-signup")]
+        browser.attachment_name(),
     ] {
         response
             .headers_mut()

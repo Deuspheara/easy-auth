@@ -395,3 +395,26 @@ parent-feature visibility. HTTP-only cookie anonymity remains in transport, whil
 proof, rate and transaction policy stays in core/PostgreSQL. Full M03, real hardware,
 other browsers, contact attachment, recovery and later release milestones remain
 unfinished; these results imply no production or conformance claim.
+
+## AUTH-53 contact attachment increment — 2026-10-19
+
+The shared-core/PostgreSQL and experimental HTTP contact attachment implementation
+passes **84 default-feature** and **152 all-feature** unique workspace cases,
+sequentially, plus strict all-target/all-feature Clippy. The all-feature breakdown
+is Axum unit 2, HTTP/database 23, core 10 and PostgreSQL 117; the logging subprocess
+body counts once. Fifteen new PostgreSQL cases cover binding/provenance, migration,
+cleanup, admission, one-use, occupied targets, both deterministic mailbox-signup
+race orderings, rollback and expiry/freshness after observed lock/audit waits.
+Three new HTTP cases cover captured proof delivery, explicit confirmation/rotation,
+boundary/opt-in behavior, generic occupied/available initiation and delivery failure.
+
+These attachment cases arrange storage sessions with passkey provenance and use a
+capturing delivery adapter. They are not new native private-key or actual SMTP
+attachment evidence. The existing SMTP adapter implements the new required method;
+actual SMTP/native attachment acceptance remains pending. Compiled-advisory and cargo-deny gates pass; source scans pass with Gitleaks
+8.24.3 and 8.30.1. The inactive SQLx MySQL/RSA advisory remains visible. No dependency
+versions, lockfile, published migrations or scanner exceptions changed. Earlier native signup
+artifacts remain unchanged. See [the contact attachment guide](../guides/email-attachment.md)
+for exact limits and residual scope. Hosted signup-evidence runs 39256989158 and
+39256989794 at 6d0df66 both passed Rust and secrets, including the existing 31 native
+cases. AUTH-53 remains In Progress; ordinary activation stays gated through AUTH-20.
