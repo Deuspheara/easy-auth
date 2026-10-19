@@ -1,4 +1,6 @@
 //! Measurement-only support. Never linked into the authentication product.
+mod revocation;
+
 use async_trait::async_trait;
 use serde_json::json;
 use sqlx::{
@@ -93,22 +95,16 @@ pub async fn measure(name: &str, probe: Arc<dyn Probe>) -> Result<()> {
             trials.push(trial(probe.clone(), workers, 512 / workers).await?);
         }
     }
-    let start = Instant::now();
-    probe.revoke(0).await?;
-    let revoke_ms = start.elapsed().as_secs_f64() * 1_000.0;
-    for _ in 0..64 {
-        if probe.validate(0).await? {
-            return Err("revoked session accepted after revoke returned".into());
-        }
-    }
-    if !probe.validate(1).await? {
-        return Err("revocation affected a different user".into());
-    }
+    let revocation = revocation::under_load(probe.clone()).await?;
     println!(
         "{}",
         json!({"phase": "result", "project": name, "pool_max": 10,
-        "session_count": SESSIONS, "trials": trials, "revoke_ms": revoke_ms,
-        "post_revoke_rejections": 64, "other_user_still_valid": true})
+        "session_count": SESSIONS, "trials": trials, "revoke_ms": revocation.revoke_ms,
+        "background_workers": SESSIONS - 1,
+        "background_validations": revocation.background_validations,
+        "background_load_sustained": true,
+        "post_revoke_rejections": revocation::POST_REVOKE_CHECKS,
+        "other_user_still_valid": true})
     );
     Ok(())
 }
