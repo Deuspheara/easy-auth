@@ -174,3 +174,8 @@ retained so locks, exact snapshots and rollback stay visible. Enrollment wait te
 separate owner/audit timing from pending-row/uniqueness waits; longer matrix cases
 keep observed-lock/action/assert ordering together. AUTH-54 tracks the analogous
 mailbox-flow review independently rather than silently expanding this fix.
+
+AUTH-54 separates session validation and ordinary logout into named modules;
+`sessions/mod.rs` contains declarations only. This extraction preserves SQL and
+public adapter behavior, with existing session/HTTP regressions checked before
+any deadline-policy changes.
