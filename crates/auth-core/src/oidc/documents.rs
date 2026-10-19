@@ -1,6 +1,6 @@
 use super::{
     OIDC_FETCH_TIMEOUT, OidcConnectionRepository, OidcDiscovery, OidcHttp, OidcHttpResponse,
-    OidcJwksDocument, metadata,
+    OidcJwksDocument, OidcTarget, metadata,
     policy::{Policy, literal},
 };
 use crate::{Error, OAuthConnection, Result};
@@ -165,6 +165,11 @@ impl OidcDocuments {
     }
 
     async fn fetch(&self, url: Url) -> Result<OidcHttpResponse> {
+        let target = self.resolve_target(url).await?;
+        self.http.get(&target).await
+    }
+
+    pub(super) async fn resolve_target(&self, url: Url) -> Result<OidcTarget> {
         let port = url.port_or_known_default().ok_or(Error::Unavailable)?;
         let addresses = if let Some(ip) = literal(&url) {
             vec![SocketAddr::new(ip, port)]
@@ -173,8 +178,7 @@ impl OidcDocuments {
                 .resolve(url.host_str().ok_or(Error::Unavailable)?, port)
                 .await?
         };
-        let target = self.policy.target(url, addresses)?;
-        self.http.get(&target).await
+        self.policy.target(url, addresses)
     }
 }
 

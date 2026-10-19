@@ -40,12 +40,25 @@ impl OidcTokenVerifier {
         exchange: OAuthExchange,
         token: OidcIdToken,
     ) -> Result<VerifiedOidcIdentity> {
-        let lease = Arc::new(
+        let lease = self.lease_operation()?;
+        self.verify_leased(exchange, token, lease).await
+    }
+
+    pub(in crate::oidc) fn lease_operation(&self) -> Result<Arc<OwnedSemaphorePermit>> {
+        Ok(Arc::new(
             self.workers
                 .clone()
                 .try_acquire_owned()
                 .map_err(|_| Error::RateLimited)?,
-        );
+        ))
+    }
+
+    pub(in crate::oidc) async fn verify_leased(
+        &self,
+        exchange: OAuthExchange,
+        token: OidcIdToken,
+        lease: Arc<OwnedSemaphorePermit>,
+    ) -> Result<VerifiedOidcIdentity> {
         tokio::time::timeout(VERIFY_TIMEOUT, self.verify_inner(exchange, token, lease))
             .await
             .map_err(|_| Error::Unavailable)?
