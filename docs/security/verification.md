@@ -39,7 +39,9 @@ existing repository proof transaction; it does not claim SMTP/signup coverage.
 See the [browser reproduction instructions](../../tests/browser/passkeys/README.md)
 and [enrollment guide](../guides/passkey-enrollment.md). Other browsers, real
 devices/providers, discoverable/passkey-first accounts, sign-in and reviewed
-stronger-account recovery remain unverified. Hosted execution is pending publication.
+stronger-account recovery remain unverified. The [recorded browser run](../guides/interoperability.md#recorded-registration-browser-run--2026-10-19)
+uses committed producer `05ed2cd0e8292662a7654ffc847945e554ab6ec3`; all 149 source
+hashes were independently checked against it. Hosted execution is pending publication.
 
 ## AUTH-18 PostgreSQL enrollment checkpoint — 2026-10-19
 
