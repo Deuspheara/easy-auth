@@ -215,3 +215,42 @@ exact owned database. Emergency cleanup never converts a failed suite into a pas
 The explicit CI command runs after browser dependency setup; ordinary Cargo tests
 do not silently skip or require provider tooling. No external production credentials,
 new dependency/version, migration or authentication-policy change is introduced.
+
+
+## First-fetch admission and final lease ownership
+
+Further acceptance tests reproduced two application failures that the original
+provider runner's explicit pauses concealed. An immediate callback after no-store
+authorization metadata returned RateLimited before its code POST. With independently
+fresh discovery and no-store keys, a consecutive valid exchange returned RateLimited
+after the provider code was already exchanged. Requiring every caller to insert
+arbitrary delays is not the intended code-flow behavior.
+
+Code-flow authorization/exchange now holds the existing two-operation lease while
+waiting at most the remaining ordinary one-second interval before its first
+discovery or key load. It then calls the unchanged normal loader exactly once.
+The timer retains no database or cache-slot lock; registry/URL/freshness/admission
+checks run normally afterward. No failed-request, key-refresh, state or code retry
+loop is added. No-store documents are refetched for each operation; cache URI and
+HTTP expiry binding, ordinary fetch rate and forced-refresh bounds are unchanged.
+Standalone document/token APIs and unknown-kid refresh keep prompt backpressure.
+Authorization preparation has at most one second of admission plus its existing
+five-second document bound; exchange/verification keep their 30/15-second caps.
+Original post-DNS and final authority/deadline checks still apply after all waits.
+
+A separate reproduced resource defect moved the last lease reference into a
+successful native refresh retry, releasing it before final repository validation.
+The retry now receives a clone while the operation retains its original reference
+through final authority/claims checks. Native cancellation ownership is preserved.
+The regression gates an actual rotated signature at its final authority read and a
+second operation at its initial read: a third must promptly return RateLimited,
+then both actual signed controls succeed after release. Broken crypto/network is
+not accepted as capacity evidence.
+
+Tests retain generic prompt miss rejection and require fresh no-store fetches when
+flow admission becomes available. They cover expiry/disable/registry failure during
+admission, canceled waiters and recovered capacity, and original expiry after a
+key wait reaching actual signature/final-clock checks. The same eleven Keycloak
+cases now run without runner-side pacing, preserving actual headers and fault
+categories. The earlier paced record stays immutable. These changes introduce no
+public root/IP override, protocol downgrade, persistence policy or session grant.

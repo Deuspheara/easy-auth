@@ -48,8 +48,10 @@ before credential transmission. Missing provider email claims remain valid and
 create no local contact/session. The disposable provider user has a complete
 profile, while this client requests only openid/profile and has no email scope.
 
-Between distinct operations the runner observes the unchanged one-second metadata
-miss budget. It preserves actual provider discovery/JWKS cache headers. Keycloak's
+The runner inserts no admission delays between starts or callbacks. The application
+keeps its two-operation limit while waiting once before a first ordinary discovery/
+key fetch, then uses the unchanged one-second admission checks. It preserves actual
+provider discovery/JWKS cache headers. Keycloak's
 no-store keys mean the real rotation case does not prove the forced-refresh cache
 branch; separate actual-signature/cache tests prove that bound. Controlled signature
 corruption and captured-token substitution happen at the owned proxy, never inside
@@ -67,3 +69,11 @@ identity/session grant or production interoperability is established by this sui
 `EASY_AUTH_TEST_REPORT` creates a new immutable sanitized report with versions,
 source/binary hashes, case outcomes and cleanup facts; it refuses to overwrite an
 existing file. Reports contain no raw token, account IDs, credentials or proof.
+
+
+The current [fast-callback record](results/2026-10-20/keycloak-fast-callbacks.json)
+records `runner_admission_delays: false`. The original paced
+[provider record](results/2026-10-20/keycloak-code-rotation.json) stays immutable;
+it established those named provider cases with explicit interoperation pauses.
+Core tests independently reproduce immediate callback/key admission and final
+native-retry lease boundaries; source/binary hashes distinguish the two producers.

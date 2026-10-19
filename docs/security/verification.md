@@ -1833,3 +1833,68 @@ redacted Gitleaks scanning before publication. Prior exchange CI39337567832 at
 separately. Final mapping/JIT/local session issuance, broader provider/native
 acceptance, independent review, ordinary activation, SAML and outbound issuer remain
 separate open gates. No ticket/project completion follows from local results alone.
+
+## AUTH-29 fast-callback admission and final lease audit — 2026-10-20
+
+A later adversarial audit corrected the earlier acceptance assessment. The original
+provider runner inserted1100ms pauses between operations. Two new real-signature
+regressions first failed: an immediate valid callback after no-store authorization
+metadata returned RateLimited with zero code POSTs; independently cached discovery
+with no-store keys caused the second valid exchange to fail after two total code
+POSTs. These are application self-throttling failures. The earlier paced provider
+record remains immutable and does not prove this timing boundary.
+
+The code flow now holds its existing operation lease while waiting at most the
+remaining one-second interval before each first ordinary discovery/key fetch. It
+then invokes the unchanged normal loader once. No failed-request, state, code or
+unknown-kid retry loop is added; no-store documents are refetched and ordinary/
+forced budgets remain unchanged. Cache-slot/database locks are released before the
+admission timer. Standalone document/token APIs and forced refresh keep prompt
+admission. Authorization preparation is bounded by one admission second plus the
+existing five-second document bound; exchange/verification keep30/15second bounds.
+Original post-DNS and final database authority/deadline checks remain mandatory.
+
+A third failing regression identified premature permit release on a successful
+unknown-kid native retry. An actual rotated signature reached a controlled final
+repository wait; a second operation occupied its initial wait. The third timed out
+inside the repository instead of immediate RateLimited. The retry now receives a
+lease clone, preserving the operation's original reference through final authority
+and claims checks. Both valid signed controls succeed after release. No application
+crypto, identity/session policy, migration or dependency change is needed.
+
+Six new core cases cover those two fast-flow failures, metadata-admission expiry/
+disable/registry classification, canceled admission and recovered capacity,
+original expiry after a key wait reaching the final valid-signature check, and
+rotated-signature final-read capacity. Existing meaningful no-cache tests retain
+generic immediate miss denial and require a fresh discovery/key fetch for each
+new admitted operation. No stale reuse or same-code retry is permitted. All48 OIDC
+core tests pass, retaining algorithm/claim/key/rotation/native-worker boundaries.
+
+The [new unpaced provider record](../../tests/browser/oidc/results/2026-10-20/keycloak-fast-callbacks.json)
+passes all **11 original Keycloak cases**, with `runner_admission_delays: false`.
+All **522 source hashes** match final sources and the fixed producer binary hash
+matches. Node24.21.0/Playwright1.64.1/Chromium156.0.8078.4 and the pinned Keycloak
+image remain unchanged. Actual cache headers are preserved. Aggregate8application
+POSTs/7provider-success responses/one signature fault/one token replay, zero local
+users/sessions/audits/pending, normal exit0 and exact database/container/private-file
+removal all pass. No emergency cleanup or unexpected diagnostics. The image declares
+no anonymous data volumes. Earlier records and their source/binary hashes are unchanged.
+
+Final local gates pass: formatting, strict locked default/all-feature workspace/
+all-target Clippy, sequential **93 default** and **368 unique all-feature tests**
+(2 Axum unit/55 HTTP-PG/60 core/241 PostgreSQL/10 server; one included core logging
+case repeats in a subprocess), compiled advisory audit, all-feature cargo-deny,
+existing browser npm audit and JS syntax/diff checks. No failed/ignored tests.
+Inactive SQLx/MySQL RSA advisory remains visible and no exception is added. The
+complete staged diff receives redacted Gitleaks scanning before publication.
+
+Changed modules remain below300lines. First-fetch scheduling stays in the owning
+cache module, leased orchestration selects it, and native retry ownership stays
+with verification. Controlled admission cases have their own feature module;
+worker cases keep observed waits, release and valid signatures together as reviewed
+function-size exceptions. No public root/IP override, protocol downgrade, wire
+schema, ordinary composition or unrelated structural cleanup is introduced.
+Prior exact-head CI39340016588 at eb3281b completed SUCCESS. That checkpoint's green
+result is distinct from these corrections' new hosted run, tracked separately.
+AUTH-29/project completion and independent review/ordinary activation are not
+claimed from local evidence alone.

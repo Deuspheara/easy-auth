@@ -55,7 +55,7 @@ impl OidcCodeExchange {
         scopes: &[&str],
     ) -> Result<OidcAuthorizationUrl> {
         let _lease = self.verifier.lease_operation()?;
-        let discovery = self.documents.discovery().await?;
+        let discovery = self.documents.discovery_when_admitted().await?;
         self.check_provider(&discovery)?;
         OidcAuthorizationUrl::new(&discovery, self.documents.connection(), start, scopes)
     }
@@ -79,7 +79,7 @@ impl OidcCodeExchange {
             return Err(Error::Unauthorized);
         }
         self.repository.check_oidc_exchange(&exchange).await?;
-        let discovery = self.documents.discovery().await?;
+        let discovery = self.documents.discovery_when_admitted().await?;
         self.check_provider(&discovery)?;
         let url = url::Url::parse(discovery.token_endpoint()).map_err(|_| Error::Unavailable)?;
         super::request::validate_endpoint(&url)?;

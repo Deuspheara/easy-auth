@@ -24,6 +24,9 @@ pub(super) struct Store {
     pub now: AtomicI64,
     pub checks: AtomicUsize,
     pub disable_at: AtomicUsize,
+    pub hold_checks_from: AtomicUsize,
+    pub check_entered: Notify,
+    pub check_release: Notify,
 }
 #[async_trait]
 impl OAuthTransactionRepository for Store {
@@ -58,6 +61,10 @@ impl OidcConnectionRepository for Store {
 impl OidcExchangeRepository for Store {
     async fn check_oidc_exchange(&self, e: &OAuthExchange) -> Result<i64> {
         let check = self.checks.fetch_add(1, Ordering::SeqCst) + 1;
+        if check >= self.hold_checks_from.load(Ordering::SeqCst) {
+            self.check_entered.notify_one();
+            self.check_release.notified().await;
+        }
         if check == self.disable_at.load(Ordering::SeqCst) {
             self.enabled.store(false, Ordering::SeqCst);
         }
@@ -200,6 +207,9 @@ impl Fixture {
             now: AtomicI64::new(NOW_US),
             checks: AtomicUsize::new(0),
             disable_at: AtomicUsize::new(usize::MAX),
+            hold_checks_from: AtomicUsize::new(usize::MAX),
+            check_entered: Notify::new(),
+            check_release: Notify::new(),
         });
         let http = Arc::new(Http {
             metadata: Mutex::new(

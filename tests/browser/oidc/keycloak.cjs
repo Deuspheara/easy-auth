@@ -107,4 +107,4 @@ async function start(directory, origin, redirect) {
     throw error;
   } finally { fs.rmSync(envFile, {force:true}); }
 }
-module.exports = {start, pause};
+module.exports = {start};

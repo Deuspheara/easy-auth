@@ -302,3 +302,12 @@ code/request/response values and the `OidcTokenHttp` backend port implemented by
 not serialize a verified identity as a browser credential.
 See the [verification guide](../guides/oidc-verification.md). Existing ordinary
 server composition and wire schemas remain unchanged.
+
+
+The backend code flow may wait once per first ordinary discovery/key fetch, under
+its existing shared capacity, for the remaining admission interval. It
+keeps existing fetch rates, fresh/no-store semantics and exchange/verification
+bounds; no state/code/failed-request retry occurs. Standalone document/token APIs
+and forced-refresh admission remain prompt. A native retry retains the operation
+lease through final authority validation. These resource semantics add no wire
+route, response schema, clock extension or local authentication grant.

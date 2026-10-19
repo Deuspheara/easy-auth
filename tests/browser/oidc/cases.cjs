@@ -1,6 +1,5 @@
 'use strict';
 const assert = require('node:assert/strict');
-const {pause}=require('./keycloak.cjs');
 const {callback}=require('./browser.cjs');
 
 async function run(fixture,provider,proxy,browser,redirect) {
@@ -12,14 +11,11 @@ async function run(fixture,provider,proxy,browser,redirect) {
     console.log(JSON.stringify({case:name,status:'passed'}));
   }
   async function flow({expected='verified',mutation,proxyMode='normal'}={}) {
-    // Discovery is genuinely no-store. Keep the published one-second miss
-    // admission intact between distinct operations; never fake cache headers.
-    await pause(1100);
+    // No runner pacing: application admission must handle genuine no-store metadata.
     const started=await fixture.command('begin');
     assert.equal(started.result,'started','real PostgreSQL begin and metadata control');
     const returned=await callback(browser,started.authorization,provider,redirect,mutation);
     proxy.mode(proxyMode);
-    await pause(1100);
     const responsesBefore=proxy.facts.token_responses;
     const result=await fixture.command('finish',{callback:returned});
     assert.equal(result.result,expected,'exact application outcome, never arbitrary failure');
@@ -59,7 +55,6 @@ async function run(fixture,provider,proxy,browser,redirect) {
   });
   await record('fresh-keycloak-success-after-all-negatives',()=>flow());
   await record('disabled-postgres-context-sends-no-code',async()=>{
-    await pause(1100);
     const started=await fixture.command('begin');assert.equal(started.result,'started');
     const returned=await callback(browser,started.authorization,provider,redirect);
     const disabled=await fixture.command('disable');assert.equal(disabled.result,'disabled');

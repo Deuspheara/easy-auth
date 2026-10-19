@@ -87,3 +87,65 @@ fn cancelled_native_jobs_retain_capacity_until_completion_then_new_work_succeeds
         assert_eq!(f.gets(), 2);
     });
 }
+
+#[tokio::test]
+async fn rotated_signature_retains_its_lease_through_the_final_authority_wait() {
+    use super::setup::Signing;
+    use serde_json::json;
+    use std::sync::atomic::Ordering;
+
+    let f = Fixture::new(OidcSigningAlgorithm::ES256, &[]);
+    f.documents.jwks().await.unwrap();
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    let rotated = Signing::new(OidcSigningAlgorithm::ES256, "rotated");
+    *f.http.keys.lock().unwrap() =
+        serde_json::to_vec(&json!({"keys":[rotated.public.clone()]})).unwrap();
+    f.store.hold_checks_from.store(2, Ordering::SeqCst);
+    let (exchange, claims) = f.exchange().await;
+    let token = rotated.token(&claims);
+    let first = {
+        let verifier = f.verifier.clone();
+        tokio::spawn(async move { verifier.verify(exchange, token).await })
+    };
+    tokio::time::timeout(Duration::from_secs(5), f.store.check_entered.notified())
+        .await
+        .expect("actual rotated signature reaches its final authority check");
+    assert_eq!(
+        f.gets(),
+        3,
+        "real unknown-kid refresh completed exactly once"
+    );
+    let (exchange, claims) = f.exchange().await;
+    let token = rotated.token(&claims);
+    let second = {
+        let verifier = f.verifier.clone();
+        tokio::spawn(async move { verifier.verify(exchange, token).await })
+    };
+    tokio::time::timeout(Duration::from_secs(2), f.store.check_entered.notified())
+        .await
+        .expect("second operation occupies the remaining lease at its initial check");
+    let (third, claims) = f.exchange().await;
+    let overloaded = tokio::time::timeout(
+        Duration::from_millis(500),
+        f.verifier.verify(third, rotated.token(&claims)),
+    )
+    .await;
+    // Release every controlled wait before the capacity assertion, including on
+    // the failing baseline. Positive results separate this from broken crypto.
+    f.store.hold_checks_from.store(usize::MAX, Ordering::SeqCst);
+    f.store.check_release.notify_waiters();
+    for action in [first, second] {
+        let result = tokio::time::timeout(Duration::from_secs(5), action)
+            .await
+            .expect("test infrastructure: authority waits released")
+            .unwrap()
+            .unwrap();
+        assert_eq!(result.subject(), "subject");
+    }
+    assert!(
+        matches!(overloaded, Ok(Err(Error::RateLimited))),
+        "final authority wait must retain capacity after a refresh; third timed out={}",
+        overloaded.is_err()
+    );
+    assert_eq!(f.gets(), 3);
+}

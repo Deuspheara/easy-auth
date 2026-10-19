@@ -389,3 +389,14 @@ IPC ownership, scenarios and runner/provenance. All new modules remain below300l
 Longer ordered composition, callbacks and resource try/finally functions keep proof,
 cleanup and fixed diagnostic boundaries visible as reviewed size exceptions. No
 unrelated structural cleanup, generic test engine or shared plugin is introduced.
+
+
+First ordinary document admission remains in the owning discovery/key cache module;
+leased code-flow orchestration opts into its bounded wait, while standalone and
+forced-refresh paths retain prompt admission. No generic retry abstraction or
+public timer/configuration hook is added. Exchange admission/expiry/cancellation
+scenarios have their own feature test module; actual native/final-authority lease
+checks stay with verification worker tests. Cache/preflight guards end before
+timers, and final authority/claim validation retains the operation lease. All
+changed implementation/test modules remain below300lines; longer ordered scenarios
+retain their observation, release and valid controls as reviewed size exceptions.

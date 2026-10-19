@@ -85,11 +85,16 @@ impl OidcTokenVerifier {
         // Reuse validated discovery only inside this bounded operation. In
         // particular, no-store metadata must not cause a second self-throttled
         // fetch after the one-use code has already been exchanged.
+        let code_flow = discovery.is_some();
         let discovery = match discovery {
             Some(discovery) => discovery,
             None => self.documents.discovery().await?,
         };
-        let observed = self.documents.keys_from_discovery(&discovery, None).await?;
+        let observed = if code_flow {
+            self.documents.keys_when_admitted(&discovery).await?
+        } else {
+            self.documents.keys_from_discovery(&discovery, None).await?
+        };
         let claims = match attempt(&token, observed.clone(), lease.clone()).await? {
             Attempt::Claims(claims) => claims,
             Attempt::UnknownKey => {
@@ -97,7 +102,9 @@ impl OidcTokenVerifier {
                     .documents
                     .keys_from_discovery(&discovery, Some(&observed))
                     .await?;
-                match attempt(&token, current, lease).await? {
+                // Retain the operation lease through the final authority read;
+                // the native retry owns a separate cancellation-safe reference.
+                match attempt(&token, current, lease.clone()).await? {
                     Attempt::Claims(claims) => claims,
                     Attempt::UnknownKey => return Err(Error::Unauthorized),
                 }

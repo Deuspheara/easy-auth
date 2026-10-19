@@ -74,6 +74,32 @@ impl OidcDocuments {
             .map_err(|_| Error::Unavailable)?
     }
 
+    #[cfg(feature = "oidc-verification")]
+    pub(super) async fn discovery_when_admitted(&self) -> Result<OidcDiscovery> {
+        let delay = {
+            let cache = self.discovery.try_lock().map_err(|_| Error::RateLimited)?;
+            let now = Instant::now();
+            if cache
+                .cached
+                .as_ref()
+                .is_some_and(|cached| cached.expires > now)
+            {
+                Duration::ZERO
+            } else {
+                cache.attempted.map_or(Duration::ZERO, |previous| {
+                    MIN_NETWORK_INTERVAL.saturating_sub(now.duration_since(previous))
+                })
+            }
+        };
+        // A leased code-flow operation may wait once for its FIRST ordinary fetch.
+        // Keep no slot/DB lock across the timer; never retry failed discovery,
+        // bypass admission, reuse no-store metadata or resend a provider code.
+        if !delay.is_zero() {
+            tokio::time::sleep(delay).await;
+        }
+        self.discovery().await
+    }
+
     /// Raw bounded envelope for a future reviewed JOSE verifier. These bytes do
     /// not establish a trusted key, signature, algorithm, claim or authentication.
     pub async fn jwks(&self) -> Result<OidcJwksDocument> {
@@ -134,6 +160,33 @@ impl OidcDocuments {
         tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys_from(discovery, observed))
             .await
             .map_err(|_| Error::Unavailable)?
+    }
+
+    #[cfg(feature = "oidc-verification")]
+    pub(super) async fn keys_when_admitted(
+        &self,
+        discovery: &OidcDiscovery,
+    ) -> Result<OidcJwksDocument> {
+        let delay =
+            {
+                let cache = self.keys.try_lock().map_err(|_| Error::RateLimited)?;
+                let now = Instant::now();
+                if cache.cached.as_ref().is_some_and(|cached| {
+                    cached.expires > now && cached.url == discovery.jwks_uri()
+                }) {
+                    Duration::ZERO
+                } else {
+                    cache.attempted.map_or(Duration::ZERO, |previous| {
+                        MIN_NETWORK_INTERVAL.saturating_sub(now.duration_since(previous))
+                    })
+                }
+            };
+        if !delay.is_zero() {
+            tokio::time::sleep(delay).await;
+        }
+        // First ordinary key fetch only. Unknown-kid refresh still uses prompt
+        // admission and its independent fixed forced-refresh budget.
+        self.keys_from_discovery(discovery, None).await
     }
 
     async fn load_keys_from(

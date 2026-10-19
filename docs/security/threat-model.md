@@ -334,3 +334,15 @@ replay cases with private fixture TLS/address mapping and shared production requ
 code. It preserves actual cache headers and distinguishes signed invalid claims
 from deliberate proxy faults. No user/device settings, production root/IP policy or
 ordinary routes change; private IPC and generated credentials never become logs.
+
+
+Code-flow first-fetch admission may wait once under its existing shared lease,
+keeping the one-second discovery/key budget without making a valid fast callback
+consume state and self-throttle. No cache-slot/database lock spans that timer;
+normal registry/fetch guards and original post-DNS/final deadlines remain in force.
+No-store data is refetched and failed requests/state/codes are never retried.
+Standalone/forced-refresh backpressure is unchanged. A successful unknown-kid
+native retry retains its operation permit through final authority validation;
+otherwise a blocked final read could exceed the declared concurrency bound.
+Controlled expiry/cancellation and actual-rotated-signature capacity tests exercise
+these invariants, while the real provider runner applies no admission pacing.

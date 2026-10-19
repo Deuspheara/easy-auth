@@ -71,7 +71,7 @@ async function main() {
     limitations:['controlled signature corruption and captured-token replay occur at the owned proxy, not inside Keycloak',
       'Keycloak no-store discovery and JWKS headers are unchanged; real rotation does not establish the forced-refresh cache branch',
       'no independent security audit, production-provider acceptance or local identity/session issuance'],
-    cases:results,proxy:proxy.facts,database:fixture.state.facts,...cleanup};
+    runner_admission_delays:false,cases:results,proxy:proxy.facts,database:fixture.state.facts,...cleanup};
   if(process.env.EASY_AUTH_TEST_REPORT)fs.writeFileSync(process.env.EASY_AUTH_TEST_REPORT,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
   console.log(JSON.stringify({passed:results.length,chromium:version,proxy:proxy.facts,database:fixture.state.facts,...cleanup}));
 }

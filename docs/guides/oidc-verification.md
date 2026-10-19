@@ -48,6 +48,8 @@ there is no insecure stale/signature fallback.
 NumericDates must be unsigned whole-second JSON numbers. The policy has strict
 clocks with no leeway, a five-minute token-age limit and a result deadline no later than either original OAuth authority or token expiry/age.
 Two operations per shared verifier and a 15-second whole-operation bound limit work.
+Both initial verification and a successful refresh retry retain their operation
+lease through final database authority and claim checks.
 Native crypto jobs retain their lease after async cancellation until completion;
 the timeout does not kill native code. Do not recreate services per request.
 
@@ -103,8 +105,16 @@ a 30-second whole-operation timeout. Verification retains its 15-second bound an
 native cancellation ownership. It rechecks database authority after DNS and after
 signature verification. Non-cacheable discovery is used within that one operation,
 including a possible key refresh, then never reused by a subsequent operation.
-A rapid new operation can therefore hit the unchanged one-second metadata miss
-budget; restart the flow after admission permits, never retry a consumed code.
+The code flow holds its existing lease while waiting at most one second before
+its first ordinary discovery or key fetch, then invokes normal admission once.
+This handles fast callbacks and independently non-cacheable keys while preserving
+fetch rate, freshness and original authority. Authorization URL preparation is
+bounded by that one-second wait plus the existing five-second document operation;
+exchange/verification retain their 30/15-second bounds including any admission wait.
+No database or cache-slot lock is held during the admission timer. Standalone
+document/token verification APIs and forced unknown-kid refresh still use prompt
+admission. Contention or forced cooldown can still return RateLimited; discard a
+failed consumed context and start a new flow, never retry its code.
 No database lock spans DNS, HTTPS or native verification.
 
 Run server component TLS POST checks as well as the focused core/PostgreSQL checks:
@@ -124,8 +134,18 @@ This is specific local-provider evidence, not general production interoperabilit
 Run its explicit build/Node commands after the documented Docker, PostgreSQL and
 pinned browser setup. CI runs it after browser dependencies; it is not an ignored
 Cargo test. No production-provider credentials or user-device interaction is needed.
-The test preserves actual provider cache headers, scopes and client configuration;
+The runner adds no interoperation admission delays. The application schedules
+its own first fetch within the unchanged budget. The test preserves actual provider
+cache headers, scopes and client configuration;
 controlled proxy faults are labeled separately from provider-signed claims. It
 requires normal owned resource cleanup and creates no local user/session/contact.
 Final identity mapping/JIT and session issuance remain separate work; AUTH-30
 owns the mapping/JIT policy boundary.
+
+
+The [current fast-callback record](../../tests/browser/oidc/results/2026-10-20/keycloak-fast-callbacks.json)
+retains all eleven provider cases with no runner pacing. The earlier paced record
+remains immutable. Dedicated core regressions first reproduced immediate no-store
+callback and successive no-store-key self-throttling, plus premature lease release
+after a rotated-key retry. Exact-error/expiry/cancellation/capacity controls pass;
+waiting never revives state, resends a code or extends its original commit cap.

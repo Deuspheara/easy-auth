@@ -113,7 +113,7 @@ waits; these native regressions do not claim to reproduce that timing scenario.
 
 ## AUTH-29 owned Keycloak boundary — 2026-10-20
 
-The [sanitized provider record](../../tests/browser/oidc/results/2026-10-20/keycloak-code-rotation.json)
+The [current unpaced provider record](../../tests/browser/oidc/results/2026-10-20/keycloak-fast-callbacks.json)
 and [reproduction guide](../../tests/browser/oidc/README.md) distinguish actual
 provider-generated signatures/claims and key rotation from controlled proxy faults.
 The real PostgreSQL state/context boundary is used throughout; no local identity or
@@ -125,3 +125,11 @@ cached-key branch. Dedicated real-signature cache tests own that separate eviden
 This is bounded local interoperability evidence, not production/provider-wide or
 independent security-review acceptance. Hosted exact-commit results are tracked
 separately; broader provider/JIT/ordinary activation remains unfinished.
+
+
+The first paced provider record remains immutable. The current producer applies no
+caller admission pauses: bounded first-fetch waiting belongs to application code,
+while fresh/no-store semantics and fetch/forced-refresh rates remain unchanged.
+Actual immediate-callback/key-cache regressions and rotated-signature final-wait
+capacity controls supplement provider evidence; final authority keeps its operation
+lease on both signature attempts. These checks add no local session/JIT grant.
