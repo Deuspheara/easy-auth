@@ -60,7 +60,8 @@ pub(super) async fn serve() -> Result<(), Box<dyn Error>> {
         )),
     };
     let notifications = easy_auth_server::notification_worker(auth.clone());
-    let app = experimental_passkey_recovery_router(auth, browser.clone(), services)?;
+    let app = experimental_passkey_recovery_router(auth, browser.clone(), services)?
+        .merge(super::manual::routes());
     let listener = TcpListener::bind(bind).await?;
     super::clock::listen(pool, realm, service.rp_id().to_owned());
     println!("{}", serde_json::json!({"origin":browser.origin()}));

@@ -291,3 +291,9 @@ clock-only trusted fixture control and aggregate DB assertions. No production
 clock configuration, mock key/session or generic workflow framework is introduced.
 Longer fixture orchestration retains ownership/cleanup ordering; feature modules
 and scripts remain below roughly 300 lines.
+
+The recovery example also owns a human signup bootstrap under `manual/`, with
+static resource routing in `manual.rs`. It calls real signup through the shared
+reference-client transport and contains no alternate registration/session policy.
+Its additional native case is separate from the seven recovery scenarios. These
+fixture-only resources never enter library or normal server composition.

@@ -3,6 +3,7 @@
 mod baseline;
 mod clock;
 mod database;
+mod manual;
 #[path = "../support/smtp_fixture.rs"]
 mod owned;
 mod server;

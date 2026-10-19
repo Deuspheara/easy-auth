@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owned passkey device test</title>
+<main>
+<h1>Disposable passkey device test</h1>
+<p>This page exists only in the owned local test fixture. It creates an email-free test account through real registration and a separate signed assertion. It does not activate ordinary server routes.</p>
+<p>Your credential manager may retain a localhost passkey after this disposable server database is removed. Remove only the test entry yourself afterward. Do not use a personal email or existing account.</p>
+<form id="signup-form">
+<label><input id="consent" type="checkbox" required> I am ready to create a disposable test passkey and complete both system prompts.</label>
+<button type="submit">Create disposable passkey account</button>
+</form>
+<p id="status" role="status" aria-live="polite">Checking browser support…</p>
+<p>Authenticated public account ID: <output id="owner">None</output></p>
+<p><a href="/passkey-recovery/setup">Configure the offline recovery code</a></p>
+<p><a href="/passkey-recovery">Open recovery</a></p>
+<button id="logout" type="button">Sign out of this fixture</button>
+</main>
+<script type="module" src="/fixture/passkey-signup.js"></script>
+</html>

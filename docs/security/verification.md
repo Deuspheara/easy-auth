@@ -1259,3 +1259,33 @@ claim write gate. Its two longer scenario functions retain proof preparation,
 observed ordering and outcome assertions together as a justified test-size exception.
 No structural cleanup is deferred. AUTH-20 remains In Progress; independent review,
 physical-device/other-browser evidence and safe activation remain open.
+
+## AUTH-20 human device-fixture bootstrap (2026-10-19)
+
+The owned development example now serves a fixture-only signup page. It creates
+an email-free account through the actual registration and separate assertion APIs,
+with deliberate disposable-credential consent and same-origin native WebAuthn JSON
+handling. It seeds no account/key/session, preserves resident/UV requirements, and
+shares existing client abort/redirect/error protections. Static resources use
+no-store/no-referrer/nosniff/CSP. They do not enter library or normal server routes.
+
+An eighth native case verifies static headers, absence of cookies/authority from
+GET, no signup before consent, actual create/get, the resulting public account ID,
+confirmed code setup and empty browser storage. All seven prior recovery scenarios
+and their protocol/denial assertions remain. Final owned aggregates reflect only
+the added account: eight users/keys/signup audits/codes, twelve configurations,
+five unused codes, seven starts/four completions/three cancellations, thirty
+source admissions and zero weak/provenance/pending errors. All fourteen exact
+owned messages and the automated database are removed. The new
+[report](../../tests/browser/passkeys/results/2026-10-19/chromium-manual-bootstrap.json)
+records eight passing cases; all 425 source hashes and the fixed producer binary
+hash match the checked source. Earlier published reports remain immutable.
+
+Formatting, strict locked default/all-feature all-target Clippy, **93 default** and
+**270 all-feature real-PostgreSQL workspace tests**, compiled-dependency audit,
+cargo-deny and npm audit pass. The inactive SQLx/MySQL RSA advisory remains visible.
+No production API, SQL, migration or dependency changes are part of this fixture
+extension. Fixture static routing, manual assets and its additional native case
+remain focused modules under 300 lines; no structural cleanup is deferred.
+The native guide describes private operator entry, arranged-time limits and separate
+credential-manager cleanup. Automated emulation cannot establish real-device success.

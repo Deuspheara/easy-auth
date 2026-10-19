@@ -8,6 +8,7 @@ const readline = require('node:readline');
 const {chromium} = require('playwright');
 const {mailbox} = require('../attachment/mail.cjs');
 const {runPages} = require('./cases.cjs');
+const {manualBootstrap} = require('./manual.cjs');
 const root = path.resolve(__dirname, '../../../..');
 
 async function main() {
@@ -63,6 +64,7 @@ async function main() {
     browser = await chromium.launch({headless: true});
     version = browser.version();
     results = await runPages(browser, origin, mail, prepareClock);
+    results.push(await manualBootstrap(browser, origin));
     const deadline = Date.now() + 5000;
     while (!await control('observe-owned-notices', 'recovery_notices_drained')) {
       assert.equal(Date.now() < deadline, true, 'actual worker acknowledgements must drain owned queue');
@@ -90,11 +92,12 @@ async function main() {
     throw failure;
   }
   assert.equal(diagnostic, false, 'no unexpected fixture diagnostics');
-  for (const field of ['users', 'credentials', 'signup_audits', 'recovery_codes', 'recovery_started']) assert.equal(database[field], 7, field);
+  for (const field of ['users', 'credentials', 'signup_audits', 'recovery_codes']) assert.equal(database[field], 8, field);
+  assert.equal(database.recovery_started, 7);
   for (const field of ['strong_verified_users','attachment_audits','recovery_cancelled']) assert.equal(database[field], 3, field);
   assert.equal(database.recovery_completed, 4);
-  assert.equal(database.recovery_configured, 11);
-  assert.equal(database.recovery_codes_unused, 4);
+  assert.equal(database.recovery_configured, 12);
+  assert.equal(database.recovery_codes_unused, 5);
   for (const field of ['recovery_candidates','recovery_pending','recovery_notices_pending_all','invalid_completion_provenance','weak_sessions','invalid_recovery_provenance','recovery_setups_pending','unproven_remaining_keys','signup_pending','attachment_pending']) assert.equal(database[field], 0, field);
   assert.equal(database.recovery_source_attempts <= 40, true, 'original source admission remains intact');
   assert.equal(cleanup.messages_removed, 14, 'only exact owned contact/configuration/start/completion/cancellation notices');
@@ -116,7 +119,7 @@ async function main() {
 }
 main().catch(error => {
   // Never echo assertion values, message bodies, proof URLs, cookies or child output.
-  const frame = error.stack?.match(/recovery\/(cases|setup|cancellation)\.cjs:(\d+)/);
+  const frame = error.stack?.match(/recovery\/(cases|setup|cancellation|manual)\.cjs:(\d+)/);
   console.error('Recovery pages suite failed:', error.caseName || 'startup/cleanup', error.stageName || 'case', error.name, frame ? frame[1] + ':' + frame[2] : 'fixture');
   process.exitCode = 1;
 });
