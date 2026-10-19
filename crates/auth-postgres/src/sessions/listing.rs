@@ -1,5 +1,5 @@
 use crate::{Postgres, unavailable};
-use auth_core::{Error, Result, SessionInfo, SessionPage, Verifier};
+use auth_core::{Result, SessionInfo, SessionPage, Verifier};
 use sqlx::Row;
 use uuid::Uuid;
 
@@ -13,28 +13,8 @@ impl Postgres {
         after: Option<Uuid>,
     ) -> Result<SessionPage> {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        // Touch only the caller, conditionally: an expired or revoked session cannot be revived.
-        let caller = sqlx::query(
-            r#"
-            UPDATE auth_sessions SET last_seen_at=statement_timestamp()
-            WHERE realm_id=$1 AND token_hash=$2 AND revoked_at IS NULL
-              AND expires_at>statement_timestamp()
-              AND last_seen_at>statement_timestamp()-interval '30 minutes'
-              AND EXISTS (SELECT 1 FROM auth_users owner
-                WHERE owner.realm_id=$1 AND owner.id=auth_sessions.user_id
-                  AND (owner.authentication_policy='mailbox'
-                    OR (owner.authentication_policy='passkey_required'
-                        AND auth_sessions.authentication_method='passkey')))
-            RETURNING id,user_id
-            "#,
-        )
-        .bind(realm)
-        .bind(current.as_slice())
-        .fetch_optional(&mut *tx)
-        .await
-        .map_err(unavailable)?
-        .ok_or(Error::Unauthorized)?;
-        let current_id: Uuid = caller.get("id");
+        let (user, current_id, deadline) =
+            super::validation::active_caller(&mut tx, realm, current).await?;
         let rows = sqlx::query(r#"
             SELECT id,id=$3 AS current,
                 floor(extract(epoch FROM created_at)*1000)::bigint AS created_at_ms,
@@ -55,7 +35,7 @@ impl Postgres {
             ORDER BY id LIMIT $5
         "#)
             .bind(realm)
-            .bind(caller.get::<Uuid,_>("user_id"))
+            .bind(user.id)
             .bind(current_id)
             .bind(after)
             .bind((PAGE_SIZE+1) as i64)
@@ -81,6 +61,7 @@ impl Postgres {
         } else {
             None
         };
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(SessionPage { sessions, next })
     }

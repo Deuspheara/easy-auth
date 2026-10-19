@@ -1,6 +1,6 @@
 use super::ownership::Owner;
-use crate::audit;
 use crate::{Postgres, unavailable};
+use crate::{audit, deadlines::Deadline};
 use auth_core::AuditEvent;
 use auth_core::{Result, Verifier};
 use uuid::Uuid;
@@ -16,6 +16,7 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         let caller = owner.lock_fresh(&mut tx, realm, current).await?;
         let user = owner.user;
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, caller).await?;
         let revoked: Option<Uuid> = sqlx::query_scalar(
             r#"
             UPDATE auth_sessions SET revoked_at=clock_timestamp()
@@ -43,6 +44,7 @@ impl Postgres {
             )
             .await?;
         }
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(revoked == Some(caller))
     }
@@ -52,6 +54,7 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         let actor_session_id = owner.lock_fresh(&mut tx, realm, current).await?;
         let user = owner.user;
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, actor_session_id).await?;
         sqlx::query(
             r#"
             UPDATE auth_sessions SET revoked_at=clock_timestamp()
@@ -99,6 +102,7 @@ impl Postgres {
             },
         )
         .await?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)
     }
 }

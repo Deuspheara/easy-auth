@@ -23,6 +23,12 @@ def request(path, data=None):
         data = json.dumps(data).encode()
     return client.open(urllib.request.Request(base+path, data=data, headers=headers), timeout=15)
 
+def assert_embedded_user(public_user):
+    # The example exposes the core User; /v1/session deliberately projects its
+    # public fields. Keep exact identity checks and verify the extra policy too.
+    embedded_user = json.load(request('/private'))
+    assert embedded_user == {**public_user, 'authentication_policy': 'mailbox'}
+
 email = f'smoke-{time.time_ns()}@example.test'
 assert request('/readyz').status == 200
 assert request('/v1/email/start', {'email': email}).status == 202
@@ -34,7 +40,7 @@ assert request('/v1/email/finish', {'token': token}).status == 204
 user = json.load(request('/v1/session'))
 assert user['email'] == email and 'token' not in user
 if '--embedded' in sys.argv:
-    assert json.load(request('/private')) == user
+    assert_embedded_user(user)
 try:
     request('/v1/email/finish', {'token': token})
     raise AssertionError('proof replay accepted')
@@ -127,7 +133,7 @@ if '--sessions' in sys.argv:
     assert not list(jar), 'revocation must clear authentication/action cookies'
     assert email_sign_in() == user
     assert len(json.load(request('/v1/sessions'))['sessions']) == 1
-    if '--embedded' in sys.argv: assert json.load(request('/private')) == user
+    if '--embedded' in sys.argv: assert_embedded_user(user)
     assert request('/v1/logout', {}).status == 204
     email, user, jar, client = primary_state
     assert json.load(request('/v1/session')) == user
@@ -163,7 +169,7 @@ if '--lifecycle' in sys.argv:
     assert request('/v1/password/login', {'email':new_email,'password':password}).status == 204
     changed = json.load(request('/v1/session'))
     assert changed['id'] == user['id'] and changed['email'] == new_email
-    if '--embedded' in sys.argv: assert json.load(request('/private')) == changed
+    if '--embedded' in sys.argv: assert_embedded_user(changed)
     email = new_email
     assert request('/v1/account/delete/start', {'confirmation':'delete my account'}).status == 202
     deletion = re.search(r'#token=([A-Za-z0-9_-]{43})', mail_with('Confirm account deletion', email)['Text']).group(1)

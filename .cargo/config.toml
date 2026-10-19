@@ -1,0 +1,6 @@
+[env]
+# SQLx 0.8 test databases share 20 connection permits per integration binary.
+# Four test workers leave room for gate, action and observer connections, including
+# tests that intentionally run multiple concurrent transactions. Tests still run
+# their own concurrency scenarios; callers can explicitly override this budget.
+RUST_TEST_THREADS = "4"

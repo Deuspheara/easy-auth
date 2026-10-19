@@ -1,6 +1,6 @@
-use crate::audit;
 use crate::locking::{fresh_account, lock_emails};
 use crate::{Postgres, unavailable};
+use crate::{audit, deadlines::Deadline};
 use auth_core::AuditEvent;
 use auth_core::{Error, Result, Verifier};
 use sqlx::Row;
@@ -23,6 +23,7 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         lock_emails(&mut tx, realm, &previous, email).await?;
         let (user, session) = fresh_account(&mut tx, realm, current, &previous).await?;
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, session).await?;
         sqlx::query(r#"
     INSERT INTO auth_email_changes(realm_id,id,user_id,session_id,old_email,new_email,old_hash,new_hash,browser_hash)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -39,6 +40,7 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(previous)
     }
@@ -71,9 +73,11 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         lock_emails(&mut tx, realm, &old, &new).await?;
         let (user, session) = fresh_account(&mut tx, realm, current, &old).await?;
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, session).await?;
         let proof = sqlx::query(
             r#"
-            SELECT id,old_hash=$5 AS is_old,old_confirmed,new_confirmed
+            SELECT id,old_hash=$5 AS is_old,old_confirmed,new_confirmed,
+                (extract(epoch FROM expires_at)*1000000)::bigint AS expires_us
             FROM auth_email_changes
             WHERE realm_id=$1
             AND user_id=$2
@@ -95,6 +99,7 @@ impl Postgres {
         .await
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
+        let deadline = deadline.with_proof(proof.get("expires_us"));
         let is_old: bool = proof.get("is_old");
         let old_done: bool = proof.get("old_confirmed");
         let new_done: bool = proof.get("new_confirmed");
@@ -133,6 +138,7 @@ impl Postgres {
         .await
         .map_err(unavailable)?;
         if !complete {
+            deadline.check(&mut tx).await?;
             tx.commit().await.map_err(unavailable)?;
             return Ok(false);
         }
@@ -205,6 +211,7 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(true)
     }

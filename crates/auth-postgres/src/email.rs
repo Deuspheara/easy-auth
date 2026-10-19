@@ -1,6 +1,6 @@
 use crate::locking::lock_email;
 use crate::{Postgres, unavailable};
-use crate::{audit, identity::user_from_row};
+use crate::{audit, deadlines::Deadline, identity::user_from_row};
 use auth_core::AuditEvent;
 use auth_core::User;
 use auth_core::{Error, Result, Verifier};
@@ -90,8 +90,8 @@ impl Postgres {
             WHERE realm_id=$1
             AND token_hash=$2
             AND browser_hash=$3
-            AND expires_at > statement_timestamp()
-            RETURNING email
+            AND expires_at > clock_timestamp()
+            RETURNING email,(extract(epoch FROM expires_at)*1000000)::bigint AS expires_us
             "#,
         )
         .bind(realm)
@@ -102,6 +102,7 @@ impl Postgres {
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
         let email: String = challenge.get("email");
+        let deadline = Deadline::proof(challenge.get("expires_us"));
         let row = sqlx::query(
             r#"
             INSERT INTO auth_users(realm_id,id,email)
@@ -142,6 +143,7 @@ impl Postgres {
             },
         )
         .await?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(user)
     }

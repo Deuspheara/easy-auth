@@ -1,5 +1,5 @@
-use crate::audit;
 use crate::{Postgres, unavailable};
+use crate::{audit, deadlines::Deadline};
 use auth_core::AuditEvent;
 use auth_core::{Error, Result, Verifier};
 use uuid::Uuid;
@@ -108,6 +108,7 @@ impl Postgres {
         .await
         .map_err(unavailable)?;
         let actor_session_id = active.ok_or(Error::Unauthorized)?;
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, actor_session_id).await?;
         let inserted = sqlx::query("INSERT INTO auth_password_credentials(realm_id,user_id,password_hash) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING")
             .bind(realm)
             .bind(user)
@@ -146,6 +147,7 @@ impl Postgres {
             },
         )
         .await?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)
     }
     pub(crate) async fn password_login(

@@ -1,5 +1,8 @@
 mod support;
 
+#[path = "lifecycle/deadlines/mod.rs"]
+mod deadlines;
+
 #[path = "lifecycle/account/mod.rs"]
 mod account;
 #[path = "lifecycle/email.rs"]

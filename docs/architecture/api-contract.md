@@ -149,3 +149,13 @@ JSON and an independent attachment binding, with an 8 KiB body bound. GET
 `/email-attach` consumes nothing. See the [contact attachment contract](../guides/email-attachment.md).
 Native Chromium platform/USB cases verify real SMTP confirmation and later passkey
 login; AUTH-20 recovery/management remains required before ordinary activation.
+
+Proof consumption and session-authorized mutations recheck the original database
+deadline after potentially blocking writes and before commit. Expiry at that check
+returns the existing generic 401 and rolls back mutation, proof consumption, session
+touch/rotation, audit and notices together. Session validation/inventory lock owner
+before caller session and evaluate policy and idle/absolute bounds after those waits;
+a touch cannot renew authority that expires during the touch itself. Fresh actions
+also retain the initiating authentication's five-minute cap. Logout remains
+idempotent. See [ADR 0010](adr/0010-final-transaction-deadlines.md) for the precise
+transaction boundary; this does not authorize consuming-application actions.

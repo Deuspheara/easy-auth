@@ -1,6 +1,6 @@
-use crate::audit;
 use crate::locking::lock_email;
 use crate::{Postgres, unavailable};
+use crate::{audit, deadlines::Deadline};
 use auth_core::AuditEvent;
 use auth_core::{Error, Result, Verifier};
 use uuid::Uuid;
@@ -85,7 +85,7 @@ impl Postgres {
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
         // Revalidate after locks: an earlier preflight or KDF does not authorize a stale proof.
-        let consumed = sqlx::query(
+        let expires_us: Option<i64> = sqlx::query_scalar(
             r#"
             DELETE
             FROM auth_password_resets r
@@ -98,6 +98,7 @@ impl Postgres {
             AND c.realm_id=r.realm_id
             AND c.user_id=$5
             AND c.version=r.credential_version
+            RETURNING (extract(epoch FROM r.expires_at)*1000000)::bigint
             "#,
         )
         .bind(realm)
@@ -105,12 +106,10 @@ impl Postgres {
         .bind(browser.as_slice())
         .bind(&email)
         .bind(user)
-        .execute(&mut *tx)
+        .fetch_optional(&mut *tx)
         .await
         .map_err(unavailable)?;
-        if consumed.rows_affected() != 1 {
-            return Err(Error::Unauthorized);
-        }
+        let deadline = Deadline::proof(expires_us.ok_or(Error::Unauthorized)?);
         sqlx::query("UPDATE auth_password_credentials SET password_hash=$3, version=$4 WHERE realm_id=$1 AND user_id=$2")
             .bind(realm)
             .bind(user)
@@ -164,6 +163,7 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)
     }
 }

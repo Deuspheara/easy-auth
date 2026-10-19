@@ -1,0 +1,1169 @@
+{
+  "recorded_at": "2026-10-19T14:34:01.796Z",
+  "node": "v24.21.0",
+  "playwright": "1.64.1",
+  "chromium": "156.0.8078.4",
+  "mailpit": "v1.27.11",
+  "platform": "darwin",
+  "arch": "arm64",
+  "source_base_revision": "3d1d3c219bc5b68837c08f988ecd40b8e69dbd23",
+  "fixture_binary_sha256": "3d7b67a694e65c22fbba37ab472bd4bdcc76fdb3ef49bd89b9e50a75d1df4b06",
+  "source_sha256": [
+    {
+      "path": ".cargo/config.toml",
+      "sha256": "9151db58732f429bd068df31778e66be8a4cfc93cc0d5280855bd017d090a3df"
+    },
+    {
+      "path": "crates/auth-postgres/src/deadlines.rs",
+      "sha256": "e85558f3aa028d82832162af1c0c3975f169452bc2650452ecaf1dc484fe82d3"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/credentials.rs",
+      "sha256": "1a65ab0f0f4efc37f9861ab69e9b0bf8e37dd3bb9e5d3875bbaa8a7c17873cb7"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/email.rs",
+      "sha256": "34090ff46eac0a626bf0606e8f1482992434e747e9d7156e7e391256a44e6472"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/gates.rs",
+      "sha256": "a312f5adb7a654fcfdd571bef86799b84d06b6b914858095bd1940355e97b3aa"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/lifecycle.rs",
+      "sha256": "061485e1a343ad49d9d11fded0507db40eed7a76fb2476bcd05f3d316ccfb697"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/mod.rs",
+      "sha256": "6403aa2331ea44661f6f1ad61630629d120b3ef043542d3c9ba42c03316c50f1"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/sessions.rs",
+      "sha256": "1f63e5e331152fbb414038655d8ee67510e11285eaa138e79eb8d6dc8f7af85a"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/deadlines/touch.rs",
+      "sha256": "b38b57ab1ccacc884e0497975d699845c035307dfa2b02cf8809412a97bca2ed"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug.yml",
+      "sha256": "94e7664bfd8081d3257d9c10530c0964337aa750151e7930586b72edb252ec65"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature.yml",
+      "sha256": "d1e49729449fd803d63fa505912cdbc56aea1731e590c679712433e3425c5429"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "66a49330bedaca0c9875d7a5bed3ae64f04147e600d62ab82efb434076b97af9"
+    },
+    {
+      "path": ".gitleaks.toml",
+      "sha256": "61628908284fa4a3fde553f361803c23c0d21afa6e5a2f78d23cecd9b936feb6"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "5f67b9e2d1c45fd12229b7f4f34a2815ae8f1909b1a600c8fa08172e0aaea39a"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "dd1de477261810373e7cd11b6495a8c5b256f9e788b65054ff6655adae44a716"
+    },
+    {
+      "path": "apps/auth-server/Cargo.toml",
+      "sha256": "a44f2ec0bc094195e350c8639ff2dc075cfb1b3777cb0becca351aa13df4f3ab"
+    },
+    {
+      "path": "apps/auth-server/examples/embedded.rs",
+      "sha256": "398ec43eb609558184cc78856c217cdd5fd15044ebfb58c03ead97b0c7513ea4"
+    },
+    {
+      "path": "apps/auth-server/examples/passkey-smtp-browser/database.rs",
+      "sha256": "d30528bcc8d7067d7be17b08355cb7bfee4add10ffbbdc61be0771e6103df411"
+    },
+    {
+      "path": "apps/auth-server/examples/passkey-smtp-browser/main.rs",
+      "sha256": "1676578ff80573b6ac1530369ce8367b8f96ca945cb85d10ed7086c2db539548"
+    },
+    {
+      "path": "apps/auth-server/examples/passkey-smtp-browser/server.rs",
+      "sha256": "3d0ce53fe13caca44bca8f19697a244157dea5c9cf2589309da9b17122fcd52b"
+    },
+    {
+      "path": "apps/auth-server/src/configuration.rs",
+      "sha256": "ac2dcca79cb92d6cad83647fa79f983366b0c40ae89ef4490bdc0dfa13a5efc7"
+    },
+    {
+      "path": "apps/auth-server/src/lib.rs",
+      "sha256": "651e6b6fe97aa4f79f45321ba3f8c28d913fa3ad88e3255a3bcf89bc3658c600"
+    },
+    {
+      "path": "apps/auth-server/src/main.rs",
+      "sha256": "87da9038df9718e8b7b5a473138b6a6d05fa1e41d213953bfa07f03910ca572b"
+    },
+    {
+      "path": "apps/auth-server/src/notifications.rs",
+      "sha256": "5c3c888bb2a930e85b2707e595f2173270340353fe4fcc02523f35be52f5a607"
+    },
+    {
+      "path": "apps/auth-server/src/smtp.rs",
+      "sha256": "9c963409618b18be7cfe282611901b2b7ee1a95059103cca36aaf8353122b8e2"
+    },
+    {
+      "path": "benchmarks/adoption/Cargo.toml",
+      "sha256": "e7bef19003dc24d018eb029d9a2e998ec42a7a276afb27c48bffe455d907db4d"
+    },
+    {
+      "path": "benchmarks/adoption/src/easy.rs",
+      "sha256": "6182d51ad9871135432e224b93364f65465aa0b1486aff834946b468433db184"
+    },
+    {
+      "path": "benchmarks/adoption/src/lib.rs",
+      "sha256": "e03beea534cecae4a7f068e6db63bbb6a23118ffc4c92dffd364c2af308506ac"
+    },
+    {
+      "path": "benchmarks/adoption/src/lucid.rs",
+      "sha256": "b4f74135d71e5289c03373e34af5c0dc7a0ea189ed40d49934fb5a0afc842c6a"
+    },
+    {
+      "path": "benchmarks/adoption/src/revocation.rs",
+      "sha256": "9953e05fd5de57bf88784da15341050d27a9e8b172c2843b5ca9300370789dda"
+    },
+    {
+      "path": "benchmarks/adoption/src/rustauth.rs",
+      "sha256": "0a8bd5cf18a1b5757cd3759654e08220325bd5eb246f4851ed06de3ffb884aa3"
+    },
+    {
+      "path": "compose.yaml",
+      "sha256": "3daa5888ee698fa0618fba5ebd7829b68e15bb5f46b58a2302ca7a35b4ef549a"
+    },
+    {
+      "path": "crates/auth-axum/Cargo.toml",
+      "sha256": "085e74d252a7b88693ba908fc4ddf71cef91080af1b12cf78d353bdd5a6ff5e4"
+    },
+    {
+      "path": "crates/auth-axum/examples/export_openapi.rs",
+      "sha256": "dbecc8d99352d4e6a593eae10940c3a8ea88949e6a0ae65087493db823d3d1f6"
+    },
+    {
+      "path": "crates/auth-axum/examples/export_passkey_authentication_openapi.rs",
+      "sha256": "d4150aefafb79047e0fdd2efc15047e22ccfb083acc82b1271fa79a478106151"
+    },
+    {
+      "path": "crates/auth-axum/examples/export_passkey_openapi.rs",
+      "sha256": "c60c8a10cb8bf3ec58907f2c456319e6d8163b524bae4537d254f27ac83e44bd"
+    },
+    {
+      "path": "crates/auth-axum/examples/export_passkey_signup_openapi.rs",
+      "sha256": "51a8ad0e47946154deae3811656fe8a6456e0373a2a3d4457eb0f66c2ed2876c"
+    },
+    {
+      "path": "crates/auth-axum/examples/passkey-browser/counterless.rs",
+      "sha256": "a0115303928b04d7c011e61f7fe752f359ef4c260e11774b003e4cbf2cebb5a5"
+    },
+    {
+      "path": "crates/auth-axum/examples/passkey-browser/fixture.rs",
+      "sha256": "b8d0042e99dccdc0f06027da917b5e8bbb43895d892409d78becb72347918b64"
+    },
+    {
+      "path": "crates/auth-axum/examples/passkey-browser/mail.rs",
+      "sha256": "32a4e51e2a25ba56353bd152e509fffd87a6042b68633118ca7c76b4c956db4f"
+    },
+    {
+      "path": "crates/auth-axum/examples/passkey-browser/main.rs",
+      "sha256": "96cf01b3135834823bd8ec84f05a8b0c1fd431d31f0a22f955133264a0650611"
+    },
+    {
+      "path": "crates/auth-axum/examples/passkey-browser/summary.rs",
+      "sha256": "dbd1352cfb9af177df562971ac21b2be58d6613fc8441663bc28178d8c317f15"
+    },
+    {
+      "path": "crates/auth-axum/src/browser/boundary.rs",
+      "sha256": "e464a323f255f7b75a39c0cff5e357b9e479e1047c40994fa7bb4584b389948c"
+    },
+    {
+      "path": "crates/auth-axum/src/browser/config.rs",
+      "sha256": "ab221a54419bfec8e10fa9bf577caaed547b76f06461da03aaec9888836482b5"
+    },
+    {
+      "path": "crates/auth-axum/src/browser/cookies.rs",
+      "sha256": "541444804e6cea9fb3caafc008647abc58ac6b43adcc79f05599a0579b9c5085"
+    },
+    {
+      "path": "crates/auth-axum/src/browser/mod.rs",
+      "sha256": "8014ed7b61360ff7f97de3cfe6bd20f42fd6747c7a391d22b54312a3f0f30e8e"
+    },
+    {
+      "path": "crates/auth-axum/src/browser/tests.rs",
+      "sha256": "e40c6cf0ae9dd5104065af16099762df3514cfcf62447fd3e0f1c41aae1b2159"
+    },
+    {
+      "path": "crates/auth-axum/src/contract.rs",
+      "sha256": "e9e1f292f8a2a3766169bd3ee78d0c5d8a07f97d3fe23b775e1107c0059103b5"
+    },
+    {
+      "path": "crates/auth-axum/src/error.rs",
+      "sha256": "810bdb70514581e7a3cc8bef106c99445452757b0879169fb1afe02ea0029a05"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/account.rs",
+      "sha256": "9f1d6cebea374a2634cfeba312d89df741d170336db655dc02a98b29bde7efec"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/email.rs",
+      "sha256": "658090270e70a3279dffca9c18f1dc86eecf5ddc9c1cfa6c223c006cdfaa8357"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/health.rs",
+      "sha256": "0640a8ede75866127b7cff5ff3c3c23273c13ab860c60903db8eb28a4c0a56f8"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/mod.rs",
+      "sha256": "defbe0a9fa061aea4f9dee1f23b1f9a7e578b7960f2bb872d14c5633f251fd00"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/passwords.rs",
+      "sha256": "439cbfd4bc18dfc53d309a098aa7bc89b2132976c47fa542446c9de98126a233"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/recovery.rs",
+      "sha256": "7314fce9d299d70d5ff38d82778d5062b708e64c28a170ef05ff11e9e3565e23"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/sessions/listing.rs",
+      "sha256": "60260114ba02f772fba12071d0d293f1578f18a26478bf49f04b0060849b7c9b"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/sessions/mod.rs",
+      "sha256": "18c87cc1fbd0b42ea3ba11566a288fe966d5a3afd4925ad88235bf2d8492037f"
+    },
+    {
+      "path": "crates/auth-axum/src/handlers/sessions/revocation.rs",
+      "sha256": "d2f7457cf615672e5d8592f220829473a457fb18232e77425fb88ecbad9c7295"
+    },
+    {
+      "path": "crates/auth-axum/src/lib.rs",
+      "sha256": "967f432d4585a7db9494b57bdb41088de41d027eaa3db0fbea30b1eb91a5d712"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/account-action.js",
+      "sha256": "3af1bb59138e981dfc7162cbebbbb5fbe7acd2c87ea0d85b986054e59f696ec5"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/account-delete.html",
+      "sha256": "0addc356436d3eadadac72d1886519e16cd1838b5dead6255be1da790aed216a"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/client.html",
+      "sha256": "c35493c68c43377cab4f0d73272471cc19ab9c8ac9b4303dd3aaeed60ec6b985"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/client.js",
+      "sha256": "004735d4ee6b3de74750a62b1cc2bdc2604871ed970ad88db612918edb3aeaed"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/email-attach.html",
+      "sha256": "76bf04335b4be6d06f5ff047329af6dbbeeafa194d906b1e59c3f76c1a61f04e"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/email-attach.js",
+      "sha256": "68edc9d993a506b0aecfa984d0eb973c7432c463112663b5a50f2d14f8d1a7ae"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/email-change.html",
+      "sha256": "a7d2bf79847c79262b78b4b53974c26011bb34371c76bf8b742b1fa43d5a081f"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/reset.html",
+      "sha256": "3f22ac65caccf4a39a7f951b583b32b46dfcdc1aef522e874e95d00d7a3f6e3f"
+    },
+    {
+      "path": "crates/auth-axum/src/pages/reset.js",
+      "sha256": "c8e25ecfe4f175445b371de59f481759eb7d65a5e4d434df572e5ec66145e26b"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/authentication/contract.rs",
+      "sha256": "e30ff24207b8cac53df25f61a3793856923785d75beda7f696a5b2a38d49129f"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/authentication/handlers.rs",
+      "sha256": "dea7f5feaf40f1f01e67d575b57e64718c65c847afaf9877e7ff429b51bd5134"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/authentication/mod.rs",
+      "sha256": "26ac8b590d1761f8ab72c8ccdff1748a3ed99af48af92e86999aa39a181578d4"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/authentication/routing.rs",
+      "sha256": "ff922b0b6681d29d14f7e7abbca0b3a775a131b315ed3987ebf361c56a512060"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/authentication/schema.rs",
+      "sha256": "d331618f3cfee1f1c00dd67ca9fafa29f11a6dc54df5ae9fec7f072530c9f9bc"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/authentication/types.rs",
+      "sha256": "01bf269a937831d87c72821d7387b0423976cd9d0e54bf646ab315975257f30e"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/contract.rs",
+      "sha256": "10298f94fd66da0715fa9d468a8d022fb2f288ebbed0f7a02353f2f8c6a2af15"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/email_attachment/handlers.rs",
+      "sha256": "cdd399b38302233ddf9da5fa7b6388bf890f02f5f0e70af05d88841b4d609342"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/email_attachment/mod.rs",
+      "sha256": "05de76a9aefec4b3eaf3238820a23e2ad49894f085bc3d5b501d885fc7f8b761"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/handlers.rs",
+      "sha256": "15c8d6bf896cf5f32e71cd4f6518ea66c2698774ba85efc4818c3ef228b4fa6f"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/mod.rs",
+      "sha256": "d3784f752d6072bec6e1038bed6d78aee36f2613e70c87bc1623359fdc9e7227"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/routing.rs",
+      "sha256": "21708e184d3126ce45f49429b5f2ac173a10ea9293b82852c8024f90fff7cdf7"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/schema.rs",
+      "sha256": "e652ef8bd73de3cd47d0c9e167616f34eca08cc26c2e4cbd6054fbe3479cfdb4"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/signup/contract.rs",
+      "sha256": "b0650404b3aa8a5a3dfdeb0afd5f3f2c31f8aa0f3d40d6be7c47c6c789365b99"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/signup/handlers.rs",
+      "sha256": "f35f2ab6344f6eb1306947bdda4e00e8776b46e146aa5a681754f5392d52a650"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/signup/mod.rs",
+      "sha256": "5611a5becfe22e27f9ae71c1d6e76f923b03e9be78c411edeff7cebbe75260cc"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/signup/routing.rs",
+      "sha256": "c8b52f1f7f6bdfbd2ee626a16654357ab7975557e778c8c8f38974ba2642adae"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/signup/types.rs",
+      "sha256": "d2023329a023e6165b05eca6ad29b29bcc8e8f2adfa78f7487c0dc9fa0bb854a"
+    },
+    {
+      "path": "crates/auth-axum/src/passkeys/types.rs",
+      "sha256": "d2ef92ed85bffcce16b625900d1ce8cab91f62b27f98a35aa448b484523a6564"
+    },
+    {
+      "path": "crates/auth-axum/src/router.rs",
+      "sha256": "2a64108a2cff5cb97a95b738e502b58c1518cf51fa929275fded861fdc822473"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser.rs",
+      "sha256": "538e5d4e7c9294c4670f361d96e42ad3f863fdd1bf00b88d23e10b7aa2c82766"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/account.rs",
+      "sha256": "98d4b0b0c4fb49b077641b61407211cbadf1a4435b2d4c19b55412604cf04174"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/audit.rs",
+      "sha256": "3e660db33821bfb62ba590f7f2bfb144d9edb02272d8750a88ad44f254192479"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/boundary.rs",
+      "sha256": "ada73d40248be4314ac30f79adcb4d8ab8318e03537ae03f30bf21a679759e70"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/contract.rs",
+      "sha256": "b8683bedfe2570614dc313a6aff21372d71a4a54524498f6a303b7a63fffffdd"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/email.rs",
+      "sha256": "10cac0709a11b900a79dadef0bf89677abda27124df9fbfd8b1a0c9968d66789"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_authentication/boundary.rs",
+      "sha256": "1bc3a8c6de17bed8f07e8cf628f80faa9d483f026e1d2a0d2542c082118f6417"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_authentication/contract.rs",
+      "sha256": "01c5baf1fb9a7d169f5052e2efb95d8dd8345d3fceeb84e5519e34fc230b8a67"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_authentication/mod.rs",
+      "sha256": "4458690cc035b097f3d3d3d2a9db8fcf19425e0286fa8b33750c638c330597ff"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_signup/boundary.rs",
+      "sha256": "368fe33811c3922483c8664d3d31594a50d74134e5f456399b8cc06d386a551f"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_signup/contract.rs",
+      "sha256": "3e2d308fc51df6b1d97e8c5b7cf515d91aa235a948ad06143ae1a3957b716d7c"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_signup/email_attachment.rs",
+      "sha256": "cb8ad27dc07e8d44f07a0a4e7d97af838b20bc23a39b8c3ecf39a34cd00f0f33"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkey_signup/mod.rs",
+      "sha256": "5d3e80bc542ecdbdd53ca52a81410055c6e0796d14f35e74fb2933a1770877c3"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passkeys.rs",
+      "sha256": "79575fc161910ae35a0ab74bc6e3ce46f115e89e7752eab800c53c3d17374de2"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/passwords.rs",
+      "sha256": "661e122ea898477561ce2dd5559712d511ee72eb9450617e02f276b7a8efa771"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/recovery.rs",
+      "sha256": "29cc16e35e13d529b0432e237d2def9c10dcc5da2999a7114415f4fb78ad65c4"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/sessions/boundary.rs",
+      "sha256": "44a22cceb90143bd7508b8ca3ffa671d756f9b09ea80bba1cb2a3125275215e6"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/sessions/inventory.rs",
+      "sha256": "ac6a74903480d04f982fa7b3bc89526202089a9e696eb70a791b490228c32efa"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/sessions/mod.rs",
+      "sha256": "2726b3584021bea63e10fddc2455476d7aa997fbf80cb2fbab4c1e51b9a0a776"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/sessions/optional_mailbox.rs",
+      "sha256": "6dc409bf384e4105706adca83f3529c032edaf563098695a64e68446c5d5b1f3"
+    },
+    {
+      "path": "crates/auth-axum/tests/browser/sessions/revocation.rs",
+      "sha256": "f73ca046c67dcbb1f37b7073737f3b663303a5d88676ecc82ebe2a7b65be8048"
+    },
+    {
+      "path": "crates/auth-axum/tests/support/mail.rs",
+      "sha256": "fc5e99a7ccea8d7cb0692b18a73afc0812b6b981bd1351330667ee2d1fbd2d0e"
+    },
+    {
+      "path": "crates/auth-axum/tests/support/mod.rs",
+      "sha256": "264cbe0b5c64d9fec7e0177fa1ab85dac0e875484cadfd6dd8ac824242e840a5"
+    },
+    {
+      "path": "crates/auth-core/Cargo.toml",
+      "sha256": "495e69ad875be0c9c059deca9841a5925e5b60bfd6cbe64e97d990a8531e6519"
+    },
+    {
+      "path": "crates/auth-core/examples/password_cost.rs",
+      "sha256": "89d4977eaabfff835fd08e98c149cab7b46c5338870f7524eea154f1d3309970"
+    },
+    {
+      "path": "crates/auth-core/src/audit.rs",
+      "sha256": "c1f0c9ef6d0b7ec8da6e7b688ebe6911666981b166a965b334902b7a2108366f"
+    },
+    {
+      "path": "crates/auth-core/src/auth/account.rs",
+      "sha256": "25807b000fb24aa5650bb1bd701ce54da48df86abe3679af0b8adc0db83ff2e2"
+    },
+    {
+      "path": "crates/auth-core/src/auth/admission.rs",
+      "sha256": "ec2041ddaa9afe4734169f4d150c4cd4cfa1c69c0844fd0e372a66afd12a5a6d"
+    },
+    {
+      "path": "crates/auth-core/src/auth/email.rs",
+      "sha256": "78ce30f75a19c4eaf1c0a72f9c11bbc616ea4c6c47dd71895926a083d50b7a54"
+    },
+    {
+      "path": "crates/auth-core/src/auth/email_attachment.rs",
+      "sha256": "982267f8f81a6af25d36b58b418cd1745b5c6eb96331fd306b6325003eba0ec4"
+    },
+    {
+      "path": "crates/auth-core/src/auth/mod.rs",
+      "sha256": "ac69f340b78881cab5ed7c29b77c554dfaad7392df38129bb86559b50b7d47be"
+    },
+    {
+      "path": "crates/auth-core/src/auth/notifications.rs",
+      "sha256": "9be0e3c3ca1a9702cbecf2d594d76bf57556aa92accf01ec10693d41baf28743"
+    },
+    {
+      "path": "crates/auth-core/src/auth/passwords.rs",
+      "sha256": "539f84fd774604979eca128053c93585025e2c703639d2b30523ae39d35a234e"
+    },
+    {
+      "path": "crates/auth-core/src/auth/recovery.rs",
+      "sha256": "c5c5f8fa5eaf4ba5589b40617d0389eda612181ac78578f0e020a3e3711e038d"
+    },
+    {
+      "path": "crates/auth-core/src/auth/sessions.rs",
+      "sha256": "f4236a911a92499ec32ffca90b5d8e2bc703f6f4f1ad515d28c267eb1cb34b7d"
+    },
+    {
+      "path": "crates/auth-core/src/email.rs",
+      "sha256": "a5c59d793bb456994baae0a228bde9f397e4e1427b67db85592aec36caac0aa5"
+    },
+    {
+      "path": "crates/auth-core/src/error.rs",
+      "sha256": "a747cdfedd616e36f4742bef7877e67bf3f2b13b31cf450e940bf6359b322a0c"
+    },
+    {
+      "path": "crates/auth-core/src/identity.rs",
+      "sha256": "cff20cc5a9c24255ecbc52e690616c5dc44010dc6ffe91e5f2d43dfbd5eed98a"
+    },
+    {
+      "path": "crates/auth-core/src/lib.rs",
+      "sha256": "9eec41a84f328a11b488fdc97ff6d132c591728bac7100a4b7435800abe871c8"
+    },
+    {
+      "path": "crates/auth-core/src/notifications.rs",
+      "sha256": "edf0bb0aef4bf22b26ad6e190eddc7fb105bf7029375b1afe676df0fc00bdff0"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/authentication.rs",
+      "sha256": "1af0db201c974b1df3e09d343e1f3d412f795e595bb108de3789cefeb8c6a994"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/authentication_repository.rs",
+      "sha256": "7ce094761aa38713fa675a7b4d624ab65312d993016cf6ce11253162d609538c"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/authentication_state.rs",
+      "sha256": "1a00500ce5f06dc13c6c4ece6d4693ffaccd431fe6a63f7b67dcea19a190179c"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/client_context.rs",
+      "sha256": "ddf28e3a6dc6a326c9554fd0c31e47a9556302dd71641e4da0a93e598371c922"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/configuration.rs",
+      "sha256": "6b023d2b284ff458b819f66b7951c92ffd51f8c23d2910cf19f2e2552b0832ad"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/credential.rs",
+      "sha256": "3e18e6036057da556c59188c3a7b6674f646ce8f8453738c9fcb2feaf00e3cde"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/enrollment.rs",
+      "sha256": "efbaf16f21fea83a0cd0d89468d92626b7cf9655b64393f6312788c36b9e0312"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/logging.rs",
+      "sha256": "50b0c7338a75e325e19a24f08c5d5afd8a89d3c5b989e36dbcb42dfe0cfc19db"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/mod.rs",
+      "sha256": "e94f2c1e09a14f31308ed0d72ba9b07fee98a365957d64ce3abaa519f08f1516"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/registration.rs",
+      "sha256": "1b3805a1bb359f0f6fa048c4ef51243acbb839fb97696c5582b62fc304f7e9a8"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/repository.rs",
+      "sha256": "638f6c2311903c67a4f7751456576f762a4443258ee0fd6be9a7c48fec3380c2"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/sign_in.rs",
+      "sha256": "a085cc29812524fd06dac566f8eff57effd4223bfb492e3503961b3a0e7a865d"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/signup/flow.rs",
+      "sha256": "d3f24be64874c902bf410785ca1f10c21f38a248135522d9b9bf7089e5651614"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/signup/mod.rs",
+      "sha256": "127caaecc2dc698366da83beb7bb2a196782caa89420b083fe78a4cfd41518d5"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/signup/registration.rs",
+      "sha256": "50de3ad6d9d53749f25827d1a36132c79a7bcc5ce4788e6f976ced7c995601f6"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/signup/repository.rs",
+      "sha256": "c439038cc1326ff8d001e1e37b2a04cc46b221773b2a124fcc5f15e0cdb78838"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/state.rs",
+      "sha256": "e662690d5346719f323b7e4be99134c6da0e1169ab4925d93885f91b589e1ee2"
+    },
+    {
+      "path": "crates/auth-core/src/passkeys/tests.rs",
+      "sha256": "2d307792744f9aab1b71e213ffaeb837f7c3d4704460f1eb268ab7e0c124a465"
+    },
+    {
+      "path": "crates/auth-core/src/password.rs",
+      "sha256": "1049cda2b89a0f187db9df70f1177b1decfebd63767da2f1e42b206cd3b78436"
+    },
+    {
+      "path": "crates/auth-core/src/ports.rs",
+      "sha256": "818626ffa360890c65a32c3a8d0017fb91fb80e20f471f9578b79fc877d3a77d"
+    },
+    {
+      "path": "crates/auth-core/src/secret.rs",
+      "sha256": "ed0d537f235ad449986a2581431da5abb5a0904e47d5f6264d9c89c238f8d706"
+    },
+    {
+      "path": "crates/auth-core/src/sessions.rs",
+      "sha256": "9d9d01becd4169db22b9786236ab099ac213d08e5d08758775e6e5e46f6e38ae"
+    },
+    {
+      "path": "crates/auth-postgres/Cargo.toml",
+      "sha256": "c975abd027d9b58a6c353e34da35b32439067d85e00b7be3d0fed5a92301a11d"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0001_email_sessions.sql",
+      "sha256": "46d56b89baf8f6509159f76b5fc727d40fa451a967fc972158765681d2c929bb"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0002_password_credentials.sql",
+      "sha256": "84f831ea8679d06b751025c914b1a960f39674e24294b4f01ca5e30e280c46c4"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0003_password_recovery.sql",
+      "sha256": "9158e687a9323c3eb60d78d57f16d8d55297c73015412c7bc55b1572a33cd6e7"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0004_account_lifecycle.sql",
+      "sha256": "e6d26e33729065aef7f0299918a8c14bcc71feece7078105c6b7affdf9246a48"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0005_session_management.sql",
+      "sha256": "6cd0058a6f0a2466ae4f48be00dc65152112c041496d5f878ccf974d17055d8e"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0006_safe_audit.sql",
+      "sha256": "2ab9ed9e5b4d9ed48391ddcd3de50b45fc07409a22eae8dc99a85080ec1fc1c6"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0007_passkey_enrollment.sql",
+      "sha256": "1fc135c7e9cccd1d09a622eb7a17597bb2dacc7db7336bb12c57d8243d0e750b"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0008_passkey_authentication.sql",
+      "sha256": "643807caa7d3d6824f8385b7877d710cc4b1ccb7b55c30b185200af4d954ab40"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0009_optional_mailbox.sql",
+      "sha256": "41ba003d0b268d4277650508bd2e533f1409e461e36796d3ce7fd32ef9ec8adb"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0010_passkey_signup.sql",
+      "sha256": "f8388709f092e606c71b0836c73feb9e7631ecf09e41277dd7c32d904ecec90a"
+    },
+    {
+      "path": "crates/auth-postgres/migrations/0011_email_attachment.sql",
+      "sha256": "162d193dc5bf5a78515f2170eddaef941227497c8d90eb06da5f8064bb228993"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/admission.rs",
+      "sha256": "59ff30b1246ca79901e4fb62e7b9cd536cd2256278a8c4be6dedfa6bbf60be0d"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/deletion.rs",
+      "sha256": "f4090e1b08c993ba4d0f17dc0bde3fdf8e4558200f367eff575de55392b09b8c"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/email_attachment/completion.rs",
+      "sha256": "f779b2285203f271a00c7f708c23465dd2aa3d6d18738d4ee6c417d09be12344"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/email_attachment/mod.rs",
+      "sha256": "95f8d3e00b9980065a25aa2738d2d8d919740301aab805112fa250e7d9cec707"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/email_attachment/ownership.rs",
+      "sha256": "3c5a4469d0eb7e7cdd7c2abc2be7784fa4d505c57da5bfe4d801bda474c45248"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/email_attachment/preparation.rs",
+      "sha256": "2d263ec24c5d25f483aa913f80fca5e986470e86c10f7e3b4ef5706f4a8fb08c"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/email_change.rs",
+      "sha256": "0735bfb5114d8d1ed17e648e11c5f0d01adae316d09eea1518856ac35498ea37"
+    },
+    {
+      "path": "crates/auth-postgres/src/account/mod.rs",
+      "sha256": "59f1125fd7676b7839c7cb47e607619e458166b8740ecc6be20432e0241ed395"
+    },
+    {
+      "path": "crates/auth-postgres/src/audit.rs",
+      "sha256": "b2e2fa905215cafc2aa764d21b9c6d080f7339f849aab29cebea69e0ebe9d999"
+    },
+    {
+      "path": "crates/auth-postgres/src/email.rs",
+      "sha256": "b2c91fc2a8c68da78c640d542ec110c4bf58bd7f5edf06290bd1010c624ee2c9"
+    },
+    {
+      "path": "crates/auth-postgres/src/identity.rs",
+      "sha256": "31f7c4caa900ecd3ff9f448710cf0f8bbba221f83fa85c1f3739a8e4c3709369"
+    },
+    {
+      "path": "crates/auth-postgres/src/lib.rs",
+      "sha256": "a96c52044c0a8d17d1a00c3b15fba6efa00c2b13dfe6e78cc62429ebe04b361f"
+    },
+    {
+      "path": "crates/auth-postgres/src/locking.rs",
+      "sha256": "09186a2ac5363415ff7621f7b5cbdd3eb8a124a2240143ce092aaf4d13ec160d"
+    },
+    {
+      "path": "crates/auth-postgres/src/notifications.rs",
+      "sha256": "5f263248540cf3d2a647516e839c46bd1e0e5c44dbfcd42587529e43e8631f2d"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/authentication/admission.rs",
+      "sha256": "56e8412746800c59ea021569904381650fb908881d2ed796f4fd229fdf395521"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/authentication/completion.rs",
+      "sha256": "d5b4e4e5e98698c51128b48eb1eeaad1017db868a954c221d531f1da18254986"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/authentication/mod.rs",
+      "sha256": "90ab3622d62961862ef4ffd0d761e81130a3d788c7f93bf6399fe26851102016"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/authentication/preparation.rs",
+      "sha256": "2fe26f24cef7db6d2f79db4b022b06c903841251f97e64f9843d48eebcd106bb"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/authentication/repository.rs",
+      "sha256": "f441e44f059693dbe071f29b7c76d9eae7136eb97726bd5c82966cf023320473"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/completion.rs",
+      "sha256": "048d336954ccc6c63eb186b17f9e25daf61a81a2fc48aae23e0e7ba51477b634"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/mod.rs",
+      "sha256": "f1721801518f2847f7fcfaf52f7c557e7b2d938f23224ef2499133e2b89343a5"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/policy.rs",
+      "sha256": "838d3c451f86c0f8d0a180c1fb37551f44a9c9ff62ae274bba4de7e391e6dfa7"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/preparation.rs",
+      "sha256": "42a2021dfbc540f7d6584e91ab35844151122764a653f5943f19feba7f9d3977"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/repository.rs",
+      "sha256": "0f2519af2d36fef6d5ba9475eaa8cee7875a2232e1e240f1aa2bb817e1b53306"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/signup/admission.rs",
+      "sha256": "fad31a99eaf4b984cad8985d67ca5a6553ca9fe01a8ed371fa1a81832742421e"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/signup/completion.rs",
+      "sha256": "4c8f9d7e50295b1e34dcf63f5403e6178aca5dfc0d8571d518fa427c5d3ff073"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/signup/mod.rs",
+      "sha256": "c374288b9a471dbc46136c9106513a93d755e417f79988c83c02fce7417abb17"
+    },
+    {
+      "path": "crates/auth-postgres/src/passkeys/signup/preparation.rs",
+      "sha256": "16ea5554ed055decbd01ecb1f436480c45a2e0f128f4b3b1c56e4b43d3b2b643"
+    },
+    {
+      "path": "crates/auth-postgres/src/passwords.rs",
+      "sha256": "849e27a721da66ed855119da5ad9fbf3fb82c57fb76361cd03880b0e28163082"
+    },
+    {
+      "path": "crates/auth-postgres/src/recovery.rs",
+      "sha256": "6bf8c4f402724588e20a5aa5e5b96b32848ff0117fd5769a6f40eba35e4c9192"
+    },
+    {
+      "path": "crates/auth-postgres/src/repository.rs",
+      "sha256": "41a38d408159ef8f64eb5f1d307b5b26d64d516ca7e141485b8279a661a9854d"
+    },
+    {
+      "path": "crates/auth-postgres/src/sessions/listing.rs",
+      "sha256": "f5819e3f60833d0d9faa56fc9315277807ec05d0fac0ccc3fb226515853e603c"
+    },
+    {
+      "path": "crates/auth-postgres/src/sessions/logout.rs",
+      "sha256": "4b2ad7921eb2acf33663b38a623379877c6e40ccc3c692f6e841865f4e71e6d3"
+    },
+    {
+      "path": "crates/auth-postgres/src/sessions/mod.rs",
+      "sha256": "99eaaa5ee15dc2fc5206e4f63a92321963d1db9b86a419a709bb298cf4cc01a6"
+    },
+    {
+      "path": "crates/auth-postgres/src/sessions/ownership.rs",
+      "sha256": "bf5d16393818ebf48b3bbba0aac1ec0b94d3cc15d00253deb7fa5a0f2793aed6"
+    },
+    {
+      "path": "crates/auth-postgres/src/sessions/revocation.rs",
+      "sha256": "c778305f2dc8dc9582fe71b9909a03e1642a89c778a7b28e6fb6cc3d812aed55"
+    },
+    {
+      "path": "crates/auth-postgres/src/sessions/validation.rs",
+      "sha256": "754f2529020f851cf121dac769fc1fac23523a8c032edb77d691b8cc5e0cd705"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle.rs",
+      "sha256": "97ac1c56cdd1d9e06280a64fb024a10b5c34bff5ba87c43ad16ff7b425d879ab"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/atomicity.rs",
+      "sha256": "f069329eda8d73bed82bd5142d166a30c9a5a1c36d8a2b829393bd1cf4eeca76"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/binding.rs",
+      "sha256": "17431a7ae40c3ccb60d20c0e76b63a8b4841433b425c2aa216b02de095823744"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/deletion.rs",
+      "sha256": "6eff0cf491d81083905ba8cec3a70975b220b9861f66c6c976b5c756c02c526e"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_attachment/atomicity.rs",
+      "sha256": "48195ac89a26348cbaf4df2db1d0385e4407c7b6d84b8b762a2314b9a1b1050f"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_attachment/binding.rs",
+      "sha256": "0d9e207d700234e28c1e3fa79ea07e4c774f32b0054ed9649d1debc30ab0bb20"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_attachment/concurrency.rs",
+      "sha256": "43c0ec2896f20f8dda42283c7504cd8d28b0129e1a448b8e8cb391706acd73bd"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_attachment/migration.rs",
+      "sha256": "1ad5f3d6790876a2f673782c69affb3bdb821e144fa8023c2c920167b5f91c92"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_attachment/mod.rs",
+      "sha256": "bbe41eb71d7b144e0b0301c7182d5c4dd1e6ff70d5372afbaf428dd1152f7c30"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_attachment/waiting.rs",
+      "sha256": "3259b95923a7952c843dfb2a51ffb52bb3836274a319f9faa482dbd7947447cf"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/email_change.rs",
+      "sha256": "e2a154ba751d7ac23ef972aa11049649584bc6f1072401fbb0090dbc0a03d6af"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/account/mod.rs",
+      "sha256": "a6dac4ec085acf06804034dc542f611dfdeea827defdf882939b6dc51ad15986"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/concurrency.rs",
+      "sha256": "96c4437a1be7514087543aae5c9b3eb0643d39a23351fa4c487277bcec661d6f"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/events.rs",
+      "sha256": "5021cc95e64dd53d5e2aec0fd1bf1046ea904f7fd947252979887dc1d31471ed"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/migration.rs",
+      "sha256": "4df009762c9cd1ed2593dc65c1a73be526665f4243de6eeffbdd74004e08d233"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/mod.rs",
+      "sha256": "2b9bcf98369d94830de5692d45756d714e62568e2472d5c113e591467077fd20"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/ownership.rs",
+      "sha256": "c14097dc9acdb5046c952ed37059761b54f6d22eb151fcba3a37693556870d16"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/rollback.rs",
+      "sha256": "7d35164530d852542e0b387db56d8bf2501e0b2c0d3b706d78ac1c85878b8d84"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/audit/shape.rs",
+      "sha256": "649c5b13826a5666a21840acdd3d9539ebe6ae77ba5c25cf76a380e4c16a2d75"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/email.rs",
+      "sha256": "a210b78e271d2e67f039b2de76857f80557cecb84b9fc01a049392b49e9fa0b4"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/identity/admission.rs",
+      "sha256": "3d290cde283035772c65a0c9aee7aa8051ccea8f44e0f6a81a6aa09aa0299848"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/identity/migration.rs",
+      "sha256": "2e3d1558221016f763f7a3959c04f75324ca6747e84750924c4a401e2673ea84"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/identity/mod.rs",
+      "sha256": "1d75dc7fa38f00562746101501395637ab2b787704a52e16831872dae84c0a3b"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/identity/policy.rs",
+      "sha256": "1f0c868c4084996053da3867cc882e335840dc26424a49109870a797ab2b8019"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/identity/sessions.rs",
+      "sha256": "a97f365401096f58bfe1c4cad861b52c70acfc67096362c585a8c45fb93c4063"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/identity/waiting.rs",
+      "sha256": "2339a8920bbf990eee8f0e722132342daefc360f461619dcac6ce94a66295a88"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/migration.rs",
+      "sha256": "48e63833e99f1c318a506dca510ae96eb01be9052ff47f011ee2db6b2b64afd1"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/notifications.rs",
+      "sha256": "02e69a45289eb1c71169016898641fd5b76b9e5a065fa5a5d8655aefa9c4a3af"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication/binding.rs",
+      "sha256": "05d8d9d55b7c1632350c3f2244011f24ec4843e33ae832883d374c898ee4e457"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication/concurrency.rs",
+      "sha256": "e8784fb4bc581a4132c3c2e4b7e988dc195666d7626bf97d618c4c190b32742f"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication/migration.rs",
+      "sha256": "705c8835a1205a0a7732c5fbdb7acc6f253fd908283cd2832f862c68b9b7c91f"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication/mod.rs",
+      "sha256": "26d29b28c240c9701f86439da28de7dece27286c0b3106390a7f64dfdb3b7227"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication/waiting.rs",
+      "sha256": "56d3cf9a626d72f825516fb6d2783518871ad9cc8fd8ca8bcaea5d6aff58b6ad"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication_protocol/binding.rs",
+      "sha256": "34cfdf43014e5404bd61c8e47b980a458523d0fc0d79743f7949f941a8e6472e"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication_protocol/mod.rs",
+      "sha256": "2e8a7f6787712ea42b884ebba549b0a5bfa729cf1dbcd7a858f926f666dd5a60"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/authentication_protocol/verification.rs",
+      "sha256": "4b247a08a49e822cd1bfe42df2e8999a56b7626c8f2138228769b85eaf3ce5b9"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/concurrency.rs",
+      "sha256": "4ad69480b4886be79e2d52b60d5b47dbba60b54b3ed6163984feb6396c58c5de"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/enrollment.rs",
+      "sha256": "f73b551f8195ec1ea43bb253b6c8d53bbfa76ce6d30d608ab893ad7531811bcb"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/limits.rs",
+      "sha256": "f2023f90683b63f0dc6b1beeb8418b6f86e03c0f81a13c0ee1bb3431489f62c5"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/mod.rs",
+      "sha256": "3464cef886ae05814cf10386579b04a7d33db95f3c1bd945be52060c95a1272c"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/protocol.rs",
+      "sha256": "1af279277616f361d4ae7a85e55767b443c717fa81d73eb8c0409a8127630e37"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/atomicity.rs",
+      "sha256": "2ef9ba31819b10ce88c174c41845141b204b29acb69ec8636b7105e6ba0f78e3"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/binding.rs",
+      "sha256": "860f737e9adaca14359e4dad099aae7f9a2da6766c57e3ddaeca252ba03a52e0"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/collisions.rs",
+      "sha256": "e362f9abffceb5ee66497c62d9f369e73cf45e36e8eb932917834960d10cec26"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/limits.rs",
+      "sha256": "f2cf53fbb789c8df508c614d7fa7912a9a7d5c74fec158bb6962e9314d80465f"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/migration.rs",
+      "sha256": "ae212fa268124ecc28703ba5fa8c4cb524b3bbef610c6c22f6bd7fd3800aa5ae"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/mod.rs",
+      "sha256": "0b0586df37d2d9c7bcbd02c021ceac25a726e63e2ba2f3b6b9da80e8fd2e48d7"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/protocol.rs",
+      "sha256": "d3309bf0131021f01acec3a5025b26ca6cf2fd5dbfe16e1a947c652753f6e08b"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/signup/waiting.rs",
+      "sha256": "4cb1700684f6fdbf3c2ee19a4cdfbd940748824b4fda4a6647dfd1169e01d9a4"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/waiting.rs",
+      "sha256": "a9fddf8a8563cf8f089c9fc55b2205eeaf5e6c610e2fb85c959e500210d783d6"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passkeys/waiting_completion.rs",
+      "sha256": "9447d9365ec140a09ce9e4df767f9b2b5f57adccd9d74b5c3f853bfbd932361d"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/passwords.rs",
+      "sha256": "72853105e393158734b23e8118d4179a2e386257b99573e93e1528e49ea342cb"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/recovery.rs",
+      "sha256": "5efc97d0122869d0d99a3c10efe5ef8cf18a118a79bde55ada9e4a10b02addb7"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/sessions/concurrency.rs",
+      "sha256": "811f58d4d126b66b99a7e20ed40f1cb6915610c17a693827586126650ba039ad"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/sessions/inventory.rs",
+      "sha256": "2e1912ee404d25f95884bba0d0f1b487a1e641de12849f9e8736882a73af6b1a"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/sessions/migration.rs",
+      "sha256": "409778be146cd71e9125b1484e336a1c91e7ef1bebbc1b835fff1cb9084546cd"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/sessions/mod.rs",
+      "sha256": "3eb0fe56154ff1f6473da03b94b2e5aa3024f04e7077256771cf699e5bf802ba"
+    },
+    {
+      "path": "crates/auth-postgres/tests/lifecycle/sessions/revocation.rs",
+      "sha256": "abdd690fb8fce59cfedd0c053297cf49117d11c5d7710c2e1b2df4251a265429"
+    },
+    {
+      "path": "crates/auth-postgres/tests/support/legacy.rs",
+      "sha256": "5ae2e6b63a903bf62a6cfce0aa1a34de6d955bac4840e490b7e05c4104a62012"
+    },
+    {
+      "path": "crates/auth-postgres/tests/support/mod.rs",
+      "sha256": "d3796da742356aabe9df139908d5dbc9bd06b0a1787165e7cf92eb315d45b060"
+    },
+    {
+      "path": "deny.toml",
+      "sha256": "418947ebfb4d42ed9cc5a0a70a7ef85000bd2e703fc6aaaccc88e8a94f067a44"
+    },
+    {
+      "path": "docs/architecture/openapi-passkey-enrollment.json",
+      "sha256": "40b9a582996ba9f9bcaa024c62b48d6c73917b475d115463d17ea9ffa317e762"
+    },
+    {
+      "path": "docs/architecture/openapi-passkey-signup.json",
+      "sha256": "597a826348612cffddf2419e6716b175238f6b4023ed2d268e4c61e30c3691e1"
+    },
+    {
+      "path": "docs/architecture/openapi-passkeys.json",
+      "sha256": "f66012546459930993afeed01735c198b4eb5897a11a6bb82894d7b28ab8ffd5"
+    },
+    {
+      "path": "docs/openapi.json",
+      "sha256": "33b7dbc61649c6d03b30360f3ff1ebed57f6e40ac56627bf978c6eb695fa405c"
+    },
+    {
+      "path": "docs/planning/backlog.json",
+      "sha256": "cd6b25fba10f622196c0b3671e7f829c8b3e0b5008e22edb742bde7f5b5e0ff7"
+    },
+    {
+      "path": "docs/research/source-snapshots.json",
+      "sha256": "cabcea405cbce303ab1dd16aae0a503293f4b0641d2f01722fe0a1af2dff2ab4"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "7d21c66a15f41bad66b82ed06a289f5dc8a6e3751951d2696bbf20ce296f2b0f"
+    },
+    {
+      "path": "tests/browser/passkeys/assertions.cjs",
+      "sha256": "4595a588f7425a5c25594ddbefa5e48df9dc34dc64e0eb8d43a923df055219a8"
+    },
+    {
+      "path": "tests/browser/passkeys/attachment/cases.cjs",
+      "sha256": "f259ec8ddd3070f8a943af0d248e45376e6960594ed0321b8eb02e6d7afaf272"
+    },
+    {
+      "path": "tests/browser/passkeys/attachment/mail.cjs",
+      "sha256": "4add5e65c25c6e29e7aa46a66b40374a0d4a193918269a3b501e2f6b825ae556"
+    },
+    {
+      "path": "tests/browser/passkeys/attachment/run.cjs",
+      "sha256": "ad59b5457d33870118d4a9f440bf05ce3c67a56d5b0f1c9ff475a9f4e40992b8"
+    },
+    {
+      "path": "tests/browser/passkeys/authentication.cjs",
+      "sha256": "1ea09d9e49ca57dd642e9777b0087de14e123cd824191924b5c781f6d2790053"
+    },
+    {
+      "path": "tests/browser/passkeys/browser.cjs",
+      "sha256": "024e758089473cd351129a6003ae6e8ca05993cadf53d2ee56ab79014e321d94"
+    },
+    {
+      "path": "tests/browser/passkeys/cases.cjs",
+      "sha256": "1bc96e620e815eb1d0645c2f910f4da5495e3887a6bb41d5aae328a13f31a1f1"
+    },
+    {
+      "path": "tests/browser/passkeys/frame-assertion.cjs",
+      "sha256": "8cdd95695f645c11818dfd27eafa610aa2abc60baf7a8c62ddd50ea865fab84b"
+    },
+    {
+      "path": "tests/browser/passkeys/package-lock.json",
+      "sha256": "39c72b4c74acc1104ffe60339c62282cee13c40e9d76840173b908c50885fd68"
+    },
+    {
+      "path": "tests/browser/passkeys/package.json",
+      "sha256": "e13f8db8d5802251e84f84ff169e30c800ff648c936fbb8f191aeb5b7d1be29a"
+    },
+    {
+      "path": "tests/browser/passkeys/run.cjs",
+      "sha256": "d44ece7e35d934f79877b8b9336ebf4799c69af7542b7b29a5800ad578e72471"
+    },
+    {
+      "path": "tests/browser/passkeys/signup/cases.cjs",
+      "sha256": "0a1be64fa5416794d5ef1e79c538dfde1d143c94427d088570e15906bb024e4f"
+    },
+    {
+      "path": "tests/browser/passkeys/signup/ceremony.cjs",
+      "sha256": "728c6bafe72b55d61c617d412e8ed89242d0a8523f876333746e3768cf42d73c"
+    }
+  ],
+  "fixture": "owned disposable PostgreSQL; real configured_auth SMTP adapter; loopback Mailpit; original native resident signup; no seeded session or key metadata mutation",
+  "cases": [
+    {
+      "name": "native-signup-smtp-contact-internal",
+      "transport": "internal",
+      "status": "passed",
+      "native_signup": true,
+      "smtp_contact": true,
+      "later_account_bound_and_discoverable": true
+    },
+    {
+      "name": "native-signup-smtp-contact-usb",
+      "transport": "usb",
+      "status": "passed",
+      "native_signup": true,
+      "smtp_contact": true,
+      "later_account_bound_and_discoverable": true,
+      "occupied_target_rejected": true
+    }
+  ],
+  "database": {
+    "attachment_audits": 2,
+    "attachment_pending": 0,
+    "authentication_audits": 4,
+    "credentials": 2,
+    "invalid_attachment_provenance": 0,
+    "postgres_version": "17.11",
+    "signup_audits": 2,
+    "signup_pending": 0,
+    "strong_verified_users": 2,
+    "users": 2,
+    "weak_sessions": 0
+  },
+  "fixture_database_removed": true,
+  "messages_removed": 3,
+  "owned_mail_removed": true
+}

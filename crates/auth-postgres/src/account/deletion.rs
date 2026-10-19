@@ -1,6 +1,6 @@
-use crate::audit;
 use crate::locking::{fresh_account, lock_email};
 use crate::{Postgres, unavailable};
+use crate::{audit, deadlines::Deadline};
 use auth_core::AuditEvent;
 use auth_core::{Error, Result, Verifier};
 use uuid::Uuid;
@@ -17,6 +17,7 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         lock_email(&mut tx, realm, &email).await?;
         let (user, session) = fresh_account(&mut tx, realm, current, &email).await?;
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, session).await?;
         sqlx::query(
             r#"
             INSERT INTO auth_account_deletions(realm_id,user_id,session_id,email,token_hash,browser_hash)
@@ -32,6 +33,7 @@ impl Postgres {
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(email)
     }
@@ -53,7 +55,8 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         lock_email(&mut tx, realm, &email).await?;
         let (user, session) = fresh_account(&mut tx, realm, current, &email).await?;
-        let consumed = sqlx::query(
+        let deadline = Deadline::fresh_session(&mut tx, realm, user, session).await?;
+        let expires_us: Option<i64> = sqlx::query_scalar(
             r#"
             DELETE
             FROM auth_account_deletions
@@ -63,6 +66,7 @@ impl Postgres {
             AND user_id=$4
             AND session_id=$5
             AND expires_at>clock_timestamp()
+            RETURNING (extract(epoch FROM expires_at)*1000000)::bigint
             "#,
         )
         .bind(realm)
@@ -70,12 +74,10 @@ impl Postgres {
         .bind(browser.as_slice())
         .bind(user)
         .bind(session)
-        .execute(&mut *tx)
+        .fetch_optional(&mut *tx)
         .await
         .map_err(unavailable)?;
-        if consumed.rows_affected() != 1 {
-            return Err(Error::Unauthorized);
-        }
+        let deadline = deadline.with_proof(expires_us.ok_or(Error::Unauthorized)?);
         for table in ["auth_email_challenges", "auth_password_resets"] {
             sqlx::query(&format!(
                 "DELETE FROM {table} WHERE realm_id=$1 AND email=$2"
@@ -119,6 +121,7 @@ impl Postgres {
             .execute(&mut *tx)
             .await
             .map_err(unavailable)?;
+        deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)
     }
 }

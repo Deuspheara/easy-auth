@@ -179,3 +179,12 @@ AUTH-54 separates session validation and ordinary logout into named modules;
 `sessions/mod.rs` contains declarations only. This extraction preserves SQL and
 public adapter behavior, with existing session/HTTP regressions checked before
 any deadline-policy changes.
+
+AUTH-54 keeps the private database deadline cap in `deadlines.rs` and its use at
+explicit feature transaction tails. Session validation and inventory share
+`sessions/validation.rs`'s locked caller operation. That function exceeds the
+50-line review trigger to keep owner-before-session locks, post-wait policy and
+expiry validation, original deadline capture and caller-only touch visible together.
+No implementation type is public. Tests under `lifecycle/deadlines/` group mailbox,
+credentials, lifecycle, session and final-touch waits; only bounded gate/clock setup
+is shared there. Published migrations and public APIs are unchanged.

@@ -1,37 +1,70 @@
-use crate::{Postgres, identity::user_from_row, unavailable};
+use crate::{Postgres, deadlines::Deadline, identity::user_from_row, unavailable};
 use auth_core::{Error, Result, User, Verifier};
+use sqlx::Transaction;
 use uuid::Uuid;
 
 impl Postgres {
     pub(crate) async fn authenticate(&self, realm: Uuid, session: Verifier) -> Result<User> {
-        // Update is conditional, so expiry/revocation cannot be revived by a stale reader.
-        let row = sqlx::query(
-            r#"
-            WITH active AS (UPDATE auth_sessions
-            SET last_seen_at=statement_timestamp()
-            WHERE realm_id=$1
-            AND token_hash=$2
-            AND revoked_at IS NULL
-            AND expires_at > statement_timestamp()
-            AND last_seen_at > statement_timestamp()-interval '30 minutes'
-            AND EXISTS (SELECT 1 FROM auth_users owner
-                WHERE owner.realm_id=$1 AND owner.id=auth_sessions.user_id
-                  AND (owner.authentication_policy='mailbox'
-                    OR (owner.authentication_policy='passkey_required'
-                        AND auth_sessions.authentication_method='passkey')))
-            RETURNING user_id)
-            SELECT u.id,u.email,u.display_name,u.authentication_policy
-            FROM auth_users u
-            JOIN active a ON a.user_id=u.id
-            WHERE u.realm_id=$1
-            "#,
-        )
-        .bind(realm)
-        .bind(session.as_slice())
-        .fetch_optional(&self.pool)
-        .await
-        .map_err(unavailable)?
-        .ok_or(Error::Unauthorized)?;
-        user_from_row(realm, &row)
+        let mut tx = self.pool.begin().await.map_err(unavailable)?;
+        let (user, _, deadline) = active_caller(&mut tx, realm, session).await?;
+        deadline.check(&mut tx).await?;
+        tx.commit().await.map_err(unavailable)?;
+        Ok(user)
     }
+}
+
+/// Lock owner before session, then validate in a new statement after both waits.
+/// Shared owner locks permit independent validations while excluding policy and
+/// credential mutations. Capture the original idle deadline before touching it.
+pub(super) async fn active_caller(
+    tx: &mut Transaction<'_, sqlx::Postgres>,
+    realm: Uuid,
+    current: Verifier,
+) -> Result<(User, Uuid, Deadline)> {
+    let user: Uuid = sqlx::query_scalar(
+        r#"
+        SELECT u.id FROM auth_users u
+        JOIN auth_sessions s ON s.realm_id=u.realm_id AND s.user_id=u.id
+        WHERE s.realm_id=$1 AND s.token_hash=$2 FOR SHARE OF u
+        "#,
+    )
+    .bind(realm)
+    .bind(current.as_slice())
+    .fetch_optional(&mut **tx)
+    .await
+    .map_err(unavailable)?
+    .ok_or(Error::Unauthorized)?;
+    let session: Uuid = sqlx::query_scalar(
+        "SELECT id FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND token_hash=$3 FOR UPDATE",
+    )
+    .bind(realm)
+    .bind(user)
+    .bind(current.as_slice())
+    .fetch_optional(&mut **tx)
+    .await
+    .map_err(unavailable)?
+    .ok_or(Error::Unauthorized)?;
+    let row = sqlx::query(
+        r#"
+        SELECT u.id,u.email,u.display_name,u.authentication_policy
+        FROM auth_users u JOIN auth_sessions s ON s.realm_id=u.realm_id AND s.user_id=u.id
+        WHERE u.realm_id=$1 AND u.id=$2 AND s.id=$3 AND s.revoked_at IS NULL
+          AND s.expires_at>clock_timestamp()
+          AND s.last_seen_at>clock_timestamp()-interval '30 minutes'
+          AND (u.authentication_policy='mailbox'
+            OR (u.authentication_policy='passkey_required' AND s.authentication_method='passkey'))
+        "#,
+    )
+    .bind(realm)
+    .bind(user)
+    .bind(session)
+    .fetch_optional(&mut **tx)
+    .await
+    .map_err(unavailable)?
+    .ok_or(Error::Unauthorized)?;
+    let deadline = Deadline::active_session(tx, realm, user, session).await?;
+    sqlx::query("UPDATE auth_sessions SET last_seen_at=clock_timestamp() WHERE realm_id=$1 AND user_id=$2 AND id=$3")
+        .bind(realm).bind(user).bind(session)
+        .execute(&mut **tx).await.map_err(unavailable)?;
+    Ok((user_from_row(realm, &row)?, session, deadline))
 }

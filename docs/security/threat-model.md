@@ -89,3 +89,14 @@ its public key or verifier/session code. Stronger-account policy, passkey-first
 enrollment and real-device/other-browser gates still disable ordinary composition. See the [authentication review](../research/passkey-authentication.md).
 
 The alpha now includes opt-in password enrollment and sign-in (AUTH-12). Fresh verified sessions, a configured blocklist, bounded Argon2id, shared admission, transactional enrollment/session replacement and stale-hash rechecks are required; see ../guides/passwords.md. AUTH-13 adds browser/purpose-bound password recovery, credential versions, atomic session/proof invalidation and durable non-secret notifications. AUTH-14 adds both-address verified email changes, fresh-session/mailbox-confirmed deletion, authentication-time provenance, scoped cleanup and audit deidentification. AUTH-15 adds bounded owned-session inventory, fresh-authenticated individual/all-session revocation, proof cancellation and transactional audit. Deterministic database lock tests cover concurrent logins/revoke-all and freshness revalidation after waiting. AUTH-16 adds typed, fixed-schema audit attribution with composite ownership constraints, in-transaction recording, explicit historical provenance and scoped deidentification. Logout follows user-before-session lock order. Provider linking still requires fresh current-account proof plus a separately verified identity transaction; no matching-email merge or linking-success event is enabled. Stronger-factor recovery, queue monitoring/retention and authenticated password change remain incomplete. Linking, native tokens, external callbacks and issuer routes remain excluded. Full initial release remains blocked on their milestones. Baselines and external normative references are in ../research/protocol-dependencies.md. Every implementation ticket must state tests and residual risks; update this document when boundaries change.
+
+AUTH-54 retains locked original proof/session deadline evidence through destructive
+mutations, then checks database wall time after all potentially blocking writes.
+Expired authority rolls back proof consumption, identity/credential/session changes,
+audit and notification state. Session validation/inventory use owner-before-session
+locks, current post-wait policy and the original idle/absolute deadline before touch.
+Sensitive mailbox and revocation operations additionally retain original freshness;
+rotation never extends it. Observed-lock regressions include unchanged-row waits,
+audit/notice tails and final session touches. A table-free check precedes commit;
+it cannot promise that wall time stops during commit, response transport or later
+application work. The consuming application still owns authorization for its actions.

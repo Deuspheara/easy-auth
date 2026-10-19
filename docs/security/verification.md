@@ -513,3 +513,72 @@ surfaces; this enrollment correction does not claim those paths fixed or verifie
 That separate work is a first-release security gate and should follow this scoped
 acceptance work. Full stronger-account management/recovery remains AUTH-20; ordinary
 activation and the rest of M03/later release scope remain gated.
+
+## AUTH-54 final transaction deadlines — 2026-10-19
+
+Mailbox sign-in, password enrollment/reset, email change/deletion and sensitive
+session revocation retain the exact original database authority deadline through
+all writes. A final table-free wall-clock check rejects expired authority before
+commit and rolls back durable side effects. Session validation/inventory share
+owner-before-session locking, post-wait policy validation and an original
+idle/absolute cap captured before touch. See [ADR 0010](../architecture/adr/0010-final-transaction-deadlines.md).
+Public APIs, dependencies and published migrations are unchanged.
+
+Eight controlled pre-fix PostgreSQL regressions failed at their authorization
+assertions. The initial unrestricted run instead hit pool/observer starvation and
+is excluded from application reproduction evidence. SQLx 0.8.6's test pools share
+20 parent permits; the Cargo test default now uses four workers, with an independent
+bounded deadline observer. Setup, lock-observation and clock failures remain fatal;
+Unavailable is explicitly distinguished from the required Unauthorized result and
+needs separate database/pool diagnosis. No expected rejection accepts arbitrary errors.
+
+Local checks with real PostgreSQL 17.11 and the documented development services:
+
+- `cargo fmt --all -- --check`; default and all-feature
+  `cargo clippy --locked --workspace --all-targets [--all-features] -- -D warnings`
+  pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 tests** pass
+  (2 Axum unit, 12 HTTP/database, 4 core, 75 PostgreSQL).
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **164 tests** pass (2 Axum unit, 23 HTTP/database, 10 core, 129 PostgreSQL).
+  The isolated logging subprocess executes one already-counted core test.
+  No failed or ignored tests in the successful full runs.
+- Nine deadline tests include proof/freshness expiry during final audit/notice
+  writes, session validation/inventory unchanged-row waits, individual/all
+  revocation and a four-case final-touch matrix covering both idle and absolute
+  expiry in validation/inventory. They require observed waits before expiry and
+  unchanged realm-scoped identity, credentials, sessions, proofs, audit, notices
+  and admission snapshots after rollback. Existing successful flows, retry,
+  one-winner concurrency, binding and realm/owner isolation remain covered.
+- Freshly built native Chromium 156.0.8078.4/Playwright 1.64.1 suites pass
+  **31 browser cases and 2 real-SMTP contact cases**. Sanitized source/binary
+  fingerprints and owned cleanup are in
+  [browser evidence](../../tests/browser/passkeys/results/2026-10-19/chromium-auth54.json)
+  and [SMTP evidence](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-auth54.json).
+  Each database is removed; the SMTP suite removes exactly its three owned messages.
+- `scripts/smoke.py --password --recovery --sessions --lifecycle` passes in
+  standalone and `--embedded` compositions, each with a disposable database and
+  the real SMTP worker. The embedded fixture now checks the exact core User shape,
+  including mailbox policy, against the public identity projection at all three
+  checkpoints. Its former exact comparison omitted the core-only policy field;
+  no application authorization or identity assertion is relaxed.
+- `python3 scripts/audit.py` passes the compiled dependency gate; the existing
+  inactive SQLx/MySQL `rsa` lockfile advisory remains visible. `cargo deny
+  --all-features check` and `npm audit --audit-level=low` pass. Redacted Gitleaks
+  scans cover the staged changes, including new regression/evidence files.
+
+Environment failures were diagnosed separately: Docker's unresponsive engine was
+recovered without removing volumes; the first native attempt lacked its pinned
+Chromium path and cleaned its empty fixture database; an all-feature build hit
+host disk exhaustion before tests. Removing only this repository's generated
+incremental cache and disabling incremental generation allowed the full rerun.
+These failed attempts are not counted as successful regression evidence.
+
+The source review keeps the deadline type private and feature transaction ownership
+explicit. No new module exceeds 300 lines. The longer locked caller operation and
+feature transactions retain their lock/validation/mutation/rollback sequence in one
+place; [reviewed size exceptions](../architecture/code-organization.md) explain why.
+Session validation now performs additional database round trips; previous latency
+measurements are historical. The deadline check precedes commit and cannot bound
+commit/response latency or later consuming-application work. No production, audit,
+protocol interoperability or new performance claim is made here.

@@ -1,6 +1,7 @@
 //! PostgreSQL transactions for the shared core. SQL row shapes are private.
 mod account;
 mod audit;
+mod deadlines;
 mod email;
 mod identity;
 mod locking;

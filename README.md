@@ -78,6 +78,16 @@ python3 scripts/smoke.py
 
 Database tests run migrations in isolated real PostgreSQL databases, including concurrent one-time proof consumption and transaction rollback. They fail if PostgreSQL is unavailable. No external provider credentials are required. CI also runs cargo-audit through a compiled-graph gate (inactive optional lockfile findings remain visible), cargo-deny and secret scanning; their configured presence is not a claim of a completed audit.
 
+The Cargo configuration defaults to four test workers. SQLx 0.8.6 shares a
+20-connection parent budget across each integration binary's isolated databases;
+lock-gate tests need connections for the gate, concurrent actions and observation.
+Running too many workers can exhaust those permits before a required lock is
+reached. Keep default/all-feature runs sequential. An explicit
+`RUST_TEST_THREADS` or `--test-threads` override must preserve this connection
+budget; each scenario still runs its own concurrent actions. Deadline observers
+use a separate bounded connection and fail setup/observation independently of
+application authorization assertions.
+
 Validation details: [initial evidence](docs/security/verification.md), [interoperability matrix](docs/guides/interoperability.md), and [generated OpenAPI](docs/openapi.json).
 
 Architecture: [overview](docs/architecture/overview.md), [API contract](docs/architecture/api-contract.md), [flows](docs/architecture/auth-flows.md), [research](docs/research/ecosystem.md), [build decision](docs/architecture/adr/0001-build-versus-contribute.md). Read [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before contributing. Huly AUTH is the development tracker; the exported backlog records IDs, not a separate roadmap.
