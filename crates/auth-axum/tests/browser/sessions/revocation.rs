@@ -24,7 +24,7 @@ async fn revoke_all_clears_cookies_sessions_and_pending_mail_proof_in_only_its_r
         .unwrap();
     assert_eq!(pending.status(), StatusCode::ACCEPTED);
     let binding = cookie(&pending, "__Host-auth-browser=");
-    let token = mail.0.lock().unwrap().last().unwrap().clone();
+    let token = mail.sign_ins.lock().unwrap().last().unwrap().clone();
     for (body, origin, status) in [
         ("{}", None, StatusCode::FORBIDDEN),
         (

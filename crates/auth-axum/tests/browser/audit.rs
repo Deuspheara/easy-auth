@@ -43,7 +43,7 @@ async fn real_password_and_recovery_inputs_never_enter_audit_and_untrusted_conte
         .unwrap();
     assert_eq!(reset.status(), StatusCode::ACCEPTED);
     let binding = cookie(&reset, "__Host-auth-reset=");
-    let proof = mail.1.lock().unwrap().last().unwrap().clone();
+    let proof = mail.resets.lock().unwrap().last().unwrap().clone();
     let finish = app
         .clone()
         .oneshot(post(

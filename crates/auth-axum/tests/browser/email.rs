@@ -28,7 +28,7 @@ async fn browser_email_session_logout_end_to_end(pool: PgPool) {
             .unwrap()
             .contains("Secure")
     );
-    let token = mail.0.lock().unwrap()[0].clone();
+    let token = mail.sign_ins.lock().unwrap()[0].clone();
     let body = serde_json::json!({"token":token}).to_string();
     let invalid = app
         .clone()

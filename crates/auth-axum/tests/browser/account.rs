@@ -56,7 +56,7 @@ async fn account_lifecycle_http_with_email_only_account(pool: PgPool) {
     assert_eq!(started.status(), StatusCode::ACCEPTED);
     let binding = cookie(&started, "__Host-auth-email-change=");
     let cookies = format!("{current}; {binding}");
-    let messages = mail.4.lock().unwrap().clone();
+    let messages = mail.changes.lock().unwrap().clone();
     assert_eq!(messages.len(), 2);
     assert_eq!(messages[0].0, "alice@example.com");
     assert_eq!(messages[1].0, "new@example.com");
@@ -128,7 +128,7 @@ async fn account_lifecycle_http_with_email_only_account(pool: PgPool) {
     assert_eq!(started.status(), StatusCode::ACCEPTED);
     let binding = cookie(&started, "__Host-auth-delete=");
     let cookies = format!("{current}; {binding}");
-    let token = mail.5.lock().unwrap().last().unwrap().clone();
+    let token = mail.deletions.lock().unwrap().last().unwrap().clone();
     let body = serde_json::json!({"token":token,"confirmation":"delete my account"}).to_string();
     let completed = app
         .clone()
@@ -168,5 +168,5 @@ async fn account_lifecycle_http_with_email_only_account(pool: PgPool) {
         .unwrap();
     assert_eq!(count, 0);
     assert!(auth.deliver_security_notice().await.unwrap());
-    assert_eq!(*mail.2.lock().unwrap(), 2);
+    assert_eq!(*mail.notices.lock().unwrap(), 2);
 }

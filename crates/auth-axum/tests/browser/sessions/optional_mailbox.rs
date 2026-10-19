@@ -56,8 +56,8 @@ async fn email_free_session_has_explicit_null_contact_and_safe_sensitive_routes(
             serde_json::json!({"code":"authentication_required"})
         );
     }
-    assert!(mail.4.lock().unwrap().is_empty());
-    assert!(mail.5.lock().unwrap().is_empty());
+    assert!(mail.changes.lock().unwrap().is_empty());
+    assert!(mail.deletions.lock().unwrap().is_empty());
     let response = app
         .clone()
         .oneshot(post(

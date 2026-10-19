@@ -75,11 +75,11 @@ async fn recovery_http_proofs_sessions_and_retryable_notification(pool: PgPool) 
     assert_eq!(responses[0], responses[1]);
     assert_eq!(responses[0], responses[2]);
     assert_eq!(
-        mail.1.lock().unwrap().len(),
+        mail.resets.lock().unwrap().len(),
         3,
         "same mail path, independent of account status"
     );
-    let token = mail.1.lock().unwrap()[0].clone();
+    let token = mail.resets.lock().unwrap()[0].clone();
     let body = serde_json::json!({"token":token,"password":new}).to_string();
     for (cookie, origin, status) in [
         (None, Some("https://app.example"), StatusCode::UNAUTHORIZED),
@@ -109,7 +109,7 @@ async fn recovery_http_proofs_sessions_and_retryable_notification(pool: PgPool) 
             .status(),
         StatusCode::BAD_REQUEST
     );
-    *mail.3.lock().unwrap() = true;
+    *mail.fail_notices.lock().unwrap() = true;
     let completed = app
         .clone()
         .oneshot(post(
@@ -173,10 +173,10 @@ async fn recovery_http_proofs_sessions_and_retryable_notification(pool: PgPool) 
     }
     assert!(auth.deliver_security_notice().await.is_err());
     sqlx::query("UPDATE auth_security_notifications SET next_attempt_at=clock_timestamp()-interval '1 second'").execute(&pool).await.unwrap();
-    *mail.3.lock().unwrap() = false;
+    *mail.fail_notices.lock().unwrap() = false;
     assert!(auth.deliver_security_notice().await.unwrap());
     assert!(!auth.deliver_security_notice().await.unwrap());
-    assert_eq!(*mail.2.lock().unwrap(), 1);
+    assert_eq!(*mail.notices.lock().unwrap(), 1);
     assert_eq!(
         app.oneshot(
             Request::builder()

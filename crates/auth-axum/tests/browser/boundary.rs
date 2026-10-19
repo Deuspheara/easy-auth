@@ -30,7 +30,7 @@ async fn reject_origin_body_and_cookie_attacks(pool: PgPool) {
             StatusCode::FORBIDDEN
         );
     }
-    assert!(mail.0.lock().unwrap().is_empty());
+    assert!(mail.sign_ins.lock().unwrap().is_empty());
     let big = serde_json::json!({"email":"a".repeat(9000)}).to_string();
     assert_eq!(
         app.clone()
