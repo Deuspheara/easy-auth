@@ -35,7 +35,7 @@ pub(super) async fn claim(
         FROM auth_passkey_recovery_claims c
         JOIN auth_passkey_recovery_codes k ON k.realm_id=c.realm_id AND k.user_id=c.user_id AND k.rp_id=c.rp_id
         WHERE c.realm_id=$1 AND c.user_id=$2 AND c.rp_id=$3 AND c.id=$4
-          AND ($5::bytea IS NULL OR c.browser_hash=$5) AND c.cancelled_at IS NULL
+          AND ($5::bytea IS NULL OR c.browser_hash=$5) AND c.cancelled_at IS NULL AND c.completed_at IS NULL
           AND c.code_version=k.version AND k.consumed_at IS NOT NULL
           AND c.expires_at>clock_timestamp() FOR UPDATE OF c
     "#).bind(realm).bind(user).bind(rp).bind(id).bind(browser.as_ref().map(|value|value.as_slice()))
@@ -58,7 +58,7 @@ pub(super) async fn info(
         FROM auth_passkey_recovery_claims c
         JOIN auth_passkey_recovery_codes k ON k.realm_id=c.realm_id AND k.user_id=c.user_id AND k.rp_id=c.rp_id
         WHERE c.realm_id=$1 AND c.user_id=$2 AND c.rp_id=$3 AND c.id=$4
-          AND c.cancelled_at IS NULL AND c.expires_at>clock_timestamp()
+          AND c.cancelled_at IS NULL AND c.completed_at IS NULL AND c.expires_at>clock_timestamp()
           AND c.code_version=k.version AND k.consumed_at IS NOT NULL
     "#).bind(realm).bind(user).bind(rp).bind(id)
         .fetch_optional(&mut **tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;

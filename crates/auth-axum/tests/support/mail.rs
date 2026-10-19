@@ -15,6 +15,9 @@ pub(crate) struct Mail {
 }
 #[async_trait]
 impl EmailDelivery for Mail {
+    async fn passkey_recovery_completed(&self, email: &str) -> auth_core::Result<()> {
+        self.passkeys_changed(email).await
+    }
     async fn passkey_recovery_started(&self, email: &str) -> auth_core::Result<()> {
         self.passkeys_changed(email).await
     }

@@ -9,6 +9,7 @@ mod enrollment_policy;
 mod logging;
 mod management;
 mod recovery_claims;
+mod recovery_replacement;
 mod recovery_setup;
 mod registration;
 mod repository;
@@ -33,6 +34,12 @@ pub use recovery_claims::{
     PasskeyRecoveryClaimRepository, PasskeyRecoveryClaimRequest, PasskeyRecoveryClaims,
     PasskeyRecoveryCodeCancellation, PasskeyRecoveryKeyCancellation,
 };
+pub use recovery_replacement::{
+    PasskeyRecoveryAssertion, PasskeyRecoveryCreation, PasskeyRecoveryReplacement,
+    PasskeyRecoveryReplacementRepository, PasskeyRecoveryReplacementRequest,
+    PasskeyRecoveryReplacementStart, PasskeyRecoveryTarget, VerifiedPasskeyRecoveryRegistration,
+};
+
 pub use recovery_setup::{
     PasskeyRecoverySetup, PasskeyRecoverySetupRepository, PasskeyRecoverySetupRequest,
     PreparedPasskeyRecoveryCode,

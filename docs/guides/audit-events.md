@@ -18,6 +18,7 @@ Both server compositions record the same committed lifecycle facts through the s
 | `passkey_recovery_started` | none | none | One saved code reserved for a browser-bound claim; public `recovery_claim_id` identifies the claim, not a login grant |
 | `passkey_recovery_cancelled` | genuine fresh key session, or none for browser/reserved-code denial | none | Current claim invalidated without reviving its code or issuing a session |
 | `passkey_authenticated` | none | newly issued session | Experimental verified assertion, exact-state consume, credential update and new session committed atomically |
+| `passkey_recovered` | none | newly issued session | Saved-code claim delay/receipt and private replacement assertion verified; prior keys/sessions/proofs invalidated and claim consumed atomically |
 | `passkey_signed_up` | none | newly issued session | Optional core/PostgreSQL signup verified separate assertion and atomically created email-free user/key/session and consumed pending state |
 | `password_reset` | none | none | Current recovery proof consumed, credential replaced and sessions/proofs invalidated |
 | `session_revoked` | initiating owned session | revoked session | Logout or individual revocation changed an owned record |
@@ -88,3 +89,11 @@ browser verifier, recipient or arbitrary recovery context enters audit.
 Audit access is privileged database access today. Scope operator queries to an authorized realm, select only necessary fields and page by `id` with a fixed limit; do not expose unrestricted SQL through an application route. Request status logs remain redacted and contain no event payload. Failure-attempt auditing, exports, read authorization/retention and monitoring are later operational work.
 
 Provider linking/unlinking remains unavailable until AUTH-25 implements its verified flow. It must prove both current-account control and a separately verified new identity, bind the transaction to its purpose/realm/connection/browser, reject already-owned identities and never merge by email. Its successful audit event must commit with the actual link, using a reviewed schema extension. `identity_linked` and arbitrary event kinds are rejected by the current database. See [ADR 0007](../architecture/adr/0007-safe-audit-and-linking.md).
+
+
+Migration `0015_passkey_recovery_replacement.sql` adds `passkey_recovered` without
+new audit columns. A live fact requires an owned newly issued session and historical
+claim target, with no invented prior-session actor. Private registration/stage
+advancement creates no authentication success fact. Expiry, collision, cancellation
+or persistence errors create no completion fact; erasure clears its session/user/
+claim references. This fact does not assert policy activation or independent review.

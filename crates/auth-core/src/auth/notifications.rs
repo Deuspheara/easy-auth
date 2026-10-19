@@ -10,6 +10,11 @@ impl Auth {
         };
         let delivery = tokio::time::timeout(std::time::Duration::from_secs(10), async {
             match notice.kind {
+                SecurityNoticeKind::PasskeyRecoveryCompleted => {
+                    self.email
+                        .passkey_recovery_completed(&notice.recipient)
+                        .await
+                }
                 SecurityNoticeKind::PasskeyRecoveryStarted => {
                     self.email.passkey_recovery_started(&notice.recipient).await
                 }

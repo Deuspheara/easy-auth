@@ -100,7 +100,8 @@ recovery authentication endpoint; this must not be advertised as a working
 all-keys-lost recovery flow. It never changes
 account policy or ordinary server enablement. See
 [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md) for the implemented
-configuration boundary and separately proposed delayed recovery protocol.
+configuration, claim and private replacement boundaries plus the remaining review
+and HTTP/activation gates.
 
 `prepare(session, source)` requires actual fresh passkey-method authority and an
 owned key with assertion-use evidence in the configured RP. It returns a pending
@@ -129,10 +130,10 @@ additive and creates no saved codes for existing accounts.
 For the dedicated local notice transport check, start the documented PostgreSQL and
 Mailpit services, then run `cargo build --locked -p easy-auth-server --bin easy-auth`
 and `python3 scripts/smoke_recovery_notice.py`. The script creates an owned random
-database/recipient and queues configuration/start/cancellation fixtures through the normal worker;
+database/recipient and queues configuration/start/cancellation/completion fixtures through the normal worker;
 its dummy verifier/claim rows do not represent authorization or a recovery login.
 It verifies SMTP content, acknowledgement and the full receipt delay, removes
-only its three exact owned messages and
+only its four exact owned messages and
 drops its database. CI supplies its PostgreSQL service container explicitly through
 `EASY_AUTH_SMOKE_POSTGRES_CONTAINER`; database URLs must remain loopback test URLs.
 
@@ -171,8 +172,8 @@ configuration response. Email-free confirmation sends no fabricated email.
 ## Experimental recovery claim state
 
 `PasskeyRecoveryClaims` currently provides core/PostgreSQL `begin`, `resume`,
-`status`, `cancel`, `cancel_with_key` and `cancel_with_code`. No HTTP claim endpoint,
-replacement key or recovery session exists. These methods must not be advertised
+`status`, `cancel`, `cancel_with_key` and `cancel_with_code`. There is no HTTP claim
+endpoint, and this service issues no key or session. These methods must not be advertised
 as working all-keys-lost login. See [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
 
 Begin supplies the explicit public account ID, saved code and a separate browser
@@ -204,3 +205,31 @@ could be pre-exhausted to protect a fraudulent claim. `EmailDelivery` additional
 requires `passkey_recovery_started` and `passkey_recovery_cancelled`; the real SMTP
 adapter supplies fixed non-secret messages, and failure remains retryable. A receipt
 proves SMTP acceptance rather than human receipt or independent security review.
+
+
+## Experimental replacement completion
+
+After claim eligibility, a separately constructed `PasskeyRecoveryReplacement`
+accepts `PasskeyRecoveryTarget { user_id, claim_id }`, the retained browser secret
+and trusted source. `begin` returns private-registration public options and a
+transaction UUID; `finish_registration` verifies the response and returns an
+assertion challenge for the provisional key. `finish` requires its actual signed
+assertion and returns a new session secret only after atomic completion. All stages
+revalidate claim generation/delay/receipt/binding/deadlines in PostgreSQL; a `ready`
+status response is never permission by itself. The candidate is not a normal key.
+
+Completion replaces all previous owner passkeys across RPs and revokes old sessions
+and bound proofs; other-RP recovery codes are invalidated. The current code stays
+consumed. Contact and account policy are unchanged. A verified contact receives the
+fixed `passkey_recovery_completed` notice; email-free owners have no fabricated
+alert. `EmailDelivery` requires the corresponding method for custom adapters.
+
+Lost completion response: sign in normally using the newly installed key, then
+configure/confirm a new saved code. Completion replay returns no bearer or second
+grant. A failed transaction preserves the previous keys and candidate for a valid
+retry within the original two-minute ceremony and seven-day claim caps. Restarting
+candidate registration invalidates its prior challenge and does not reset the claim.
+
+There are no claim/replacement HTTP routes or reference recovery pages yet. This
+is experimental integration API, pending independent policy review, browser/device
+verification, usable consent/instructions and safe ordinary activation.

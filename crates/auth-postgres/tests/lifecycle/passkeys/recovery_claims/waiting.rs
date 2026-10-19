@@ -188,7 +188,7 @@ async fn expired_configuration_cannot_rotate_a_code_or_cancel_claim_during_notic
     f.unchanged(snapshot).await;
 }
 
-async fn gate(
+pub(super) async fn gate(
     pool: &PgPool,
     table: &str,
     event: &str,
@@ -206,7 +206,7 @@ async fn gate(
     gate
 }
 
-async fn cross_deadline(pool: &PgPool, realm: Uuid, query: &str) {
+pub(super) async fn cross_deadline(pool: &PgPool, realm: Uuid, query: &str) {
     let observer = sqlx::postgres::PgPoolOptions::new()
         .max_connections(1)
         .connect_with(pool.connect_options().as_ref().clone())
@@ -245,7 +245,7 @@ async fn cross_deadline(pool: &PgPool, realm: Uuid, query: &str) {
     observer.close().await;
 }
 
-async fn rejected_action(action: tokio::task::JoinHandle<auth_core::Result<()>>) {
+pub(super) async fn rejected_action(action: tokio::task::JoinHandle<auth_core::Result<()>>) {
     let result = tokio::time::timeout(Duration::from_secs(5), action)
         .await
         .expect("test infrastructure: claim completion")

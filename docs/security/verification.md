@@ -995,3 +995,85 @@ replacement-key proof and one-use completion, claim HTTP boundaries, safe
 activation and physical-device/other-browser evidence remain open. Browser loss,
 claim expiry and prolonged SMTP outage fail closed; a consumed code cannot silently
 restart recovery. This checkpoint does not complete AUTH-20 or its release gates.
+
+## AUTH-20 private replacement assertion and completion checkpoint (2026-10-19)
+
+AUTH-20 remains **In Progress**. The separate experimental core/PostgreSQL
+`PasskeyRecoveryReplacement` service now persists a private registration, advances
+only an exact verified registration to a candidate assertion, then requires its
+actual signature before atomic one-use completion. Migration 0015 adds bounded
+private candidate state and completed-claim tracking without changing published
+migrations. Every stage revalidates current claim/browser/owner/RP/code generation,
+receipt/delay and original deadlines under owner/claim/candidate locks. Public
+readiness metadata never authorizes completion. Candidates remain outside normal
+inventory/sign-in. No HTTP recovery route or ordinary activation is added.
+
+Completion checks RP-wide uniqueness before removing prior keys, invalidates old
+owner keys/sessions/bound proofs and other-RP saved codes, issues one passkey-method
+session, records an owned issued-session/claim-target fact, queues a fixed verified-
+contact completion notice and consumes private/claim state atomically. Original
+claim and two-minute ceremony deadlines cap all final writes. Optional email locks
+precede owner locks and nullable email is revalidated, matching mailbox proof
+consumers. Policy/contact ownership are unchanged. Lost completion response is
+resolved by normal sign-in using the installed key; replay retrieves no bearer or
+second grant. The saved code remains consumed and must be replaced after sign-in.
+
+The **18 new real-PostgreSQL cases** cover delay/receipt gating, registration-only
+non-authority, actual completion with no live prior session for both contact and
+email-free users, replay/lost-response sign-in, exact binding, candidate restart,
+cancellation/rotation/deletion/expiry of preverified proofs, stale old-key proofs,
+owner/realm and other-RP invalidation, audit/notice rollback, completion/cancellation
+races, one-winner completion, RP-wide collision, additive migration constraints,
+mailbox-before-owner lock order and observed unchanged-row/final-write expiry waits.
+Verified-contact fixtures acknowledge an actual current start-notice lease and
+assert its full delay before a trusted clock fixture advances time. They do not
+fabricate stronger sessions or bypass the production delay configuration.
+
+Initial fixture/compiler errors were corrected: a reserved SQL clock alias, raw
+user deletion conflicting with intentional audit ownership constraints, and a
+same-realm fixture encountering another owner's queued start notice. Tests now
+use actual owned notice/deletion flows and preserve their negative assertions.
+Default-feature lint also caught a facade cleanup that removed existing reexports;
+those exports were restored. Infrastructure/setup failures were never counted as
+successful authorization rejection. Deliberate write-failure tests require
+`Unavailable`; authority/expiry failures require `Unauthorized` and exact rollback.
+
+Final local evidence with PostgreSQL 17.11 and documented Mailpit:
+
+- `cargo fmt --all -- --check`; strict locked workspace/all-target Clippy with
+  default and all features and `-D warnings` pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 pass**.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **251 pass** (2 Axum unit, 39 HTTP/database, 10 core, 200 PostgreSQL).
+  The logging subprocess repeats one included core case. No failed or ignored
+  cases in successful full suites. The all-feature suite was repeated after
+  strengthening actual-receipt fixtures; all 18 new cases pass there too.
+- The locked adoption benchmark `easy` binary check passes with the newly required
+  delivery method. No dependency versions changed.
+- Fresh pinned native runs pass **31 Chromium and 4 real-SMTP cases**, preserving
+  existing negative assertions/admission. These cover existing signup/authentication/
+  management/code configuration, not a nonexistent recovery HTTP flow. Fixed owned
+  producer copies were made after Cargo checks/builds; source/binary hashes match
+  the new immutable [browser report](../../tests/browser/passkeys/results/2026-10-19/chromium-recovery-replacement.json)
+  and [SMTP report](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-recovery-replacement.json).
+  Both owned native databases and exactly eleven owned messages are removed.
+- The normal-server worker delivers configuration/start/cancellation/**completion**
+  notices with accepted-lease receipt/full-delay checking through both Compose
+  discovery and explicit CI-style PostgreSQL container selection. Each run removes
+  exactly four owned messages and its database. Dummy schema fixtures prove
+  transport/worker behavior, not recovery authorization. Fresh standalone and
+  embedded full password/recovery/session/lifecycle SMTP smokes pass with owned
+  database cleanup. Native results remain virtual-device evidence.
+- Compiled-dependency audit, all-feature cargo-deny and low-threshold npm audit pass;
+  the inactive SQLx/MySQL rsa advisory remains visible. The complete staged diff
+  passes redacted Gitleaks scanning before publication.
+
+Source review keeps flow/port/verified transitions, readiness/locks, registration,
+assertion completion, owner-proof invalidation and delegation in named modules.
+New Rust modules remain below roughly 300 lines. Longer completion transactions
+and integration scenarios retain explicit ordering and full-state assertions as
+reviewed size exceptions; no structural cleanup is deferred. ADR 0012 and the
+contracts/model/guides/threat model distinguish implemented core behavior from
+remaining independent review, consent/usability, recovery HTTP/native/physical-
+device evidence and safe activation. Logical expiry does not establish physical
+retention cleanup. This checkpoint does not complete AUTH-20 or its release gates.

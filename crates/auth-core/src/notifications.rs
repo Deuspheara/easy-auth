@@ -7,6 +7,7 @@ pub enum SecurityNoticeKind {
     PasskeyRecoveryChanged,
     PasskeyRecoveryStarted,
     PasskeyRecoveryCancelled,
+    PasskeyRecoveryCompleted,
     EmailChanged,
     AccountDeleted,
 }

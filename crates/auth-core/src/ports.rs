@@ -134,6 +134,7 @@ pub trait Repository: Send + Sync {
 }
 #[async_trait]
 pub trait EmailDelivery: Send + Sync {
+    async fn passkey_recovery_completed(&self, email: &str) -> Result<()>;
     async fn passkey_recovery_started(&self, email: &str) -> Result<()>;
     async fn passkey_recovery_cancelled(&self, email: &str) -> Result<()>;
     async fn passkey_recovery_changed(&self, email: &str) -> Result<()>;

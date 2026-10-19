@@ -254,3 +254,14 @@ are cohesive size exceptions rather than scattered transaction helpers. Test
 modules separate admission, lifecycle/binding, cancellation/rollback, receipt,
 concurrency, migration and observed waits. Shared migration setup finishes later
 schema before current-adapter flows; historical target assertions remain explicit.
+
+
+Private replacement flow, repository contract and unforgeable registration
+transition live in core `passkeys/recovery_replacement/`. PostgreSQL keeps readiness/
+locking, registration, assertion completion, owner-proof invalidation and delegation
+under `recovery_claims/replacement/`. Completion's longer transaction deliberately
+keeps email-before-owner, exact candidate checks, RP uniqueness, revoke/install,
+audit/notice, consumption and final deadline visible; invalidation is a named
+transaction-bound operation, not independent policy. Tests separate lifecycle,
+boundary/protocol, invalidation, rollback/races, migration and observed row/final-write
+waits. Longer scenarios preserve arranged authority and full rollback assertions.

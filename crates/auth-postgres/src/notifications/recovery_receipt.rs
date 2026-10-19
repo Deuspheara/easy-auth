@@ -38,7 +38,7 @@ pub(super) async fn delivered(pool: &PgPool, realm: Uuid, id: Uuid, lease: Uuid)
         SELECT (extract(epoch FROM c.expires_at)*1000000)::bigint
         FROM auth_passkey_recovery_claims c
         JOIN auth_passkey_recovery_codes k ON k.realm_id=c.realm_id AND k.user_id=c.user_id AND k.rp_id=c.rp_id
-        WHERE c.realm_id=$1 AND c.user_id=$2 AND c.id=$3 AND c.cancelled_at IS NULL
+        WHERE c.realm_id=$1 AND c.user_id=$2 AND c.id=$3 AND c.cancelled_at IS NULL AND c.completed_at IS NULL
           AND c.code_version=k.version AND k.consumed_at IS NOT NULL FOR UPDATE OF c
     "#).bind(realm).bind(user).bind(claim).fetch_optional(&mut *tx).await.map_err(unavailable)?;
     let lease_until: Option<i64> = sqlx::query_scalar(
@@ -76,7 +76,7 @@ pub(super) async fn delivered(pool: &PgPool, realm: Uuid, id: Uuid, lease: Uuid)
                     SET notified_at=now,not_before=now+make_interval(secs=>c.delay_seconds)
                     FROM instant WHERE c.realm_id=$1 AND c.user_id=$2 AND c.id=$3
                       AND c.notification_required AND c.notified_at IS NULL
-                      AND c.cancelled_at IS NULL AND c.expires_at>now
+                      AND c.cancelled_at IS NULL AND c.completed_at IS NULL AND c.expires_at>now
                 "#,
                 )
                 .bind(realm)

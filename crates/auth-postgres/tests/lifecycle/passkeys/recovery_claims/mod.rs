@@ -4,6 +4,7 @@ mod concurrency;
 mod lifecycle;
 mod migration;
 mod receipts;
+mod replacement;
 mod waiting;
 
 use super::{Fixture, SOURCE};
@@ -24,6 +25,7 @@ struct Claims {
     code: Secret,
     browser: Secret,
     weak: Secret,
+    token: webauthn_authenticator_rs::softtoken::SoftToken,
 }
 
 impl Claims {
@@ -84,6 +86,7 @@ impl Claims {
             code: prepared.code,
             browser: Secret::generate().unwrap(),
             weak,
+            token,
         }
     }
 
@@ -106,6 +109,7 @@ impl Claims {
             "auth_passkey_recovery_codes",
             "auth_passkey_recovery_setups",
             "auth_passkey_recovery_claims",
+            "auth_passkey_recovery_replacements",
             "auth_security_notifications",
             "auth_audit",
         ] {

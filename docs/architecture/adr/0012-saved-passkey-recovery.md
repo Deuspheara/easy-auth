@@ -1,8 +1,8 @@
 # ADR 0012: Saved-code passkey recovery
 
-Status: experimental saved-code configuration and claim scheduling/cancellation
-implemented in AUTH-20, 2026-10-19. Replacement-key recovery remains proposed,
-pending implementation and independent security review. Ordinary enablement and stronger-policy activation
+Status: experimental saved-code configuration, claim scheduling/cancellation and
+core/PostgreSQL replacement-key completion implemented in AUTH-20, 2026-10-19.
+Recovery HTTP boundaries and independent security review remain open. Ordinary enablement and stronger-policy activation
 are not approved by this document. No AAL, MFA, conformance or production claim.
 
 ## Threat and authority
@@ -48,7 +48,7 @@ pending confirmation retryable. Replays and competing confirmations have one
 winner. The existing sensitive user/source admission budget remains durable even
 when confirmation fails. Active saved codes have no age expiry in this schema;
 rotation replaces them. A claim now consumes/reserves its code once at start;
-replacement-key completion remains unimplemented.
+replacement-key completion is now an explicit experimental core/PostgreSQL service.
 
 The active version is intended to invalidate requests authorized by an older
 configuration. Setup does not revoke working keys/sessions or change policy. User
@@ -79,13 +79,13 @@ Native platform/USB tests configure before contact attachment using actual signu
 assertion proof, retain no browser storage, and then rotate configuration after a
 separate real-SMTP contact proof. Existing management cases keep their own accounts
 and all assertions, avoiding dilution of the shared admission policy. This proves
-configuration transport, not the proposed recovery protocol below.
+configuration transport; they do not exercise the replacement service below.
 
 ## Implemented claim scheduling and cancellation
 
 The optional `PasskeyRecoveryClaims` core/PostgreSQL boundary exposes begin,
-resume/status and cancellation only. There is no HTTP claim endpoint, replacement
-credential or authenticated session. Public readiness metadata is not verified
+resume/status and cancellation only. There is no HTTP claim endpoint; this service
+issues no replacement credential or authenticated session. Public readiness metadata is not verified
 proof and must never authorize an application session or key binding.
 
 A correct current saved code reserves one claim under owner/code locks. The claim
@@ -146,21 +146,62 @@ expiry, another claim requires newly configured proof under a working key; there
 is no mailbox/password fallback. These explicit usability/compromise limits require
 independent review and clear consent/instructions before activation.
 
-## Remaining key-replacement protocol — proposed, not implemented
+## Implemented private replacement-key protocol
 
-After delay, a short-lived private registration ceremony must create one provisional
-replacement key and require an actual signed assertion. Keep it out of ordinary
-inventory/sign-in until final completion. Under owner locks, recheck exact current
-code generation/claim/browser/RP/state, cancellation, notification receipt, delay
-and original deadlines after every wait/final write. Preserve RP-wide credential
-uniqueness and all reviewed protocol negatives.
+`PasskeyRecoveryReplacement` is a separate optional core/PostgreSQL service. It
+accepts an explicit public owner/claim target and the already-bound browser secret;
+it has no existing-session authority or client-selected realm/RP. Every database
+stage validates the current claim, code generation, browser, cancellation/completion,
+original expiry and elapsed delay/required receipt under the owner lock. It never
+trusts the public `ready` metadata as an authorization grant. Admission uses the
+same bounded source and owner/RP/browser continuation policy before loading state.
 
-Commit replacement, invalidation of prior keys/sessions/bound proofs, final claim
-consumption, typed audit and completion notice atomically. Issue a passkey-method
-session only from the new key's actual fresh assertion; saved-code presentation,
-waiting and public metadata grant no such method. Require replacement saved-code
-preparation/confirmation. Resolve completion lost-response retry without returning
-another unrestricted grant or storing raw bearer material.
+After eligibility, begin persists one private registration per claim and returns
+only public options/transaction ID. A two-minute original ceremony deadline covers
+both registration and assertion; restarting replaces only the candidate and cannot
+extend the claim. Expired private rows are logically unusable and bounded to one
+per claim; physical retention/cleanup remains operational work. Registration uses
+the existing reviewed verifier, requests browser
+residence and retains required origin/RP/challenge/UP/UV/context checks. It advances
+the exact persisted registration snapshot to one private candidate plus an
+account-bound assertion challenge. Neither stage creates a normal key, session,
+authentication fact or policy upgrade. Candidates are absent from ordinary inventory
+and sign-in lookup. Production does not weaken residence options for software tests.
+
+Completion requires an actual signature from that candidate, then locks and
+compares exact assertion and credential snapshots. RP-wide credential uniqueness
+is checked before deleting existing keys, including keys owned in another realm.
+For verified-mailbox owners it first acquires the email lock from a snapshot,
+then locks the owner and revalidates that nullable email. This preserves the
+email-before-owner order of proof consumers while allowing atomic proof removal.
+Owner -> claim -> candidate order remains explicit after that optional email lock.
+
+One transaction installs the proven candidate, removes all previous owner passkeys
+across RPs, revokes old sessions, invalidates owner-bound enrollment/authentication/
+contact/change/deletion/code-setup state and current-mailbox sign-in/reset proofs,
+and removes other-RP saved-code configurations/claims. Discoverable proof completion
+still rechecks the live key under the owner lock. It issues one `passkey`-method
+session from the new assertion, records `passkey_recovered` with an owned issued
+session and historical claim target, queues a fixed completion notice to an existing
+verified contact, removes private candidate state and marks the claim completed.
+The minimum original claim/ceremony deadline is checked after every final write.
+Any storage error, wait-induced expiry or snapshot/collision failure rolls all of
+this back, retaining the prior keys/sessions and retryable candidate.
+
+The reserved code stays consumed; completion, cancellation, status and receipt
+paths cannot revive that claim. Replaying completion never returns a stored bearer
+or creates another session. If the successful response is lost, normal sign-in with
+the newly installed key recovers access to the same account. After sign-in, configure
+and confirm a replacement saved code; the old one cannot start another recovery.
+Account authentication policy and contact ownership stay unchanged by this flow.
+Email-free accounts receive no fabricated completion email. Custom delivery
+adapters must implement `passkey_recovery_completed`, with the same non-secret,
+retryable queue semantics as other notices.
+
+This core/PostgreSQL implementation has software-authenticator transaction evidence,
+not a usable browser recovery page, native recovery interoperability or independent
+policy approval. Claim/replacement HTTP, consent/usability, real-device/browser
+proof and safe activation remain required.
 
 Stronger-policy activation must wait for implemented, reviewed recovery and real
 private-key proof. Before ordinary enablement, test rollback, one-use/race behavior,

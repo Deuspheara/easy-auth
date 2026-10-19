@@ -31,6 +31,11 @@ pub enum AuditEvent {
         user_id: Uuid,
         actor_session_id: Uuid,
     },
+    PasskeyRecovered {
+        user_id: Uuid,
+        claim_id: Uuid,
+        session_id: Uuid,
+    },
     PasskeyRecoveryStarted {
         user_id: Uuid,
         claim_id: Uuid,
@@ -80,7 +85,8 @@ pub enum AuditEvent {
 impl AuditEvent {
     pub fn recovery_claim_id(&self) -> Option<Uuid> {
         match self {
-            Self::PasskeyRecoveryStarted { claim_id, .. }
+            Self::PasskeyRecovered { claim_id, .. }
+            | Self::PasskeyRecoveryStarted { claim_id, .. }
             | Self::PasskeyRecoveryCancelled { claim_id, .. } => Some(*claim_id),
             _ => None,
         }
@@ -103,6 +109,7 @@ impl AuditEvent {
             Self::PasskeyEnrolled { .. } => "passkey_enrolled",
             Self::PasskeyRenamed { .. } => "passkey_renamed",
             Self::PasskeyRemoved { .. } => "passkey_removed",
+            Self::PasskeyRecovered { .. } => "passkey_recovered",
             Self::PasskeyRecoveryStarted { .. } => "passkey_recovery_started",
             Self::PasskeyRecoveryCancelled { .. } => "passkey_recovery_cancelled",
             Self::PasskeyRecoveryConfigured { .. } => "passkey_recovery_configured",
@@ -125,6 +132,7 @@ impl AuditEvent {
             | Self::PasskeyRenamed { user_id, .. }
             | Self::PasskeyRemoved { user_id, .. }
             | Self::PasskeyRecoveryConfigured { user_id, .. }
+            | Self::PasskeyRecovered { user_id, .. }
             | Self::PasskeyRecoveryStarted { user_id, .. }
             | Self::PasskeyRecoveryCancelled { user_id, .. }
             | Self::PasskeyAuthenticated { user_id, .. }
@@ -172,6 +180,7 @@ impl AuditEvent {
             Self::EmailAuthenticated { .. }
             | Self::PasskeyAuthenticated { .. }
             | Self::PasskeySignedUp { .. }
+            | Self::PasskeyRecovered { .. }
             | Self::PasskeyRecoveryStarted { .. }
             | Self::PasswordAuthenticated { .. }
             | Self::PasswordReset { .. }
@@ -183,6 +192,7 @@ impl AuditEvent {
             Self::EmailAuthenticated { session_id, .. }
             | Self::PasskeyAuthenticated { session_id, .. }
             | Self::PasskeySignedUp { session_id, .. }
+            | Self::PasskeyRecovered { session_id, .. }
             | Self::PasswordAuthenticated { session_id, .. }
             | Self::PasswordEnrolled { session_id, .. }
             | Self::EmailAttached { session_id, .. }

@@ -216,4 +216,16 @@ email-free metadata explicitly reports the absence of an independent alert.
 Reserved-code cancellation is deny-only and cannot transfer a browser or revive
 proof. The required delivery port adds started/cancelled notices. See
 [ADR 0012](adr/0012-saved-passkey-recovery.md) for rate scopes, lost-response handling,
-original deadline/receipt rules and unimplemented replacement/activation gates.
+original deadline/receipt rules, the separate replacement service and remaining
+HTTP/review/activation gates.
+
+
+The experimental `PasskeyRecoveryReplacement` Rust service now exposes private
+begin/finish-registration/finish operations for a `PasskeyRecoveryTarget` (public
+user and claim UUIDs) plus the original browser secret. It returns creation/assertion
+options and a transaction UUID; only committed genuine assertion completion returns
+a fresh `Secret` session. Repository contracts use private verified transitions and
+exact snapshots. This adds no HTTP route or OpenAPI path: existing constructors,
+wire documents and ordinary activation remain unchanged. A repeated completion is
+unauthorized; a lost response is resolved by ordinary sign-in with the installed
+replacement key, never by returning another recovery grant.

@@ -56,7 +56,7 @@ Preparation preserves an existing active verifier; confirmation consumes pending
 state and replaces the active version atomically with actor-owned audit and a
 non-secret verified-contact notice. User deletion cascades both tables. Neither
 record is an ordinary authentication session, new key or policy upgrade; recovery
-consumption is not implemented. See [ADR 0012](adr/0012-saved-passkey-recovery.md).
+claim consumption and experimental replacement completion use separate state. See [ADR 0012](adr/0012-saved-passkey-recovery.md).
 
 
 `auth_passkey_recovery_claims` holds one claim per realm/owner/RP: code generation,
@@ -68,3 +68,13 @@ claim invalidation. Current leased SMTP acceptance records the first receipt bef
 starting contact-based delay; stale/failed/late acknowledgements cannot revive state.
 Public metadata is not authentication. Account erasure removes claim/code state and
 known owned abuse buckets and clears the public historical claim target in audit.
+
+
+Migration 0015 adds `completed_at` to claims and private
+`auth_passkey_recovery_replacements` rows, composite-owned by claim/user/realm.
+One row per claim moves from registration state to candidate/assertion state with
+closed stage constraints and a two-minute expiry. Candidate bytes never enter
+ordinary credential lookup until a genuine assertion commits. Completion revokes
+old owner keys/sessions/proofs, consumes the claim and records an owned issued
+session/claim-target audit fact atomically. Cancel/rotation/deletion remove private
+state. No raw code/browser/session secret is persisted, and policy is unchanged.

@@ -139,10 +139,10 @@ Pending setup binds the exact session/realm/owner/RP; only a verifier is stored.
 Preparation cannot invalidate a confirmed code, and confirmation replacement,
 consumption, audit and fixed verified-contact notice roll back on any failure or
 original-deadline expiry after final writes. The saved code is a bearer secret and
-is not phishing resistant; offline storage is the user's responsibility. No recovery
-login or stronger-policy activation is implemented. Email-free accounts have no
-independent email notification. The delayed/cancellable recovery design and its
-remaining security review are explicitly proposed in [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
+is not phishing resistant; offline storage is the user's responsibility. Configuration
+issues no recovery session or stronger-policy activation. Email-free accounts have
+no independent email notification. The separate experimental recovery services and
+remaining security review are documented in [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
 
 
 Experimental HTTP saved-code configuration uses a separate startup-aligned router,
@@ -175,6 +175,22 @@ cancellation counter. There is no mailbox-only cancellation/login authority. Cod
 rotation invalidates claims atomically, deletion erases owned state/audit targets,
 and source/unlinked abuse metadata remains separately retained. Email-free users
 lack independent alerts; lost browser capability, expired/cancelled proof and
-long SMTP outages have explicit recovery limits. No claim HTTP endpoint or key
-replacement/session completion exists yet. Independent review, consent/usability,
-full replacement/cancellation races and physical-device evidence remain gates.
+long SMTP outages have explicit recovery limits. There is no claim HTTP endpoint;
+private replacement/session completion uses the separate service below. Independent
+review, consent/usability, HTTP/native replacement races and physical-device
+evidence remain gates.
+
+
+The experimental core/PostgreSQL replacement service rechecks ready claims under
+owner locks rather than trusting status metadata. Private candidates remain outside
+ordinary sign-in/inventory; actual candidate assertion and exact challenge/credential
+snapshots precede atomic key replacement and one-use session issuance. Optional
+email-before-owner locking matches mailbox proof consumers; owner/claim/candidate
+locks serialize cancellation, rotation and completion. Original claim and two-minute
+ceremony caps follow all final writes, including uniqueness, audit, notice and
+consumption waits. Other-RP saved proof and old keys/sessions/bound proofs are
+invalidated without crossing realm/owner. Completion replay grants nothing; a lost
+successful response requires normal sign-in with the installed key. The saved code
+stays consumed and must be replaced after sign-in. No policy upgrade or contact
+change occurs. Independent review, HTTP/browser usability, physical devices and safe
+activation remain release gates; transaction tests do not establish them.

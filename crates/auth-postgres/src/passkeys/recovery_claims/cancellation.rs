@@ -94,6 +94,12 @@ async fn cancel(
         .bind(realm).bind(user).bind(id).execute(&mut **tx).await.map_err(unavailable)?;
     sqlx::query("DELETE FROM auth_security_notifications WHERE realm_id=$1 AND user_id=$2 AND recovery_claim_id=$3")
         .bind(realm).bind(user).bind(id).execute(&mut **tx).await.map_err(unavailable)?;
+    sqlx::query("DELETE FROM auth_passkey_recovery_replacements WHERE realm_id=$1 AND claim_id=$2")
+        .bind(realm)
+        .bind(id)
+        .execute(&mut **tx)
+        .await
+        .map_err(unavailable)?;
     audit::record(
         tx,
         realm,

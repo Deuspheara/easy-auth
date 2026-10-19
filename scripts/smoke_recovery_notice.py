@@ -135,6 +135,7 @@ def check_recovery_notices(database, realm, user, address, claim):
         ("passkey_recovery_changed", "Your passkey recovery configuration changed", "configured or replaced after a fresh passkey sign-in"),
         ("passkey_recovery_started", "Passkey recovery was requested", "Existing keys remain usable during the waiting period"),
         ("passkey_recovery_cancelled", "Passkey recovery was cancelled", "Its saved code remains invalid"),
+        ("passkey_recovery_completed", "Passkey recovery completed", "Previous passkeys and sessions were invalidated"),
     ]:
         notice = str(uuid.uuid4())
         association = f"'{claim}'" if kind == "passkey_recovery_started" else "NULL"
@@ -154,7 +155,7 @@ def check_recovery_notices(database, realm, user, address, claim):
                 cwd=ROOT, stderr=subprocess.DEVNULL,
             ).strip()
             assert receipt == b"t", "real SMTP acknowledgement fixes the full waiting period"
-    assert len(owned_messages(address)) == 3, "three exact purpose-specific owned messages"
+    assert len(owned_messages(address)) == 4, "four exact purpose-specific owned messages"
 
 
 def main():
@@ -176,7 +177,7 @@ def main():
         wait_ready(child, port)
         seed_transport_fixture(database, realm, user, address, claim, version)
         check_recovery_notices(database, realm, user, address, claim)
-        print("PASS: configuration/start/cancellation SMTP notices and accepted-lease receipt")
+        print("PASS: configuration/start/cancellation/completion SMTP notices and accepted-lease receipt")
     finally:
         if child is not None:
             child.terminate()
