@@ -159,3 +159,11 @@ a touch cannot renew authority that expires during the touch itself. Fresh actio
 also retain the initiating authentication's five-minute cap. Logout remains
 idempotent. See [ADR 0010](adr/0010-final-transaction-deadlines.md) for the precise
 transaction boundary; this does not authorize consuming-application actions.
+
+AUTH-20's optional core/PostgreSQL `PasskeyManagement` provides bounded public key
+metadata, expected-version rename and last-proven-key-protected removal. No HTTP
+management route or ordinary activation is supplied by this checkpoint. Core port
+consumers must implement `EmailDelivery::passkeys_changed` for non-secret queued
+notices. See the [management guide](../guides/passkey-management.md) and
+[ADR 0011](adr/0011-passkey-management-and-recovery.md); recovery and the full
+stronger-account management/activation contract remain in progress.

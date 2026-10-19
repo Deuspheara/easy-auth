@@ -3,6 +3,7 @@ mod authentication_protocol;
 mod concurrency;
 mod enrollment;
 mod limits;
+mod management;
 mod protocol;
 mod signup;
 mod waiting;

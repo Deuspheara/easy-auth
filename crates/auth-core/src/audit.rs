@@ -21,6 +21,16 @@ pub enum AuditEvent {
         user_id: Uuid,
         actor_session_id: Uuid,
     },
+    PasskeyRenamed {
+        passkey_id: Uuid,
+        user_id: Uuid,
+        actor_session_id: Uuid,
+    },
+    PasskeyRemoved {
+        passkey_id: Uuid,
+        user_id: Uuid,
+        actor_session_id: Uuid,
+    },
     PasskeyAuthenticated {
         user_id: Uuid,
         session_id: Uuid,
@@ -55,12 +65,23 @@ pub enum AuditEvent {
 }
 
 impl AuditEvent {
+    pub fn passkey_id(&self) -> Option<Uuid> {
+        match self {
+            Self::PasskeyRenamed { passkey_id, .. } | Self::PasskeyRemoved { passkey_id, .. } => {
+                Some(*passkey_id)
+            }
+            _ => None,
+        }
+    }
+
     pub fn kind(&self) -> &'static str {
         match self {
             Self::EmailAuthenticated { .. } => "email_authenticated",
             Self::PasswordAuthenticated { .. } => "password_authenticated",
             Self::PasswordEnrolled { .. } => "password_enrolled",
             Self::PasskeyEnrolled { .. } => "passkey_enrolled",
+            Self::PasskeyRenamed { .. } => "passkey_renamed",
+            Self::PasskeyRemoved { .. } => "passkey_removed",
             Self::PasskeyAuthenticated { .. } => "passkey_authenticated",
             Self::PasskeySignedUp { .. } => "passkey_signed_up",
             Self::PasswordReset { .. } => "password_reset",
@@ -77,6 +98,8 @@ impl AuditEvent {
             | Self::PasswordAuthenticated { user_id, .. }
             | Self::PasswordEnrolled { user_id, .. }
             | Self::PasskeyEnrolled { user_id, .. }
+            | Self::PasskeyRenamed { user_id, .. }
+            | Self::PasskeyRemoved { user_id, .. }
             | Self::PasskeyAuthenticated { user_id, .. }
             | Self::PasskeySignedUp { user_id, .. }
             | Self::PasswordReset { user_id }
@@ -93,6 +116,12 @@ impl AuditEvent {
                 actor_session_id, ..
             }
             | Self::PasskeyEnrolled {
+                actor_session_id, ..
+            }
+            | Self::PasskeyRenamed {
+                actor_session_id, ..
+            }
+            | Self::PasskeyRemoved {
                 actor_session_id, ..
             }
             | Self::SessionRevoked {
@@ -126,6 +155,8 @@ impl AuditEvent {
             | Self::SessionRevoked { session_id, .. } => Some(*session_id),
             Self::PasswordReset { .. }
             | Self::PasskeyEnrolled { .. }
+            | Self::PasskeyRenamed { .. }
+            | Self::PasskeyRemoved { .. }
             | Self::AllSessionsRevoked { .. }
             | Self::EmailChanged { .. }
             | Self::AccountDeleted => None,

@@ -11,11 +11,11 @@ pub(crate) async fn record(
     event: AuditEvent,
 ) -> Result<()> {
     sqlx::query(r#"
-        INSERT INTO auth_audit(realm_id,user_id,kind,schema_version,actor_session_id,session_id,subject_erased,occurred_at)
-        VALUES ($1,$2,$3,1,$4,$5,$6,clock_timestamp())
+        INSERT INTO auth_audit(realm_id,user_id,kind,schema_version,actor_session_id,session_id,subject_erased,occurred_at,passkey_id)
+        VALUES ($1,$2,$3,1,$4,$5,$6,clock_timestamp(),$7)
     "#)
         .bind(realm).bind(event.user_id()).bind(event.kind())
-        .bind(event.actor_session_id()).bind(event.session_id()).bind(event.user_id().is_none())
+        .bind(event.actor_session_id()).bind(event.session_id()).bind(event.user_id().is_none()).bind(event.passkey_id())
         .execute(&mut **tx).await.map_err(unavailable)?;
     Ok(())
 }
@@ -28,7 +28,7 @@ pub(crate) async fn erase_subject(
 ) -> Result<()> {
     sqlx::query(
         r#"
-        UPDATE auth_audit SET user_id=NULL,actor_session_id=NULL,session_id=NULL,subject_erased=true
+        UPDATE auth_audit SET user_id=NULL,actor_session_id=NULL,session_id=NULL,passkey_id=NULL,subject_erased=true
         WHERE realm_id=$1 AND user_id=$2
     "#,
     )

@@ -35,6 +35,12 @@ async fn upgrade_preserves_existing_mailbox_session_and_supports_attachment_with
     .execute(&pool)
     .await
     .unwrap();
+    sqlx::raw_sql(include_str!(
+        "../../../../migrations//0012_passkey_management.sql"
+    ))
+    .execute(&pool)
+    .await
+    .unwrap();
     let f = Fixture::new(pool.clone()).await;
     let (proof, browser) = f.proof("contact@example.com").await;
     f.store

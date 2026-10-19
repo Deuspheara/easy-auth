@@ -3,6 +3,7 @@ use uuid::Uuid;
 /// Non-secret, purpose-specific delivery work. Never exposed through the HTTP API.
 pub enum SecurityNoticeKind {
     PasswordReset,
+    PasskeysChanged,
     EmailChanged,
     AccountDeleted,
 }

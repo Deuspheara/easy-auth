@@ -25,6 +25,9 @@ impl Smtp {
 }
 #[async_trait]
 impl EmailDelivery for Smtp {
+    async fn passkeys_changed(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email, "Your passkeys changed", "A passkey on your authentication account was renamed or removed after a fresh passkey sign-in. Removal invalidates existing sessions. If this was not you, sign in with a remaining key and contact the service operator through a trusted channel. This notice contains no credential, recovery code or sign-in link.".to_owned()).await
+    }
     async fn email_attachment(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
         self.send(email, "Confirm contact email", format!(
             "A contact email was requested for your passkey account. Confirm only if you requested it, in the same browser while your passkey sign-in is still fresh. This link expires within five minutes and works once. It does not enable email sign-in or mailbox-only recovery.\n\n{}/email-attach#token={}\n\nIf you did not request this, ignore the message. No account has been merged or moved.",

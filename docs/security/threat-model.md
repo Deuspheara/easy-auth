@@ -100,3 +100,14 @@ rotation never extends it. Observed-lock regressions include unchanged-row waits
 audit/notice tails and final session touches. A table-free check precedes commit;
 it cannot promise that wall time stops during commit, response transport or later
 application work. The consuming application still owns authorization for its actions.
+
+AUTH-20's in-progress optional management boundary requires a genuinely fresh
+passkey-method session, exact owner/realm/RP and expected metadata version. The
+owner lock serializes rename/removal; removal leaves another key with actual
+assertion-use evidence, revokes owned sessions and cancels bound pending state.
+A proof verified before removal cannot bypass final credential checks. Original
+deadlines cap final audit/notice waits. Public target UUID audit attribution is
+cleared with subject erasure, and fixed notices use only verified contacts.
+This is a partial management boundary, not recovery or ordinary activation.
+All-keys-lost proof/delay/cancellation/notification and physical-device/browser
+acceptance remain required; email-free notification limits must be explicit.

@@ -53,6 +53,7 @@ async fn audit_upgrade_keeps_unknown_provenance_and_erases_invalid_legacy_subjec
         include_str!("../../../migrations/0009_optional_mailbox.sql"),
         include_str!("../../../migrations/0010_passkey_signup.sql"),
         include_str!("../../../migrations/0011_email_attachment.sql"),
+        include_str!("../../../migrations//0012_passkey_management.sql"),
     ] {
         sqlx::raw_sql(source).execute(&pool).await.unwrap();
     }

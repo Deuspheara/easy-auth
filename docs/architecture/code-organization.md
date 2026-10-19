@@ -188,3 +188,14 @@ expiry validation, original deadline capture and caller-only touch visible toget
 No implementation type is public. Tests under `lifecycle/deadlines/` group mailbox,
 credentials, lifecycle, session and final-touch waits; only bounded gate/clock setup
 is shared there. Published migrations and public APIs are unchanged.
+
+AUTH-20's in-progress management boundary uses focused core `management/flow.rs`,
+`repository.rs` and public metadata types, plus PostgreSQL `management/` modules for
+admission, authorization/locks, inventory, mutation, notice persistence and explicit
+port delegation. Entry files declare/reexport only. The removal transaction exceeds
+50 lines to retain owner/session/key lock order, proven-remaining-key guard, session
+and ceremony invalidation, typed target audit, notice and final deadline/commit
+in one place. It adds no unrelated responsibility or generic credential engine.
+Management tests separate boundaries, concurrency, rollback, observed final-write
+waits and schema upgrades. Recovery and HTTP management remain unfinished AUTH-20
+work and are not claimed complete by these modules.

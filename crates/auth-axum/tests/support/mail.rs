@@ -15,6 +15,13 @@ pub(crate) struct Mail {
 }
 #[async_trait]
 impl EmailDelivery for Mail {
+    async fn passkeys_changed(&self, _email: &str) -> auth_core::Result<()> {
+        if *self.fail_notices.lock().unwrap() {
+            return Err(auth_core::Error::Unavailable);
+        }
+        *self.notices.lock().unwrap() += 1;
+        Ok(())
+    }
     async fn email_attachment(&self, email: &str, token: &Secret) -> auth_core::Result<()> {
         if *self.fail_attachments.lock().unwrap() {
             return Err(auth_core::Error::Unavailable);

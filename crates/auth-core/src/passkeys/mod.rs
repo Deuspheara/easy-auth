@@ -6,6 +6,7 @@ mod configuration;
 mod credential;
 mod enrollment;
 mod logging;
+mod management;
 mod registration;
 mod repository;
 mod sign_in;
@@ -20,6 +21,9 @@ pub use authentication_repository::{
 pub use authentication_state::PrivatePasskeyAuthentication;
 pub use credential::{StoredPasskey, VerifiedPasskeyAuthentication};
 pub use enrollment::{PasskeyEnrollment, PasskeyEnrollmentOptions};
+pub use management::{
+    PasskeyInfo, PasskeyManagement, PasskeyManagementRepository, PasskeyManagementRequest,
+};
 pub use repository::{
     PasskeyEnrollmentContext, PasskeyEnrollmentRequest, PasskeyEnrollmentStart, PasskeyRepository,
 };

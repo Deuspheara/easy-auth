@@ -9,6 +9,12 @@ use uuid::Uuid;
 struct Mailbox(Mutex<Option<String>>);
 #[async_trait]
 impl EmailDelivery for Mailbox {
+    async fn passkeys_changed(&self, _: &str) -> auth_core::Result<()> {
+        Err(auth_core::Error::Unavailable)
+    }
+    async fn email_attachment(&self, _: &str, _: &Secret) -> auth_core::Result<()> {
+        Err(auth_core::Error::Unavailable)
+    }
     async fn sign_in(&self, _: &str, token: &Secret) -> auth_core::Result<()> {
         *self.0.lock().unwrap() = Some(token.expose().to_owned());
         Ok(())

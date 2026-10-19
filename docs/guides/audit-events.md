@@ -4,7 +4,7 @@ Both server compositions record the same committed lifecycle facts through the s
 
 ## Version 1 fields
 
-`auth_audit` has nine fixed columns: `id`, `realm_id`, `user_id`, `kind`, `occurred_at`, `schema_version`, `actor_session_id`, `session_id` and `subject_erased`. IDs are opaque identifiers, not authentication credentials. Runtime event time uses the database clock when the fact is recorded, after lock waits; it is not the transaction-start or exact commit timestamp. No free-form metadata column exists.
+`auth_audit` has ten fixed columns after migration 0012: `id`, `realm_id`, `user_id`, `kind`, `occurred_at`, `schema_version`, `actor_session_id`, `session_id`, `subject_erased` and nullable `passkey_id`. IDs are opaque identifiers, not authentication credentials. Runtime event time uses the database clock when the fact is recorded, after lock waits; it is not the transaction-start or exact commit timestamp. No free-form metadata column exists.
 
 | Kind | Actor session | Issued/affected session | Meaning |
 | --- | --- | --- | --- |
@@ -12,6 +12,8 @@ Both server compositions record the same committed lifecycle facts through the s
 | `password_authenticated` | none | newly issued session | Password verification and exact stored-credential recheck committed |
 | `password_enrolled` | fresh initiating session | replacement session | First credential enrollment and rotation committed |
 | `passkey_enrolled` | fresh initiating session | none | Optional core/PostgreSQL registration verified, state consumed and unique credential inserted; no new authenticated session |
+| `passkey_renamed` | fresh passkey-method session | none | Owned key label/version changed; public `passkey_id` retains the target |
+| `passkey_removed` | fresh passkey-method session | none | Owned key removed with proven-key guard and session invalidation; `passkey_id` retains the target |
 | `passkey_authenticated` | none | newly issued session | Experimental verified assertion, exact-state consume, credential update and new session committed atomically |
 | `passkey_signed_up` | none | newly issued session | Optional core/PostgreSQL signup verified separate assertion and atomically created email-free user/key/session and consumed pending state |
 | `password_reset` | none | none | Current recovery proof consumed, credential replaced and sessions/proofs invalidated |
@@ -26,7 +28,7 @@ There are no passwords/PHC strings, bearer values/verifiers, mailbox addresses, 
 
 ## Deletion and upgrades
 
-Deleting an account sets its old events' `subject_erased=true` and removes user, actor-session and affected-session references. The original kinds/times remain, followed by a subject-free deletion event. Other users and realms keep their attribution. This deidentifies the live store; timing, backups, previously exported data and delivered mail have separate privacy/retention policies.
+Deleting an account sets its old events' `subject_erased=true` and removes user, actor-session affected-session and passkey-target references. The original kinds/times remain, followed by a subject-free deletion event. Other users and realms keep their attribution. This deidentifies the live store; timing, backups, previously exported data and delivered mail have separate privacy/retention policies.
 
 Migration `0006_safe_audit.sql` leaves old rows at version 0 with unknown actor/target fields. Valid subject ownership remains; dangling/cross-realm subjects and old deletion records are deidentified. It never attaches an old event to a guessed session. New writes use version 1 with kind-specific shapes. Stop old writers, apply migrations and upgrade all replicas together; mixed-version writing is unsupported for this alpha. Custom adapters must implement equivalent atomicity, ownership, redaction and deletion semantics.
 
@@ -49,6 +51,16 @@ only after verified assertion. Registration-stage advancement emits no success
 fact or session. Final expiry/one-use consumption follows the audit write; expiry
 or audit/persistence failure rolls the account/key/session/fact back together.
 Experimental HTTP/native signup now exercises this transaction; ordinary activation remains gated.
+
+Migration `0012_passkey_management.sql` adds the nullable public target UUID and
+closed rename/removal facts. Only those live event kinds may carry `passkey_id`;
+other current/historical kinds retain NULL. A live key foreign key would prevent
+removal, so this historical identifier is instead bound to the exact owned key by
+the locked mutation transaction. User/actor/session ownership foreign keys remain.
+Subject erasure clears the target with all other attribution. The optional
+management boundary also queues a fixed non-secret notice to a verified contact;
+email-free users have no fabricated contact. Recovery and ordinary activation
+remain unfinished AUTH-20 work.
 
 ## Operator reads and linking
 

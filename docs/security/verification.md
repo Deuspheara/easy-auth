@@ -582,3 +582,61 @@ Session validation now performs additional database round trips; previous latenc
 measurements are historical. The deadline check precedes commit and cannot bound
 commit/response latency or later consuming-application work. No production, audit,
 protocol interoperability or new performance claim is made here.
+
+## AUTH-20 management storage checkpoint — 2026-10-19
+
+AUTH-20 remains **In Progress**. Optional core/PostgreSQL management now provides
+bounded metadata, expected-version rename and removal requiring another key with
+real assertion-use evidence. Genuine fresh passkey-method authority, owner/session/
+key lock order, post-write original deadlines, session/pending invalidation,
+typed target audit and verified-contact notices are in the owning modules.
+[ADR 0011](../architecture/adr/0011-passkey-management-and-recovery.md) and the
+[management guide](../guides/passkey-management.md) describe the contract and
+remaining work. No HTTP management or ordinary activation is enabled here.
+
+Local checks at this checkpoint:
+
+- `cargo fmt --all -- --check`; strict locked workspace/all-target Clippy with
+  default and all features pass.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace`: **93 tests** pass
+  (2 Axum unit, 12 HTTP/database, 4 core, 75 PostgreSQL).
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **175 tests** pass (2 Axum unit, 23 HTTP/database, 10 core, 140 PostgreSQL).
+  The isolated logging child counts once. No failed or ignored tests in these runs.
+- Eleven new PostgreSQL cases use actual registration/assertion positive controls;
+  distinguish storage-policy setup from protocol evidence; cover both contact
+  modes, weak/legacy/future/stale/idle/absolute denial, metadata redaction, stale
+  versions, same-realm foreign ownership, cross-realm/RP denial, proven-last-key
+  protection, concurrent rename/removal, a preverified assertion after removal,
+  audit/notice failure with retry, upgrade preservation and scoped target erasure.
+  The final-write matrix observes actual advisory waits before original freshness
+  expiry for rename/removal through audit and notice tails, requiring Unauthorized
+  and rollback. Infrastructure errors do not count as expected policy rejection.
+- Existing native Chromium suites pass **31 browser + 2 real-SMTP cases**, with
+  exact owned databases removed and exactly three owned messages cleaned. These
+  are existing-flow regressions, not management UI or new-notice delivery proof.
+  Exact-source/binary fingerprints are in
+  [browser evidence](../../tests/browser/passkeys/results/2026-10-19/chromium-management-storage.json)
+  and [SMTP evidence](../../tests/browser/passkeys/results/2026-10-19/chromium-smtp-management-storage.json).
+- `python3 scripts/audit.py`, `cargo deny --all-features check`, npm advisory check
+  and redacted staged Gitleaks scan pass. The preexisting inactive SQLx/MySQL RSA
+  advisory remains visible; dependency versions and scanner policies are unchanged.
+- `CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=target cargo check --locked --offline
+  --manifest-path benchmarks/adoption/Cargo.toml --features easy --bin probe-easy`
+  passes. Its explicit disabled-mail implementation was updated for required ports,
+  including previously missing contact attachment; historical measurements/artifacts
+  remain unchanged and are not measurements of this implementation.
+
+Migration 0012 is additive; all published predecessor SQL remains byte-identical.
+Older upgrade fixtures now apply it before current adapter writes, retaining their
+assertions. Feature entry files declare/reexport only, admission/authorization/
+inventory/mutation/notice persistence are separate cohesive modules, and the longer
+removal transaction keeps its security order explicit. No new implementation file
+exceeds 300 lines; the longer transaction is documented in code organization.
+
+Remaining AUTH-20 scope includes HTTP/schema/browser management and actual new
+notice delivery evidence, stronger additional-enrollment proof and activation,
+pre-enrolled all-keys-lost recovery with delay/cancellation/expiry/notification,
+ordinary embedded/standalone activation policy, and physical-device/other-browser
+acceptance. No completion, production-readiness, independent security review,
+assurance-level or conformance claim follows from this checkpoint.
