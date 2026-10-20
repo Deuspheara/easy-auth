@@ -637,3 +637,12 @@ private parent/child fixture IPC; its named browser suite records only finite
 outcomes/source provenance. Modules stay below300lines. Ordered negative matrices
 retain rejection, unchanged receive state and valid controls as reviewed function-
 size exceptions. No generic server/client framework or unrelated cleanup is added.
+
+Reusable actual-signed Google provider responses, actual-socket request helpers and
+independent one-connection audit/clock observation now live under root
+`tests/support/google/`. Integration
+modules import those fixtures privately with explicit static paths; no production
+visibility or verified-proof constructor changes. The extraction preserves both
+provider/wait files byte-for-byte and retains existing socket function bodies and
+rejection assertions. Provider I/O stays separate from application acceptance
+scenarios rather than copying another signer, socket helper or wait loop per crate.
