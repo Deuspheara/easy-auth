@@ -1,11 +1,12 @@
 # Opt-in OIDC browser composition
 
-AUTH-56 is **In Progress**. The Axum `oidc-web` feature provides trusted
+The Axum `oidc-web` feature provides trusted
 `OidcWebServices`, `oidc_web_router` and `oidc_web_openapi` for one provider per
 HTTPS origin. The server `oidc-web` feature and explicit trusted startup settings
 now use the same `configured_application` factory for standalone and embedding.
-Owned Keycloak public-login/lifecycle acceptance is recorded below; final hosted
-verification and broader release gates remain explicit.
+Owned Keycloak public-login/lifecycle acceptance is recorded below. Dated checks
+are recorded in the [verification history](../security/verification.md); broader
+release gates remain explicit.
 Default builds and absent settings do not activate these routes. This is not production-readiness,
 external-provider interoperability or independent-review evidence.
 

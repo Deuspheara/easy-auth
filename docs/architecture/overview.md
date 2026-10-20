@@ -66,4 +66,6 @@ composition, including a common exact callback, explicit session handling and st
 startup configuration. Stable policy loading and an opt-in Axum browser boundary
 and shared standalone/embedded configuration are implemented; supported-mode
 native public-login acceptance now has owned Keycloak evidence with explicit
-private-transport limits. Final hosted verification and broader release gates remain open. See the [browser guide](../guides/oidc-web.md).
+private-transport limits. See the [verification history](../security/verification.md)
+for dated checks and the [browser guide](../guides/oidc-web.md) for the opt-in
+contract. Broader release gates remain open.
