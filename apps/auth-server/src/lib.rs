@@ -12,6 +12,8 @@ pub use application::{ConfiguredApplication, configured_application};
 pub use configuration::configured_auth;
 #[cfg(feature = "google-desktop")]
 pub use google_desktop::{GoogleDesktopCallback, GoogleDesktopError, GoogleDesktopListener};
+#[cfg(feature = "google-desktop-launch")]
+pub use google_desktop::{GoogleDesktopLaunchError, GoogleDesktopSignIn, GoogleDesktopSignInError};
 pub use notifications::notification_worker;
 #[cfg(feature = "oidc-egress")]
 pub use oidc_http::OidcHttps;

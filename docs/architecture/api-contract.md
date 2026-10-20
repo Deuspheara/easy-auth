@@ -452,3 +452,12 @@ matching realm/source snapshots. It adds fixed `/google/sign-in` and
 cancel endpoints. Finish accepts the actual raw query under all original private
 bindings, including provider-error cancellation. GET grants nothing. No base or
 generic OIDC path/schema is broadened and no ordinary startup flag is introduced.
+
+
+The optional server-library `google-desktop-launch` API adds `GoogleDesktopSignIn`
+(`begin`, one-attempt `run`, consuming operation `cancel`) and finite launcher/core/
+transport error classification. It adds no HTTP/OpenAPI route. Proof remains private;
+verified completion still needs mapping and atomic sign-in. Transport cancellation
+is distinct from committed pending-state cancellation. See the
+[native operation contract](../guides/google.md#owned-native-sign-in-operation)
+for original caps, child cleanup, drop semantics and source-revision limitations.

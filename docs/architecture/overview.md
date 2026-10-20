@@ -121,3 +121,11 @@ anonymous-session guard and explicit revocation-cookie hygiene are shared with O
 Generic OIDC contracts and ordinary server startup remain unchanged. Owned HTTPS/
 PostgreSQL/offline-signature evidence is distinct from registered Google, supported
 OS browser delivery and usable genuine-freshness/lifecycle acceptance.
+
+
+The optional server `google-desktop-launch` feature adds a single owned native
+sign-in operation: private transient proof, first OS opener command, concurrent
+bounded callback capture, child cleanup and shared core verification. Local grant
+still requires existing mapping/commit. It adds no remote tokens or ordinary startup
+activation. Source reconfiguration invalidates earlier source sessions; actual OS/
+registered Google and reviewed native lifecycle acceptance remain open.

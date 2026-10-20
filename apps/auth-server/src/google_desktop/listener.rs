@@ -96,7 +96,7 @@ impl GoogleDesktopListener {
     }
 }
 
-fn remaining(expires_us: i64) -> Result<Duration, GoogleDesktopError> {
+pub(super) fn remaining(expires_us: i64) -> Result<Duration, GoogleDesktopError> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|_| GoogleDesktopError::Unavailable)?

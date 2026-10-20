@@ -3632,3 +3632,80 @@ and the rebuilt final13-case browser report again matches all773source hashes an
 producer. No application source, API schema or611-case application regression
 behavior changed at this last cleanup correction. The superseded unpublished
 browser checkpoint was retained privately; published reports were not overwritten.
+
+## AUTH-23 owned native launcher — 2026-10-20
+
+The optional server `google-desktop-launch` component adds one owned native sign-in
+operation around the existing Google authorization/listener boundary. Private
+browser/state/nonce/S256 proof remains in memory. Only the first reviewed platform
+command is selected from pinned MIT open5.4.4; Tokio owns execution with null streams,
+five-second/original-expiry cap and one-second explicit child reaping on failure.
+No fallback iteration, system setting, public command override, callback upload API,
+SQL policy copy, schema/migration or default startup activation is introduced.
+
+Callback capture runs while the opener is alive, because delivery can precede its
+exit. Both successful handoff and an actual owned callback precede core verification.
+Exit0 alone grants nothing. Provider denial/failure, actual signature rejection,
+launcher failure and core/storage failure remain distinct. Transport cancellation
+closes resources but does not promise SQL cancellation; consuming `cancel()` retains
+original private binding. Dropping a future requests child termination without
+claiming confirmed reaping or asynchronous SQL cleanup. Interrupted token I/O cannot
+restore consumed state. Verified completion still requires mapping and atomic
+current-policy/session/audit commit under the original final database-time cap.
+
+Thirteen new real-PostgreSQL process cases cover IPv4/IPv6 return before exit,
+exit0 without callback, nonzero exit before/after callback, missing executable,
+already-requested cancellation, running-child cancellation, future drop, launcher
+versus original expiry, held token-I/O cancellation, provider errors, actual signed
+nonce rejection versus transport failure, mismatched listener/source, literal
+platform command construction and revision-bound session lifetime. Ordered cases
+include positive commit controls and check authority/pending-state facts. Private
+Python actors use actual child processes and socket delivery, not the real OS
+browser or credential manager. The existing shared closure observer is imported
+once in the unit test binary; its two controls remain separate from the thirteen
+new database scenarios.
+
+An initial fixture expiry arrangement sampled database time twice and violated its
+five-minute-window constraint. It now uses one clock sample; no constraint or
+application deadline was weakened. Strict lint also caught duplicate socket imports;
+behavior-preserving extraction ab6a652 passed the original eleven transport cases
+before the launcher behavior was extended. Final missing-executable failures are
+explicit infrastructure outcomes, never accepted as application Unauthorized.
+
+Final verification at this checkpoint:
+
+- `cargo fmt --all -- --check` and strict locked workspace/all-target Clippy with
+  default and all features pass; `CARGO_INCREMENTAL=0` is retained.
+- `DATABASE_URL=... cargo test --locked --workspace`: **97 passed**.
+- `DATABASE_URL=... cargo test --locked --workspace --all-features`: **624 passed**
+  (2 Axum unit,116 HTTP,94 core,354 PostgreSQL,47 server unit,11 desktop integration).
+  The filtered logging subprocess repeats an included core case and is not added
+  to that count. Final default/all-feature runs have zero failures or ignored cases.
+- Final server all-feature target: **47 unit + 11 integration passed**; focused
+  `--features google-desktop-launch,oidc-identities --lib google_desktop::operation`:
+  **13 passed**. Isolated `google-desktop-launch` without local mapping: **11 passed**.
+- Compiled-graph advisory check, all-feature cargo-deny and browser-tooling npm audit
+  pass. Inactive SQLx/MySQL RSA0.9.10 RUSTSEC-2023-0071 stays visible; no advisory or
+  license exception is added. Linux is-wsl0.4.0/is-docker0.2.0 are reviewed MIT code.
+- CI retains all existing gates and adds isolated launcher feature and owned
+  process/PostgreSQL checks. Previous exact-head run39408462999 at d0107ee succeeded;
+  the new publication requires its own hosted run. Historical browser source-hash
+  reports remain unchanged and do not claim to match this checkpoint.
+
+Source-rebind regression proves the deliberate existing limitation: persisting a
+new ephemeral redirect rotates revision and invalidates earlier source sessions,
+even if their stored rows are unrevoked. A later signed same-subject sign-in keeps
+its original owner and obtains current authority. No exact-redirect/revision guard
+is relaxed. Stable registration/concurrent-client lifecycle, actual Google client
+and eligible freshness behavior, supported OS browser delivery and ordinary
+activation remain open. The configured OS handler is trusted, not authenticated by
+exit0. No production readiness, Google/OS interoperability or real device success
+is claimed. AUTH-20's Safari failure remains unresolved; no further prompts,
+credential-manager access or security-setting changes were requested.
+
+Maintainability review keeps process ownership, orchestration and finite errors in
+three focused private modules with deliberate public operation/error reexports.
+Tests separate binding, completion, cancellation, resources, actor and setup;
+all new files stay under300lines. Longer ordered scenarios retain negative, observed
+resource outcomes and positive controls together as justified function-size
+exceptions. No unrelated cleanup or persistence refactor is deferred.

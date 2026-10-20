@@ -336,3 +336,29 @@ do not turn unresolved questions into permissive switches or speculative modules
 Manual provider/device evidence, independent review, SAML and outbound issuer remain
 separate release gates. This proposal is not an audit, protocol certification or
 production-readiness claim.
+
+
+## Bounded native launcher checkpoint
+
+An additional optional server `google-desktop-launch` feature owns one native
+sign-in attempt around the existing exact listener/core authorization boundary.
+`operation.rs` retains protected proof and coordinates concurrent callback capture
+and successful opener exit before verification; `launch.rs` owns first-command
+selection and bounded child lifecycle; `operation_error.rs` exposes finite errors.
+No SQL, migration, core policy or public HTTP contract changes are introduced.
+
+Use pinned `open`5.4.4 only for command construction, selecting its first command.
+Execution belongs to Tokio, with null streams, five-second/original-expiry cap,
+kill-on-drop and explicit one-second reap on returned error. No fallback iteration,
+raw command errors, provider selection or system changes are allowed. The OS's
+configured handler is trusted; its successful exit establishes no identity or grant.
+Private Python process actors permit real process/socket/PG/signature acceptance
+without launching a browser. Actual OS/registered-provider evidence remains open.
+
+Explicit operation cancellation retains original private proof; transport failure
+or dropping a future cannot promise SQL cleanup. Final local authority still needs
+the existing mapping and atomic sign-in transaction. Reconfiguring an ephemeral
+redirect rotates source revision and deliberately invalidates previous source
+sessions. That existing guard is preserved and regression-tested; stable registration
+and concurrent native lifecycle require further design before ordinary activation.
+See the [native operation guide](../../guides/google.md#owned-native-sign-in-operation).

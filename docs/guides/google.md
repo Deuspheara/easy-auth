@@ -6,8 +6,9 @@ separate optional server `google-desktop` feature supplies owned loopback delive
 An explicitly selected eligible-client session-age profile also supplies signed
 authentication-time/deletion proofs. An experimental Axum `google-web` composition
 now adds HTTPS reference pages and bound sign-in/deletion HTTP routes. Ordinary
-startup selection, OS browser launch, mobile delivery and lifecycle activation
-remain gated.
+startup selection, actual OS/browser acceptance, mobile delivery and lifecycle
+activation remain gated. The optional server `google-desktop-launch` component
+adds a bounded external launcher around owned loopback delivery.
 The [ADR](../architecture/adr/0019-google-code-flow.md) records the remaining work.
 
 Enable `easy-auth-core/google` and use the existing PostgreSQL and server
@@ -384,3 +385,63 @@ OIDC `prompt=login`/`max_age=0` as a Google contract. A
 returned old authentication time would still fail the existing freshness policy.
 Provider-application eligibility, actual signed claim availability and a usable
 reviewed lifecycle remain unverified; no provider settings have been changed.
+
+
+## Owned native sign-in operation
+
+The optional server `google-desktop-launch` feature exports `GoogleDesktopSignIn`
+and finite `GoogleDesktopLaunchError`/`GoogleDesktopSignInError` types. It does not
+add a startup flag, HTTP token-upload endpoint, native SDK or remote token family.
+Bind a `GoogleDesktopListener`, persist its exact concrete redirect through trusted
+configuration, then construct matching `GoogleAuthorization` services. Pass that
+listener, service and admission source to `GoogleDesktopSignIn::begin`.
+
+The operation retains original browser/state/nonce/S256 proof privately in memory.
+`run(cancel_future)` constructs the first platform command from pinned `open`5.4.4,
+then owns its Tokio child with null stdin/stdout/stderr and kill-on-drop. It never
+iterates opener fallbacks, chooses a provider, changes settings, or interpolates
+protocol data into shell source. macOS selects `/usr/bin/open -- URL`; Linux selects
+the first platform opener (including WSL's static PowerShell command); Windows
+normally uses a static PowerShell script with the target in an environment data
+field; detected Wine selects `winebrowser` with a literal URL argument. These
+platform selections are source-reviewed, not actual-platform acceptance.
+Unsupported platforms return a finite unavailable error. The configured OS handler
+is trusted; exit0 is neither browser identity evidence nor authentication evidence.
+Do not log command Debug output, authorization URLs or callback queries.
+
+The opener has a five-second limit bounded by the original operation deadline.
+The listener accepts concurrently because a callback can arrive before opener exit.
+Both successful handoff and an actual captured callback are required before core
+verification. Exit0 without callback waits under the original listener cap; a
+callback followed by failed handoff yields no token POST or proof. Transport,
+launcher and core/provider/storage failures remain distinguishable.
+
+Cancellation or failure closes the owned socket and kills/reaps only the owned
+opener child, with a one-second bounded cleanup wait. Unconfirmed cleanup is an
+explicit error. It never kills the browser. Dropping a running future requests child
+termination through Tokio but cannot confirm reaping or asynchronously cancel SQL.
+Call consuming `cancel()` explicitly to cancel the original pending operation;
+transport cancellation alone does not delete it. State may already be consumed
+when cancellation interrupts token I/O; cancellation never resurrects it or revokes
+an ambient session. Retained rows expire at their original deadline.
+
+`Verified` completion is still proof only. Apply the original identity policy and
+`OidcSignIn` to obtain an atomic current-policy/session/audit commit. Registration,
+launcher success, callback receipt and signature verification alone issue no session.
+
+Current lifecycle limitation: persisting a different ephemeral redirect rotates the
+source revision. Existing source-bound sessions then fail their current-revision
+guard even if their stored rows are unrevoked. The regression proves both that
+denial and a subsequent same-subject sign-in retaining its original owner. Do not
+relax exact redirects or revision checks to bypass this limitation. A reviewed
+registration/concurrent-client lifecycle is required before ordinary native use.
+
+Owned acceptance uses actual child processes, IPv4/IPv6 sockets, PostgreSQL and
+RS256 signatures. Private Python actors replace the opener only inside tests;
+the real OS browser and credential manager are never launched by these cases.
+They establish process/transport behavior, not registered Google or OS/browser
+interoperability. Run with the documented PostgreSQL setup:
+
+```sh
+CARGO_INCREMENTAL=0 cargo test --locked -p easy-auth-server --features google-desktop-launch,oidc-identities --lib google_desktop::operation
+```

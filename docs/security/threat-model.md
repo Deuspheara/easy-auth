@@ -553,3 +553,18 @@ not registered Google eligibility, actual provider TLS, genuine user freshness o
 ordinary activation. The fixture blocks external traffic, uses public S256/nonce
 inputs, verifies aggregate outcomes and removes its owned DB/TLS material. No
 credential-manager/system security setting or manual device prompt is involved.
+
+
+The optional native Google launcher keeps nonce/PKCE/browser proof inside its owned
+operation. Only the public authorization URL reaches the first configured OS opener,
+with null streams and no raw command/error logging or fallback iteration. Target
+values remain argv/environment data; no caller command or token-upload API exists.
+Five-second/original-expiry launcher bounds and one-second explicit child reaping
+limit resources; callback capture runs concurrently, but both handoff and owned
+callback are required before verification. Killing targets only the opener child,
+never a browser/process group. Drop requests termination without claiming confirmed
+cleanup or SQL cancellation. Explicit cancellation retains original binding and
+never resurrects consumed state. Signature completion alone grants no local session.
+The OS handler/configuration is trusted, not authenticated by exit status. Actual
+platform/browser and Google registration remain unverified. Rebinding an ephemeral
+redirect invalidates old source-revision sessions; this fail-closed guard stays intact.

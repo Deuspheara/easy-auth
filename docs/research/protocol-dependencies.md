@@ -179,3 +179,25 @@ the pinned Playwright/Chromium setup and private TLS proxy. A context-local priv
 certificate exception is fixture evidence only, not a production transport fallback
 or system trust change. Real Google registration, eligibility, supported OS return
 and genuinely usable fresh lifecycle remain unverified acceptance gates.
+
+
+The optional AUTH-23 native launcher pins `open`5.4.4 (MIT, MSRV1.62), with default
+features disabled, solely for `commands` construction. Exact downloaded source was
+reviewed for macOS/Linux/Windows/WSL: only the first command is selected; Tokio owns
+execution and finite errors, null streams, original-deadline bounds and cleanup.
+The `insecure` feature, dependency execution helpers and fallback iteration are
+unused. Windows/WSL normally use static PowerShell source and a target environment value;
+detected Wine places `winebrowser` first with literal target data;
+macOS passes the URL as data after `--`. No protocol value becomes shell source.
+Linux adds MIT `is-wsl`0.4.0 and `is-docker`0.2.0, whose reviewed sources read/cache
+local platform markers without logging or spawning processes; existing once_cell
+and libc versions are retained. Server test base64 uses already locked0.22.1.
+No existing package version, trust root, crypto or advisory exception changes.
+
+Review rejected `webbrowser`1.2.4 for this use because its source logs target/command
+Debug information and its macOS default selection contains a Safari fallback.
+No global logging suppression or local dependency patch was introduced. These are
+selection constraints, not an interoperability or vendor-defect claim. The chosen
+OS handler is trusted configuration and remains unverified by automated private
+process actors. See upstream [open source](https://github.com/Byron/open-rs/tree/v5.4.4)
+and the [native contract](../guides/google.md#owned-native-sign-in-operation).

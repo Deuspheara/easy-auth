@@ -719,3 +719,13 @@ The longer ordered browser case sequence deliberately retains one real account/
 session lifecycle through cancellation, old/missing proof refusal and final deletion
 so ownership retention and final aggregate facts remain directly observable. This
 is a function-size exception, not a generic scenario framework.
+
+
+AUTH-23's native launcher keeps process selection/lifecycle in `launch.rs`, finite
+errors in `operation_error.rs` and one protected sign-in attempt in `operation.rs`.
+Capture/cleanup remains explicit. Longer ordered test scenarios retain their
+security-sensitive sequence as function-size exceptions; files remain below300lines. Tests separate binding,
+completion, cancellation, process actor and feature setup. The existing socket
+fixture is imported once per test binary rather than duplicated per feature subtree.
+Production visibility remains private except the deliberate library operation/error
+API. No policy, transaction, HTTP route or unrelated cleanup is moved into the server.
