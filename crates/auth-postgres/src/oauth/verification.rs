@@ -6,12 +6,7 @@ use sqlx::PgPool;
 pub(super) async fn check(pool: &PgPool, exchange: &OAuthExchange) -> Result<i64> {
     let mut tx = pool.begin().await.map_err(unavailable)?;
     configuration::lock(&mut tx, exchange.configuration()).await?;
-    let owner = ownership::lock(
-        &mut tx,
-        exchange.configuration().realm(),
-        exchange.purpose(),
-    )
-    .await?;
+    let owner = ownership::lock(&mut tx, exchange.configuration(), exchange.purpose()).await?;
     let cap = owner
         .deadline
         .as_ref()

@@ -3,6 +3,8 @@ mod deletion;
 mod email_attachment;
 mod email_change;
 mod erasure;
+#[cfg(feature = "oidc-identities")]
+pub(crate) mod provider_deletion;
 
 use crate::{Postgres, unavailable};
 use auth_core::{Error, Result, Verifier};

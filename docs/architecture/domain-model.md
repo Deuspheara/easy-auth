@@ -20,6 +20,12 @@ See [ADR 0013](adr/0013-oauth-state-transactions.md) for original authority bind
 and mandatory final revalidation. Final sign-in persistence consumes the proof and
 rechecks configuration, full mapping/JIT policy and original caps under locks.
 Linking-purpose proofs reject until AUTH-25 implements that separate boundary.
+AUTH-55 adds a distinct deletion-purpose preparation bound to an active original
+provider-required owner/session and exact source revision. It cannot become sign-in
+or linking authority and does not refresh authentication time. The purpose's state
+is one-use and capped by the original active session. Final provider deletion,
+signed freshness authorization and its HTTP composition remain unimplemented at
+this checkpoint; [ADR 0017](adr/0017-provider-account-deletion.md) records the design.
 
 VerificationChallenge holds only token/browser verifiers, email/purpose and expiry. Email proof consumption commits atomically with user/session creation; a failed session insert rolls back that consumption. Password-reset proofs use a separate table/cookie and bind the current credential version; consumption, password/version update, session/proof invalidation, audit and non-secret notification enqueue commit atomically. Delivery claims are leased and realm scoped. Parallel consumption yields one winner. PostgreSQL constraints include realm in all identity relations.
 

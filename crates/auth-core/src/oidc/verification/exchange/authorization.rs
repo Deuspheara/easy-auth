@@ -13,6 +13,8 @@ const RESERVED: &[&str] = &[
     "nonce",
     "code_challenge",
     "code_challenge_method",
+    "max_age",
+    "prompt",
 ];
 
 pub struct OidcAuthorizationUrl(Zeroizing<String>);
@@ -26,6 +28,7 @@ impl OidcAuthorizationUrl {
         connection: &OAuthConnection,
         start: &OAuthStart,
         scopes: &[&str],
+        reauthenticate: bool,
     ) -> Result<Self> {
         if !discovery.supports_s256() {
             return Err(Error::Unavailable);
@@ -61,6 +64,11 @@ impl OidcAuthorizationUrl {
             .append_pair("nonce", start.proof.nonce().expose())
             .append_pair("code_challenge", &start.proof.code_challenge())
             .append_pair("code_challenge_method", "S256");
+        if reauthenticate {
+            url.query_pairs_mut()
+                .append_pair("max_age", "0")
+                .append_pair("prompt", "login");
+        }
         Ok(Self(Zeroizing::new(url.into())))
     }
 }

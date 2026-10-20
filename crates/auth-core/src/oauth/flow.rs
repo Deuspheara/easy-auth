@@ -98,7 +98,9 @@ impl OAuthTransactions {
         if intent.source.is_empty()
             || intent.source.len() > 256
             || intent.source.chars().any(char::is_control)
-            || matches!(intent.purpose, OAuthPurpose::Link { user, .. } if user.is_nil())
+            || matches!(intent.purpose,
+                OAuthPurpose::Link { user, .. } | OAuthPurpose::DeleteProviderAccount { user, .. }
+                if user.is_nil())
         {
             return Err(Error::InvalidInput);
         }

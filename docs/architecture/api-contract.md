@@ -1,5 +1,15 @@
 # HTTP contract v1
 
+AUTH-55's preparation checkpoint adds the optional Rust enum variant
+`OAuthPurpose::DeleteProviderAccount { user, session }` and the fixed-parameter
+`OidcCodeExchange::reauthentication_url` API. Consumers of this experimental enum
+must handle the new purpose; it is not a sign-in/linking proof. PostgreSQL requires
+the identity feature and exact active original provider source/session. Migration
+0019 adds its closed owner/session binding. No HTTP path, schema, cookie or
+provider deletion action is activated by these preparation APIs. The final
+transaction and HTTP boundary remain work under
+[ADR 0017](adr/0017-provider-account-deletion.md).
+
 AUTH-30's explicit core/PostgreSQL `oidc-identities` features add trusted mapping
 policy and an opaque proof. The administrative `configure_oidc_identity_policy`
 returns a policy bound to a fresh persisted revision, atomically cancelling old

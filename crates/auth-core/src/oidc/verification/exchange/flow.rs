@@ -54,10 +54,34 @@ impl OidcCodeExchange {
         start: &OAuthStart,
         scopes: &[&str],
     ) -> Result<OidcAuthorizationUrl> {
+        self.authorization(start, scopes, false).await
+    }
+    /// Request fresh provider authentication without accepting arbitrary extra
+    /// parameters. The request is not proof of freshness: consumers must require
+    /// and validate signed auth_time and their exact purpose/context at commit.
+    pub async fn reauthentication_url(
+        &self,
+        start: &OAuthStart,
+        scopes: &[&str],
+    ) -> Result<OidcAuthorizationUrl> {
+        self.authorization(start, scopes, true).await
+    }
+    async fn authorization(
+        &self,
+        start: &OAuthStart,
+        scopes: &[&str],
+        reauthenticate: bool,
+    ) -> Result<OidcAuthorizationUrl> {
         let _lease = self.verifier.lease_operation()?;
         let discovery = self.documents.discovery_when_admitted().await?;
         self.check_provider(&discovery)?;
-        OidcAuthorizationUrl::new(&discovery, self.documents.connection(), start, scopes)
+        OidcAuthorizationUrl::new(
+            &discovery,
+            self.documents.connection(),
+            start,
+            scopes,
+            reauthenticate,
+        )
     }
     pub async fn exchange(
         &self,

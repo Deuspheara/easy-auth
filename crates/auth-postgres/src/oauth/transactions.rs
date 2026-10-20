@@ -19,7 +19,7 @@ pub(super) async fn save(pool: &PgPool, request: &OAuthRequest) -> Result<i64> {
     .await
     .map_err(unavailable)?;
     configuration::lock(&mut tx, &request.configuration).await?;
-    let owner = ownership::lock(&mut tx, realm, &request.purpose).await?;
+    let owner = ownership::lock(&mut tx, &request.configuration, &request.purpose).await?;
     sqlx::query(
         "DELETE FROM auth_oauth_transactions WHERE realm_id=$1 AND expires_at<=clock_timestamp()",
     )
@@ -49,7 +49,7 @@ pub(super) async fn save(pool: &PgPool, request: &OAuthRequest) -> Result<i64> {
     ).bind(realm).bind(request.configuration.connection()).bind(request.configuration.client())
         .bind(request.configuration.revision()).bind(request.state.as_slice()).bind(request.browser.as_slice())
         .bind(request.nonce.as_slice()).bind(request.pkce.as_slice())
-        .bind(if owner.user.is_some() { "link" } else { "sign_in" }).bind(owner.user).bind(owner.session)
+        .bind(owner.purpose).bind(owner.user).bind(owner.session)
         .bind(owner.deadline.as_ref().map(Deadline::expires_us)).fetch_optional(&mut *tx).await.map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
     let deadline = owner
@@ -66,7 +66,7 @@ pub(super) async fn take(pool: &PgPool, request: &OAuthRequest) -> Result<i64> {
     let mut tx = pool.begin().await.map_err(unavailable)?;
     // Disable/reconfiguration serializes before owner/session and pending locks.
     configuration::lock(&mut tx, &request.configuration).await?;
-    let owner = ownership::lock(&mut tx, realm, &request.purpose).await?;
+    let owner = ownership::lock(&mut tx, &request.configuration, &request.purpose).await?;
     let expires: i64 = sqlx::query_scalar(
         r#"
         SELECT (extract(epoch FROM expires_at)*1000000)::bigint FROM auth_oauth_transactions
@@ -84,11 +84,7 @@ pub(super) async fn take(pool: &PgPool, request: &OAuthRequest) -> Result<i64> {
     .bind(request.browser.as_slice())
     .bind(request.nonce.as_slice())
     .bind(request.pkce.as_slice())
-    .bind(if owner.user.is_some() {
-        "link"
-    } else {
-        "sign_in"
-    })
+    .bind(owner.purpose)
     .bind(owner.user)
     .bind(owner.session)
     .fetch_optional(&mut *tx)

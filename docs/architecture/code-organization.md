@@ -114,6 +114,14 @@ Rust permits one implementation of a trait for a type. PostgreSQL's `repository.
 
 ## Reviewed size exceptions
 
+AUTH-55's `account/provider_deletion/authorization.rs` owns the concrete active
+provider-session preparation locks shared by OAuth start/consume/context checks.
+It takes no unrelated source-configuration lock and performs no deletion or
+authentication-time update. Its longer ordered function keeps policy, optional
+email, owner, session, identity and original deadline checks visible. Focused
+schema, purpose, invalidation, ordering and wait test modules remain below 300
+lines; longer ordered cases retain valid controls and exact failure assertions.
+
 Account deletion delegates its already-authorized destructive tail to
 `account/erasure.rs`. This private operation owns account-related proof/admission
 cleanup, audit erasure, user deletion and the established deletion notice. It

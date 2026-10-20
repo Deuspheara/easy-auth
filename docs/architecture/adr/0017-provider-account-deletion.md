@@ -3,6 +3,12 @@
 Date: 2026-10-20. Status: proposed for AUTH-55; provider deletion is not implemented
 or activated by this design. AUTH-56 owns ordinary OIDC sign-in composition.
 
+The preparation checkpoint implements the distinct OAuth purpose, migration 0019,
+current active provider-session/source authorization and fixed reauthentication
+URL API. Those operations can request/consume exchange context only. Final
+subject/freshness-authorized erasure and the HTTP/browser boundary below remain
+proposed, with no deletion capability claimed.
+
 ## Context
 
 AUTH-30 creates `provider_required` users without inventing a mailbox. Its sessions
@@ -41,6 +47,9 @@ identity. `iat`, local mint time, `amr`/`acr`, provider email, an account UUID a
 bearer alone cannot satisfy it. No selected display name is needed for deletion.
 Providers unable to return the required proof remain unsupported for this action;
 there is no weaker fallback or remote-availability override.
+The [OIDC authorization request specification](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest)
+describes these parameters and the required authentication-time claim; a fresh
+token/request is not itself proof of a new user gesture.
 
 ## Intended transaction and lifecycle
 

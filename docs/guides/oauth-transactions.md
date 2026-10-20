@@ -16,7 +16,7 @@ preserves a disable. Only explicit `enable_oauth_connection` with the latest per
 snapshot re-enables it. These are administrative interfaces, not request handlers.
 
 `begin` takes an `OAuthIntent` containing the host browser secret, trusted source
-and a closed sign-in/link purpose. It returns fresh state, private browser proof
+and a closed purpose. It returns fresh state, private browser proof
 and the fixed database deadline. Authorization parameters are state, expected
 nonce and the proof's S256 challenge. The raw PKCE verifier must stay in a protected
 transient transport; it is not an authorization URL parameter. The library does
@@ -44,6 +44,27 @@ idle or absolute expiry. This is permission to attempt provider proof, not permi
 to attach an identity or downgrade an account. Future linking must prove the new
 provider identity and revalidate original authority/policy at its final commit.
 Matching email addresses never select or merge local accounts.
+
+AUTH-55 adds `OAuthPurpose::DeleteProviderAccount { user, session }` as preparation
+for a distinct provider deletion flow. PostgreSQL requires `oidc-identities` and
+the exact active provider-required owner/session/source/configuration revision.
+It rejects without that feature. The initiating session may have old or unknown
+provider authentication time: requesting new proof grants no action and never
+updates that time. The original idle/absolute cap still bounds preparation,
+consumption and context checks. Sign-in/linking cannot consume this purpose, and
+neither the sign-in use case nor repository can issue a session from its proof.
+Migration 0019 extends the closed purpose/session binding without changing old
+pending rows or granting deletion authority. No provider deletion endpoint or
+final deletion transaction exists at this checkpoint; see
+[proposed ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
+
+`OidcCodeExchange::reauthentication_url` adds fixed `max_age=0` and `prompt=login`
+to the existing exact state/nonce/S256 authorization request. Provider metadata
+cannot supply competing `max_age`/`prompt` query parameters. The
+[OIDC authorization request specification](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest)
+requires an authentication-time claim for maximum-age requests. Parameters alone
+are not evidence of a prompt or fresh authentication: the final sensitive action
+must require the genuinely recent signed `auth_time` and exact existing identity.
 
 State consumption happens before network exchange and cannot be retried. A provider
 failure or lost exchange result requires a new start. `OAuthExchange` does not verify

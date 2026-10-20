@@ -1,5 +1,15 @@
 # Threat model — alpha design, before credential flows
 
+AUTH-55's implemented preparation purpose binds a current provider-required
+owner/session and exact configuration/policy revision under source-before-owner
+locks. Old/unknown authentication time may initiate reauthentication but grants
+no deletion; idle/absolute expiry, revocation and policy/source changes still deny.
+Sign-in/linking purposes cannot substitute for it, and its verified proof cannot
+mint a session through either sign-in layer. Maximum-age/login request parameters
+are not authentication evidence. Final subject/freshness-authorized deletion and
+HTTP/browser composition remain unimplemented; ordinary activation stays gated.
+See [proposed ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
+
 AUTH-30's optional core mapping consumes only a verified signed identity bound to
 the exact trusted realm/connection/client/revision and explicit issuer allowlist.
 Display selection has no email/alternate-field fallback. JIT configuration defaults

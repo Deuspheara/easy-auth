@@ -8,7 +8,17 @@ use uuid::Uuid;
 #[derive(Clone, Eq, PartialEq)]
 pub enum OAuthPurpose {
     SignIn,
-    Link { user: Uuid, session: Verifier },
+    Link {
+        user: Uuid,
+        session: Verifier,
+    },
+    /// An active source-bound provider session may request reauthentication.
+    /// This purpose never grants sign-in/linking or deletion by itself. Final
+    /// deletion requires the exact existing subject and recent signed auth_time.
+    DeleteProviderAccount {
+        user: Uuid,
+        session: Verifier,
+    },
 }
 
 /// Request-local context selected by a trusted handler, never callback selectors.

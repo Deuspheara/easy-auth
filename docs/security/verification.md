@@ -2225,3 +2225,69 @@ boundary. These are first-release blockers, not implemented capabilities. AUTH-2
 linking, AUTH-20's unresolved Safari/Dashlane recovery evidence, broader provider
 acceptance, SAML, outbound issuer and independent review remain open. Acceptance
 of AUTH-30's scoped backend boundary does not complete M05 or the full release.
+
+## AUTH-55 deletion-purpose preparation checkpoint (2026-10-20)
+
+This checkpoint implements preparation, not provider account deletion. The explicit
+OAuth purpose binds the active initiating provider-required owner/session to the
+exact current connection/client/issuer/revision and policy row. Source/policy locks
+precede optional email, owner, session and identity locks. Wrong configuration
+rejects without acquiring an unrelated source-configuration lock. The original
+idle/absolute cap bounds start, consumption and later exchange context checks;
+no preparation operation changes authentication time or grants deletion/sign-in.
+Without `oidc-identities`, PostgreSQL rejects the purpose. Migration 0019 extends
+closed purpose/owner/session constraints and preserves original pending rows.
+
+The typed reauthentication URL adds only fixed maximum-age/login parameters to
+the existing state/nonce/S256 request. Provider metadata cannot supply competing
+parameters, including decoded/case variants. Neither URL parameters, a new token
+nor an old/unknown initiating authentication time is evidence of fresh private
+provider proof. Final deletion must still implement signed `auth_time`, exact
+subject, explicit destructive confirmation and original-cap authorization.
+
+Ten new real-PostgreSQL tests cover actual signed-provider/session setup, old/unknown
+time preservation, wrong purpose/browser/owner/source/realm/method, one-use state,
+direct sign-in use-case/repository denial, revoked/idle/absolute/policy invalidation,
+source disable and owner-policy lock ordering, migration compatibility and observed
+owner/pending/final-INSERT waits across the original session deadline. A separate
+verification-only database case proves feature-disabled denial; two new core tests
+check fixed URL policy, original proof binding and metadata conflicts. Expected
+authorization failures are exact Unauthorized; setup, observer, SQL or socket
+failures never count as rejection evidence. Session snapshots assert no touch,
+revocation or other mutation during rejected preparation.
+
+Before migration, the valid raw purpose/binding case failed with actual check
+constraint SQLSTATE 23514. This demonstrates missing schema support, not an account
+takeover. The first wait fixture's table lock stopped earlier expired-state cleanup,
+so its INSERT observer timed out; a trigger now gates the actual INSERT and checks
+that the observed wait precedes expiry. A subsequent aggregate assertion incorrectly
+assumed one session per user despite earlier successful control logins. Exact
+pre-action counts and unchanged session-row snapshots replace that invalid fixture
+assumption. Neither failure is recorded as an application defect or a passing
+regression; final rejection and rollback assertions remain mandatory.
+
+Final local gates pass with `CARGO_INCREMENTAL=0`: formatting, strict locked
+default/all-feature workspace/all-target Clippy, **93 default** and **423 distinct
+all-feature** workspace tests (288 PostgreSQL, 55 HTTP/PostgreSQL, 68 core, 10 server,
+2 Axum; the logging child repeats an included core case), **57 verification-only
+core tests**, and the separate feature-disabled PostgreSQL test. No failed or ignored
+cases in these final runs. Compiled advisory, all-feature license/source/bans and npm
+audits pass; the inactive optional SQLx/MySQL RSA advisory remains visible. No
+dependency/version change, advisory exception or published migration edit is added.
+
+All nineteen existing owned Keycloak cases pass after the extension. The immutable
+[baseline report](../../tests/browser/oidc/results/2026-10-20/keycloak-purpose-preparation-baseline.json)
+matches **572 source/configuration hashes** and its frozen producer binary. Final
+counts remain 2 users/4 sessions/4 audits/0 pending, 1 identity/1 provider user/0
+provider contacts/3 OIDC sessions/0 weak provider sessions; the native process exits
+zero and removes its database, provider container and private files with no emergency
+cleanup or unexpected diagnostics. This is unchanged-flow regression evidence,
+not native reauthentication or deletion acceptance. Earlier reports are immutable.
+
+New implementation/test modules stay below 300 lines. The longer ordered source
+authorization and security scenarios retain visible locks, original caps, error
+classification and valid controls as reviewed exceptions. No unrelated cleanup,
+production HTTP route or ordinary activation is introduced. ADR 0017 remains
+proposed for the final deletion/HTTP boundary. AUTH-55 stays In Progress pending
+those operations, their actual rollback/race/negative and native acceptance tests,
+full gates and hosted evidence. AUTH-56 remains a separate composition gate.
