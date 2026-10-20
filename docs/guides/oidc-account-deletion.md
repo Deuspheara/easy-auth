@@ -3,8 +3,8 @@
 The optional core/PostgreSQL `oidc-identities` boundary supports deliberate deletion
 of a `provider_required` account using a separate verified provider proof. It adds
 an explicit opt-in Axum HTTP/browser boundary, without ordinary server activation.
-AUTH-55 remains In Progress until actual provider-to-HTTP acceptance and final
-verification are complete. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
+The implementation has component and owned Keycloak-to-HTTP acceptance evidence.
+Ordinary provider composition remains gated through AUTH-56. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
 records the transaction and experimental transport.
 
 ## Prepare a separate provider proof
@@ -155,5 +155,16 @@ The 18 HTTP/PostgreSQL component regressions use real signed ES256 proofs, inclu
 rollback and an observed final-audit lock wait proving no response before commit.
 The Chromium reference-client suite uses controlled responses to check seven bad
 callback forms, explicit confirmation, URL scrubbing, reload, cancellation and 503
-feedback. Those are component/client checks; the existing 23-case Keycloak report
-exercises the Rust backend and does not yet prove this HTTP composition end to end.
+feedback. Those are component/client checks. A separate six-case owned Keycloak run now
+exercises this HTTP composition end to end, while all 23 existing native backend
+cases pass unchanged on the same frozen source. See the
+[HTTP provider record](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion-http.json)
+and [backend regression record](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion-http-backend-regression.json).
+The initial session comes from actual signed core login and a one-use fixture-only
+cookie-delivery capability; it is not ordinary public sign-in acceptance. Real
+provider reauthentication then drives the production deletion routes and pages.
+The run verifies non-mutating callback GET/cancellation, wrong fresh signed subject,
+503 token-service failure, explicit committed deletion, captured old-cookie/state
+replay rejection and a fresh signed login denied while cooldown is still live.
+This is an email-free owned fixture, not provider-contact SMTP, independent review
+or production-provider interoperability evidence.

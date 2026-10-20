@@ -16,8 +16,17 @@ async function start(directory) {
     {stdio:['ignore','pipe','pipe'],timeout:15000});
   fs.chmodSync(key,0o600);
   const facts = {posts:0,token_responses:0,signature_mutations:0,token_replays:0};
+  const faults = {unavailable:0};
+  let application;
   let base, origin, callback, mode = 'normal', captured, firstRequest, lastClaims, lastKid;
   const server = https.createServer({key:fs.readFileSync(key),cert:fs.readFileSync(certificate)}, (incoming, outgoing) => {
+    if (application && incoming.headers.host===application.host) {
+      const upstream=http.request(application.base+incoming.url,{method:incoming.method,headers:incoming.headers},response=>{
+        outgoing.writeHead(response.statusCode,response.headers);response.pipe(outgoing);
+      });
+      upstream.on('error',()=>{outgoing.writeHead(502);outgoing.end();});
+      incoming.pipe(upstream);return;
+    }
     if (callback && incoming.headers.host===new URL(callback).host && incoming.url.split('?')[0]===new URL(callback).pathname) {
       outgoing.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'});
       outgoing.end('<!doctype html><title>Owned callback captured</title>');return;
@@ -31,6 +40,10 @@ async function start(directory) {
       if (token) {
         facts.posts += 1;
         firstRequest ||= {path:incoming.url,authorization:incoming.headers.authorization,body:Buffer.from(body)};
+      }
+      if(token && mode==='unavailable') {
+        faults.unavailable++;
+        outgoing.writeHead(503,{'Content-Type':'application/json'});outgoing.end('{"error":"temporarily_unavailable"}');return;
       }
       const headers = {...incoming.headers,host:new URL(origin).host,
         'x-forwarded-proto':'https','x-forwarded-host':'fixture.invalid',
@@ -70,6 +83,13 @@ async function start(directory) {
   origin = 'https://fixture.invalid:'+server.address().port;
   return {origin,address:'127.0.0.1:'+server.address().port,
     certificate_der:Array.from(new crypto.X509Certificate(fs.readFileSync(certificate)).raw),facts,
+    connectApplication(value, publicOrigin) {
+      assert.match(value,/^http:\/\/127\.0\.0\.1:\d+$/);
+      const url=new URL(publicOrigin);
+      assert.equal(url.protocol,'https:');assert.equal(url.hostname,'app.example');
+      assert.equal(url.port,String(server.address().port));
+      application={base:value,host:url.host};
+    }, faults,
     connect(value) {base=value;}, allowCallback(value) {callback=value;}, mode(value) {mode=value;},
     lastKid() {return lastKid;}, lastClaims() {return lastClaims;},
     async replayCode() {

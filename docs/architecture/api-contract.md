@@ -6,8 +6,9 @@ reference/callback pages. It derives owner/session from current authentication,
 requires `delete my account` at start and finish, and uses independent HttpOnly
 proof cookies. Normal OpenAPI/routes and ordinary server activation are unchanged.
 See the [HTTP contract](../guides/oidc-account-deletion.md#explicit-experimental-http-composition)
-and [combined schema](openapi-oidc-account-deletion.json). Actual provider-to-HTTP
-acceptance remains pending; the existing Keycloak report proves the backend only.
+and [combined schema](openapi-oidc-account-deletion.json). Owned Keycloak-to-HTTP
+acceptance is now recorded separately from the preserved backend cases; ordinary
+provider sign-in composition remains gated.
 
 AUTH-55 adds the optional Rust enum variant
 `OAuthPurpose::DeleteProviderAccount { user, session }` and the fixed-parameter

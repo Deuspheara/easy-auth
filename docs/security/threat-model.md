@@ -13,8 +13,8 @@ Final expiry or storage failure restores account/audit/notice/cooldown state;
 consumed OAuth state stays consumed. No verified contact means no invented notice.
 The opt-in HTTP/browser composition uses exact-Origin POSTs, independent HttpOnly
 proof cookies, session-derived owner and two destructive confirmations. Its callback
-GET is static and never consumes proof. Actual provider-to-HTTP acceptance and
-ordinary activation stay gated.
+GET is static and never consumes proof. Owned Keycloak-to-HTTP acceptance now covers the real routes/pages; ordinary
+activation stays gated.
 See [ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
 
 AUTH-30's optional core mapping consumes only a verified signed identity bound to

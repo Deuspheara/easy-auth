@@ -76,11 +76,10 @@ session revocation. amr/acr are not local passkey/MFA or application-permission 
 Logout can dispose of an owned bearer even if its provider source is disabled.
 
 Provider-required users do not acquire mailbox/password, passkey sign-in or saved-code
-passkey recovery fallback, even if trusted storage later has verified contact. No public
-provider contact attachment, policy transition or provider-only deletion endpoint is
-provided here. AUTH-55 now has an optional
-[backend provider deletion use case](oidc-account-deletion.md); its HTTP/browser
-boundary remains unfinished. AUTH-56 owns supported embedded
+passkey recovery fallback, even if trusted storage later has verified contact. Public provider contact attachment and policy transition remain unimplemented.
+AUTH-55 provides a separate optional
+[provider deletion use case and HTTP boundary](oidc-account-deletion.md), with
+component and owned Keycloak-to-HTTP evidence. AUTH-56 owns supported embedded
 and standalone OIDC web composition and depends on that lifecycle boundary.
 Ordinary provider activation and complete first-release lifecycle remain
 separate gates. Applications must not fabricate contact or weaken policy to work around

@@ -100,9 +100,10 @@ Provider-required accounts cannot use mailbox/password sign-in, password enrollm
 mailbox deletion, passkey sign-in or saved-code passkey recovery as implicit fallback.
 Verified local contact does not relax policy. Preverified passkey proofs and retained
 recovery codes reject after this policy change. No public policy-transition, provider
-contact attachment or provider-only account-deletion endpoint is added. AUTH-55 owns
-provider-only deletion, with its optional backend transaction now implemented under
-[ADR 0017](0017-provider-account-deletion.md) and its HTTP/browser boundary still open.
+contact attachment or provider-only account-deletion endpoint is added by AUTH-30.
+AUTH-55 provides provider-only deletion through an optional backend transaction
+and HTTP/browser boundary under [ADR 0017](0017-provider-account-deletion.md),
+with component and owned Keycloak-to-HTTP acceptance evidence.
 AUTH-56 owns embedded/standalone OIDC web composition with deletion as a prerequisite.
 Those lifecycle/activation capabilities require their own reviewed boundary. The
 original AUTH-30 account-deletion races use an owned persistence fixture; AUTH-55

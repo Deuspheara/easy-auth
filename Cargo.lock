@@ -576,6 +576,7 @@ dependencies = [
  "rcgen",
  "reqwest",
  "rustls",
+ "serde",
  "serde_json",
  "sqlx",
  "tokio",

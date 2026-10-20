@@ -13,7 +13,7 @@
 | Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
-| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 owned Keycloak/browser cases through local mapping/JIT/session commit and purpose-bound reauthentication/deletion; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session/deletion boundary and component-tested opt-in deletion HTTP; native provider-to-HTTP acceptance, ordinary routes, linking and complete lifecycle remain gated |
+| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 owned Keycloak/browser cases through local mapping/JIT/session commit and purpose-bound reauthentication/deletion; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session/deletion boundary and component/native-tested opt-in deletion HTTP; ordinary routes, linking and complete lifecycle remain gated |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
 
@@ -161,6 +161,24 @@ final mutation uses core/PostgreSQL directly through private fixture IPC.
 Final counts require the surviving mailbox user/session, six audits with four
 provider facts deidentified, one deletion/cooldown and no provider identity/session
 authority. This is backend acceptance, not a supported public HTTP deletion flow,
-production-provider acceptance or SMTP provider-contact evidence. The opt-in HTTP/browser boundary now has separate component/client checks; actual
-provider-to-HTTP confirmation acceptance remains AUTH-55 work. Ordinary composition is
+production-provider acceptance or SMTP provider-contact evidence. The opt-in HTTP/browser boundary now has separate component/client checks and
+six real provider-to-HTTP cases, recorded below. Ordinary composition is
 AUTH-56. No independent review or ordinary activation claim follows.
+
+
+## AUTH-55 actual HTTP provider deletion — 2026-10-20
+
+The [six-case HTTP record](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion-http.json)
+adds real Keycloak reauthentication through the actual reference pages, protected
+cookies, HTTP deletion routes and PostgreSQL commit. A one-use fixture capability
+only delivers the session already obtained from signed core login; it is not a
+public login acceptance path. Wrong-subject proof reaches the real verified port,
+controlled transport failure returns 503, callback GET/cancellation cannot delete,
+and explicit completion invalidates captured old cookies/proof. A fresh signed
+same-subject login is rejected with the cooldown verified live. The
+[same-source backend report](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion-http-backend-regression.json)
+retains all 23 prior cases/aggregates. Both require normal cleanup and source/binary
+hashes. New HTTP final counts are zero users/sessions/identities/pending/contact/
+notices, two deidentified audit facts and one live cooldown. This is email-free
+owned-provider evidence, not provider-contact SMTP, independent audit,
+production-provider interoperability or ordinary activation.

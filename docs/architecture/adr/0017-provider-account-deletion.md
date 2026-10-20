@@ -1,8 +1,8 @@
 # ADR 0017: Purpose-bound provider account deletion
 
 Date: 2026-10-20. Status: accepted for AUTH-55's optional core/PostgreSQL deletion
-transaction. The optional HTTP/browser boundary is now implemented and component
-tested; actual provider-to-HTTP acceptance remains pending. Ordinary activation is
+transaction and opt-in HTTP/browser boundary. Component and owned Keycloak-to-HTTP
+acceptance are recorded; exact final-commit CI remains mandatory. Ordinary activation is
 not enabled. AUTH-56 owns ordinary OIDC sign-in composition.
 
 The preparation checkpoint implements the distinct OAuth purpose, migration 0019,
@@ -108,11 +108,11 @@ no deletion authority is invented by migration. Exact infrastructure failures ar
 not expected authorization rejections.
 
 HTTP contract/Origin/cookie/callback/redaction/confirmation negatives now pass.
-Actual owned Keycloak browser reauthentication-to-HTTP-deletion acceptance with
-normal cleanup remains required.
+Actual owned Keycloak browser reauthentication-to-HTTP-deletion acceptance now
+passes six cases with normal cleanup, alongside all 23 existing backend cases.
 Keep all existing native/SMTP cases. Record formatting, strict default/all-feature
 lint, full default/all-feature real-DB suites, security/license/secret scans and
-exact-code hosted CI. Until the remaining native HTTP acceptance evidence exists,
+exact-code hosted CI. Until exact final-source verification and hosted CI are complete,
 AUTH-55 stays open; backend/component acceptance is not an independent review or
 ordinary activation approval. Exact results and limits are recorded in
 [verification evidence](../../security/verification.md).
@@ -124,5 +124,28 @@ alignment. Normal routers are unchanged. Closed query failures are converted to 
 fixed error rather than echoing attacker-supplied field names. The reference client
 never auto-submits callback proof, stores it persistently or displays provider errors.
 Component acceptance consists of 18 real PostgreSQL HTTP cases plus a controlled
-Chromium reference-client suite. This does not complete actual provider-to-HTTP
-acceptance, independent review or AUTH-55.
+Chromium reference-client suite. Actual provider-to-HTTP acceptance is now separately recorded in six native cases;
+component results alone do not establish it, independent review or ordinary activation.
+
+
+## Owned HTTP provider acceptance
+
+A separate server-package example composes the same opt-in Axum router, core
+verifier and real PostgreSQL port with the existing production HTTPS sources and
+owned certificate/address mapping. Its initial session is obtained from actual
+Keycloak signed login and delivered to the owned browser through a one-use
+fixture-only capability. It seeds no session or identity and exposes no ordinary
+login route. Provider reauthentication and deletion then use the actual reference
+pages, cookies and HTTP routes. Finite verified-port observations forward the
+opaque proof unchanged and preserve the PostgreSQL result. Wrong-subject denial
+therefore cannot be a missing signature/nonce/infrastructure failure in disguise.
+The controlled unavailable-token case must return 503, not an expected 401.
+
+The captured old cookies are restored only inside this isolated browser to prove
+replay rejection after committed erasure; Chromium's actual fixture DNS/TLS path
+performs that request. A fresh signed same-subject login reaches resolution and is
+denied with a still-live cooldown. Final evidence has zero users/sessions/identities/
+pending/contact/notice rows, two deidentified audit facts and one live cooldown.
+No provider-contact SMTP, production-provider, independent audit or ordinary
+activation acceptance follows. Reports, source/binary hashes and normal cleanup
+are linked from the [deletion guide](../../guides/oidc-account-deletion.md).

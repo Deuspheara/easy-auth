@@ -58,5 +58,5 @@ proof and requires the initiating source's exact subject and genuine recent sign
 authentication. The shared account erasure tail supports absent verified contact;
 the caller holds source/owner/session/identity locks and retains every original cap
 through the final clock check. An explicit opt-in provider deletion HTTP/browser composition is implemented;
-actual provider-to-HTTP acceptance and ordinary activation remain gated. [ADR 0017](adr/0017-provider-account-deletion.md)
+owned provider-to-HTTP acceptance is recorded and ordinary activation remains gated. [ADR 0017](adr/0017-provider-account-deletion.md)
 and the [deletion guide](../guides/oidc-account-deletion.md) record that boundary.

@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+experimental-oidc-account-deletion = ["oidc-identities", "auth-axum/oidc-account-deletion"]
 oidc-identities = ["oidc-verification", "auth-core/oidc-identities", "auth-postgres/oidc-identities"]
 oidc-verification = ["oidc-egress", "auth-core/oidc-verification", "auth-postgres/oidc-verification"]
 oidc-egress = ["auth-core/oidc-egress", "auth-postgres/oidc-egress", "dep:reqwest", "dep:rustls", "dep:webpki-roots"]
@@ -17,6 +18,7 @@ experimental-passkey-recovery = ["experimental-passkeys", "auth-axum/passkey-rec
 experimental-passkeys = ["auth-axum/passkey-recovery-setup", "auth-core/passkeys", "auth-postgres/passkeys"]
 
 [dev-dependencies]
+serde.workspace = true
 serde_json.workspace = true
 rcgen = { version = "=0.14.10", default-features = false, features = ["ring", "zeroize"] }
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
@@ -57,3 +59,8 @@ required-features = ["experimental-passkey-recovery"]
 name = "oidc-keycloak"
 path = "examples/oidc-keycloak/main.rs"
 required-features = ["oidc-verification"]
+
+[[example]]
+name = "oidc-deletion-http"
+path = "examples/oidc-deletion-http/main.rs"
+required-features = ["experimental-oidc-account-deletion"]

@@ -470,3 +470,15 @@ remain below 300 lines. Longer fixture construction and ordered commit-wait test
 keep prerequisite verification and the observed invariant together; production
 handlers remain under the function-size review trigger. No unrelated cleanup is
 deferred. The browser client checks are separate from native Keycloak acceptance.
+
+
+AUTH-55's owned HTTP provider fixture keeps composition/commands, bootstrap,
+server/cookie delivery, finite proof observation and a rejecting no-mail tripwire
+in named `apps/auth-server/examples/oidc-deletion-http/` modules. Its entry file
+only declares/reuses modules and coordinates owned lifetime. The existing bounded
+IPC reader/writer was extracted and verified separately before extension; database
+ownership and production transport modules are reused without a public bypass.
+The browser runner separates owned lifetime/reporting, browser actions and named
+acceptance scenarios. All new modules remain below 300 lines. Longer setup and
+ordered scenario functions keep prerequisite proof, observed outcome and cleanup
+visible together; no application authorization is duplicated in fixture code.

@@ -2439,3 +2439,64 @@ report proves the backend at its earlier source checkpoint. Backend commit
 The new HTTP source still needs its own exact-commit CI and owned
 Keycloak-to-HTTP acceptance. AUTH-55 remains In Progress, ordinary activation stays
 gated, and no independent audit or production-readiness claim follows.
+
+## AUTH-55 actual provider-to-HTTP acceptance — 2026-10-20
+
+A separate owned server-package example now composes the real opt-in Axum deletion
+router, core verifier and PostgreSQL port. It reuses the existing production TLS
+builder/GET/POST/readers with private owned certificate/address mapping, plus the
+existing exact-owned-database cleanup. Bounded private IPC was first extracted in
+`52b7d8f` and verified separately with all 23 native cases, strict lint and
+verification-only compilation. Initial session establishment uses genuine signed
+Keycloak/core sign-in and a one-use exact-Origin fixture-only cookie-delivery
+capability; no session/identity is seeded or emitted as a bearer on IPC. Ordinary
+provider login/server activation remains separate AUTH-56 work.
+
+The [six-case HTTP record](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion-http.json)
+passes real provider reauthentication through actual reference pages/callback GET,
+protected session/proof cookies, explicit start/final confirmation and HTTP deletion.
+Callback GET and cancellation preserve account/session authority; a wrong genuinely
+recent signed subject reaches the verified deletion port and is rejected by real
+PostgreSQL. Finite observations forward the original opaque proof unchanged and
+preserve the actual repository result. Injected token-service unavailability at the
+owned proxy returns **503**, does not reach deletion and never counts as expected
+Unauthorized. Successful deletion clears cookies and rejects captured original
+cookies/callback replay. A fresh signed same-subject login reaches account resolution
+and rejects with its original proof live and the cooldown independently observed live.
+
+Exact HTTP final counts: zero users, sessions, identities, pending transactions,
+contacts and notices; two deidentified audit facts, no retained subject references,
+and one live cooldown. Mail calls remain zero through a rejecting email-free fixture
+tripwire; this is not provider-contact SMTP evidence. Both normal and failure runs
+remove the owned DB/container/private files without emergency cleanup or unexpected
+diagnostics. The first run's replay observation failed in Playwright's separate Node
+request DNS resolver after successful deletion. Restoring only the actually issued
+old cookies inside the owned Chromium context fixes that infrastructure issue and
+retains the precise 401/no-provider-POST assertion. No application check was weakened.
+
+The [same-source backend regression record](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion-http-backend-regression.json)
+retains all **23** prior cases and exact aggregates (19 token POST attempts, 18
+successful token responses, one controlled signature mutation/replay, final mailbox
+control user/session and deidentified provider facts). The new suite independently
+requires **6** cases, 5 POST attempts, 4 token responses and one controlled 503.
+Both reports preserve source/binary hashes, versions, named outcomes and normal
+cleanup. The controlled reference-client suite also passes seven malformed callback
+forms, explicit confirmation, URL scrubbing, reload denial, cancellation and 503
+feedback without browser storage. CI runs all three suites; no earlier report is
+replaced and ordinary sign-in acceptance is not inferred from fixture bootstrap.
+
+Frozen source passes formatting, strict default/all-feature workspace/all-target
+Clippy, sequential default workspace tests (**93**) and all-feature tests (**459**
+distinct: 306 PostgreSQL, 73 HTTP, 68 core, 10 server and 2 Axum unit). The logging
+child repeats one core test and is not double-counted. Verification-only core tests
+pass **57** and the verification-only native example compiles. Compiled advisory,
+cargo-deny, npm audit and complete staged-diff secret checks pass; inactive
+SQLx/MySQL RSA remains reported without an ignore. The only added manifest wiring
+is an explicit experimental feature/example and the already-pinned workspace serde
+dev dependency. No migration, protocol version, production root override or policy
+change is introduced. All new modules are below 300 lines; composition and ordered
+acceptance scenarios retain visible prerequisites, precise outcomes and cleanup.
+
+Hosted CI on the final pushed commit is still required before ticket completion.
+Local or fixture acceptance is not an independent security review, production-provider
+interoperability claim, provider-contact SMTP acceptance or ordinary activation.

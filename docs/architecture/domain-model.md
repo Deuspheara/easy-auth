@@ -128,4 +128,5 @@ retains independent browser/state/nonce/PKCE proof in host-only HttpOnly cookies
 and requires explicit confirmation at initiation and completion. Its callback GET
 serves static content only. These transport values confer no identity, freshness
 or erasure authority outside the existing verified core/PostgreSQL transaction.
-Actual provider-to-HTTP acceptance and ordinary activation remain gated.
+Owned Keycloak-to-HTTP acceptance is recorded separately; ordinary activation
+remains gated.

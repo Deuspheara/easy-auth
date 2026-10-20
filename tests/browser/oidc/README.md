@@ -153,3 +153,48 @@ parameters, address scrubbing, explicit final confirmation, no automatic POST,
 reload denial, cancellation and unavailable feedback. It uses no real provider or
 account. CI runs it separately; it must not be counted among the 23 native
 Keycloak/backend cases or as provider-to-HTTP interoperability acceptance.
+
+
+## Real provider-to-HTTP deletion acceptance
+
+After the documented PostgreSQL, Docker and pinned Chromium setup:
+
+```sh
+CARGO_INCREMENTAL=0 cargo build --locked -p easy-auth-server --example oidc-deletion-http --features experimental-oidc-account-deletion
+node tests/browser/oidc/http-deletion/run.cjs
+```
+
+The optional `EASY_AUTH_OIDC_HTTP_TEST_BINARY` selects a frozen owned producer;
+`EASY_AUTH_TEST_REPORT` writes a fresh versioned report with exclusive creation.
+This suite is separate from, and does not replace, all 23 existing native cases.
+It provisions an owned Keycloak realm/client/users and random PostgreSQL database,
+then serves the actual opt-in deletion router behind the owned private TLS proxy.
+Its initial session is actual signed core login; a one-use, exact-Origin,
+fixture-only capability delivers that committed session cookie into the browser.
+No identity/session is seeded and no ordinary login endpoint is claimed. The
+experimental server feature only forwards library capabilities; ordinary server
+configuration does not enable provider routes.
+
+Six cases cover bootstrap, protected cookies and callback GET/cancellation,
+wrong recent signed subject, injected token-service 503, explicit provider
+reauthentication-to-HTTP deletion, old-cookie/callback replay and fresh signed
+cooldown denial. Finite observations at the verified deletion port forward the
+opaque value unchanged to the real PostgreSQL adapter and preserve its result.
+They retain no raw claims, credential/session values or provider errors. A separate
+bootstrap proof observation proves fresh cooldown denial reached account resolution.
+The cooldown is queried as still live, not inferred from row existence.
+
+Cookie replay restores only genuinely issued old values in this owned Chromium
+context, then uses the browser's real mapped HTTPS path. No trace, storage state,
+credential or callback is saved in the report. Email-free fixture mail attempts
+fail visibly and must remain zero; no fake contact or SMTP success is introduced.
+The run requires zero residual account/identity/session/pending/contact/notice rows,
+two deidentified audit facts, one live cooldown and normal server/database/provider/
+private-file cleanup with no emergency path or unexpected diagnostics.
+
+See the [six-case HTTP record](results/2026-10-20/keycloak-provider-deletion-http.json)
+and [same-source 23-case regression record](results/2026-10-20/keycloak-provider-deletion-http-backend-regression.json).
+Owned certificate/address mapping and isolated-browser certificate tolerance stay
+inside fixtures; system trust/security settings and production egress policy are
+unchanged. These runs do not establish provider-contact SMTP, independent review,
+production-provider interoperability, ordinary sign-in or general readiness.
