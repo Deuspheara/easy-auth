@@ -539,3 +539,9 @@ URL/IP policy or startup write before validation. Production transport has no fi
 injection. Tests keep pure settings/file cases separate; the named startup script
 owns normal-binary mode/restart/refusal cases and disposable resources. New modules
 remain below300lines, with no unrelated structural cleanup deferred.
+
+AUTH-56 extracts the embedded example's application-owned private route/state into
+`examples/embedded/application.rs` before native public-login acceptance reuses it.
+The entrypoint retains configured factory/listener/worker composition. Existing
+standalone/embedded actual-SMTP lifecycle checks and strict lint verify unchanged
+behavior; no provider policy, credential capability or production hook is introduced.

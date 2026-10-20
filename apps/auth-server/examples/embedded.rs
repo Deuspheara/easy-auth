@@ -1,30 +1,7 @@
 //! Run with the same environment as the server: cargo run -p easy-auth-server --example embedded
-use auth_axum::BrowserConfig;
-use auth_core::{Auth, Error, User};
-use axum::{
-    Json, Router,
-    extract::State,
-    http::{HeaderMap, StatusCode, header},
-    routing::get,
-};
+#[path = "embedded/application.rs"]
+mod application;
 use std::net::SocketAddr;
-#[derive(Clone)]
-struct Application {
-    auth: Auth,
-    browser: BrowserConfig,
-}
-async fn private(
-    State(app): State<Application>,
-    headers: HeaderMap,
-) -> Result<([(header::HeaderName, &'static str); 1], Json<User>), StatusCode> {
-    auth_axum::authenticate(&app.auth, &app.browser, &headers)
-        .await
-        .map(|user| ([(header::CACHE_CONTROL, "no-store")], Json(user)))
-        .map_err(|error| match error {
-            Error::Unavailable => StatusCode::SERVICE_UNAVAILABLE,
-            _ => StatusCode::UNAUTHORIZED,
-        })
-}
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let easy_auth_server::ConfiguredApplication {
@@ -34,13 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         bind,
     } = easy_auth_server::configured_application().await?;
     let notifications = easy_auth_server::notification_worker(auth.clone());
-    let application = Router::new()
-        .route("/private", get(private))
-        .with_state(Application {
-            auth: auth.clone(),
-            browser: browser.clone(),
-        })
-        .merge(router);
+    let application = application::router(auth, browser).merge(router);
     let listener = tokio::net::TcpListener::bind(bind).await?;
     axum::serve(
         listener,
