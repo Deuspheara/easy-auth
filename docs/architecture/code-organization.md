@@ -646,3 +646,12 @@ visibility or verified-proof constructor changes. The extraction preserves both
 provider/wait files byte-for-byte and retains existing socket function bodies and
 rejection assertions. Provider I/O stays separate from application acceptance
 scenarios rather than copying another signer, socket helper or wait loop per crate.
+
+Server `tests/google_desktop/` acceptance separates original-operation metadata,
+configured fixture/rebinding, actual delivery, lifecycle, binding/concurrency and
+atomicity/deadline scenarios. Its gated integration entry only declares the feature
+suite, with explicit private imports of the shared signed provider/socket/clock
+fixtures. No production visibility or code changes are needed. All modules remain
+below300lines; ordered full-boundary cases retain actual delivery, observed facts,
+fault/result and signed positive controls as function-size exceptions. No unrelated
+cleanup is deferred.

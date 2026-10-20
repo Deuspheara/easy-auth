@@ -152,3 +152,11 @@ server edges. No new package, crypto implementation, roots or advisory exception
 is introduced. This avoids handwritten HTTP parsing and unbounded detached server
 tasks. Owned socket/browser evidence is separate from registered Google/OS/native
 acceptance and usable provider lifecycle.
+
+Server desktop/database acceptance reuses the workspace-selected josekit0.10.3 as
+a development-only dependency for the shared actual RS256 provider fixture. The
+package/version/source and license/advisory policy are unchanged; Cargo.lock adds
+only that development edge. No production signature implementation, proof
+constructor or provider transport override is added. Native receives are actual
+sockets/PostgreSQL; provider GET/token/JWKS responses remain private in-memory
+fixtures with actual signatures, without claiming real Google interoperability.

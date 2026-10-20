@@ -93,4 +93,6 @@ Server `google-desktop` now supplies owned, bounded literal-loopback HTTP delive
 and an opaque captured callback that feeds the same core authorization use case.
 It does not own provider registration, system-browser launch, remote application
 tokens or mobile delivery. Default startup and generic web composition are unchanged;
-registered provider, complete listener/database acceptance and lifecycle remain gates.
+owned real listener/PostgreSQL/offline-signature acceptance now has nine server
+scenarios. Registered provider, supported OS browser launch/return and lifecycle
+remain gates; those components do not establish Google/native interoperability.

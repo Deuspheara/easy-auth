@@ -20,6 +20,7 @@ experimental-passkey-recovery = ["experimental-passkeys", "auth-axum/passkey-rec
 experimental-passkeys = ["auth-axum/passkey-recovery-setup", "auth-core/passkeys", "auth-postgres/passkeys"]
 
 [dev-dependencies]
+josekit.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 rcgen = { version = "=0.14.10", default-features = false, features = ["ring", "zeroize"] }

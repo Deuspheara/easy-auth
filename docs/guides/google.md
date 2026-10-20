@@ -176,9 +176,46 @@ transport outcomes, separate from later provider/storage/proof errors.
 
 The [owned transport suite](../../tests/browser/google-desktop/README.md) covers
 actual IPv4/IPv6 sockets and Chromium query scrubbing. Its fixture creates no
-Google account, verified identity or local session. Full listener-to-database/
-signed-provider acceptance, supported OS system-browser launch/return, registered
+Google account, verified identity or local session. The separate server integration
+suite also covers actual listener-to-PostgreSQL delivery, offline RS256 verification
+and final commit. Supported OS system-browser launch/return, registered
 client semantics, mobile delivery and usable reviewed lifecycle remain required.
+
+## Owned desktop database acceptance
+
+Nine server integration scenarios run actual loopback receives through
+`GoogleDesktopCallback::finish`, shared Google authorization, real PostgreSQL
+consumption, actual offline RS256/JWKS responses, mapping and local session commit.
+Both IPv4/IPv6 preserve provider-only ownership and do not merge a matching verified
+mailbox. Receiving and verifying a return grant no local authority before commit.
+Foreign owned sockets cannot replace the configured URI. Trusted rebind rotates
+the existing source revision and cancels old pending work; a captured old return
+remains unauthorized even with its old service snapshot and original private proof.
+
+Actual delivery races against a restored private operation retain one exchange
+and one local commit. Provider denial/failure and explicit cancellation do not
+revoke an unrelated session or issue a grant. Transport cancellation leaves pending
+state for separately authorized core cancellation. Actual signed nonce rejection
+remains Unauthorized; token transport and final audit faults remain Unavailable.
+Final authority rolls back on audit failure or expiry during an independently
+observed audit lock wait; no already consumed state is restored. Signed positive
+controls follow faults, cancellation, stale revision and expired-commit outcomes.
+
+The fixture signs only the originally issued code/PKCE/client/redirect and records
+independent GET/POST/signature counters. Clock/lock observers use one separate
+connection. Owned short-deadline arrangements preserve the original five-minute
+pending window, without changing production policy or resetting caps at receipt.
+Shared test fixtures remain private; no production proof constructor or hook exists.
+
+Run with the documented real database and both explicit features:
+
+```sh
+CARGO_INCREMENTAL=0 cargo test --locked -p easy-auth-server --features google-desktop,oidc-identities --test google_desktop
+```
+
+These fixtures do not call Google or validate registered clients, provider TLS,
+OS default-browser launch, mobile return, genuine Google freshness or usable
+provider-required deletion. Those remain AUTH-23 activation/acceptance gates.
 
 ## Evidence and remaining gates
 
@@ -187,7 +224,8 @@ Google-shaped discovery/code responses. They cover original code/PKCE/redirect,
 fixed scope/egress/authentication, wrong claims/signature/algorithm, duplicate email
 flags, email-attribute semantics, cancellation, source/purpose isolation and exact
 provider-error versus infrastructure-error results. Their controlled repository is
-a component fixture. Eighteen separate PostgreSQL scenarios now exercise the actual
+a component fixture. Eighteen PostgreSQL-crate scenarios and nine server-owned
+desktop database scenarios now exercise the actual
 Google code component through real state consumption, signature verification,
 mapping and existing local identity/session commit. They cover provider-only
 ownership without email merging, JIT, scoped identity ownership, callback and subject concurrency,

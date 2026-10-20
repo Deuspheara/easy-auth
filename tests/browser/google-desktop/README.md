@@ -31,3 +31,14 @@ report is never overwritten. These transport checks complement the real PostgreS
 Google authorization tests rather than substituting for them or for registered
 provider/platform/manual evidence. Server-side cleanup cannot remove browser history
 outside the current page or prove whole-process secret erasure.
+
+The separate server integration suite needs the documented real PostgreSQL setup
+and both explicit transport/identity features. It uses actual listener delivery
+and the same shared actual-signed provider fixtures as the PostgreSQL crate:
+
+```sh
+CARGO_INCREMENTAL=0 cargo test --locked -p easy-auth-server --features google-desktop,oidc-identities --test google_desktop
+```
+
+Those nine cases cover backend commit/rollback/cancellation/URI/revision/race/cap
+invariants; the browser fixture above still proves only its named transport case.

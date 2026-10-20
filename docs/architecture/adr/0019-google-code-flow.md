@@ -155,10 +155,15 @@ state requires explicit core cancellation. Finite transport failures are distinc
 from application proof/storage failures. Fixed no-store/no-referrer/CSP responses
 scrub the browser URL without reflecting protocol values or issuing cookies.
 
-Actual-socket and owned Chromium evidence is a transport checkpoint, not registered
-Google/native authentication, OS default-browser launch or full PostgreSQL/signature
-acceptance through this listener. Those tests and the genuinely usable lifecycle
-gate remain required. Normal startup and generic web callbacks are unchanged.
+Actual-socket and owned Chromium evidence initially covered transport only. Nine
+additional server integration scenarios now carry actual owned IPv4/IPv6 receives
+through shared core completion, real PostgreSQL consumption, offline RS256/JWKS,
+mapping and final session commit. They preserve exact URI/revision/private proof,
+one-use concurrency, cancellation semantics, error attribution and final audit
+rollback/deadline checks, with positive signed controls. Provider-shaped fixture
+responses are not registered Google/native authentication or OS default-browser
+launch. Those outcomes and the genuinely usable lifecycle gate remain required.
+Normal startup and generic web callbacks are unchanged.
 
 Native support is part of AUTH-23, not implied by a working web callback. Use an
 external system browser and the registered platform's supported return mechanism.

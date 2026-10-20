@@ -3266,3 +3266,85 @@ browser reports are unchanged. AUTH-23 remains In Progress: real listener-to-
 PostgreSQL/signed-provider acceptance, supported OS browser launch/return, registered
 Google/manual matrix and usable reviewed provider-required deletion remain open.
 AUTH-20's Safari issue, independent review and broader release gates remain open.
+
+## AUTH-23 owned native return through real PostgreSQL — 2026-10-20
+
+The separate structural commit82f4ea2 moves actual-signed Google provider and
+independent clock/lock fixtures to root tests/support/google without changing their
+bytes. Existing socket helper function bodies and complete-rejection assertions
+are also retained. Original Google/PostgreSQL18, native socket9 and strict scoped
+lint pass before adding acceptance behavior; no production visibility changes.
+
+Nine new server integration cases now carry actual owned IPv4/IPv6 receives through
+the public opaque callback completion method, shared core flow, real PostgreSQL
+state consumption, actual offline RS256/JWKS responses, mapping and final session
+commit. Receipt and verification alone create no local authority. Matching signed
+verified email does not merge a mailbox owner; provider-required policy and missing
+authentication-time provenance remain intact. Another owned listener cannot stand
+in for the configured return URI. Trusted rebinding retains existing revision/
+cancellation policy; captured old delivery with its original service snapshot and
+private proof remains unauthorized before token POST.
+
+An actual capture racing a restored private operation yields one signed exchange
+and one local commit. Received denial/provider failure and explicit pending cancel
+preserve unrelated sessions and issue no authority. Transport cancel leaves pending
+work until separately authorized original-proof core cancellation. Actual signed
+nonce rejection is Unauthorized, while deliberate token transport/final audit faults
+are Unavailable; counters and valid controls distinguish these from infrastructure
+or fixture failure. Real audit-trigger failure rolls back user/identity/session/fact
+without restoring consumed state. An independently observed final audit lock wait
+crossing the original proof deadline similarly rolls back all authority. Its short
+owned timing arrangement retains the original five-minute pending window and final
+clock check; no production clock override or cap restart exists. Positive signed
+controls follow faults, cancellation, stale configuration and expiry.
+
+Final local checks pass with CARGO_INCREMENTAL=0 and documented real PostgreSQL:
+
+```sh
+cargo fmt --all --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-server --features google-desktop,oidc-identities --test google_desktop
+cargo build --locked -p easy-auth-server --features google-desktop --example google-desktop-browser
+node tests/browser/google-desktop/run.cjs
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Results: **97 default / 572 all-feature workspace cases** (2 Axum unit,99 HTTP,
+88 core,342 PostgreSQL-crate,32 server unit,9 server real-database; logging subprocess
+repeat excluded), with the **9 native/PostgreSQL cases also passing in their explicit
+feature-combination target**. Final runs have no failures/ignored cases. Real DB
+suites remain sequential with the same shared20-permit/four-worker budget; the
+independent audit/clock observer has exactly one connection. Compiled advisory and
+all-feature license/bans/source checks pass; inactive optional SQLx/MySQL RSA advisory
+remains visible. Server adds only development usage of the selected josekit0.10.3;
+no package version, production dependency, schema or application code changes.
+
+The [fresh Chromium transport report](../../tests/browser/google-desktop/results/2026-10-20/chromium-loopback-shared-fixtures.json)
+passes its one existing browser case after extraction, matching all **721 current
+code-source hashes** and the rebuilt fixed producer. It proves actual callback
+delivery/CSP query scrubbing/nonreflection/empty cookies and script storage/clean
+exit, not database authority. The separate nine database cases establish the latter
+component path. The previous712-source report remains immutable and is not counted
+as an additional distinct browser case. No authorization code, assertion, token,
+private key, user-setting data or trace is saved; private fixture IPC is not
+forwarded to logs.
+
+The full staged diff receives redacted Gitleaks scanning before publication.
+Changed links, fixture privacy and responsibility boundaries are reviewed. Native
+test modules separate attempt metadata, configured setup/rebinding, actual delivery,
+lifecycle, binding/concurrency and atomicity. All remain below300lines. Longer
+ordered full-boundary cases retain actual receipt, observed facts, fault results
+and signed positive controls as justified function-size exceptions; no unrelated
+cleanup is deferred. CI explicitly runs the native/identity feature combination
+sequentially so the new database coverage cannot disappear behind feature gating.
+
+AUTH-23 remains In Progress: actual registered Google/provider TLS and manual matrix,
+supported OS system-browser launch/return, mobile mechanisms and a usable reviewed
+genuinely fresh provider-required deletion path remain unfinished. Offline signed
+fixtures/Chromium are not substitutes for those outcomes, independent review or
+production readiness. No user/device prompts or provider/browser/security settings
+changes occurred. AUTH-20's Safari recovery failure remains unresolved.

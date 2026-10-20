@@ -444,7 +444,7 @@ cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
 freshness is inferred from issuance or prompts, and no provider-required account
 activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).
 
-Eighteen Google-profile PostgreSQL integration scenarios now traverse the real state,
+Eighteen PostgreSQL-crate Google-profile scenarios traverse the real state,
 signature/mapping and local identity/session boundaries with controlled offline
 RS256 responses. Exact provider wire assertions and independent signed-response
 counters distinguish invalid claims/JIT/source policy from infrastructure failures.
@@ -493,4 +493,11 @@ Handled browser responses reflect no proof, issue no cookie and scrub query/frag
 with a fixed CSP-allowed script under no-store/no-referrer headers. Browser history
 outside the current page and process-wide secret erasure are not claimed. Owned
 Chromium and socket checks establish transport behavior only, not registered Google,
-OS default-browser launch, mobile delivery or complete listener/database acceptance.
+OS default-browser launch or mobile delivery. Nine separate server real-database
+scenarios now carry actual owned listener delivery through signed offline responses,
+state consumption and final local commit. Exact captured URI and current revision
+reject cross-listener and old-snapshot substitution; verification alone grants
+nothing. One-use races, explicit versus transport-only cancellation, unchanged
+unrelated sessions, actual signed rejection versus infrastructure faults and final
+audit rollback/observed-expiry controls preserve these boundaries. These fixtures
+establish component behavior, not real Google TLS/client/freshness or usable deletion.
