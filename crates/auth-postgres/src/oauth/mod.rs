@@ -1,5 +1,7 @@
 mod admission;
 mod configuration;
+#[cfg(feature = "oidc-identities")]
+mod identity_policy;
 mod ownership;
 mod transactions;
 #[cfg(feature = "oidc-verification")]

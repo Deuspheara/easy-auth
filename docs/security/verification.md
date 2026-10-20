@@ -1953,3 +1953,63 @@ and deletion races, actual JIT denial and provider session provenance remain
 required before completing AUTH-30. No new native/provider acceptance run is claimed
 for this core-only mapping checkpoint. Existing browser reports stay immutable;
 AUTH-20's Safari/Dashlane failure and independent recovery review remain open.
+
+
+## AUTH-30 transactional policy storage checkpoint — 2026-10-20
+
+AUTH-30 remains **In Progress**. PostgreSQL `oidc-identities` now adds trusted
+`configure_oidc_identity_policy` and additive migration 0017. Each application
+allocates a fresh connection revision, cancels old pending OAuth state and writes
+policy in one transaction. Existing disable is retained. The returned typed policy
+carries the persisted revision. A stale policy row does not authorize an identity:
+current enabled configuration/policy must still be checked by the unimplemented
+final resolver. No user, session or authentication audit is created here.
+
+The configuration SQL was first extracted without behavior changes in a separate
+commit; all **24 existing OAuth PostgreSQL regressions** and strict all-feature
+workspace/all-target lint pass after extraction. Policy storage then reuses that
+private transaction function without duplicating configuration or cancellation SQL.
+
+Six new actual-PostgreSQL cases prove:
+
+- Policy/revision persistence, original pending cancellation and rejection of a
+  previously consumed exchange, with no local user/session/audit creation.
+- An injected policy-write fault is exactly Unavailable, and rolls back revision,
+  pending cancellation and prior policy. The old exchange remains usable after
+  rollback; removing the trigger permits a valid retry and invalidates that exchange.
+- Concurrent policy application and disable retain disable; reapplying stale policy
+  receives a new revision, stays disabled and requires explicit latest re-enable.
+  This checks administrative configuration concurrency, not final callback commit.
+- Identical connection/local-client IDs in different realms, and another client in
+  the original realm, retain independent current policies and revisions.
+- Upgrade from migration 0016 preserves mailbox user/session/audit, registry and
+  pending OAuth state. The existing session and original callback remain usable;
+  migration creates zero implicit policies.
+- Closed modes, empty/null/oversized issuer arrays and cross-realm foreign keys
+  reject with exact PostgreSQL constraint codes, not arbitrary errors. Omitted SQL
+  JIT mode defaults to deny. URL spelling/uniqueness/membership remain core validation.
+
+Final local checks with PostgreSQL **17.11**, `CARGO_INCREMENTAL=0`, four workers
+and sequential database suites pass:
+
+- Formatting and strict locked default/all-feature workspace/all-target Clippy.
+- `cargo test --locked --workspace`: **93 distinct tests**.
+- `cargo test --locked --workspace --all-features`: **380 distinct tests**
+  (2 Axum unit, 55 HTTP/PostgreSQL, 66 core, 247 PostgreSQL, 10 server).
+  The logging child repeats an included core case; no failures or ignored tests.
+- Compiled-dependency advisory and all-feature cargo-deny gates. The inactive
+  SQLx/MySQL RSA advisory remains visible. No dependency/lockfile changes.
+- Local documentation links, diff whitespace and redacted staged Gitleaks checks.
+
+Source review keeps policy persistence in its 61-line owning module. The longer
+administrative transaction retains revision/cancellation/policy/commit together.
+Policy and migration/schema cases have separate modules under 200 lines; their
+longer ordered cases keep setup, fault/operation, observation and valid controls
+visible. No public API is widened for tests and no unrelated cleanup is deferred.
+README, ADR0016, architecture, API and threat-model descriptions match this scope.
+
+Actual JIT denial/provisioning, external subject uniqueness, disabled callback
+commit races, deletion behavior and provider account/session provenance remain
+required AUTH-30 work. Explicit linking/unlinking is the separate AUTH-25 boundary;
+the eventual sign-in resolver must reject linking-purpose proofs until it exists.
+No new browser/provider run, ordinary activation or release/audit claim is made.

@@ -3,7 +3,9 @@
 AUTH-30's optional core mapping consumes only a verified signed identity bound to
 the exact trusted realm/connection/client/revision and explicit issuer allowlist.
 Display selection has no email/alternate-field fallback. JIT configuration defaults
-to deny; mapping grants no local identity/session. Current database policy checks,
+to deny; mapping grants no local identity/session. Trusted policy persistence uses
+a fresh revision and cancels old pending state in the same transaction; faults roll
+back both. Disable is preserved. Final identity-transaction database policy checks,
 JIT enforcement, subject uniqueness, deletion races and provider session provenance
 remain required work. [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md)
 distinguishes implemented mapping from those unimplemented safeguards.

@@ -1,9 +1,12 @@
 # HTTP contract v1
 
-AUTH-30's explicit core-only `oidc-identities` feature adds trusted mapping policy
-and an opaque mapped proof, not an HTTP callback or session endpoint. HTTP DTOs and
-OpenAPI are unchanged. Provider email never becomes local verified contact; JIT
-configuration defaults to deny. Persistence/issuance remain unimplemented. See
+AUTH-30's explicit core/PostgreSQL `oidc-identities` features add trusted mapping
+policy and an opaque proof. The administrative `configure_oidc_identity_policy`
+returns a policy bound to a fresh persisted revision, atomically cancelling old
+pending state without clearing disable. It is never browser input. HTTP DTOs and
+OpenAPI are unchanged; no callback/session endpoint is added. Provider email never
+becomes local verified contact. JIT defaults to deny; identity resolution and
+issuance remain unimplemented. See
 [ADR 0016](adr/0016-oidc-identity-mapping.md).
 
 AUTH-19 adds explicit experimental passkey HTTP sign-in, separately enabled from

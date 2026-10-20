@@ -2,9 +2,15 @@
 
 AUTH-30's optional core `oidc/identities/` separates trusted mapping policy and
 opaque mapped proof. Signed presentation decoding stays in a focused verification
-profile module. No SQL, HTTP, new crate or generic mapping framework is added.
+profile module. PostgreSQL `oauth/identity_policy.rs` owns policy storage, reusing
+the private configuration transaction write. Its longer administrative operation
+keeps revision/pending cancellation, policy write and commit in one visible
+transaction. Schema/upgrade and policy rollback/isolation tests have separate
+modules. No HTTP, new crate or generic mapping framework is added.
 The longer issuer-bound, cross-registration and invalid-attribute tables keep their
-negative cases and controls together as reviewed test-size exceptions. No new file
+negative cases and controls together as reviewed test-size exceptions. Longer
+ordered PostgreSQL migration/rollback/isolation cases likewise retain setup,
+actual operation, database observation and valid controls together. No new file
 exceeds 300 lines. Database identity resolution remains required subsequent work.
 
 AUTH-22's optional `oauth/` modules keep core configuration validation, transient

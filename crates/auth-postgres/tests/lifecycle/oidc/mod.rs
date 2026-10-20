@@ -1,4 +1,8 @@
 mod binding;
+#[cfg(feature = "oidc-identities")]
+mod identity_policy;
+#[cfg(feature = "oidc-identities")]
+mod identity_policy_schema;
 mod refresh;
 mod setup;
 

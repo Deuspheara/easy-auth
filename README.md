@@ -42,8 +42,11 @@ HTTPS discovery/JWKS fetching with exact issuer checks, pinned public addresses
 and bounded caches. It creates no identity or session and enables no provider route.
 
 The experimental [OIDC token verifier](docs/guides/oidc-verification.md) now checks
-transaction-bound signatures and required claims. Code exchange, provider login
-and final identity/session issuance remain unfinished.
+transaction-bound signatures and required claims, with explicit S256 code exchange
+and owned Keycloak evidence. Optional [identity mapping](docs/architecture/adr/0016-oidc-identity-mapping.md)
+adds typed display selection, exact issuer allowlists and transactional trusted
+policy storage. Local identity provisioning/session issuance and ordinary provider
+activation remain unfinished.
 
 ## Run locally
 
