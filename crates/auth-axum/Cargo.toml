@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-web = ["oidc-account-deletion"]
 oidc-account-deletion = ["auth-core/oidc-identities", "auth-postgres/oidc-identities"]
 passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
 passkey-authentication = ["passkey-enrollment"]
@@ -71,3 +72,7 @@ required-features = ["passkey-recovery"]
 [[example]]
 name = "export_oidc_account_deletion_openapi"
 required-features = ["oidc-account-deletion"]
+
+[[example]]
+name = "export_oidc_web_openapi"
+required-features = ["oidc-web"]

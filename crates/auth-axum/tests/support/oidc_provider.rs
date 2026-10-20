@@ -15,7 +15,8 @@ use std::{
 
 // Trusted fake network boundary only. Identity proof is an actual ES256 signature
 // verified by core against the served JWK; no public proof constructor is added.
-pub(super) struct Provider {
+pub(crate) struct Provider {
+    redirect: &'static str,
     public: Value,
     signer: Box<dyn JwsSigner>,
     body: Mutex<Vec<u8>>,
@@ -25,13 +26,14 @@ pub(super) struct Provider {
     pub documents_unavailable: AtomicBool,
 }
 impl Provider {
-    pub fn new() -> Self {
+    pub fn new(redirect: &'static str) -> Self {
         let key = ES256.generate_key_pair().unwrap();
         let mut public = key.to_jwk_public_key();
         public.set_key_id("owned");
         public.set_algorithm("ES256");
         public.set_key_use("sig");
         Self {
+            redirect,
             public: serde_json::to_value(public).unwrap(),
             signer: Box::new(ES256.signer_from_der(key.to_der_private_key()).unwrap()),
             body: Mutex::new(Vec::new()),
@@ -103,10 +105,7 @@ impl OidcTokenHttp for Provider {
         );
         assert!(request.authorization().is_none());
         assert_eq!(form["grant_type"], "authorization_code");
-        assert_eq!(
-            form["redirect_uri"],
-            "https://app.example/oidc/account-delete/callback"
-        );
+        assert_eq!(form["redirect_uri"], self.redirect);
         OidcTokenResponse::new(
             200,
             Some("application/json".into()),

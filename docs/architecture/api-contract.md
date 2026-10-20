@@ -359,3 +359,21 @@ bounds; no state/code/failed-request retry occurs. Standalone document/token API
 and forced-refresh admission remain prompt. A native retry retains the operation
 lease through final authority validation. These resource semantics add no wire
 route, response schema, clock extension or local authentication grant.
+
+## AUTH-56 opt-in shared OIDC browser routes
+
+The explicit Axum `oidc-web` feature and trusted `oidc_web_router` add
+`POST /v1/oidc/sign-in/start` (`{}`), `finish` (`{state,code,issuer?}`) and `cancel`
+(`{}`), plus the fixed `/oidc/sign-in` page and nonmutating `/oidc/callback` bridge.
+One exact HTTPS source/realm/callback is selected by trusted composition. Start and
+finish reject any presented session cookie; logout is explicit. Independent protected
+purpose cookies carry browser/state/nonce/PKCE, and only committed success returns a
+session cookie. Callback GET does no database/provider work or grant; exact unique
+state-cookie matching selects fixed UI only. Scripts scrub URL proof before rendering,
+require deliberate finish and drop proof on reload/navigation. Cancel never replaces
+or revokes an ambient session. Existing provider-deletion endpoints reuse their
+original use case and stronger proof requirements with the same common callback.
+See [the concrete schema](openapi-oidc-web.json), [consumer guide](../guides/oidc-web.md)
+and [ADR 0018](adr/0018-oidc-web-composition.md) for errors, cookie transport and
+request-snapshot concurrency limits. Normal OpenAPI/server composition is unchanged;
+standalone configuration and supported-mode native acceptance remain unfinished.

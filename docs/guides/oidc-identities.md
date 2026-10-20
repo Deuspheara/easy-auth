@@ -1,8 +1,9 @@
 # Experimental OIDC identity mapping and JIT
 
 The core/PostgreSQL `oidc-identities` features add local provider identity resolution
-after the [transaction-bound verifier](oidc-verification.md). They enable no public
-callback route or ordinary server configuration. AUTH-30's backend boundary has
+after the [transaction-bound verifier](oidc-verification.md). They enable no HTTP
+route by themselves. The separate [opt-in Axum browser boundary](oidc-web.md) now
+provides sign-in/shared callback routes; ordinary server configuration remains unfinished. AUTH-30's backend boundary has
 passed local and hosted acceptance; provider linking/unlinking is AUTH-25 and
 stronger-account recovery gates remain open.
 [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records policy.

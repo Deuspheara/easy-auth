@@ -1,4 +1,6 @@
 mod mail;
+#[cfg(feature = "oidc-account-deletion")]
+pub(crate) mod oidc_provider;
 pub(crate) use mail::Mail;
 
 use auth_core::{Auth, PasswordService};

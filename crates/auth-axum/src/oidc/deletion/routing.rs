@@ -14,7 +14,7 @@ use axum::{
     http::header,
     middleware::{self, Next},
     response::Response,
-    routing::post,
+    routing::{get, post},
 };
 use std::sync::Arc;
 
@@ -28,6 +28,13 @@ pub struct OidcAccountDeletionServices {
     pub(super) deletion: Arc<OidcAccountDeletion>,
 }
 impl OidcAccountDeletionServices {
+    #[cfg(feature = "oidc-web")]
+    pub(in crate::oidc) fn from_source(
+        source: Arc<Source>,
+        deletion: Arc<OidcAccountDeletion>,
+    ) -> Self {
+        Self { source, deletion }
+    }
     pub fn new(
         policy: OidcIdentityPolicy,
         transactions: Arc<OAuthTransactions>,
@@ -64,23 +71,27 @@ pub fn experimental_oidc_account_deletion_router(
         auth: auth.clone(),
         browser: browser.clone(),
     };
-    let state = DeletionState {
-        base: base.clone(),
-        services,
-    };
-    let routes = Router::new()
+    let routes = routes(base.clone(), services).merge(
+        Router::new()
+            .route(CALLBACK_PATH, get(super::pages::callback_page))
+            .layer(middleware::from_fn_with_state(base.clone(), boundary)),
+    );
+    Ok(
+        configured_router(auth, browser, oidc_account_deletion_openapi())
+            .merge(routes)
+            .layer(middleware::from_fn_with_state(base, clear_revoked_proof)),
+    )
+}
+
+pub(in crate::oidc) fn routes(base: AppState, services: OidcAccountDeletionServices) -> Router {
+    Router::new()
         .route("/v1/account/provider-delete/start", post(handlers::start))
         .route("/v1/account/provider-delete/finish", post(handlers::finish))
         .route("/v1/account/provider-delete/cancel", post(handlers::cancel))
         .merge(super::pages::routes())
         .layer(DefaultBodyLimit::max(8192))
         .layer(middleware::from_fn_with_state(base.clone(), boundary))
-        .with_state(state);
-    Ok(
-        configured_router(auth, browser, oidc_account_deletion_openapi())
-            .merge(routes)
-            .layer(middleware::from_fn_with_state(base, clear_revoked_proof)),
-    )
+        .with_state(DeletionState { base, services })
 }
 
 // Only this opt-in composition extends logout/revocation cookie hygiene. The

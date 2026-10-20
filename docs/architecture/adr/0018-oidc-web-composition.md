@@ -1,9 +1,11 @@
 # ADR 0018: Shared OIDC browser composition
 
-Date: 2026-10-20. Status: stable startup metadata loading is implemented for
-AUTH-56; shared browser/server composition remains proposed and unimplemented.
+Date: 2026-10-20. Status: stable startup metadata loading and opt-in Axum browser
+composition are implemented for AUTH-56; server configuration and supported-mode
+native acceptance remain proposed and unimplemented.
 AUTH-30 and AUTH-55 acceptance are prerequisites, not ordinary sign-in activation.
-No new schema, public HTTP route or production configuration is enabled here.
+No new schema or ordinary production configuration is enabled here. Public routes
+require the explicit `oidc-web` feature and trusted `oidc_web_router` composition.
 
 ## Context and scope
 
@@ -93,6 +95,16 @@ account. Check at both stages. The eventual PostgreSQL sign-in transaction still
 owns one-use identity/session/audit commit and all source/deadline revalidation.
 Tests must exercise overlapping requests and session arrival after initiation;
 never report an HTTP precheck as a database atomicity guarantee.
+
+The implemented guard examines the request's cookie snapshot. Distinct concurrent
+anonymous starts can each create a bounded transaction; they do not share a global
+browser/session epoch or serialize other authentication methods. The browser may
+retain the last start's cookies. Exact state/proof matching prevents crossing those
+attempts, and both contexts cancel independently. A request already in flight is
+not undone by a later cookie response in another tab. Explicit callback confirmation,
+one-use database completion and checks at both stages remain required; this does
+not claim browser-wide atomic account-switch exclusion. Peer address is an abuse-
+admission dimension, not an identity binding; forwarding headers do not select it.
 
 All locally initiated POSTs require one exact Origin, closed bounded bodies and
 closed query inputs. Sign-in purpose is fixed by its trusted route. Deletion retains

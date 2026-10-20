@@ -1,4 +1,4 @@
-use super::provider::Provider;
+use crate::support::oidc_provider::Provider;
 use crate::support::{Mail, post};
 use auth_core::*;
 use auth_postgres::Postgres;
@@ -60,7 +60,9 @@ impl Fixture {
         .unwrap()
         .with_jit(OidcJitPolicy::Allow);
         let policy = store.configure_oidc_identity_policy(&policy).await.unwrap();
-        let provider = Arc::new(Provider::new());
+        let provider = Arc::new(Provider::new(
+            "https://app.example/oidc/account-delete/callback",
+        ));
         let documents = Arc::new(
             OidcDocuments::new(
                 policy.configuration().clone(),

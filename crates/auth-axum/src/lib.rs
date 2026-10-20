@@ -18,6 +18,8 @@ pub use oidc::{
     OidcAccountDeletionServices, experimental_oidc_account_deletion_router,
     oidc_account_deletion_openapi,
 };
+#[cfg(feature = "oidc-web")]
+pub use oidc::{OidcWebServices, oidc_web_openapi, oidc_web_router};
 #[cfg(feature = "passkey-enrollment")]
 pub use passkeys::{experimental_passkey_enrollment_router, passkey_enrollment_openapi};
 #[cfg(feature = "passkey-authentication")]

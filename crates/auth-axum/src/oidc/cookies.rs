@@ -19,6 +19,15 @@ pub(super) const ACCOUNT_DELETION_COOKIES: Cookies = Cookies {
     ],
 };
 const COOKIE_SECONDS: u32 = 300;
+#[cfg(feature = "oidc-web")]
+pub(super) const SIGN_IN_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-oidc-signin-browser",
+        "__Host-auth-oidc-signin-state",
+        "__Host-auth-oidc-signin-nonce",
+        "__Host-auth-oidc-signin-pkce",
+    ],
+};
 
 pub(super) struct Transaction {
     pub browser: Secret,
@@ -30,6 +39,10 @@ pub(super) struct Cookies {
 }
 
 impl Cookies {
+    #[cfg(feature = "oidc-web")]
+    pub fn state_hint(&self, headers: &HeaderMap) -> Result<Option<Secret>> {
+        read_optional_cookie(headers, self.names[1])
+    }
     pub fn read(&self, headers: &HeaderMap) -> Result<Transaction> {
         Ok(Transaction {
             browser: read_cookie(headers, self.names[0])?,

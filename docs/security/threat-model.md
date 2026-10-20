@@ -392,3 +392,19 @@ claimed verified contexts. Metadata restoration cannot rewrite proof provenance;
 corrupt stored revisions and schema/write failures fail closed as unavailable.
 New startup operations create no user/session/identity. Ordinary browser/server
 OIDC activation remains unimplemented at this checkpoint.
+
+AUTH-56's opt-in `oidc-web` boundary fixes one trusted exact source and HTTPS common
+callback. Callback GET compares canonical state with independent purpose cookies
+only to select fixed UI; it makes no storage/provider call or grant. Duplicate,
+unknown, malformed, ambiguous and oversized inputs receive fixed scrubbed failure
+content. Deliberate exact-Origin POSTs retain core one-use state/browser/nonce/PKCE/
+issuer/purpose/current-source/deadline checks through real committed sign-in. A
+present session cookie rejects sign-in at start and finish; cancellation never
+revokes or replaces an ambient session. Request snapshot checks are not a global
+browser epoch: concurrent starts and already in-flight operations remain possible.
+Explicit confirmation, exact binding and one-use completion remain required. Provider
+and persistence failures stay distinct from authorization rejection and never issue
+a session. Final audit failure rolls back local identity/session while consumed
+OAuth state remains consumed. Original deletion proof/freshness requirements are
+unchanged. Standalone configuration and supported-mode native acceptance remain
+unimplemented; broader release and independent-review gates stay open.

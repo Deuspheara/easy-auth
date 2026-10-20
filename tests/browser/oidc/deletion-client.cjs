@@ -71,11 +71,21 @@ async function main() {
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('The operation was not confirmed.'));
     assert.equal((await page.locator('body').innerText()).includes('secret-server-marker'),false);
     assert.equal(await page.locator('#confirm-form').isHidden(),true);
+    finishStatus = 204;
+    const commonCallback = 'https://app.example/oidc/callback';
+    await page.goto(commonCallback+'?'+query);
+    await page.waitForFunction(() => !document.getElementById('confirm-form').hidden);
+    assert.equal(page.url(),commonCallback);
+    assert.equal(calls.length,3,'shared callback still requires explicit destructive confirmation');
+    await page.locator('#confirmation').fill('delete my account');
+    await page.locator('#confirm').click();
+    await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Account deletion completed.'));
+    assert.deepEqual(calls[3],{action:'finish',body:{confirmation:'delete my account',state,code:'owned-client-code',issuer:'https://issuer.example'}});
     assert.equal(await page.evaluate(() => localStorage.length+sessionStorage.length),0);
     assert.equal(pageErrors,0);
     console.log(JSON.stringify({suite:'oidc-deletion-reference-client',status:'passed',malformed_callback_cases:negativeCases,
       explicit_confirmation:true,url_scrubbed:true,reload_cannot_replay:true,cancellation_denial_only:true,
-      unavailable_is_not_success:true,no_browser_storage:true,actual_provider_acceptance:false}));
+      unavailable_is_not_success:true,no_browser_storage:true,shared_callback_explicit_confirmation:true,actual_provider_acceptance:false}));
   } finally {await browser.close();}
 }
 main().catch(() => {console.error('OIDC deletion reference-client checks failed');process.exitCode=1;});

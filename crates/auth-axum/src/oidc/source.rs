@@ -8,6 +8,14 @@ pub(super) struct Source {
     pub exchange: Arc<OidcCodeExchange>,
 }
 impl Source {
+    #[cfg(feature = "oidc-web")]
+    pub fn sign_in_scopes(&self) -> &'static [&'static str] {
+        match self.policy.display_name_claim() {
+            auth_core::OidcDisplayNameClaim::Subject => &[],
+            auth_core::OidcDisplayNameClaim::Name
+            | auth_core::OidcDisplayNameClaim::PreferredUsername => &["profile"],
+        }
+    }
     pub fn new(
         policy: OidcIdentityPolicy,
         transactions: Arc<OAuthTransactions>,

@@ -510,3 +510,16 @@ OAuth field mutator crate-private and no new proof constructor. Feature tests un
 from reusable scoped setup. All new/affected modules stay below 300 lines. Longer
 ordered concurrency and lifecycle cases retain prerequisites, actual waits, precise
 results and cleanup together; no unrelated cleanup is deferred.
+
+AUTH-56's `oidc/web/` separates trusted service/router composition, closed DTOs,
+nonmutating callback selection, thin use-case handlers, contract and fixed sign-in
+pages. It reuses the existing deletion routes through a private composition boundary,
+without duplicating deletion policy or persistence. Cookie namespaces are fixed
+constants in the owning codec. The two clients retain explicit purpose-specific
+confirmation and status handling rather than hiding destructive behavior behind a
+generic client framework. Test modules group boundary, callback, completion, failures
+and independently observed commit ordering. The actual-signature provider fixture
+now lives once in `tests/support/oidc_provider.rs`, with explicit expected redirect
+supplied independently of the request. All affected modules remain under 300 lines;
+longer ordered setup/scenarios retain prerequisites, observations and positive
+controls together as reviewed size exceptions. No unrelated cleanup is deferred.

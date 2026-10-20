@@ -1,4 +1,4 @@
-use super::routing::{CALLBACK_PATH, DeletionState};
+use super::routing::DeletionState;
 use axum::{Router, http::header, response::Html, routing::get};
 
 // These GETs serve fixed bytes only. Callback parameters/cookies never enter a
@@ -10,10 +10,6 @@ pub(super) fn routes() -> Router<DeletionState> {
             get(|| async { Html(include_str!("pages.html")) }),
         )
         .route(
-            CALLBACK_PATH,
-            get(|| async { Html(include_str!("pages.html")) }),
-        )
-        .route(
             "/oidc/account-delete.js",
             get(|| async {
                 (
@@ -22,4 +18,8 @@ pub(super) fn routes() -> Router<DeletionState> {
                 )
             }),
         )
+}
+
+pub(in crate::oidc) async fn callback_page() -> Html<&'static str> {
+    Html(include_str!("pages.html"))
 }

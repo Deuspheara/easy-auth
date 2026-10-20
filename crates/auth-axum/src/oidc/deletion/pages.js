@@ -1,6 +1,6 @@
 "use strict";
 const callbackPath = "/oidc/account-delete/callback";
-const onCallback = location.pathname === callbackPath;
+const onCallback = location.pathname === callbackPath || location.pathname === "/oidc/callback";
 let returned = readCallback();
 const form = document.getElementById("confirm-form");
 const confirmation = document.getElementById("confirmation");

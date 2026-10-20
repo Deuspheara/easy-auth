@@ -2568,3 +2568,72 @@ embedded/standalone login acceptance remain AUTH-56 work. No new native provider
 acceptance, activation, production-readiness or independent-review claim follows
 from these component tests. Hosted CI for the pushed checkpoint must be inspected
 separately before being claimed as successful.
+
+## AUTH-56 opt-in shared OIDC HTTP checkpoint — 2026-10-20
+
+AUTH-56 remains **In Progress**. The Axum `oidc-web` feature now supplies trusted
+services, one exact HTTPS common callback, public start/finish/cancel routes and
+fixed reference sign-in/error pages alongside the existing deletion use case.
+Callback GET uses canonical unique state-cookie matching only as a fixed UI hint;
+it performs no database/provider call, consumption, cookie grant or deletion.
+Deliberate Origin-protected POST retains the existing opaque core/PG proof chain.
+Presented current-session cookies reject sign-in at both stages; cancellation
+retains an ambient session. Request-snapshot checks are explicitly not a global
+browser/session epoch. The [guide](../guides/oidc-web.md),
+[ADR 0018](../architecture/adr/0018-oidc-web-composition.md) and concrete OpenAPI
+record the contract and remaining delivery gates.
+
+**25 new real-PostgreSQL HTTP scenarios** exercise actual ES256 signatures through
+a controlled provider port, without seeded users/sessions or proof constructors:
+public sign-in/session/logout and common-callback deletion; unique/nonmutating/
+malformed callback selection; Origin/closed query/JSON/body limits; all four cookie
+components, issuer/audience/nonce, expiry and replay; current-session arrival and
+cancellation; overlapping starts/one-use concurrent completion; default-deny JIT,
+trusted profile scope/display mapping; provider/discovery infrastructure failures,
+admin disable/revision and atomic audit failure. An independent one-connection
+observer verifies the final audit lock wait and absence of any successful response
+or externally visible owner/session before commit. The shared actual-signature
+provider fixture has one definition and an independently supplied expected redirect.
+
+Two new-test failures were investigated explicitly rather than accepted as protocol
+rejections. Peer IP was incorrectly assumed to be an identity binding; ADR0013 and
+storage show it is committed abuse admission. Its replacement test exhausts the
+actual peer quota, requires 429 despite a forged forwarding header, retains proof,
+and completes with the same peer after releasing only that owned quota. No security
+binding or application check was removed. The expiry arrangement initially used two
+volatile clock observations, occasionally exceeding the unchanged five-minute schema
+cap by one microsecond (23514). One statement timestamp now arranges exact expiry;
+a separate assertion verifies both expiry and the original cap before testing 401.
+
+Final local checks pass: formatting; strict locked default/all-feature workspace/
+all-target Clippy; **93 default** and **500 all-feature workspace tests** (2 Axum,
+98 HTTP/database, 69 core, 321 PostgreSQL, 10 server; the logging subprocess repeats
+one included core case); and **57 verification-only** core cases. No failures or
+ignored cases in the final runs. Compiled-dependency advisory, all-feature cargo-deny,
+npm audit and complete staged redacted secret scanning pass. The inactive SQLx/MySQL
+RSA advisory remains visible; no dependency version, exception or migration changed.
+
+Both controlled Chromium reference clients pass seven malformed callbacks each,
+explicit finish/confirmation, URL scrubbing, no automatic proof import or reload
+replay, fixed failure text and no browser storage; the sign-in client also checks
+restored-page proof loss. These are controlled-response tests, not provider acceptance.
+All **6 existing rebuilt Keycloak HTTP deletion cases** and **23 backend cases** pass
+with original assertions and owned database/container/file cleanup. The backend
+report matches every current source hash and its fixed producer binary. The six-case
+HTTP report predates only subsequent Rust test-fixture corrections; its production
+source is unchanged. These native cases retain their documented fixture-only initial
+session bootstrap and do not prove the new public sign-in against Keycloak.
+
+The structural feature-tree refactor was separately committed as `340f04a` after
+18 HTTP cases, unchanged generated deletion OpenAPI, six native cases and the client
+checks passed. Startup commit `aa22baa9e3278721fe42d142e00830c4e75173b7` has exact-head
+hosted CI success in run **39371009045**. The new HTTP checkpoint still requires its
+own exact-head CI. Supported standalone/embedded configuration/factory and native
+public sign-in through both modes remain unfinished; AUTH-56 is not complete.
+Independent review, AUTH-20's unresolved Safari recovery and the broader release
+gates remain open. No further manual device prompts or settings changes were made.
+
+Maintainability review keeps production modules below 300 lines and separates
+composition, handlers, callback selection, DTOs, contract and fixed clients. Longer
+ordered fixture/scenario functions retain prerequisites, observed waits and positive
+controls together as documented size exceptions. No unrelated cleanup is deferred.
