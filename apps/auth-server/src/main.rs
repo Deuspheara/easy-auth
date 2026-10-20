@@ -4,13 +4,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt()
         .with_env_filter("easy_auth=info,easy_auth_axum=info")
         .init();
-    let (auth, browser, bind) = easy_auth_server::configured_auth().await?;
+    let easy_auth_server::ConfiguredApplication {
+        auth, router, bind, ..
+    } = easy_auth_server::configured_application().await?;
     let listener = tokio::net::TcpListener::bind(bind).await?;
     let notifications = easy_auth_server::notification_worker(auth.clone());
     tracing::info!("auth_server_started");
     axum::serve(
         listener,
-        auth_axum::router(auth, browser).into_make_service_with_connect_info::<SocketAddr>(),
+        router.into_make_service_with_connect_info::<SocketAddr>(),
     )
     .with_graceful_shutdown(async { shutdown_signal().await })
     .await?;

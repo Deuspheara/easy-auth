@@ -523,3 +523,9 @@ now lives once in `tests/support/oidc_provider.rs`, with explicit expected redir
 supplied independently of the request. All affected modules remain under 300 lines;
 longer ordered setup/scenarios retain prerequisites, observations and positive
 controls together as reviewed size exceptions. No unrelated cleanup is deferred.
+
+AUTH-56 extracts `auth-server/application.rs` as the shared configured application
+factory before enabling OIDC startup behavior. Both standalone and embedded entry
+points use its typed auth/browser/router/bind result; `configured_auth` is preserved.
+The extraction retains default routing, configuration validation and notification
+worker ownership, verified through existing workspace and real-SMTP lifecycle cases.

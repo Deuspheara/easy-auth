@@ -27,7 +27,12 @@ async fn private(
 }
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let (auth, browser, bind) = easy_auth_server::configured_auth().await?;
+    let easy_auth_server::ConfiguredApplication {
+        auth,
+        browser,
+        router,
+        bind,
+    } = easy_auth_server::configured_application().await?;
     let notifications = easy_auth_server::notification_worker(auth.clone());
     let application = Router::new()
         .route("/private", get(private))
@@ -35,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             auth: auth.clone(),
             browser: browser.clone(),
         })
-        .merge(auth_axum::router(auth, browser));
+        .merge(router);
     let listener = tokio::net::TcpListener::bind(bind).await?;
     axum::serve(
         listener,
