@@ -60,3 +60,7 @@ the caller holds source/owner/session/identity locks and retains every original 
 through the final clock check. An explicit opt-in provider deletion HTTP/browser composition is implemented;
 owned provider-to-HTTP acceptance is recorded and ordinary activation remains gated. [ADR 0017](adr/0017-provider-account-deletion.md)
 and the [deletion guide](../guides/oidc-account-deletion.md) record that boundary.
+
+[ADR 0018](adr/0018-oidc-web-composition.md) proposes AUTH-56's shared OIDC browser
+composition, including a common exact callback, explicit session handling and stable
+startup configuration. It adds no implementation or ordinary activation by itself.

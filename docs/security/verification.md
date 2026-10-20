@@ -2500,3 +2500,15 @@ acceptance scenarios retain visible prerequisites, precise outcomes and cleanup.
 Hosted CI on the final pushed commit is still required before ticket completion.
 Local or fixture acceptance is not an independent security review, production-provider
 interoperability claim, provider-contact SMTP acceptance or ordinary activation.
+
+### AUTH-55 hosted completion
+
+Final commit `e55dded204aaa0011d7e6e6c3802aaaaabfad26c` passed hosted run
+[39365720693](https://github.com/Deuspheara/easy-auth/actions/runs/39365720693),
+including both rust and secrets jobs. The run verified formatting, strict
+all-target/all-feature lint, default/all-feature workspace tests, verification-only
+core behavior, all 23 backend and 6 HTTP Keycloak cases, controlled reference-client
+checks, retained native passkey/SMTP/recovery suites, real notice smoke, compiled
+advisories and cargo-deny dependency/license policy. The exact head and final
+completed/success conclusion were checked before AUTH-55 completion. Ordinary OIDC
+web sign-in remains AUTH-56 work; wider release gates remain unchanged.
