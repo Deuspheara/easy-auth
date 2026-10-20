@@ -6,7 +6,7 @@ use crate::{
 };
 use std::sync::Arc;
 
-const ISSUER: &str = "https://accounts.google.com";
+pub(super) const ISSUER: &str = "https://accounts.google.com";
 const ENDPOINT_ORIGINS: &[&str] = &[
     ISSUER,
     "https://oauth2.googleapis.com",

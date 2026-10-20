@@ -3068,3 +3068,61 @@ earlier public provider reports are unchanged. Native/browser/SMTP and final-hea
 hosted acceptance remain required; no new real-provider or browser run is claimed
 from these local SQL/HTTP tests. AUTH-23's callback, native OS return, registration,
 actual provider freshness/deletion and manual matrix remain open.
+
+## AUTH-23 bounded Google callback decoding — 2026-10-20
+
+The opt-in core decoder now accepts the actual bounded raw query, exact canonical
+returned issuer on success/errors, canonical state and exactly one code/error
+outcome. Six new unit scenarios exercise decoded duplicates, malformed encoding,
+controls/fragments, wrong/missing issuer, contradictory results, token uploads,
+limits, redaction and finite denial/provider-failure classification. Bounded
+Google-documented presentation fields and error details are discarded; unknown
+members fail closed in an explicitly documented supported subset, without claiming
+general OAuth conformance. The existing redacted authorization-code type and
+transaction/private-proof boundary are reused. No route or session is added.
+
+Two additional real PostgreSQL callback scenarios prove decoding leaves authority
+and pending state unchanged, wrong private proof/browser does not consume/cancel,
+valid consume makes one actual offline RS256 exchange/session commit, replay makes
+no second token POST, and bound denial/provider-failure cancellation creates no
+identity/session/audit or token POST. An actual signed positive control follows
+cancellation. All twelve Google PostgreSQL cases pass, including earlier
+concurrency, realm/source isolation, fault rollback and final-deadline controls.
+
+Final local commands pass using documented PostgreSQL, CARGO_INCREMENTAL=0 and the
+unchanged four-worker/shared-connection budget:
+
+```sh
+cargo fmt --all --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-core --features google
+cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Results: **97 default / 548 all-feature workspace tests**, including 2 Axum unit,
+99 HTTP,88 core,336 PostgreSQL and23 server cases (logging subprocess repeat
+excluded); **76 isolated core Google cases** and **12 Google PostgreSQL cases**.
+Final runs have no failures/ignored cases. Compiled-dependency advisory and
+all-feature license/bans/source checks pass; inactive optional SQLx/MySQL RSA
+advisory remains visible. The final staged diff receives redacted secret scanning.
+Documentation local links, changed tree, visibility and responsibility boundaries
+are reviewed. New decoder/unit/PostgreSQL files remain under300lines; longer
+ordered database scenarios keep negative bindings, observed facts, valid controls
+and replay/cancellation together as justified function-size exceptions. No unrelated
+cleanup is deferred. No migration, dependency, generic callback or browser behavior
+changes; historical browser/provider reports remain immutable. Hosted final-head
+browser/SMTP/security acceptance remains separate from these local checks.
+
+Primary-source lifecycle research is recorded in ADR0019: Google's optional signed
+authentication-time claim needs provider-application eligibility/configuration and
+does not provide a supported Google reauthentication request. Neither generic OIDC
+reauthentication parameters nor a new token/session can substitute for fresh proof.
+No provider settings, user browser or credential manager were changed. AUTH-23
+remains In Progress: Google web/native delivery, registered/manual provider evidence
+and a usable reviewed provider-required deletion path remain unfinished. AUTH-20's
+Safari failure is unresolved; no new device prompts or interoperability claims.

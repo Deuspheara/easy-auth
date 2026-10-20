@@ -444,7 +444,7 @@ cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
 freshness is inferred from issuance or prompts, and no provider-required account
 activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).
 
-Ten Google-profile PostgreSQL integration scenarios now traverse the real state,
+Twelve Google-profile PostgreSQL integration scenarios now traverse the real state,
 signature/mapping and local identity/session boundaries with controlled offline
 RS256 responses. Exact provider wire assertions and independent signed-response
 counters distinguish invalid claims/JIT/source policy from infrastructure failures.
@@ -453,3 +453,15 @@ tests preserve one-use and ownership. The fixture's signed authentication-time
 controls do not establish claim availability from an actual Google registration;
 token issuance never creates freshness and later proof does not rewrite old
 sessions. No Google callback/native/deletion activation follows from these tests.
+
+The Google raw-query decoder requires canonical state and exact actual issuer for
+successes and failures; it rejects duplicate decoded names, malformed encoding,
+oversized values and contradictory/unsupported inputs. Its deliberately closed
+member set is not general OAuth conformance. Scope/domain/prompt/account-selection
+metadata grants no policy, and foreign error details/URIs are discarded without
+output or fetch. Query parsing neither consumes nor cancels anything: subsequent
+operation/private-proof/browser/source/purpose/route binding is mandatory, including
+before error cancellation. Error outcomes cannot become token requests. Real
+PostgreSQL tests preserve pending state after wrong private proof/browser and show
+one-use successful exchange or denial-only cancellation. No arbitrary callback-URL
+import, new route or issuer fallback is introduced.

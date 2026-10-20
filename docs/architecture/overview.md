@@ -76,3 +76,9 @@ It returns the existing verified identity proof and adds no SQL, route, native
 transport or local-session grant. The [component guide](../guides/google.md) and
 [ADR 0019](adr/0019-google-code-flow.md) distinguish offline signature controls from
 the remaining public callback/native transport and real-provider lifecycle acceptance.
+
+The core Google callback decoder retains bounded actual state/issuer and a redacted
+untrusted outcome. Transport-independent decoding cannot consume/cancel pending
+state or issue authority. Its real PostgreSQL controls preserve private-operation
+binding before code exchange or cancellation; public web/native delivery remains
+separate work and the generic callback contract stays unchanged.

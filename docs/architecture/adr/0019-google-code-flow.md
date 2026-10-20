@@ -83,6 +83,27 @@ authorized-presenter, nonce, time, signature and key-rotation checks stay in for
 
 ## Web callback and client registration
 
+The core callback-decoding checkpoint adds `GoogleAuthorizationResponse` and its
+untrusted code/denied/provider-failure outcome. It bounds the raw query and decoded
+values, requires actual canonical response issuer on successes and failures per
+[RFC 9207](https://datatracker.ietf.org/doc/html/rfc9207#section-2), and preserves the
+canonical returned state for subsequent private operation binding. It rejects
+duplicate decoded members, malformed encoding, contradictory results and unsupported
+inputs. Only the existing redacted code type reaches a later code exchange.
+Google's documented scope/authuser/hd/prompt metadata and optional session state
+are bounded and discarded; foreign error descriptions/URIs are never retained or
+used for output, fetching or authorization. Unknown members fail closed in this
+supported subset; this differs from general OAuth unknown-member tolerance and
+does not establish conformance or provider interoperability.
+
+The decoder creates no authority and performs no cancellation, consume or I/O.
+Actual route/private browser-proof/source/purpose/current-configuration binding
+remains with the transport and `OAuthTransactions`; error classification alone
+cannot authorize cancellation. Real PostgreSQL callback cases exercise that
+boundary and one-use code verification without introducing a public route. Generic
+OIDC callback contracts remain unchanged. Google web/native delivery and genuine
+provider-required lifecycle evidence remain open.
+
 The current closed callback contract admits state, code, issuer and session state.
 Google's documented callback also includes scope. Add only a reviewed Google-specific
 bounded decoding contract; do not permit arbitrary response members or weaken the
@@ -136,6 +157,18 @@ The native adapter does not create remote application access/refresh tokens: the
 outbound issuer and native token-family contracts remain the separate M07 gate.
 
 ## Account lifecycle and activation
+
+Primary-source follow-up on 2026-10-20 narrows the remaining lifecycle question.
+Google's [Security Bundle](https://developers.google.com/identity/siwg/security-bundle#authentication_time)
+documents optional signed `auth_time`, requested through the OIDC `claims` member
+and enabled for a published, verified provider application. It also explicitly
+states that Google Account reauthentication requests are not supported. Therefore
+the generic OIDC deletion request's `prompt=login`/`max_age=0` cannot simply be reused
+as a supported Google reauthentication contract. Optional claim availability does
+not prove a genuinely fresh event or a usable deletion path for an existing Google
+session. No provider-console/browser settings are changed and no claims request,
+deletion method or weaker fallback is activated by this research. Actual registered
+profile/lifecycle evidence and a reviewed usable policy remain required.
 
 Preserve provider-required policy and the existing fresh provider deletion path.
 Google's availability of signed authentication-time claims must be established for

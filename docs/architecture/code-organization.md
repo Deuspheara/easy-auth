@@ -604,3 +604,13 @@ the 429 response during a cold fetch, without cookies or authority; the independ
 case explicitly warms/cancels a valid attempt before preserving its original two
 successes and separate cancellation assertions. No production wait, limit or policy
 changes are needed to distinguish these two scenarios.
+
+Google callback decoding lives in private `oidc/google/callback.rs` with deliberate
+public untrusted response/outcome types reexported through the existing facade.
+Exchange policy shares only its exact issuer constant with the sibling decoder.
+No transport, SQL or policy framework enters this module. Bounded query decoding
+and result classification remain cohesive; verification unit cases and PostgreSQL
+binding/cancellation controls each live in a named `google/callback.rs` test module.
+All three files stay below300lines. Longer ordered PostgreSQL scenarios retain
+negative binding, unchanged pending facts, valid commit and replay/cancellation
+controls together as function-size exceptions. No unrelated cleanup is deferred.
