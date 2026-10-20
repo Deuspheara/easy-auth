@@ -444,7 +444,7 @@ cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
 freshness is inferred from issuance or prompts, and no provider-required account
 activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).
 
-Eighteen PostgreSQL-crate Google-profile scenarios traverse the real state,
+Twenty-three PostgreSQL-crate Google-profile scenarios traverse the real state,
 signature/mapping and local identity/session boundaries with controlled offline
 RS256 responses. Exact provider wire assertions and independent signed-response
 counters distinguish invalid claims/JIT/source policy from infrastructure failures.
@@ -501,3 +501,18 @@ nothing. One-use races, explicit versus transport-only cancellation, unchanged
 unrelated sessions, actual signed rejection versus infrastructure faults and final
 audit rollback/observed-expiry controls preserve these boundaries. These fixtures
 establish component behavior, not real Google TLS/client/freshness or usable deletion.
+
+The explicit eligible-client Google session-age profile adds only fixed essential
+signed authentication-time request/validation to the already constrained code
+exchange. Decoded/case-folded metadata claim collisions reject; no callback-selected
+profile, arbitrary claims, unsupported reauthentication prompt or fallback exists.
+Actual signed capability absence is provider-profile Unavailable, malformed/invalid
+claims Unauthorized. The same shared flow retains every original binding. Separate
+exchange methods enforce sign-in versus original account-deletion purpose before
+token I/O. Verified deletion proof alone erases nothing: exact initiating owner/
+subject/current source/session, genuine recent signed authentication and final caps
+still gate the existing PostgreSQL transaction. Old signed time is never rewritten
+by a new token/session/request. Actual-signature/database controls preserve missing/
+stale/wrong-subject/cross-purpose denial, complete rollback, one deletion under a
+race and deleted-subject cooldown. Those controls do not establish provider app
+eligibility, forced reauthentication or usable real-provider lifecycle/activation.

@@ -160,3 +160,11 @@ only that development edge. No production signature implementation, proof
 constructor or provider transport override is added. Native receives are actual
 sockets/PostgreSQL; provider GET/token/JWKS responses remain private in-memory
 fixtures with actual signatures, without claiming real Google interoperability.
+
+Google's Security Bundle/OIDC documentation was rechecked on2026-10-20 for the
+explicit eligible-client session-age request. The component uses existing URL/
+zeroizing storage, josekit RS256 and typed claim validation; no dependency/version,
+algorithm, trust root or license/advisory exception is added. Fixed `claims` request
+support is distinct from actual application verification/settings and from a new
+Google authentication event. Provider reauthentication requests remain unsupported;
+ordinary activation still requires genuine registered-client/lifecycle evidence.

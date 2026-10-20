@@ -197,6 +197,32 @@ outbound issuer and native token-family contracts remain the separate M07 gate.
 
 ## Account lifecycle and activation
 
+The explicit session-age profile is selected only by trusted composition for an
+eligible registered application. Converting a validated Google code component to
+`GoogleSessionAgeCodeExchange` requests only fixed essential ID-token `auth_time`
+through Google's documented `claims` parameter, preserving original S256/state/
+nonce/redirect and all existing source/key checks. It supplies no prompt/max-age
+reauthentication parameter or arbitrary caller claims. Metadata endpoint `claims`
+collisions reject rather than overriding either input. The base sign-in-only
+component and generic OIDC request behavior remain unchanged.
+
+`GoogleAuthorization::new_session_age` selects that concrete profile for the shared
+sign-in start/completion/cancel use case. Its default constructor remains ordinary
+Google sign-in. A private two-case dispatcher delegates protocol exchange while
+retaining one implementation of state/proof/route/cancel policy; it is not a generic
+provider framework. Exact snapshot equality remains mandatory at construction.
+
+The selected profile requires an actual correctly typed signed authentication-time
+claim. An otherwise valid response missing it is a provider-profile failure, not
+proof that a user failed authentication. Separate sign-in and account-deletion
+exchange methods reject cross-purpose/linking contexts before token I/O. A deletion
+exchange yields only the existing opaque purpose-bound identity proof; exact owner/
+subject/current-session/source, genuine age and original deadline checks remain in
+`OidcAccountDeletion` and PostgreSQL. Old signed authentication time stays old.
+Requesting the claim neither makes it fresh nor establishes provider feature
+eligibility. Registered-client/manual proof of a usable lifecycle remains a gate;
+this component does not activate ordinary Google login or deletion routes.
+
 Primary-source follow-up on 2026-10-20 narrows the remaining lifecycle question.
 Google's [Security Bundle](https://developers.google.com/identity/siwg/security-bundle#authentication_time)
 documents optional signed `auth_time`, requested through the OIDC `claims` member
@@ -205,8 +231,9 @@ states that Google Account reauthentication requests are not supported. Therefor
 the generic OIDC deletion request's `prompt=login`/`max_age=0` cannot simply be reused
 as a supported Google reauthentication contract. Optional claim availability does
 not prove a genuinely fresh event or a usable deletion path for an existing Google
-session. No provider-console/browser settings are changed and no claims request,
-deletion method or weaker fallback is activated by this research. Actual registered
+session. This research changes no provider-console/browser setting or route. The
+explicit claim-request component does not force a new event or establish eligibility.
+No weaker fallback is activated. Actual registered
 profile/lifecycle evidence and a reviewed usable policy remain required.
 
 Preserve provider-required policy and the existing fresh provider deletion path.

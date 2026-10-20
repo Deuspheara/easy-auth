@@ -5,6 +5,7 @@ mod google;
 pub use google::{
     GoogleAuthorization, GoogleAuthorizationCompletion, GoogleAuthorizationOutcome,
     GoogleAuthorizationResponse, GoogleAuthorizationStart, GoogleCodeExchange,
+    GoogleSessionAgeCodeExchange,
 };
 #[cfg(feature = "oidc-identities")]
 mod identities;

@@ -3348,3 +3348,77 @@ genuinely fresh provider-required deletion path remain unfinished. Offline signe
 fixtures/Chromium are not substitutes for those outcomes, independent review or
 production readiness. No user/device prompts or provider/browser/security settings
 changes occurred. AUTH-20's Safari recovery failure remains unresolved.
+
+## AUTH-23 explicit eligible-client Google session-age proof profile — 2026-10-20
+
+Trusted composition can now convert a validated Google exchange to
+`GoogleSessionAgeCodeExchange`. It adds only fixed essential signed `auth_time`
+request/validation, preserving original scope/state/nonce/S256/redirect and existing
+issuer/egress/RS256/client rules. Decoded/case-folded metadata `claims` collisions
+reject. No arbitrary claims, unsupported Google reauthentication parameter, new
+dependency or insecure fallback is added. The base sign-in-only profile and generic
+OIDC request behavior remain unchanged. Shared `GoogleAuthorization::new_session_age`
+selects the explicit concrete profile without duplicating callback/cancel policy;
+exact snapshot equality remains mandatory.
+
+Separate exchange methods accept sign-in versus original account-deletion purpose
+and reject other/linking contexts before token POST. Actual signed capability
+absence is provider-profile Unavailable; malformed/invalid signed claims remain
+Unauthorized. Old signed time stays old after new issuance/local session creation.
+A deletion exchange yields only existing opaque proof; deliberate confirmation,
+exact original owner/session/subject/current source, genuine freshness and all
+original/final caps remain with the existing mapped deletion use case/PostgreSQL.
+Selecting/requesting the capability neither proves eligibility nor forces a new
+Google authentication event, and activates no ordinary route.
+
+Six new actual-signature core scenarios cover fixed request projection/default
+preservation/redaction, metadata collisions, signed missing versus malformed claim
+classification, source/transport errors, cross-purpose/link refusal before POST
+and unchanged old authentication time. Private protocol fields are compared without
+formatting them on assertion failure. Five new real PostgreSQL cases cover selected
+managed sign-in and no freshness promotion; missing/malformed/stale claim denial
+before any erasure; exact owner/current session/subject and sign-in-purpose refusal;
+one deletion/fact from concurrent valid proofs; full private account/session/identity/
+audit/notice/cooldown rollback after a real audit-trigger fault; successful signed
+controls and deleted-subject cooldown. Older unknown-authentication sessions may
+initiate the bounded action, but only new qualifying signed proof can finish it.
+No application SQL, published migration or meaningful existing assertion changes.
+
+Final local checks pass with CARGO_INCREMENTAL=0 and documented real PostgreSQL:
+
+```sh
+cargo fmt --all --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-core --features google
+cargo test --locked -p easy-auth-core --features oidc-verification
+cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Results: **97 default / 583 all-feature workspace cases** (2 Axum unit,99 HTTP,
+94 core,347 PostgreSQL-crate,32 server unit,9 server real-DB; logging subprocess
+repeat excluded), **82 isolated core Google**, **60 isolated generic verifier** and
+**23 Google PostgreSQL** cases. Final runs have no failures/ignored cases. Real DB
+suites retain sequential execution, original shared20/four-worker budget and bounded
+observers. Compiled advisory and all-feature license/bans/source checks pass;
+inactive optional SQLx/MySQL RSA advisory remains visible without exception. The
+full staged diff receives redacted Gitleaks scanning; changed local documentation
+links, responsibilities, visibility and naming are reviewed. New profile/dispatcher
+modules72/36lines and existing flow150lines stay focused; test files remain below
+300lines. Longer request/purpose/rollback matrices retain signed controls as
+function-size exceptions. No unrelated cleanup is deferred.
+
+Existing immutable browser reports remain historical; no new browser/provider/manual
+interoperability run is claimed for this profile checkpoint. Current full workspace
+checks retain the native socket and real-database acceptance scenarios. Hosted
+CI39395320135 at exactdf682f5 completed successfully; acceptance of the new final
+head is tracked separately in Huly. AUTH-23 remains In Progress for Google web/
+deletion delivery, supported OS/browser/native registration/manual evidence and a
+genuinely usable repeatable provider-required freshness/deletion path. The optional
+claim/component success is not ordinary activation, independent review or production
+readiness. No user/device prompts or provider/browser/security settings changed;
+AUTH-20's Safari recovery failure and broader release gates remain unresolved.

@@ -12,7 +12,7 @@ const ENDPOINT_ORIGINS: &[&str] = &[
     "https://oauth2.googleapis.com",
     "https://www.googleapis.com",
 ];
-const IDENTITY_SCOPES: &[&str] = &["email", "profile"];
+pub(super) const IDENTITY_SCOPES: &[&str] = &["email", "profile"];
 
 /// Opt-in Google code verification, not a local session or ordinary activation.
 /// Retains the original opaque state/S256 context and the shared reviewed verifier.
@@ -54,6 +54,12 @@ impl GoogleCodeExchange {
 
     pub fn configuration(&self) -> &OAuthConnection {
         self.exchange.configuration()
+    }
+
+    /// Explicit eligible-client profile selection, not evidence that the Google
+    /// application is verified/configured or its user's authentication is fresh.
+    pub fn with_session_age_claims(self) -> super::GoogleSessionAgeCodeExchange {
+        super::GoogleSessionAgeCodeExchange::new(self.exchange)
     }
 
     /// Start must come from matching OAuthTransactions and retain its private

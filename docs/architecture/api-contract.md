@@ -129,6 +129,17 @@ See the [desktop contract](../guides/google.md#owned-desktop-loopback-delivery) 
 resource bounds and remaining registered-provider/platform/lifecycle gates. This
 adds no ordinary startup flag, generic web route or remote application token API.
 
+`GoogleCodeExchange::with_session_age_claims` produces the explicit eligible-client
+`GoogleSessionAgeCodeExchange`. Its fixed authorization request selects essential
+signed `auth_time` without reauthentication parameters or arbitrary claims. Separate
+sign-in/deletion exchange methods preserve purpose before token I/O; actual signed
+claim absence is Unavailable, invalid claims Unauthorized, and old time stays old.
+`GoogleAuthorization::new_session_age` retains shared callback/cancellation bindings
+for this sign-in profile. The returned existing opaque deletion proof still needs
+mapping and the original deliberate-confirmation/freshness-checked deletion use
+case. No endpoint/OpenAPI or ordinary activation changes. See the
+[eligible-profile contract](../guides/google.md#eligible-session-age-claims-profile).
+
 Only exact configured Origin is accepted on initial browser POST endpoints, including pre-authentication. Missing/null Origin fails closed, so command-line clients must explicitly send it. No wildcard credentialed CORS. SameSite=Lax, Secure in HTTPS production, HttpOnly, Path=/, no Domain; production session uses __Host- prefix. Dev HTTP is loopback-only and explicitly enabled. Duplicate cookie names/invalid token shapes must be rejected. An Origin guard is appropriate for this constrained same-origin contract; it is not a substitute for OAuth state or SAML correlation.
 
 Outbound issuer (M07) has a distinct protocol contract: registered clients, exact redirects, code + S256, client authentication where applicable, signing keys, discovery, JWKS, audience-bound ID/access tokens, revocation and introspection. First-party alpha session introspection does not constitute OIDC support. Native refresh credentials and cross-origin apps are unavailable until that gate passes.

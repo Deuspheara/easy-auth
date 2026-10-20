@@ -3,8 +3,9 @@
 AUTH-23 adds the opt-in core `google` feature and `GoogleCodeExchange`. This is a
 code/identity-proof component, not supported Google web/native activation. A
 separate optional server `google-desktop` feature supplies owned loopback delivery.
-No public Google web endpoint, startup setting, OS browser launcher, mobile return
-adapter, local-session grant or provider-deletion flow is supplied by these components.
+An explicitly selected eligible-client session-age profile also supplies signed
+authentication-time/deletion proofs. Public Google web routes, startup selection,
+OS browser launch, mobile delivery and ordinary lifecycle activation remain gated.
 The [ADR](../architecture/adr/0019-google-code-flow.md) records the remaining work.
 
 Enable `easy-auth-core/google` and use the existing PostgreSQL and server
@@ -66,6 +67,51 @@ open a system browser, validate registered desktop credentials or implement mobi
 return handling. Installed-client wire secrets cannot prove application authenticity.
 The offline tests exercise Basic/Post requests for both HTTPS and explicit loopback
 metadata, not successful registered Google/native clients.
+
+## Eligible session-age claims profile
+
+For a registered application eligible for Google's
+[session-age feature](https://developers.google.com/identity/siwg/security-bundle),
+consume a validated `GoogleCodeExchange` with `with_session_age_claims()` to obtain
+`GoogleSessionAgeCodeExchange`. Its readonly configuration preserves the exact
+source snapshot. This is trusted composition, not a request/callback option or
+proof that provider application verification/settings are correct. Reapply trusted
+configuration when changing its policy, then build matching services from the
+persisted revision. No provider settings are changed automatically.
+
+`authorization_url` retains fixed scopes and original state/nonce/S256/redirect,
+adding exactly `claims={"id_token":{"auth_time":{"essential":true}}}`. It rejects
+decoded/case-folded metadata `claims` collisions and accepts no caller-selected
+claims, `prompt` or `max_age`. The existing generic OIDC request behavior and base
+Google profile remain unchanged.
+
+`exchange` accepts sign-in only; `exchange_account_deletion` accepts only the
+original `DeleteProviderAccount` context. Both reject other/linking purposes before
+token POST and require a correctly typed actual signed `auth_time`. An otherwise
+valid signed response missing it returns Unavailable as a provider-profile failure;
+malformed/invalid signed claims remain Unauthorized. No base-profile fallback is
+attempted and consumed state is not restored. A returned old authentication time
+stays old, regardless of new token issuance or local session creation.
+
+`GoogleAuthorization::new_session_age` selects this concrete profile in the shared
+start/sign-in-completion/cancel use case, retaining all original state/private-proof/
+browser/route/current-source bindings. Its default constructor still uses the base
+sign-in-only profile. Neither constructor grants local authority at verification.
+
+Deletion exchange returns only the existing opaque purpose-bound verified identity.
+The caller must obtain deliberate confirmation and pass its mapped proof to
+`OidcAccountDeletion` with the real repository. Exact original owner, active session,
+subject, source and original caps plus genuine signed freshness remain mandatory
+under the existing PostgreSQL transaction. Sign-in proof, provider email, issuance
+time or a requested claim cannot substitute. Old/unknown-authentication sessions may
+initiate the bounded operation but cannot erase an account without new qualifying
+signed proof. Missing, old, wrong-subject and cross-purpose proofs fail closed;
+rollback, one-use and deleted-subject cooldown semantics are unchanged.
+
+This profile requests information about Google's last authentication event. It
+does not force a new one or establish a usable real-provider lifecycle. Actual
+registered feature eligibility, signed claim availability and a reviewed repeatable
+freshness/deletion path remain required before ordinary Google activation.
 
 ## Callback decoding component
 
@@ -224,7 +270,7 @@ Google-shaped discovery/code responses. They cover original code/PKCE/redirect,
 fixed scope/egress/authentication, wrong claims/signature/algorithm, duplicate email
 flags, email-attribute semantics, cancellation, source/purpose isolation and exact
 provider-error versus infrastructure-error results. Their controlled repository is
-a component fixture. Eighteen PostgreSQL-crate scenarios and nine server-owned
+a component fixture. Twenty-three PostgreSQL-crate scenarios and nine server-owned
 desktop database scenarios now exercise the actual
 Google code component through real state consumption, signature verification,
 mapping and existing local identity/session commit. They cover provider-only
@@ -246,8 +292,9 @@ handling, native remote token families and broader release gates remain separate
 Google's [Security Bundle](https://developers.google.com/identity/siwg/security-bundle#authentication_time)
 documents optional `auth_time` for a published/verified application with the feature
 enabled and the claim requested. It explicitly does not support Google Account
-reauthentication requests. This component does not request that claim or reuse the
-generic OIDC `prompt=login`/`max_age=0` deletion request as a Google contract. A
+reauthentication requests. The base profile leaves that claim optional; the explicit
+session-age profile requests it and rejects its absence. Neither reuses generic
+OIDC `prompt=login`/`max_age=0` as a Google contract. A
 returned old authentication time would still fail the existing freshness policy.
 Provider-application eligibility, actual signed claim availability and a usable
 reviewed lifecycle remain unverified; no provider settings have been changed.

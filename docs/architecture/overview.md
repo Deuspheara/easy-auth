@@ -96,3 +96,11 @@ tokens or mobile delivery. Default startup and generic web composition are uncha
 owned real listener/PostgreSQL/offline-signature acceptance now has nine server
 scenarios. Registered provider, supported OS browser launch/return and lifecycle
 remain gates; those components do not establish Google/native interoperability.
+
+Core `GoogleSessionAgeCodeExchange` is an explicit eligible-client profile around
+the same validated Google exchange. It requests fixed signed authentication time,
+requires its actual presence and keeps sign-in and deletion proof purposes separate.
+The shared Google authorization use case can select it without duplicating callback
+bindings. Existing PostgreSQL deletion still owns genuine age/owner/subject/session/
+source/final-cap checks and atomic erasure. Neither requested claims nor recent
+token/local-session creation establishes freshness or real provider eligibility.

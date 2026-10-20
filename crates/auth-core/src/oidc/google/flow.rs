@@ -1,4 +1,5 @@
 use super::{GoogleAuthorizationOutcome, GoogleAuthorizationResponse, GoogleCodeExchange};
+use super::{GoogleSessionAgeCodeExchange, authorization_exchange::AuthorizationExchange};
 use crate::{
     Error, OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthIntent, OAuthPurpose,
     OAuthStart, OAuthTransactions, OidcAuthorizationUrl, Result, Secret, VerifiedOidcIdentity,
@@ -26,13 +27,29 @@ pub enum GoogleAuthorizationCompletion {
 /// No HTTP route, browser launch, listener ownership or ordinary activation.
 pub struct GoogleAuthorization {
     transactions: Arc<OAuthTransactions>,
-    exchange: Arc<GoogleCodeExchange>,
+    exchange: AuthorizationExchange,
 }
 
 impl GoogleAuthorization {
     pub fn new(
         transactions: Arc<OAuthTransactions>,
         exchange: Arc<GoogleCodeExchange>,
+    ) -> Result<Self> {
+        Self::configured(transactions, AuthorizationExchange::Ordinary(exchange))
+    }
+
+    /// Explicit eligible-client session-age profile. Claim absence remains a
+    /// provider-profile failure; selecting it creates no claim or fresh event.
+    pub fn new_session_age(
+        transactions: Arc<OAuthTransactions>,
+        exchange: Arc<GoogleSessionAgeCodeExchange>,
+    ) -> Result<Self> {
+        Self::configured(transactions, AuthorizationExchange::SessionAge(exchange))
+    }
+
+    fn configured(
+        transactions: Arc<OAuthTransactions>,
+        exchange: AuthorizationExchange,
     ) -> Result<Self> {
         if transactions.configuration() != exchange.configuration() {
             return Err(Error::InvalidInput);

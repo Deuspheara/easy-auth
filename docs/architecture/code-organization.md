@@ -655,3 +655,14 @@ fixtures. No production visibility or code changes are needed. All modules remai
 below300lines; ordered full-boundary cases retain actual delivery, observed facts,
 fault/result and signed positive controls as function-size exceptions. No unrelated
 cleanup is deferred.
+
+The owning Google `session_age.rs` module keeps the explicit eligible-client request,
+signed-claim presence and separate proof-purpose boundaries together. A private
+concrete `authorization_exchange.rs` dispatcher selects the two implemented Google
+profiles for the shared flow, without adding a plugin/trait engine or duplicating
+callback policy. The opaque URL owner permits only the fixed internal Google claim
+extension; generic request behavior remains unchanged. Core profile tests and
+PostgreSQL session-age rejection/atomicity/setup scenarios are named feature modules;
+only the private test profile factory is shared with its managed-flow case. All
+files remain below300lines. Ordered request/proof/rollback matrices retain actual
+signed controls as function-size exceptions; no unrelated cleanup is deferred.
