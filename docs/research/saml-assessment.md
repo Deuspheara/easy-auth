@@ -77,3 +77,31 @@ The required easy-auth corpus and harness must cover:
 | Operational trust | Certificate rollover/expiry, disabled connection, bounded metadata fetch, DNS redirect/rebinding, signed metadata over wrong node | Explicit administrative trust and SSRF controls; no identity from stale or untrusted connection state. |
 
 Pin a local IdP and perform end-to-end SP-initiated browser interoperability after corpus success. Review native dependencies and images, obtain focused security review, and only then select the verifier in an ADR. No IdP-initiated login, SLO or SAML IdP implementation is authorized by this assessment. M06 / AUTH-32 owns this release gate; unrelated authentication milestones may proceed.
+
+## AUTH-32 native checkpoint — 2026-10-20
+
+The earlier native-build gap now has preliminary evidence. The same pinned samael
+revision and unchanged Cargo.lock compiled with Rust 1.95.0 in an isolated Linux
+arm64 container, without installing host libraries. Actual native packages include
+xmlsec 1.2.37, libxml2 2.9.14 and OpenSSL 3.0.22. The
+[recipe and limits](../../tests/provider/saml/native/README.md) verify the entire
+source archive before extraction and retain exact observed package/image provenance.
+Native packages resolve at build time; no reproducible-binary or advisory clearance
+is claimed. An altered archive was rejected before extraction/compilation.
+
+The unchanged upstream library suite passed 86 tests, with one ignored case. Its
+ignored positive was also explicitly executed: exit 101, one failed assertion,
+with native RSA-SHA1 signature rejection. Independent public-certificate key
+extraction shows that this fixture's configured metadata key differs from its
+embedded certificate key; the passing companion fixture has matching keys. This
+is consistent with the observed rejection, not proof of a library vulnerability.
+No assertion, fixture, algorithm or trust policy was changed to make it pass.
+
+The [finite record](../../tests/provider/saml/native/results/2026-10-20/upstream-native.json)
+keeps these outcomes separate. Read-only, network-disabled execution with no host
+mounts contains the run but does not establish zero attempted resource accesses.
+Upstream legacy-algorithm positives are not our required production allowlist.
+Strict parser/resource and verified-content controls, the easy-auth adapter and
+PostgreSQL corpus, native dependency advisory/license inventory and focused
+independent security review remain outstanding. No production verifier, SAML
+runtime dependency or ACS is selected by this checkpoint.

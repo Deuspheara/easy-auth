@@ -4102,3 +4102,29 @@ same-server catalog query found zero owned probe databases after completion.
 Signed `auth_time` was again absent. This adds IPv6 registered return evidence on
 the same macOS/Helium setup; other platforms, web/negative/cancellation matrix,
 genuine freshness/deletion, ordinary activation and independent review remain gated.
+
+## AUTH-32 preliminary native candidate evidence — 2026-10-20
+
+The [source-pinned research recipe](../../tests/provider/saml/native/README.md)
+builds unchanged samael 0.0.22 at `2d27dfe4930c4632b202f32886a85b2d1f9226c2`
+with its original lockfile. The complete archive digest is checked before extraction;
+an independently altered copy fails that guard before compilation. The pinned
+Rust image and actual native-library/compiler/test-executable versions are retained
+in the [finite result](../../tests/provider/saml/native/results/2026-10-20/upstream-native.json).
+The build/run installs no host libraries and adds no application dependency.
+
+Network-disabled, read-only execution with dropped capabilities and no host mounts
+produced 86 passed / 0 failed / 1 ignored. Explicit execution of the ignored
+`idp::tests::test_accept_signed_with_correct_key_idp` produced 0 passed / 1 failed,
+exit 101, with the original assertion intact and native RSA-SHA1 signature failure.
+The public fixture metadata and embedded certificate contain different keys; a
+passing companion has matching keys. This observation is consistent with the
+rejection; no embedded certificate was substituted as trusted configuration.
+The default-suite success and explicit failure remain separate outcomes.
+
+This is upstream research, not application or protocol acceptance. Runtime policy,
+migrations and security assertions are unchanged. Original upstream fixtures and
+keys remain outside this repository. Required hostile parser/resource observers,
+verified-node/profile/algorithm policy, PostgreSQL correlation/replay/isolation,
+native advisory/license review and focused independent security review remain open.
+No SAML ACS or production verifier is enabled. AUTH-32 remains In Progress.

@@ -31,6 +31,11 @@ Assessment updated: 2026-10-19. Candidates require lockfile/advisory and license
 
 **Hard SAML release blocker:** until a specific pinned dependency passes signature-wrapping, duplicate-ID, unsigned-claims, attacker-KeyInfo, DTD/XXE, replay, audience/destination/recipient/issuer/time/InResponseTo tests and a focused security review, ship no SAML ACS. Do not silently accept unsigned responses. Native dependencies are preferable to unreviewed custom verification.
 
+AUTH-32's [isolated native checkpoint](saml-assessment.md#auth-32-native-checkpoint--2026-10-20)
+adds 86 passing upstream samael tests and a separately preserved ignored-positive
+failure. It resolves the unexecuted native-build gap only; it does not select a
+production verifier or clear the native advisory/license and hostile-parser gates.
+
 AUTH-18's [passkey enrollment source review](passkey-enrollment.md) records the
 private-state serialization boundary, RP ownership, discoverability limitations,
 authentication provenance/recovery prerequisites and concrete browser/database
