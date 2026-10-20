@@ -755,3 +755,11 @@ PostgreSQL services; `probe.rs` checks public metadata and bound cancellation/so
 facts. Production modules and visibility are unchanged. All files stay below200lines
 and functions below50lines. No generic fixture framework or unrelated cleanup is
 introduced. External network checks stay outside default CI execution.
+
+
+The restricted disposable Google database fixture is shared privately from root
+`tests/support/google/database.rs` as registered-client acceptance is prepared.
+Its extraction preserves the implementation byte-for-byte; the public preflight
+imports the same body at an explicit static path. This avoids a second lifecycle
+implementation or production API exposure. The published preflight record retains
+its original producer/source paths as historical evidence.

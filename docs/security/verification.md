@@ -3958,3 +3958,18 @@ ordinary activation and independent review remain AUTH-23 gates. No account,
 provider setting, credential manager or security configuration was changed. The
 existing cleanup commit's hosted run39427439051 remains a separate tracked run;
 new preflight publication will require its own exact-head CI result.
+
+
+## AUTH-23 owned Google database fixture extraction — 2026-10-20
+
+Before preparing registered-client acceptance, the existing public preflight's
+restricted database fixture moved to root `tests/support/google/database.rs` for
+private reuse. The complete body matches commit87b8b63 byte-for-byte; only the
+preflight's static import path changes. No application/API/schema/dependency or
+lifecycle behavior changes. Strict all-feature workspace/all-target Clippy,
+formatting/diff checks, the actual production-TLS public preflight (3GETs/zero
+local authority), all4 unchanged failure controls and independent catalog cleanup
+pass after extraction. Previously published source/producer records remain
+unchanged. Full workspace results recorded above belong to87b8b63; they are not
+claimed as a new run for this structural-only extraction. Subsequent behavior
+needs its own final verification.

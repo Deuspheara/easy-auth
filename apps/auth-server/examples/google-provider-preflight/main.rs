@@ -1,4 +1,5 @@
 //! Explicit public-provider GET preflight. No browser, credentials or token POSTs.
+#[path = "../../../../tests/support/google/database.rs"]
 mod database;
 mod network;
 mod probe;
