@@ -27,20 +27,7 @@ impl Postgres {
             input.defense(),
         )?;
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        sqlx::query(
-            r#"
-            INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true)
-            ON CONFLICT (realm_id,id,client_id) DO UPDATE SET
-              revision=EXCLUDED.revision,issuer=EXCLUDED.issuer,provider_client=EXCLUDED.provider_client,
-              redirect_uri=EXCLUDED.redirect_uri,defense=EXCLUDED.defense
-            "#,
-        ).bind(connection.realm()).bind(connection.connection()).bind(connection.client())
-            .bind(connection.revision()).bind(connection.issuer()).bind(connection.provider_client())
-            .bind(connection.redirect()).bind(defense(&connection)).execute(&mut *tx).await.map_err(unavailable)?;
-        sqlx::query("DELETE FROM auth_oauth_transactions WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision<>$4")
-            .bind(connection.realm()).bind(connection.connection()).bind(connection.client()).bind(connection.revision())
-            .execute(&mut *tx).await.map_err(unavailable)?;
+        replace(&mut tx, &connection).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(connection)
     }
@@ -71,6 +58,29 @@ impl Postgres {
         }
         Ok(())
     }
+}
+
+/// Persist a freshly allocated configuration revision inside the caller's
+/// transaction. Retain disable and cancel previous-revision pending state together.
+pub(super) async fn replace(
+    tx: &mut Transaction<'_, Pg>,
+    connection: &OAuthConnection,
+) -> Result<()> {
+    sqlx::query(
+        r#"
+        INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true)
+        ON CONFLICT (realm_id,id,client_id) DO UPDATE SET
+          revision=EXCLUDED.revision,issuer=EXCLUDED.issuer,provider_client=EXCLUDED.provider_client,
+          redirect_uri=EXCLUDED.redirect_uri,defense=EXCLUDED.defense
+        "#,
+    ).bind(connection.realm()).bind(connection.connection()).bind(connection.client())
+        .bind(connection.revision()).bind(connection.issuer()).bind(connection.provider_client())
+        .bind(connection.redirect()).bind(defense(connection)).execute(&mut **tx).await.map_err(unavailable)?;
+    sqlx::query("DELETE FROM auth_oauth_transactions WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision<>$4")
+        .bind(connection.realm()).bind(connection.connection()).bind(connection.client()).bind(connection.revision())
+        .execute(&mut **tx).await.map_err(unavailable)?;
+    Ok(())
 }
 
 pub(super) async fn lock(tx: &mut Transaction<'_, Pg>, connection: &OAuthConnection) -> Result<()> {
