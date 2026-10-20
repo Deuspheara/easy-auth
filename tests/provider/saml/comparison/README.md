@@ -86,3 +86,9 @@ size exception; all owned source files are under150lines.
 lock and adapter hashes. Source/image hashes are provenance, not a reproducible
 binary or external audit claim. Remove the copied example when done so the upstream
 checkout remains clean. No application/API/migration or SAML gate changes.
+
+The subsequent [exact-policy qualification](../rust-policy/README.md) reuses this
+driver and signer. Default comparison inputs remain84rows; the additional signed
+algorithm controls require the explicit `--exact-policy` exporter flag. Historical
+source hashes remain tied to the recorded commit; newer callback sharing does not
+change the default upstream API/options or negative cases.

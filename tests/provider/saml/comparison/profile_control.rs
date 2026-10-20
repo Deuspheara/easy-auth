@@ -21,6 +21,10 @@ enum Algorithms {
     Strong,
     WeakDigest,
     WeakSignature,
+    Signature384,
+    Signature512,
+    Digest384,
+    Digest512,
 }
 
 fn main() {
@@ -67,7 +71,63 @@ fn run() -> Result<()> {
             engine::emit(name, mode, &xml, std::slice::from_ref(&cert));
         }
     }
+    if std::env::args().nth(1).as_deref() == Some("--exact-policy") {
+        for (name, target, algorithms) in policy_cases() {
+            let xml = signed_profile(&owner, &cert, target, algorithms)?;
+            for mode in [
+                ReduceMode::ValidateAndMarkNoAncestors,
+                ReduceMode::PreDigest,
+            ] {
+                engine::emit(name, mode, &xml, std::slice::from_ref(&cert));
+            }
+        }
+    }
     Ok(())
+}
+
+fn policy_cases() -> [(&'static str, Target, Algorithms); 8] {
+    [
+        (
+            "profile-response-signature384",
+            Target::Response,
+            Algorithms::Signature384,
+        ),
+        (
+            "profile-response-signature512",
+            Target::Response,
+            Algorithms::Signature512,
+        ),
+        (
+            "profile-response-digest384",
+            Target::Response,
+            Algorithms::Digest384,
+        ),
+        (
+            "profile-response-digest512",
+            Target::Response,
+            Algorithms::Digest512,
+        ),
+        (
+            "profile-assertion-signature384",
+            Target::Assertion,
+            Algorithms::Signature384,
+        ),
+        (
+            "profile-assertion-signature512",
+            Target::Assertion,
+            Algorithms::Signature512,
+        ),
+        (
+            "profile-assertion-digest384",
+            Target::Assertion,
+            Algorithms::Digest384,
+        ),
+        (
+            "profile-assertion-digest512",
+            Target::Assertion,
+            Algorithms::Digest512,
+        ),
+    ]
 }
 
 fn signed_profile(
@@ -95,14 +155,27 @@ fn signed_profile(
     for reference in &mut signature.signed_info.reference {
         reference.digest_method.algorithm = match algorithms {
             Algorithms::WeakDigest => DigestAlgorithm::Sha1,
+            Algorithms::Digest384 => DigestAlgorithm::Unsupported(
+                "http://www.w3.org/2001/04/xmldsig-more#sha384".to_owned(),
+            ),
+            Algorithms::Digest512 => {
+                DigestAlgorithm::Unsupported("http://www.w3.org/2001/04/xmlenc#sha512".to_owned())
+            }
             _ => DigestAlgorithm::Sha256,
         };
     }
-    if matches!(algorithms, Algorithms::WeakSignature) {
-        signature.signed_info.signature_method.algorithm = SignatureAlgorithm::Unsupported(
-            "http://www.w3.org/2000/09/xmldsig#rsa-sha1".to_owned(),
-        );
-    }
+    signature.signed_info.signature_method.algorithm = match algorithms {
+        Algorithms::WeakSignature => {
+            SignatureAlgorithm::Unsupported("http://www.w3.org/2000/09/xmldsig#rsa-sha1".to_owned())
+        }
+        Algorithms::Signature384 => SignatureAlgorithm::Unsupported(
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384".to_owned(),
+        ),
+        Algorithms::Signature512 => SignatureAlgorithm::Unsupported(
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512".to_owned(),
+        ),
+        _ => SignatureAlgorithm::RsaSha256,
+    };
     match target {
         Target::Response => response.signature = Some(signature),
         Target::Assertion => {

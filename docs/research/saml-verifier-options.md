@@ -6,6 +6,14 @@ measurements, in [the assessment](saml-assessment.md). Independent security revi
 is still mandatory. Passing this bounded corpus does not establish compliance,
 interoperability, exhaustive XXE safety or production readiness.
 
+## Exact-policy follow-up
+
+The [tested source patch and independent resource observation](saml-exact-policy.md)
+resolve the exact-policy gap for an experimental patched pin:106 inputs, full
+candidate tests and working file/network controls. Upstream adoption, independent
+security review and application acceptance remain open. The comparison below
+records the original unpatched pins; no production verifier is selected.
+
 ## Confirmed cause and ownership
 
 The assessed Samael is **0.0.22**, commit

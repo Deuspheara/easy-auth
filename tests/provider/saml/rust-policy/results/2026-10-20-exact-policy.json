@@ -1,0 +1,2346 @@
+{
+  "aggregate_exact_child": {
+    "connect_calls": 0,
+    "diagnostics_emitted": false,
+    "http_requests": 0,
+    "sentinel_file_calls": 0,
+    "traced_execution_confirmed": true
+  },
+  "broad_profile_rows": [
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "second-healthy",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "second-healthy",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "unsigned",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "unsigned",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "missing-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "missing-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "untrusted-keyinfo",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "untrusted-keyinfo",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "rollover",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "rollover",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "duplicate-id",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "duplicate-id",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "doctype",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "doctype",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "malformed",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "malformed",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "multiple-roots",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "multiple-roots",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-missing-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-missing-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-unsigned",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-unsigned",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-duplicate-id",
+      "error_class": "coverage_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-duplicate-id",
+      "error_class": "coverage_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-doctype",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-doctype",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-internal-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-internal-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-file-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-file-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-http-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-http-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-external-dtd",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-external-dtd",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-parameter-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-parameter-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-response",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-response",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-assertion",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-assertion",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature384",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature384",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature512",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature512",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest384",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest384",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest512",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest512",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature384",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature384",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature512",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature512",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest384",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest384",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest512",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest512",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-file-reference",
+      "error_class": "reference_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-http-reference",
+      "error_class": "reference_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-path-reference",
+      "error_class": "reference_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-file-reference",
+      "error_class": "reference_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-http-reference",
+      "error_class": "reference_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "strict-flow",
+      "attacker_marker": false,
+      "case": "profile-path-reference",
+      "error_class": "reference_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    }
+  ],
+  "candidate_controls_passed": true,
+  "controls_after": {
+    "file_observer": {
+      "case": "file-control",
+      "connect_calls": 0,
+      "diagnostics_emitted": false,
+      "http_requests": 0,
+      "marker_matches": true,
+      "parse_accepted": null,
+      "sentinel_file_calls": 1
+    },
+    "healthy_parser": {
+      "case": "healthy",
+      "connect_calls": 0,
+      "diagnostics_emitted": false,
+      "http_requests": 0,
+      "marker_matches": true,
+      "parse_accepted": true,
+      "sentinel_file_calls": 0
+    },
+    "http_observer": {
+      "case": "http-control",
+      "connect_calls": 1,
+      "diagnostics_emitted": false,
+      "http_requests": 1,
+      "marker_matches": true,
+      "parse_accepted": null,
+      "sentinel_file_calls": 0
+    }
+  },
+  "controls_before": {
+    "file_observer": {
+      "case": "file-control",
+      "connect_calls": 0,
+      "diagnostics_emitted": false,
+      "http_requests": 0,
+      "marker_matches": true,
+      "parse_accepted": null,
+      "sentinel_file_calls": 1
+    },
+    "healthy_parser": {
+      "case": "healthy",
+      "connect_calls": 0,
+      "diagnostics_emitted": false,
+      "http_requests": 0,
+      "marker_matches": true,
+      "parse_accepted": true,
+      "sentinel_file_calls": 0
+    },
+    "http_observer": {
+      "case": "http-control",
+      "connect_calls": 1,
+      "diagnostics_emitted": false,
+      "http_requests": 1,
+      "marker_matches": true,
+      "parse_accepted": null,
+      "sentinel_file_calls": 0
+    }
+  },
+  "environment": {
+    "default_features": false,
+    "features": [
+      "crypto-aws-lc"
+    ],
+    "image": "sha256:6f40d6a8388282c249a9f5645a9db9c4eaa5d6b30db71490685ade44cf67b425",
+    "lock_sha256": "09c5298f304507da1b652fe54a038c1f24cfea3fcb9c3f1dc3e8e1b7f1de72f4",
+    "profile_source_sha256": "e236709e04420e2df1ec3ad3320fa577ae63907d7bcee5ec2b475382536e321d",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "source_archive_sha256": "5ac1dc497d608edf2c6b751751a6c86d2b935a6e6e56149c788bfe436198e3e1",
+    "test_failed": 0,
+    "test_ignored": 0,
+    "test_log_sha256": "2226ed731688ba784ce5dbeb0ee499558833e8e8abc2c09a8d1704ec22536fed",
+    "test_passed": 1087,
+    "test_suites": 44,
+    "upstream_commit": "3b289001a7a84d5a7ff7af2671991ab7098090bd",
+    "upstream_lock_modified": false,
+    "upstream_source_patched": true
+  },
+  "exact_rows": [
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "second-healthy",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "second-healthy",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "unsigned",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "unsigned",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "missing-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "missing-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "untrusted-keyinfo",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "untrusted-keyinfo",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "rollover",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "rollover",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "forged-sibling-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "duplicate-id",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "duplicate-id",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "doctype",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "doctype",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "malformed",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "malformed",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "multiple-roots",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "multiple-roots",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-wrong-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-missing-key",
+      "error_class": "trust_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-missing-key",
+      "error_class": "trust_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-unsigned",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-unsigned",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-altered-signature",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-tampered-subject",
+      "error_class": "signature_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-before",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-forged-after",
+      "error_class": "protocol_profile_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-duplicate-id",
+      "error_class": "coverage_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-duplicate-id",
+      "error_class": "coverage_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "assertion-healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "healthy-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-before",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-doctype",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-doctype",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-internal-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-internal-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-file-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-file-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-http-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-http-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-external-dtd",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-external-dtd",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-parameter-entity",
+      "error_class": "xml_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-parameter-entity",
+      "error_class": "xml_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-response-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "resource-healthy-assertion-after",
+      "error_class": "subject_confirmation_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-response",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-response",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-assertion",
+      "error_class": "none",
+      "mode": "rooted",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": true,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-healthy-assertion",
+      "error_class": "none",
+      "mode": "predigest",
+      "trusted_subject": true,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-digest",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-weak-signature",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature384",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature384",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature512",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-signature512",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest384",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest384",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest512",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-response-digest512",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature384",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature384",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature512",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-signature512",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest384",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest384",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest512",
+      "error_class": "algorithm_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-assertion-digest512",
+      "error_class": "algorithm_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-file-reference",
+      "error_class": "reference_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-http-reference",
+      "error_class": "reference_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-path-reference",
+      "error_class": "reference_rejected",
+      "mode": "rooted",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-file-reference",
+      "error_class": "reference_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-http-reference",
+      "error_class": "reference_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    },
+    {
+      "accepted": false,
+      "api": "exact-flow",
+      "attacker_marker": false,
+      "case": "profile-path-reference",
+      "error_class": "reference_rejected",
+      "mode": "predigest",
+      "trusted_subject": false,
+      "wrapper_marker": false
+    }
+  ],
+  "fault_injection": {
+    "missing_strace": {
+      "stage": "observer_unavailable",
+      "status": "infrastructure_failed"
+    },
+    "missing_strace_exit_code": 2,
+    "restored_observer": {
+      "aggregate_exact_child": {
+        "connect_calls": 0,
+        "diagnostics_emitted": false,
+        "http_requests": 0,
+        "sentinel_file_calls": 0,
+        "traced_execution_confirmed": true
+      },
+      "candidate_controls_passed": true,
+      "controls_after": {
+        "file_observer": {
+          "case": "file-control",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 1
+        },
+        "healthy_parser": {
+          "case": "healthy",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        "http_observer": {
+          "case": "http-control",
+          "connect_calls": 1,
+          "diagnostics_emitted": false,
+          "http_requests": 1,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 0
+        }
+      },
+      "controls_before": {
+        "file_observer": {
+          "case": "file-control",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 1
+        },
+        "healthy_parser": {
+          "case": "healthy",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        "http_observer": {
+          "case": "http-control",
+          "connect_calls": 1,
+          "diagnostics_emitted": false,
+          "http_requests": 1,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 0
+        }
+      },
+      "input_rows": 106,
+      "same_finite_outcomes": true,
+      "status": "controls_passed",
+      "transport_sha256": "9433cf8d6d2bd92f05f317fd101a0643c0ce4c85a187417c7bd53b67024942d8"
+    }
+  },
+  "historical_fixture_failure": {
+    "cause": "existing signing API fills empty values; populated digest/signature values were retained",
+    "correction": "empty those generated fixture fields using DOM ranges, then sign through existing provider",
+    "final_verification_tests_passed": 39,
+    "test": "new mixed-pair fixture initially failed broad verification"
+  },
+  "input_rows": 106,
+  "limitations": [
+    "Experimental source patch is not an upstream merged release or production dependency",
+    "Independent syscall/HTTP observation is aggregate across bounded exact-flow inputs, not an external security review",
+    "Native mode tags duplicate each Rust XML input",
+    "Direct file/HTTP/path Reference negatives alter SignedInfo and are not cryptographically valid controls",
+    "No enabled encrypted/SimpleSign/Redirect/metadata lifecycle or application/DB authority is qualified"
+  ],
+  "production_gate_open": false,
+  "scope": "bounded aggregate exact-flow child, not exhaustive XXE assurance",
+  "source_sha256": {
+    "tests/provider/saml/comparison/profile_control.rs": "6953b0e07d3a06c685ef71f73ec559c9a7a3d736d2b842136d907bef9745fdcc",
+    "tests/provider/saml/comparison/run.py": "20783d6715315783ea8e6aefbbfeb97d9d99fef34e539075810554e81cac663e",
+    "tests/provider/saml/comparison/rust_candidate.rs": "b54ed67c2ed36c2ccfcec641e495d7adf131d44b0ccfd7e61681eb2b4d8a7c84",
+    "tests/provider/saml/native/parser-probe/observe.py": "5c8033919c5545ca8b60e2d02cf943fe7696d4686ec0abb6c850ceaec85c7e5e",
+    "tests/provider/saml/rust-policy/UPSTREAM-LICENSE": "09be077884b32b473090374da8e696520d957f35c30db49314fb97f076a15c89",
+    "tests/provider/saml/rust-policy/exact_candidate.rs": "76e8502839e67ad71406f93b330d940b28ffaa24e52bc581ac0c05268c887700",
+    "tests/provider/saml/rust-policy/observe.py": "31c514869ceedc4f3591bf611fff0e26ae44aef0ced720a928add86ba4a60da1",
+    "tests/provider/saml/rust-policy/observer.Dockerfile": "c88602e0e52b217f51877b94e7332451ecb7c3d522787f33b7b240e339eeb015",
+    "tests/provider/saml/rust-policy/patches/0001-extract-verified-profile.patch": "e783b62efb6e05bbe49a4900dec5eea755880dbc7034d2e6b87413a2c1cc31c4",
+    "tests/provider/saml/rust-policy/patches/0002-exact-sha256-profile.patch": "092c85bace3f8f85d2701e378b9f382f9d0d8babb66add0181bd10cef6157817",
+    "tests/provider/saml/rust-policy/test_observe.py": "dc034260a4fbdbefa9096d518580c04e951cf26fbfa8a35e2114159a8586563f"
+  },
+  "status": "controls_passed",
+  "transport_sha256": "7ef942b3537089d32b03fd3c35b64e44a605365ac3c96c2da806171e0c493b55",
+  "validation": {
+    "candidate_fmt_all_exit_code": 0,
+    "candidate_no_default_features_check_exit_code": 0,
+    "extraction_tests_passed": 36,
+    "full_candidate_clippy_log_sha256": "82e4fd2733306f9a170633f66f7bdeb26ab043884aef2c490f07df0fe166e906",
+    "full_candidate_tests_linux_failed": 0,
+    "full_candidate_tests_linux_ignored": 0,
+    "full_candidate_tests_linux_passed": 1087,
+    "gitleaks_exit_code": 0,
+    "independent_security_review_complete": false,
+    "macos_rustc": "rustc 1.95.0 (59807616e 2026-04-14) (Homebrew)",
+    "no_crypto_check_log_sha256": "07d47e0bab152af9b58475b9364450ac685ad82221b5e87832c798d704adea65",
+    "owned_linux_strict_clippy": [
+      {
+        "example": "exact_adapter",
+        "exit_code": 0
+      },
+      {
+        "example": "profile_signer",
+        "exit_code": 0
+      }
+    ],
+    "reporting_tests_passed": 14,
+    "upstream_full_aws_lc_clippy_macos_exit_code": 0
+  }
+}

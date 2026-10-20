@@ -1,0 +1,550 @@
+--- a/src/config/builders.rs
++++ b/src/config/builders.rs
+@@ -686,10 +686,7 @@
+         setting.require_audience_restriction =
+             audience_restriction_required(config.validation.audience);
+         setting.want_message_signed = response_signature_required(config.validation.responses);
+-        setting.strict_xml_signature_profile = matches!(
+-            config.validation.xml_signatures,
+-            super::XmlSignatureProfile::StrictRsaSha2
+-        );
++        setting.xml_signature_profile = config.validation.xml_signatures;
+         setting.want_encrypted_cbc_response_signed =
+             encrypted_cbc_response_signature_required(config.validation.responses);
+         setting.want_logout_request_signed =
+--- a/src/config/policies.rs
++++ b/src/config/policies.rs
+@@ -67,6 +67,9 @@
+     /// present, must belong to the XML-DSig namespace and use enveloped-signature
+     /// or exclusive canonicalization.
+     StrictRsaSha2,
++    /// The strict reference/transform profile, restricted to RSA-SHA256 and
++    /// SHA-256 reference digests on signatures authenticating accepted content.
++    StrictRsaSha256,
+     /// Accept every algorithm and same-document reference shape supported by
+     /// the selected cryptographic provider.
+     #[default]
+--- a/src/crypto/verify/profile.rs
++++ b/src/crypto/verify/profile.rs
+@@ -1,6 +1,7 @@
+ //! Algorithm and reference-shape policy on verifier-authenticated signature nodes.
+ use super::{reference_resolution, verified_target_from_uri};
+-use crate::constants::transform_algorithm;
++use crate::config::XmlSignatureProfile;
++use crate::constants::{digest_algorithm, signature_algorithm, transform_algorithm};
+ use crate::error::{ReferenceResolutionReason, SamlError};
+ use bergshamra::core::ns as bergshamra_ns;
+ use bergshamra::xml::{Document as BergshamraDocument, NodeId as BergshamraNodeId};
+@@ -47,6 +48,7 @@
+ pub(super) fn enforce_strict_profile_on_verified_signature(
+     document: &BergshamraDocument<'_>,
+     signature_node: BergshamraNodeId,
++    profile: XmlSignatureProfile,
+ ) -> Result<(), SamlError> {
+     let signed_info =
+         exactly_one_dsig_child(document, signature_node, bergshamra_ns::node::SIGNED_INFO)
+@@ -103,6 +105,14 @@
+     ) {
+         return Err(SamlError::AlgorithmUnsupported);
+     }
++    // Evaluate the exact verified Signature/SignedInfo in the verifier DOM.
++    // No unsigned-node scan or parse/serialize bridge supplies policy evidence.
++    if profile == XmlSignatureProfile::StrictRsaSha256
++        && (dsig_algorithm(document, signature_method) != Some(signature_algorithm::RSA_SHA256)
++            || dsig_algorithm(document, digest_method) != Some(digest_algorithm::SHA256))
++    {
++        return Err(SamlError::AlgorithmUnsupported);
++    }
+     for transforms in dsig_children(document, reference, bergshamra_ns::node::TRANSFORMS) {
+         // Bergshamra executes every direct child whose local name is
+         // `Transform`, including elements outside the XML-DSig namespace.
+--- /dev/null
++++ b/src/crypto/verify/tests/exact.rs
+@@ -0,0 +1,126 @@
++//! Exact policy regression scenarios using the existing signer and verifier.
++use super::*;
++use crate::constants::digest_algorithm::{SHA256, SHA384, SHA512};
++
++type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
++
++fn signed_pair(signature: &str, digest: &str, response: bool) -> TestResult<String> {
++    let key = load_private_key(SP_PRIVKEY, None)?;
++    let signed = construct_saml_signature(
++        RESPONSE,
++        response,
++        &key,
++        SP_SIGNING_CERT,
++        signature,
++        &[],
++        None,
++    )?;
++    // Fixture construction only: change the requested digest, then recompute
++    // both digest and signature using the existing provider before verification.
++    let original = digest_for_signature(signature).ok_or("unknown fixture digest")?;
++    sign_template(&empty_signature_values(&signed.replace(original, digest))?)
++}
++
++fn empty_signature_values(xml: &str) -> TestResult<String> {
++    fn collect(node: &Node, replacements: &mut Vec<(usize, usize, String)>) {
++        if matches!(node.local_name.as_str(), "DigestValue" | "SignatureValue") {
++            replacements.push((
++                node.start,
++                node.end,
++                format!("<ds:{0}></ds:{0}>", node.local_name),
++            ));
++        }
++        for child in &node.children {
++            collect(child, replacements);
++        }
++    }
++    let document = dom::parse(xml)?;
++    let mut replacements = Vec::new();
++    collect(&document.root, &mut replacements);
++    replacements.sort_by_key(|item| std::cmp::Reverse(item.0));
++    let mut template = xml.to_owned();
++    for (start, end, value) in replacements {
++        template.replace_range(start..end, &value);
++    }
++    Ok(template)
++}
++
++#[test]
++fn exact_policy_accepts_only_sha256_pairs_for_both_signature_targets() -> TestResult {
++    for response in [true, false] {
++        for (signature, digest) in [
++            (RSA_SHA256, SHA256),
++            (RSA_SHA384, SHA256),
++            (RSA_SHA512, SHA256),
++            (RSA_SHA256, SHA384),
++            (RSA_SHA256, SHA512),
++        ] {
++            let signed = signed_pair(signature, digest, response)?;
++            let trusted = [SP_SIGNING_CERT.to_owned()];
++            let broad = verify_signatures_detailed_with_profile(
++                &signed,
++                &trusted,
++                XmlLimits::default(),
++                XmlSignatureProfile::StrictRsaSha2,
++            )?;
++            assert!(
++                broad.verified(),
++                "target_response={response}, signature={signature}, digest={digest}"
++            );
++            let exact = verify_signatures_detailed_with_profile(
++                &signed,
++                &trusted,
++                XmlLimits::default(),
++                XmlSignatureProfile::StrictRsaSha256,
++            );
++            if signature == RSA_SHA256 && digest == SHA256 {
++                let result = exact?;
++                assert!(result.verified());
++                assert!(if response {
++                    result.response_covered()
++                } else {
++                    result.assertion_directly_covered()
++                });
++            } else {
++                assert!(matches!(exact, Err(SamlError::AlgorithmUnsupported)));
++            }
++        }
++    }
++    Ok(())
++}
++
++#[test]
++fn exact_policy_uses_authenticated_content_not_unrelated_signature_algorithms() -> TestResult {
++    let unrelated = signature_over_top_level_issuer(SP_PRIVKEY, SP_SIGNING_CERT, RSA_SHA512)?;
++    let signed = assertion_signed_response_with_extra_signature(&root_signature(&unrelated)?)?;
++    let result = verify_signatures_detailed_with_profile(
++        &signed,
++        &[SP_SIGNING_CERT.to_owned()],
++        XmlLimits::default(),
++        XmlSignatureProfile::StrictRsaSha256,
++    )?;
++    assert!(result.verified() && result.assertion_directly_covered());
++    assert!(!result.response_covered());
++    assert!(result
++        .verified_embedded_signatures()
++        .iter()
++        .all(|value| value.algorithm_uri() == RSA_SHA256));
++    Ok(())
++}
++
++#[test]
++fn typed_sp_configuration_preserves_exact_profile() -> TestResult {
++    use crate::{AcsEndpoint, EntityId, EntitySetting, SpConfig, SpValidationPolicy};
++    let config = SpConfig::builder(EntityId::try_new("https://sp.example.test")?)
++        .acs_endpoint(AcsEndpoint::post("https://sp.example.test/acs")?)
++        .validation(SpValidationPolicy {
++            xml_signatures: XmlSignatureProfile::StrictRsaSha256,
++            ..SpValidationPolicy::recommended()
++        })
++        .build()?;
++    assert_eq!(
++        EntitySetting::try_from(&config)?.xml_signature_profile,
++        XmlSignatureProfile::StrictRsaSha256
++    );
++    Ok(())
++}
+--- a/src/crypto/verify.rs
++++ b/src/crypto/verify.rs
+@@ -14,6 +14,7 @@
+ use profile::enforce_strict_profile_on_verified_signature;
+ 
+ use super::keys::load_certificate;
++use crate::config::XmlSignatureProfile;
+ use crate::constants::transform_algorithm;
+ use crate::error::{ReferenceResolutionReason, SamlError, SignatureVerificationReason};
+ use crate::util::normalize_cert_string;
+@@ -697,7 +698,7 @@
+     xml: &str,
+     metadata_certs: &[String],
+     limits: XmlLimits,
+-    strict_xml_signature_profile: bool,
++    signature_profile: XmlSignatureProfile,
+ ) -> Result<SignatureVerification, SamlError> {
+     let doc = dom::parse_with_limits(xml, limits)?;
+     let root = &doc.root;
+@@ -787,7 +788,8 @@
+                                 // LogoutResponse coverage. A protocol Response can
+                                 // also be evidence when `verified_content` returns
+                                 // no XML. Enforce the profile for either case.
+-                                if strict_xml_signature_profile
++                                if signature_profile
++                                    != XmlSignatureProfile::AllowProviderSupportedForCompatibility
+                                     && (signature.is_some()
+                                         || references_cover_direct_assertion(
+                                             &document,
+@@ -801,6 +803,7 @@
+                                     enforce_strict_profile_on_verified_signature(
+                                         &document,
+                                         signature_node,
++                                        signature_profile,
+                                     )?;
+                                 }
+                                 if let Some(signature) = signature {
+@@ -974,6 +977,8 @@
+ 
+ #[cfg(test)]
+ mod tests {
++    mod exact;
++
+     use super::*;
+     use crate::constants::signature_algorithm::{RSA_SHA256, RSA_SHA384, RSA_SHA512};
+     use crate::constants::{digest_for_signature, namespace, transform_algorithm};
+@@ -1086,7 +1091,11 @@
+             bergshamra_ns::node::SIGNATURE,
+         )
+         .ok_or(SamlError::SignedReferenceMismatch)?;
+-        enforce_strict_profile_on_verified_signature(&document, signature)
++        enforce_strict_profile_on_verified_signature(
++            &document,
++            signature,
++            XmlSignatureProfile::StrictRsaSha2,
++        )
+     }
+ 
+     #[test]
+@@ -1538,7 +1547,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+         assert!(result.verified() && result.assertion_directly_covered());
+         Ok(())
+@@ -1571,7 +1580,7 @@
+             &response_with_first_invalid_signature()?,
+             &[IDP_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+         assert!(!result.verified() && !result.response_covered());
+         assert!(result.verified_embedded_signatures().is_empty());
+@@ -1592,7 +1601,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+ 
+         let [signature] = result.verified_embedded_signatures() else {
+@@ -1617,7 +1626,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+ 
+         let [signature] = result.verified_embedded_signatures() else {
+@@ -1641,7 +1650,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            true,
++            XmlSignatureProfile::StrictRsaSha2,
+         )?;
+ 
+         let [signature] = result.verified_embedded_signatures() else {
+@@ -1661,7 +1670,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            true,
++            XmlSignatureProfile::StrictRsaSha2,
+         );
+ 
+         assert!(matches!(result, Err(SamlError::SignedReferenceMismatch)));
+@@ -1676,7 +1685,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+         let [signature] = compatible.verified_embedded_signatures() else {
+             return Err("expected the assertion-covering signature".into());
+@@ -1688,7 +1697,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            true,
++            XmlSignatureProfile::StrictRsaSha2,
+         );
+         assert!(matches!(strict, Err(SamlError::AlgorithmUnsupported)));
+         Ok(())
+@@ -1702,7 +1711,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            true,
++            XmlSignatureProfile::StrictRsaSha2,
+         );
+         assert!(matches!(result, Err(SamlError::SignedReferenceMismatch)));
+         Ok(())
+@@ -1716,7 +1725,7 @@
+             &signed,
+             &[SP_SIGNING_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+ 
+         let [signature] = result.verified_embedded_signatures() else {
+@@ -1746,7 +1755,7 @@
+             &signed_response_and_assertion,
+             &[SP_SIGNING_CERT.to_string(), IDP_CERT.to_string()],
+             XmlLimits::default(),
+-            false,
++            XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+         )?;
+         assert!(
+             result.verified() && result.assertion_directly_covered() && result.response_covered()
+@@ -1817,7 +1826,7 @@
+                 FALSE_SIGNED,
+                 &certs,
+                 XmlLimits::default(),
+-                false,
++                XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+             )?;
+             assert!(
+                 !result.verified()
+--- a/src/entity.rs
++++ b/src/entity.rs
+@@ -60,7 +60,7 @@
+     pub want_message_signed: bool,
+     /// Typed SP: enforce the strict RSA-SHA2 profile on embedded signatures that
+     /// authenticate accepted SSO and Single Logout messages.
+-    pub(crate) strict_xml_signature_profile: bool,
++    pub(crate) xml_signature_profile: crate::config::XmlSignatureProfile,
+     /// Typed SP: requires outer integrity for CBC-encrypted Assertions.
+     pub(crate) want_encrypted_cbc_response_signed: bool,
+     /// IdP: requires signed AuthnRequests.
+@@ -169,10 +169,7 @@
+                 &self.require_audience_restriction,
+             )
+             .field("want_message_signed", &self.want_message_signed)
+-            .field(
+-                "strict_xml_signature_profile",
+-                &self.strict_xml_signature_profile,
+-            )
++            .field("xml_signature_profile", &self.xml_signature_profile)
+             .field(
+                 "want_encrypted_cbc_response_signed",
+                 &self.want_encrypted_cbc_response_signed,
+@@ -292,7 +289,7 @@
+             validate_audience: true,
+             require_audience_restriction: true,
+             want_message_signed: false,
+-            strict_xml_signature_profile: false,
++            xml_signature_profile: crate::config::XmlSignatureProfile::default(),
+             want_encrypted_cbc_response_signed: false,
+             want_authn_requests_signed: false,
+             verify_authn_request_signature_if_present: false,
+--- a/src/flow.rs
++++ b/src/flow.rs
+@@ -113,6 +113,9 @@
+     pub require_audience_restriction: bool,
+     /// Whether embedded SAML signatures must satisfy the strict RSA-SHA2 profile.
+     pub strict_xml_signature_profile: bool,
++    /// Explicit embedded-signature policy. When set, takes precedence over
++    /// `strict_xml_signature_profile`; use `StrictRsaSha256` for exact SHA-256.
++    pub xml_signature_profile: Option<crate::config::XmlSignatureProfile>,
+     /// Expected issuer (peer `entityID`).
+     pub from_issuer: Option<&'a str>,
+     /// Peer signing certificate(s) for verification.
+@@ -150,6 +153,7 @@
+             verify_signature_if_present: false,
+             require_audience_restriction: true,
+             strict_xml_signature_profile: false,
++            xml_signature_profile: None,
+             from_issuer: None,
+             signing_certs: &[],
+             decrypt_key: None,
+@@ -513,7 +517,12 @@
+         xml,
+         opts.signing_certs,
+         opts.xml_limits,
+-        opts.strict_xml_signature_profile,
++        opts.xml_signature_profile
++            .unwrap_or(if opts.strict_xml_signature_profile {
++                crate::config::XmlSignatureProfile::StrictRsaSha2
++            } else {
++                crate::config::XmlSignatureProfile::AllowProviderSupportedForCompatibility
++            }),
+     )?;
+     let verified_xml_signatures = verification
+         .verified_embedded_signatures()
+--- a/src/idp.rs
++++ b/src/idp.rs
+@@ -640,6 +640,7 @@
+                 verify_signature_if_present: self.setting.verify_authn_request_signature_if_present,
+                 require_audience_restriction: true,
+                 strict_xml_signature_profile: false,
++                xml_signature_profile: None,
+                 from_issuer: sp.metadata.get_entity_id(),
+                 signing_certs: &signing_certs,
+                 decrypt_key: None,
+--- a/src/logout/parsing.rs
++++ b/src/logout/parsing.rs
+@@ -101,7 +101,8 @@
+             check_signature: self_setting.want_logout_request_signed,
+             verify_signature_if_present: false,
+             require_audience_restriction: true,
+-            strict_xml_signature_profile: self_setting.strict_xml_signature_profile,
++            strict_xml_signature_profile: false,
++            xml_signature_profile: Some(self_setting.xml_signature_profile),
+             from_issuer: from_meta.get_entity_id(),
+             signing_certs: &signing_certs,
+             decrypt_key: None,
+@@ -135,7 +136,8 @@
+             check_signature: self_setting.want_logout_response_signed,
+             verify_signature_if_present: false,
+             require_audience_restriction: true,
+-            strict_xml_signature_profile: self_setting.strict_xml_signature_profile,
++            strict_xml_signature_profile: false,
++            xml_signature_profile: Some(self_setting.xml_signature_profile),
+             from_issuer: from_meta.get_entity_id(),
+             signing_certs: &signing_certs,
+             decrypt_key: None,
+--- a/src/logout/tests.rs
++++ b/src/logout/tests.rs
+@@ -518,7 +518,8 @@
+ 
+     fn strict_sp() -> Result<ServiceProvider, SamlError> {
+         let mut service_provider = sp()?;
+-        service_provider.setting.strict_xml_signature_profile = true;
++        service_provider.setting.xml_signature_profile =
++            crate::config::XmlSignatureProfile::StrictRsaSha2;
+         Ok(service_provider)
+     }
+ 
+--- a/src/sp.rs
++++ b/src/sp.rs
+@@ -711,7 +711,8 @@
+                 check_signature: true,
+                 verify_signature_if_present: false,
+                 require_audience_restriction: self.setting.require_audience_restriction,
+-                strict_xml_signature_profile: self.setting.strict_xml_signature_profile,
++                strict_xml_signature_profile: false,
++                xml_signature_profile: Some(self.setting.xml_signature_profile),
+                 from_issuer: idp.metadata.get_entity_id(),
+                 signing_certs: &signing_certs,
+                 decrypt_key,
+--- /dev/null
++++ b/tests/typed_sso/exact_profile.rs
+@@ -0,0 +1,57 @@
++//! Public typed SP propagation, with genuine signatures on both targets.
++use super::*;
++use saml_rs::constants::signature_algorithm::RSA_SHA384;
++
++#[test]
++fn typed_sp_enforces_exact_profile_before_exposing_a_session(
++) -> Result<(), Box<dyn std::error::Error>> {
++    let exchange = recommended_post_exchange()?;
++    let unsigned =
++        strip_embedded_signatures(&response_xml_from_fields(&exchange.response_fields)?)?;
++    let key = load_private_key(PRIVKEY, None)?;
++    for response_target in [true, false] {
++        for algorithm in [RSA_SHA256, RSA_SHA384, RSA_SHA512] {
++            let signed = construct_saml_signature(
++                &unsigned,
++                response_target,
++                &key,
++                CERT,
++                algorithm,
++                &[],
++                None,
++            )?;
++            let fields = response_fields_with_xml(exchange.response_fields.clone(), &signed)?;
++            let broad = Saml::sp(sp_with_validation(SpValidationPolicy {
++                xml_signatures: XmlSignatureProfile::StrictRsaSha2,
++                ..recommended_sso_accept_validation()
++            })?)?;
++            broad.finish_sso(
++                &exchange.idp_descriptor,
++                &exchange.pending,
++                BrowserInput::<SsoResponse>::post(fields.clone()),
++                validation(),
++            )?;
++            let exact = Saml::sp(sp_with_validation(SpValidationPolicy {
++                xml_signatures: XmlSignatureProfile::StrictRsaSha256,
++                ..recommended_sso_accept_validation()
++            })?)?;
++            let result = exact.finish_sso(
++                &exchange.idp_descriptor,
++                &exchange.pending,
++                BrowserInput::<SsoResponse>::post(fields),
++                validation(),
++            );
++            if algorithm == RSA_SHA256 {
++                let session = result?;
++                assert_eq!(session.verified_xml_signatures().len(), 1);
++                assert_eq!(
++                    session.verified_xml_signatures()[0].algorithm_uri(),
++                    RSA_SHA256
++                );
++            } else {
++                assert!(matches!(result, Err(SamlError::AlgorithmUnsupported)));
++            }
++        }
++    }
++    Ok(())
++}
+--- a/tests/typed_sso.rs
++++ b/tests/typed_sso.rs
+@@ -5,6 +5,9 @@
+     feature = "crypto-aws-lc",
+     feature = "crypto-fips"
+ ))]
++
++#[path = "typed_sso/exact_profile.rs"]
++mod exact_profile;
+ 
+ use std::{
+     collections::HashMap,

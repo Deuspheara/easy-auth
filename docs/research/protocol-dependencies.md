@@ -251,3 +251,7 @@ identical corpus bytes against both exact pins. It recommends qualifying the
 complete strict message component, conditional on exact algorithm/digest policy,
 independent resource evidence and security review. No production selection or
 SAML release-gate change follows from the passing bounded controls.
+
+The [exact SHA-256 follow-up](saml-exact-policy.md) validates a reviewable
+upstream-compatible profile patch and independent resource observation. It leaves
+production dependency selection, independent review and the SAML gate unchanged.

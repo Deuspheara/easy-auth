@@ -7,14 +7,18 @@ use saml_rs::xml::dom::{self, Node};
 use saml_rs::SamlError;
 use std::io::{self, BufRead, Read};
 
-fn main() {
-    if run().is_err() {
+pub(crate) fn main() {
+    if run_with_options(|_| {}, "strict-flow", true).is_err() {
         eprintln!("comparison_transport_failed");
         std::process::exit(2);
     }
 }
 
-fn run() -> Result<(), Box<dyn std::error::Error>> {
+pub(crate) fn run_with_options(
+    configure: impl Fn(&mut FlowOptions<'_>),
+    api: &str,
+    include_generic: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
     for line in io::stdin().lock().take(2 * 1024 * 1024).lines() {
         let line = line?;
         let fields: Vec<_> = line.split('\t').collect();
@@ -27,13 +31,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             .filter(|s| !s.is_empty())
             .map(str::to_owned)
             .collect();
-        emit(
-            fields[0],
-            fields[1],
-            "raw-signature",
-            verify_signature(&xml, &certs)
-                .map(|(verified, content)| if verified { content } else { None }),
-        );
+        if include_generic {
+            emit(
+                fields[0],
+                fields[1],
+                "raw-signature",
+                verify_signature(&xml, &certs)
+                    .map(|(verified, content)| if verified { content } else { None }),
+            );
+        }
         let mut opts = FlowOptions::default();
         opts.binding = Some(Binding::Post);
         opts.parser_type = Some(ParserType::SamlResponse);
@@ -43,6 +49,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         opts.from_issuer = Some("https://idp.example.test");
         opts.expected_audience = Some("https://sp.example.test");
         opts.expected_in_response_to = Some("auth32-owned-request");
+        configure(&mut opts);
         let request = HttpRequest {
             body: vec![("SAMLResponse".to_owned(), STANDARD.encode(xml.as_bytes()))],
             ..Default::default()
@@ -50,7 +57,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         emit(
             fields[0],
             fields[1],
-            "strict-flow",
+            api,
             flow(&opts, &request).map(|value| Some(value.saml_content)),
         );
     }
