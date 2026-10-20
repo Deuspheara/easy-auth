@@ -1,9 +1,8 @@
 # ADR 0016: Scoped OIDC identity mapping and explicit provisioning
 
 Date: 2026-10-20. Status: accepted for AUTH-30's optional core/PostgreSQL mapping,
-policy storage, JIT resolution and provider sessions. AUTH-30 remains In Progress
-pending hosted publication and completion review; owned Keycloak now exercises
-actual local JIT/session behavior. Explicit
+policy storage, JIT resolution and provider sessions, with local and hosted
+acceptance of actual local JIT/session behavior through owned Keycloak. Explicit
 linking/unlinking remains AUTH-25; ordinary provider activation is not enabled.
 
 ## Context and identity boundary
@@ -101,8 +100,10 @@ Provider-required accounts cannot use mailbox/password sign-in, password enrollm
 mailbox deletion, passkey sign-in or saved-code passkey recovery as implicit fallback.
 Verified local contact does not relax policy. Preverified passkey proofs and retained
 recovery codes reject after this policy change. No public policy-transition, provider
-contact attachment or provider-only account-deletion endpoint is added. Those
-lifecycle/activation capabilities require their own reviewed boundary; account-deletion
+contact attachment or provider-only account-deletion endpoint is added. AUTH-55 owns
+provider-only deletion; AUTH-56 owns embedded/standalone OIDC web composition with
+deletion as a prerequisite. Those lifecycle/activation capabilities require their
+own reviewed boundary; account-deletion
 race tests use an owned persistence fixture following owner lock and audit erasure.
 
 ## Deletion and retention

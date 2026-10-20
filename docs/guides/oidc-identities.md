@@ -2,9 +2,10 @@
 
 The core/PostgreSQL `oidc-identities` features add local provider identity resolution
 after the [transaction-bound verifier](oidc-verification.md). They enable no public
-callback route or ordinary server configuration. AUTH-30 remains In Progress pending
-hosted publication/completion review; provider linking/unlinking is AUTH-25 and stronger-account recovery gates
-remain open. [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records policy.
+callback route or ordinary server configuration. AUTH-30's backend boundary has
+passed local and hosted acceptance; provider linking/unlinking is AUTH-25 and
+stronger-account recovery gates remain open.
+[ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records policy.
 
 ## Trusted setup
 
@@ -77,7 +78,9 @@ Logout can dispose of an owned bearer even if its provider source is disabled.
 Provider-required users do not acquire mailbox/password, passkey sign-in or saved-code
 passkey recovery fallback, even if trusted storage later has verified contact. No public
 provider contact attachment, policy transition or provider-only deletion endpoint is
-provided here. Ordinary provider activation and complete first-release lifecycle remain
+provided here. AUTH-55 owns provider-only deletion; AUTH-56 owns supported embedded
+and standalone OIDC web composition and depends on that lifecycle boundary.
+Ordinary provider activation and complete first-release lifecycle remain
 separate gates. Applications must not fabricate contact or weaken policy to work around
 an unavailable lifecycle operation.
 

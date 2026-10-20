@@ -2202,3 +2202,26 @@ CI run 39350358984 for `38fda0b` completed SUCCESS, verified from GitHub. The ne
 requires its own hosted run before AUTH-30 completion. AUTH-25 linking, provider-only public
 lifecycle, AUTH-20's unresolved Safari/recovery evidence and the other first-release gates
 remain open independently.
+
+## AUTH-30 hosted acceptance and remaining delivery gates (2026-10-20)
+
+[CI run 39353249042](https://github.com/Deuspheara/easy-auth/actions/runs/39353249042)
+completed SUCCESS for `1ffc809387620da2b34a6de6385d90c646e196ad`, including both
+Rust and secret-scanning jobs. All required steps passed: formatting, strict
+all-feature/all-target lint, default and all-feature real-PostgreSQL workspace
+tests, verification-only core tests and example compilation, the nineteen-case
+owned Keycloak suite, existing passkey/SMTP/recovery browser suites, recovery-notice
+delivery, compiled advisory checking and all-feature cargo-deny. No failed step
+was skipped or retried to obtain acceptance.
+
+The local report still matches all 560 source/configuration hashes and its frozen
+producer binary. The subsequent documentation-only checkpoint records this hosted
+result and explicit ownership of remaining gates; it changes no tested code,
+configuration, dependencies, migrations or immutable evidence report.
+
+AUTH-55 owns provider-required account deletion without weaker fallback. AUTH-56
+owns supported embedded/standalone OIDC web composition and depends on that lifecycle
+boundary. These are first-release blockers, not implemented capabilities. AUTH-25
+linking, AUTH-20's unresolved Safari/Dashlane recovery evidence, broader provider
+acceptance, SAML, outbound issuer and independent review remain open. Acceptance
+of AUTH-30's scoped backend boundary does not complete M05 or the full release.
