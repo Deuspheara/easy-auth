@@ -1,8 +1,5 @@
-use super::{
-    cookies::{self, Transaction},
-    routing::DeletionState,
-    types::*,
-};
+use super::super::cookies::ACCOUNT_DELETION_COOKIES as COOKIES;
+use super::{routing::DeletionState, types::*};
 use crate::{
     browser::{clear_auth_cookies, read_cookie},
     error::ApiError,
@@ -34,7 +31,7 @@ pub(super) async fn start(
     query.map_err(|_| ApiError::Body(StatusCode::BAD_REQUEST))?;
     let Json(input) = body?;
     confirm(&input.confirmation)?;
-    cookies::require_absent(&headers)?;
+    COOKIES.require_absent(&headers)?;
     let purpose = purpose(&state, &headers).await?;
     let browser = Secret::generate()?;
     let source = source_key(source);
@@ -43,9 +40,10 @@ pub(super) async fn start(
         source: &source,
         purpose,
     };
-    let start = state.services.transactions.begin(&intent).await?;
+    let start = state.services.source.transactions.begin(&intent).await?;
     let url = match state
         .services
+        .source
         .exchange
         .reauthentication_url(&start, &[])
         .await
@@ -56,6 +54,7 @@ pub(super) async fn start(
             // unavailable repository may retain the bounded row until expiry.
             let _ = state
                 .services
+                .source
                 .transactions
                 .cancel(&intent, &start.state, &start.proof)
                 .await;
@@ -66,7 +65,7 @@ pub(super) async fn start(
         authorization_url: url.expose().to_owned(),
     })
     .into_response();
-    cookies::set(&mut response, &state.base.browser, &browser, &start);
+    COOKIES.set(&mut response, &state.base.browser, &browser, &start);
     Ok(response)
 }
 
@@ -87,7 +86,7 @@ pub(super) async fn finish(
         Ok(()) => clear_auth_cookies(&state.base.browser),
         Err(error) => {
             let mut response = ApiError::from(error).into_response();
-            cookies::clear(&mut response, &state.base.browser);
+            COOKIES.clear(&mut response, &state.base.browser);
             response
         }
     })
@@ -99,7 +98,7 @@ async fn complete(
     source: &str,
     input: DeletionFinishInput,
 ) -> auth_core::Result<()> {
-    let transaction = Transaction::read(headers)?;
+    let transaction = COOKIES.read(headers)?;
     let returned_state = Secret::parse(input.state)?;
     if returned_state.verifier() != transaction.state.verifier() {
         return Err(Error::Unauthorized);
@@ -111,19 +110,25 @@ async fn complete(
         purpose: purpose(state, headers).await?,
     };
     let callback = OAuthCallback {
-        redirect: state.services.policy.configuration().redirect(),
+        redirect: state.services.source.policy.configuration().redirect(),
         issuer: input.issuer.as_deref(),
     };
     let exchange = state
         .services
+        .source
         .transactions
         .consume(&intent, &transaction.state, transaction.proof, callback)
         .await?;
-    let verified = state.services.exchange.exchange(exchange, code).await?;
+    let verified = state
+        .services
+        .source
+        .exchange
+        .exchange(exchange, code)
+        .await?;
     state
         .services
         .deletion
-        .finish(state.services.policy.map(verified)?)
+        .finish(state.services.source.policy.map(verified)?)
         .await
 }
 
@@ -143,7 +148,7 @@ pub(super) async fn cancel(
         Ok(()) => StatusCode::NO_CONTENT.into_response(),
         Err(error) => ApiError::from(error).into_response(),
     };
-    cookies::clear(&mut response, &state.base.browser);
+    COOKIES.clear(&mut response, &state.base.browser);
     Ok(response)
 }
 async fn cancel_pending(
@@ -151,7 +156,7 @@ async fn cancel_pending(
     headers: &HeaderMap,
     source: &str,
 ) -> auth_core::Result<()> {
-    let transaction = Transaction::read(headers)?;
+    let transaction = COOKIES.read(headers)?;
     let intent = OAuthIntent {
         browser: &transaction.browser,
         source,
@@ -159,6 +164,7 @@ async fn cancel_pending(
     };
     state
         .services
+        .source
         .transactions
         .cancel(&intent, &transaction.state, &transaction.proof)
         .await

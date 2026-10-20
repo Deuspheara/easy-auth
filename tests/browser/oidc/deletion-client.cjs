@@ -7,7 +7,7 @@ const {chromium} = require('../passkeys/node_modules/playwright');
 // Reference-client checks with controlled HTTP responses, separate from actual
 // Keycloak/PostgreSQL acceptance. No external provider, credential or account.
 async function main() {
-  const directory = path.resolve(__dirname, '../../../crates/auth-axum/src/oidc_deletion');
+  const directory = path.resolve(__dirname, '../../../crates/auth-axum/src/oidc/deletion');
   const html = fs.readFileSync(path.join(directory, 'pages.html'), 'utf8');
   const script = fs.readFileSync(path.join(directory, 'pages.js'), 'utf8');
   const browser = await chromium.launch({headless:true});

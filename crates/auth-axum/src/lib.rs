@@ -4,7 +4,7 @@ mod contract;
 mod error;
 mod handlers;
 #[cfg(feature = "oidc-account-deletion")]
-mod oidc_deletion;
+mod oidc;
 #[cfg(feature = "passkey-enrollment")]
 mod passkeys;
 mod router;
@@ -14,7 +14,7 @@ pub use browser::BrowserConfig;
 pub use contract::openapi;
 pub use handlers::sessions::authenticate;
 #[cfg(feature = "oidc-account-deletion")]
-pub use oidc_deletion::{
+pub use oidc::{
     OidcAccountDeletionServices, experimental_oidc_account_deletion_router,
     oidc_account_deletion_openapi,
 };

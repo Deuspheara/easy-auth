@@ -1,4 +1,5 @@
-use super::{cookies, handlers, oidc_account_deletion_openapi};
+use super::super::{cookies::ACCOUNT_DELETION_COOKIES as COOKIES, source::Source};
+use super::{handlers, oidc_account_deletion_openapi};
 use crate::{
     Auth, BrowserConfig,
     browser::boundary,
@@ -23,9 +24,7 @@ pub(super) const CALLBACK_PATH: &str = "/oidc/account-delete/callback";
 /// persisted policy/revision; no browser-supplied owner or connection is accepted.
 #[derive(Clone)]
 pub struct OidcAccountDeletionServices {
-    pub(super) policy: OidcIdentityPolicy,
-    pub(super) transactions: Arc<OAuthTransactions>,
-    pub(super) exchange: Arc<OidcCodeExchange>,
+    pub(super) source: Arc<Source>,
     pub(super) deletion: Arc<OidcAccountDeletion>,
 }
 impl OidcAccountDeletionServices {
@@ -35,15 +34,8 @@ impl OidcAccountDeletionServices {
         exchange: Arc<OidcCodeExchange>,
         deletion: Arc<OidcAccountDeletion>,
     ) -> Result<Self> {
-        if policy.configuration() != transactions.configuration()
-            || policy.configuration() != exchange.configuration()
-        {
-            return Err(Error::InvalidInput);
-        }
         Ok(Self {
-            policy,
-            transactions,
-            exchange,
+            source: Arc::new(Source::new(policy, transactions, exchange)?),
             deletion,
         })
     }
@@ -61,7 +53,7 @@ pub fn experimental_oidc_account_deletion_router(
     browser: BrowserConfig,
     services: OidcAccountDeletionServices,
 ) -> Result<Router> {
-    let connection = services.policy.configuration();
+    let connection = services.source.policy.configuration();
     if auth.realm() != connection.realm()
         || !browser.origin().starts_with("https://")
         || connection.redirect() != format!("{}{CALLBACK_PATH}", browser.origin())
@@ -106,7 +98,7 @@ async fn clear_revoked_proof(
         .iter()
         .any(|value| value.to_str().is_ok_and(|value| value.starts_with(&prefix)))
     {
-        cookies::clear(&mut response, &state.browser);
+        COOKIES.clear(&mut response, &state.browser);
     }
     response
 }

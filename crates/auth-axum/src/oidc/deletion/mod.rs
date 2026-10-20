@@ -1,5 +1,4 @@
 mod contract;
-mod cookies;
 mod handlers;
 mod pages;
 mod routing;

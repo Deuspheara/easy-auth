@@ -459,7 +459,7 @@ reviewed size exceptions. No unrelated structural cleanup is deferred.
 
 ## AUTH-55 experimental HTTP boundary
 
-`auth-axum/oidc_deletion/` keeps trusted service alignment/routing, protected cookie
+`auth-axum/oidc/deletion/` keeps trusted service alignment/routing, protected cookie
 transport, closed DTOs, thin use-case handlers, OpenAPI and fixed reference pages
 in named modules. No SQL, alternate authorization policy or network crypto is
 implemented in the adapter. Two read-only core configuration getters enable exact
@@ -470,6 +470,12 @@ remain below 300 lines. Longer fixture construction and ordered commit-wait test
 keep prerequisite verification and the observed invariant together; production
 handlers remain under the function-size review trigger. No unrelated cleanup is
 deferred. The browser client checks are separate from native Keycloak acceptance.
+
+AUTH-56 moves that adapter under the owning `oidc/` feature tree before adding
+browser sign-in. Exact trusted source alignment and the protected cookie codec
+live in private sibling modules, with fixed deletion cookie names and unchanged
+public deletion constructors, paths and contracts. This structural checkpoint
+adds no authentication behavior or persistence policy.
 
 
 AUTH-55's owned HTTP provider fixture keeps composition/commands, bootstrap,
