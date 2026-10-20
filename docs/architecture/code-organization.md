@@ -745,3 +745,13 @@ upgrade/negative-plus-positive cases retain their sequence as function-size
 exceptions; all new or extended implementation/test files remain below300lines.
 Public Start/Request layouts and existing repository implementations are preserved;
 new exact-return methods have fail-closed defaults. No unrelated cleanup is deferred.
+
+
+The Google public-provider preflight is an explicit example, not server startup or
+protocol policy. Its entry composes owned database cleanup; `database.rs` owns only
+that restricted local disposable lifecycle; `network.rs` observes unchanged
+production GET transport and refuses token POSTs; `setup.rs` composes trusted core/
+PostgreSQL services; `probe.rs` checks public metadata and bound cancellation/source
+facts. Production modules and visibility are unchanged. All files stay below200lines
+and functions below50lines. No generic fixture framework or unrelated cleanup is
+introduced. External network checks stay outside default CI execution.

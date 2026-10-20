@@ -3891,3 +3891,70 @@ framework. No core policy, persistence logic, migration, dependency or unrelated
 cleanup changes are needed. AUTH-23 remains In Progress for actual Google/OS,
 genuine freshness and ordinary lifecycle/activation gates. No Safari prompts,
 credential-manager access or system settings were involved.
+
+
+## AUTH-23 public Google metadata and production TLS preflight — 2026-10-20
+
+The opt-in `google-provider-preflight` example now exercises real public Google
+metadata with unchanged production `OidcHttps` DNS/egress/public roots and real
+PostgreSQL registry checks. It creates/migrates only its own random local database
+and holds an actual native listener. Google authorization preparation and exact
+operation return checks use the existing core services, followed by explicit
+pending cancellation and actual source disable. No production code/policy, schema,
+HTTP endpoint, credential loader, startup activation or dependency changes.
+
+The [fixed-producer record](../../tests/provider/google/results/2026-10-20/public-provider-preflight.json)
+passes:3 public GETs, discovery S256/response issuer/client-secret-post admission,
+bounded public JWKS envelope, actual native authorization preparation, one pending
+row then cancellation, zero users/identities/sessions/audits/pending, and exact
+Unauthorized on cached discovery after real source disable. The token transport
+refuses every POST and must observe0 attempts. Static unregistered placeholders
+are never submitted. No browser is opened or authorization URL visited; raw URLs,
+proof/documents and foreign errors are not recorded. JWKS-envelope admission is
+not signature/claim verification.
+
+Four fixed-producer controls independently pass with exit1 and exact fixed stages,
+empty stdout and no credentials/foreign causes: injected probe failure after DB
+creation; nonlocal database URL; a loopback URL with host-override query; missing
+explicit mode. The common lifecycle closes the owned database after success or
+probe failure. Independent catalog queries find0 matching databases after every
+control. Docker port inspection confirms that observer is the same PostgreSQL17.11
+server at the configured literal loopback port. A forcibly interrupted process
+cannot promise asynchronous cleanup.
+
+Provenance is base commitdd7c9f971b6acec568454f61e9c8e7f8d8903dab plus all6 changed/new
+runtime-source overlays (manifest and5 example modules). All other runtime sources
+are verified unchanged from that base; Cargo.lock is unchanged. Every overlay hash
+and the retained fixed executable SHA256 were rechecked against the record. This
+is source/run provenance, not a reproducible-binary claim. Historical browser
+reports remain unchanged and are not new browser evidence for this example.
+
+Final local verification, CARGO_INCREMENTAL=0/documented real PostgreSQL setup:
+
+- Formatting and strict locked workspace/all-target Clippy for default and all
+  features: pass. The example also compiled with its minimal google-desktop feature.
+- `cargo test --locked --workspace --all-features`:638 passed, zero failures/ignored
+  (2 Axum unit,116 HTTP,96 core,358 PostgreSQL,54 server unit,12 desktop integration).
+  The filtered logging child is not counted twice.
+- `cargo test --locked --workspace`:97 passed, zero failures/ignored.
+- Compiled dependency advisory gate and all-feature cargo-deny pass without new
+  exceptions. Inactive SQLx/MySQL RSA0.9.10 RUSTSEC-2023-0071 remains visible.
+- The explicit live run and4 controls are separate acceptance observations, not
+  additional default-suite authentication cases or successful provider denials.
+  External availability is allowed to fail the live preflight; it is not run by
+  default CI and no external credentials are required.
+
+Maintainability review separates entry/lifecycle composition, restricted owned DB,
+production GET observation/token refusal, trusted service setup and ordered probe
+assertions. All5 modules stay below200lines and functions below50lines; visibility
+is confined to the example. No generic fixture framework, production test hook or
+unrelated cleanup is introduced. The interoperability table now distinguishes this
+Google evidence from unimplemented Apple support.
+
+This establishes only public metadata/TLS compatibility at the recorded time.
+Actual registered-client acceptance, callback/token/signature/claim behavior,
+OS-browser handoff, genuine Google freshness, usable provider-required deletion,
+ordinary activation and independent review remain AUTH-23 gates. No account,
+provider setting, credential manager or security configuration was changed. The
+existing cleanup commit's hosted run39427439051 remains a separate tracked run;
+new preflight publication will require its own exact-head CI result.

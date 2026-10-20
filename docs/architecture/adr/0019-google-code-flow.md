@@ -376,3 +376,15 @@ stable native registration profile and exact per-operation return persistence. I
 resolves port-only reopen/concurrency invalidation without weakening the existing
 exact profile or actual administrative source-revision invalidation. This is a
 component boundary, not ordinary Google/native activation or OS interoperability.
+
+
+## Public-provider transport evidence
+
+The explicit `google-provider-preflight` example now checks real public Google
+discovery/JWKS over production TLS with current PostgreSQL registry checks and an
+owned native authorization/cancellation cycle. It accepts no registered client
+credentials and blocks all token POSTs. This narrows the previously untested public
+metadata/TLS boundary only; signed/registered-client and actual browser/OS evidence
+remain mandatory. Its disposable database lifecycle closes after success or probe
+failure, with independent failure and catalog controls. See the
+[preflight guide](../../guides/google.md#public-metadata-and-transport-preflight).

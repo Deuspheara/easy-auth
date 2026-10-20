@@ -499,3 +499,47 @@ No session is issued until mapping and atomic sign-in commit. The original bound
 launcher and explicit cancellation/drop rules apply. See
 [ADR0020](../architecture/adr/0020-native-oauth-operation-returns.md) for migration,
 compatibility, threat boundaries and the remaining activation gates.
+
+
+## Public metadata and transport preflight
+
+The explicit `google-provider-preflight` example checks current public Google
+metadata using the unchanged production `OidcHttps` DNS, public roots, hostname/
+certificate validation and constrained egress. It creates and migrates only a new
+randomly named local database, binds an actual loopback listener, persists the
+stable source and prepares/cancels a native Google authorization operation. It also
+loads the bounded public JWKS envelope and requires cached discovery to reject an
+actual database source disable. The URL/private proof and raw provider documents
+never enter output.
+
+With the documented development PostgreSQL running, export `DATABASE_URL` for its
+administrative connection. This tool requires a literal loopback host, no query or
+fragment, and permission to create/drop its disposable database. It does not migrate
+the administrative database. Run explicitly:
+
+```sh
+CARGO_INCREMENTAL=0 cargo run --locked -p easy-auth-server --features google-desktop --example google-provider-preflight -- --public-metadata
+```
+
+Only three public GETs were needed in the dated run. The example uses hardcoded
+unregistered placeholders that are never submitted to Google. Its token transport
+refuses every POST; no browser is opened, authorization URL visited, user signed in,
+provider setting changed or local identity/session issued. A loaded JWKS envelope
+is not a verified signature. Public metadata/TLS success does not establish client
+registration, authorization response behavior, actual signed claims, Google
+freshness, OS browser delivery or a usable provider-required lifecycle.
+
+The explicit `--check-cleanup-on-failure` mode creates a disposable database, injects
+a fixed preflight failure and closes the database through the same lifecycle. It
+must exit1 with stage `injected_probe_failure`; this is an independent cleanup
+control, not a provider test pass. Omitting a mode or supplying a nonlocal/ambiguous
+database URL fails before database creation. All errors are fixed stage names,
+never foreign messages or credential/URL values. An independent catalog read must
+also find no `easy_auth_google_probe_` databases afterward. Interrupted processes
+cannot promise asynchronous cleanup and need explicit operator investigation.
+
+This live check is opt-in and is not executed by the default/credential-free CI
+suite: external service availability can fail it. Never relabel a public transport/
+metadata failure as a successful authentication rejection or relax TLS/egress to
+make it pass. The [run record and reproduction notes](../../tests/provider/google/README.md)
+state the source/producer provenance and remaining matrix.

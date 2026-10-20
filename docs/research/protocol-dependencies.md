@@ -209,3 +209,12 @@ root, advisory or license exception. RFC8252 section7.3 and Google's desktop flo
 were rechecked on2026-10-20 for ephemeral literal-loopback ports and IPv4/IPv6.
 That protocol research is not registered-client/OS-browser acceptance evidence.
 See [ADR0020](../architecture/adr/0020-native-oauth-operation-returns.md).
+
+
+AUTH-23's credential-free public-provider preflight uses only the already selected
+`OidcHttps`, public roots and existing PostgreSQL/core dependencies. It introduces
+no dependency, TLS override, alternate verifier or provider credential. Public
+Google metadata/JWKS admission and native request preparation are separate evidence
+from signed identity, registered client or OS/browser interoperability; raw public
+keys establish no authentication. See the
+[preflight boundary](../guides/google.md#public-metadata-and-transport-preflight).

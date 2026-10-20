@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T13:20:11.715640+00:00",
+  "scope": "credential-free public metadata and production TLS only",
+  "source": {
+    "base_revision": "dd7c9f971b6acec568454f61e9c8e7f8d8903dab",
+    "overlay_sha256": {
+      "apps/auth-server/Cargo.toml": "3b6e4da4beec9c3bdd827b01c0417af4d58e542767777315b611e12af198078f",
+      "apps/auth-server/examples/google-provider-preflight/database.rs": "be4347ee3291a03a0656d89bb30d14403c2bd9bbb36faf060f422684644de2d3",
+      "apps/auth-server/examples/google-provider-preflight/main.rs": "d49cde4eca1d8a52b0b37a99756344622d5b91ebf30a297a54562d000f087d19",
+      "apps/auth-server/examples/google-provider-preflight/network.rs": "de3c47435ff21cd40237e281eb7f33a60a4ececf9827f6757d94f5f26cdf166a",
+      "apps/auth-server/examples/google-provider-preflight/probe.rs": "7e59839f0d14bfb79de800cce4dc59abbbb41d9300622d58be4effe1341fa2c8",
+      "apps/auth-server/examples/google-provider-preflight/setup.rs": "09cd6b800e47bcb4d8aa2105dfff9aa83d9af51d8360e361653fad79f4c4cb66"
+    },
+    "other_runtime_sources_unchanged": true,
+    "cargo_lock_sha256": "763700ff74ce32f1bbffe08066809309459530701e2a3597de3c81ddc15a805c"
+  },
+  "producer": {
+    "example": "google-provider-preflight",
+    "features": [
+      "google-desktop"
+    ],
+    "profile": "dev",
+    "cargo_incremental": "0",
+    "executable_sha256": "a43cdf4364b56d2975f6f64502d5732c6952e4178588633df14276212cede601",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14) (Homebrew)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.3",
+    "cargo": "cargo 1.95.0 (f2d3ce0bd 2026-03-21) (Homebrew)",
+    "reproducible_binary_claim": false
+  },
+  "postgresql": {
+    "version": "17.11",
+    "owned_databases_before": 0,
+    "owned_databases_after": 0
+  },
+  "result": {
+    "status": "passed",
+    "scope": "public_metadata_only",
+    "registered_client": false,
+    "public_root_tls": true,
+    "discovery_contract": true,
+    "public_jwks_envelope": true,
+    "native_authorization_prepared": true,
+    "exact_operation_return": true,
+    "pending_cancelled": true,
+    "disabled_source_rejected": true,
+    "users": 0,
+    "identities": 0,
+    "sessions": 0,
+    "audits": 0,
+    "pending": 0,
+    "public_get_requests": 3,
+    "blocked_token_requests": 0,
+    "browser_launched": false,
+    "signature_verified": false,
+    "owned_database_removed": true
+  },
+  "failure_controls": [
+    {
+      "case": "cleanup_after_failure",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stage": "injected_probe_failure",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "nonlocal_database",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stage": "local_database_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "database_host_override",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stage": "local_database_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "missing_explicit_mode",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stage": "explicit_preflight_mode_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    }
+  ],
+  "limitations": [
+    "No registered Google client or credential submission",
+    "No browser or OS handoff",
+    "No token POST or signature/claim verification",
+    "No genuine Google freshness or deletion evidence",
+    "No ordinary activation or production-readiness claim"
+  ]
+}
