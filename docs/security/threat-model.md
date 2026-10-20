@@ -406,5 +406,16 @@ Explicit confirmation, exact binding and one-use completion remain required. Pro
 and persistence failures stay distinct from authorization rejection and never issue
 a session. Final audit failure rolls back local identity/session while consumed
 OAuth state remains consumed. Original deletion proof/freshness requirements are
-unchanged. Standalone configuration and supported-mode native acceptance remain
-unimplemented; broader release and independent-review gates stay open.
+unchanged. Supported-mode native public-login acceptance remains unfinished;
+broader release and independent-review gates stay open.
+
+The shared AUTH-56 application factory validates a closed typed `AUTH_OIDC_*`
+contract before database loading/listening. Unknown/partial/unsupported settings,
+HTTP origins even in development, invalid egress/algorithm/claim choices and
+inconsistent registered client authentication fail closed. Confidential credentials
+come only from bounded protected files, never inferred public fallback. Core's
+existing egress metadata validation is reused before provisioning; it is no I/O or
+current-authority proof. Stable loading preserves revisions and operator disable.
+No root/address/insecure override, additional audience, dynamic issuer, secret
+logging or policy-row credential storage is added. Auth-only legacy composition
+refuses enabled browser settings rather than silently dropping requested routes.

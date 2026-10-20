@@ -64,5 +64,5 @@ and the [deletion guide](../guides/oidc-account-deletion.md) record that boundar
 [ADR 0018](adr/0018-oidc-web-composition.md) proposes AUTH-56's shared OIDC browser
 composition, including a common exact callback, explicit session handling and stable
 startup configuration. Stable policy loading and an opt-in Axum browser boundary
-are implemented; standalone configuration and supported-mode native acceptance
-remain unfinished. See the [browser guide](../guides/oidc-web.md).
+and shared standalone/embedded configuration are implemented; supported-mode
+native public-login acceptance remains unfinished. See the [browser guide](../guides/oidc-web.md).

@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-web = ["oidc-identities", "auth-axum/oidc-web"]
 experimental-oidc-account-deletion = ["oidc-identities", "auth-axum/oidc-account-deletion"]
 oidc-identities = ["oidc-verification", "auth-core/oidc-identities", "auth-postgres/oidc-identities"]
 oidc-verification = ["oidc-egress", "auth-core/oidc-verification", "auth-postgres/oidc-verification"]

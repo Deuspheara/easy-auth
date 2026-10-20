@@ -47,6 +47,15 @@ jobs:
         working-directory: tests/browser/passkeys
       - run: node tests/browser/oidc/deletion-client.cjs
       - run: node tests/browser/oidc/signin-client.cjs
+      - name: Build and check supported OIDC startup composition
+        run: |
+          cargo build --locked -p easy-auth-server --bin easy-auth
+          cp target/debug/easy-auth "$RUNNER_TEMP/easy-auth-oidc-disabled"
+          cargo build --locked -p easy-auth-server --bin easy-auth --example embedded --features oidc-web
+          python3 scripts/smoke_oidc_startup.py
+        env:
+          EASY_AUTH_OIDC_UNSUPPORTED_TEST_BINARY: ${{ runner.temp }}/easy-auth-oidc-disabled
+          EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
       - run: cargo check --locked -p easy-auth-server --example oidc-keycloak --features oidc-verification
       - run: cargo build --locked -p easy-auth-server --example oidc-keycloak --features oidc-identities
       - run: node tests/browser/oidc/run.cjs

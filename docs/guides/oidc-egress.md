@@ -75,3 +75,11 @@ A caller immediately retrying a cold fetch can receive RateLimited. Normal cache
 expiry still follows the ordinary miss interval. Share the document service to
 share these limits; recreating it per request defeats the intended resource policy.
 No token verification or automatic retry loop is provided by this method.
+
+Trusted startup can call `OidcDocuments::validate_configuration(&connection,
+&origins)` before provisioning services. It reuses the constructor's private URL/
+egress metadata policy, performs no DNS/HTTP/database I/O and establishes no current
+enable/revision or identity authority. The actual document constructor still
+validates its inputs, and every operation retains existing current-source, address,
+cache and deadline checks. AUTH-56's server factory uses this metadata check before
+its stable identity-policy loader; no development root/address override is added.

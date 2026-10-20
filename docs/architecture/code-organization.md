@@ -529,3 +529,13 @@ factory before enabling OIDC startup behavior. Both standalone and embedded entr
 points use its typed auth/browser/router/bind result; `configured_auth` is preserved.
 The extraction retains default routing, configuration validation and notification
 worker ownership, verified through existing workspace and real-SMTP lifecycle cases.
+
+Server OIDC startup extends that factory through `application/oidc.rs` and focused
+`configuration/oidc/` modules for the closed environment contract, typed policy and
+protected credential-file loading. Base parameter parsing stays with configuration;
+database/SMTP/password composition is reused. Core exposes metadata-only document
+configuration validation using its existing private egress policy, avoiding a second
+URL/IP policy or startup write before validation. Production transport has no fixture
+injection. Tests keep pure settings/file cases separate; the named startup script
+owns normal-binary mode/restart/refusal cases and disposable resources. New modules
+remain below300lines, with no unrelated structural cleanup deferred.

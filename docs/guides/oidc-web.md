@@ -2,9 +2,10 @@
 
 AUTH-56 is **In Progress**. The Axum `oidc-web` feature provides trusted
 `OidcWebServices`, `oidc_web_router` and `oidc_web_openapi` for one provider per
-HTTPS origin. Standalone settings, the shared configured application factory and
-native Keycloak acceptance through both supported modes remain unfinished. The
-normal server does not activate these routes. This is not production-readiness,
+HTTPS origin. The server `oidc-web` feature and explicit trusted startup settings
+now use the same `configured_application` factory for standalone and embedding.
+Native Keycloak public-login acceptance through both modes remains unfinished.
+Default builds and absent settings do not activate these routes. This is not production-readiness,
 external-provider interoperability or independent-review evidence.
 
 Use the existing [stable startup policy loader](oidc-identities.md#startup-loading-versus-administrative-changes)

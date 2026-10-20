@@ -1,11 +1,12 @@
 # ADR 0018: Shared OIDC browser composition
 
 Date: 2026-10-20. Status: stable startup metadata loading and opt-in Axum browser
-composition are implemented for AUTH-56; server configuration and supported-mode
-native acceptance remain proposed and unimplemented.
+composition and shared server configuration are implemented for AUTH-56;
+supported-mode native public-login acceptance remains proposed and unimplemented.
 AUTH-30 and AUTH-55 acceptance are prerequisites, not ordinary sign-in activation.
-No new schema or ordinary production configuration is enabled here. Public routes
-require the explicit `oidc-web` feature and trusted `oidc_web_router` composition.
+No new schema or default activation is introduced. Public routes require the
+explicit `oidc-web` feature and trusted `oidc_web_router` composition, selected
+by complete explicit settings in the shared server application factory.
 
 ## Context and scope
 

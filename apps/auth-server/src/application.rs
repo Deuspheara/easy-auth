@@ -1,4 +1,7 @@
-use crate::configured_auth;
+#[cfg(feature = "oidc-web")]
+mod oidc;
+
+use crate::configuration;
 use auth_axum::BrowserConfig;
 use auth_core::Auth;
 use axum::Router;
@@ -14,12 +17,40 @@ pub struct ConfiguredApplication {
 }
 
 pub async fn configured_application() -> Result<ConfiguredApplication, Box<dyn std::error::Error>> {
-    let (auth, browser, bind) = configured_auth().await?;
-    let router = auth_axum::router(auth.clone(), browser.clone());
+    let settings = configuration::oidc::read()?;
+    let parameters = configuration::parameters()?;
+    #[cfg(feature = "oidc-web")]
+    let prepared = match settings {
+        configuration::oidc::Configuration::Disabled => None,
+        configuration::oidc::Configuration::Enabled(settings) => {
+            Some(settings.prepare(parameters.realm, &parameters.browser)?)
+        }
+    };
+    #[cfg(not(feature = "oidc-web"))]
+    let _ = settings;
+    let (auth, repository) = configuration::load(&parameters).await?;
+    #[cfg(feature = "oidc-web")]
+    let router = match prepared {
+        Some(prepared) => {
+            oidc::router(
+                auth.clone(),
+                parameters.browser.clone(),
+                repository,
+                prepared,
+            )
+            .await?
+        }
+        None => auth_axum::router(auth.clone(), parameters.browser.clone()),
+    };
+    #[cfg(not(feature = "oidc-web"))]
+    let router = {
+        drop(repository);
+        auth_axum::router(auth.clone(), parameters.browser.clone())
+    };
     Ok(ConfiguredApplication {
         auth,
-        browser,
+        browser: parameters.browser,
         router,
-        bind,
+        bind: parameters.bind,
     })
 }

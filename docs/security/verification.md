@@ -2637,3 +2637,74 @@ Maintainability review keeps production modules below 300 lines and separates
 composition, handlers, callback selection, DTOs, contract and fixed clients. Longer
 ordered fixture/scenario functions retain prerequisites, observed waits and positive
 controls together as documented size exceptions. No unrelated cleanup is deferred.
+
+## AUTH-56 shared server configuration checkpoint — 2026-10-20
+
+AUTH-56 remains **In Progress**. Separately verified structural commit `a7ec437`
+adds `ConfiguredApplication`/`configured_application`, used by standalone and embedded
+entrypoints while preserving the auth-only `configured_auth` signature. Existing
+93 default workspace tests, strict all-feature/all-target lint and real SMTP lifecycle
+in both modes passed before adding settings behavior; twelve exact owned messages
+and both disposable databases were removed.
+
+The explicit server `oidc-web` feature now validates a closed typed environment
+contract before database loading/listening, prepares exact HTTPS callback/issuer/
+stable IDs, explicit egress/algorithm/client-auth choices and default-deny JIT, then
+uses the stable policy loader and existing production transport/core/PG/Axum services.
+Confidential credentials require a bounded protected regular UTF-8 file; there is no
+missing-secret/public fallback. Unknown/partial/invalid Unicode/oversized settings
+and root/address/raw-secret/redirect overrides fail closed. `configured_auth` refuses
+enabled browser settings instead of silently dropping requested routes. Core's new
+metadata-only document validation API reuses its existing egress policy before
+provisioning; it creates no proof, I/O or current authority. No migration, dependency
+version, insecure transport setting or alternate authentication policy was added.
+
+**13 new pure settings/file cases pass** with OIDC enabled; **4 cases pass** without
+it, including explicit unsupported-build refusal. They exercise required/malformed/
+duplicate settings, exact policy choices, bounded/invalid/control-containing files,
+client-method consistency, redaction, Unix permissions, HTTP/nonpublic literal
+rejection and unavailable files. The feature-specific build exposed an old test
+fixture's accidental dependency on unrelated `Url` serde feature unification. Its
+JSON now uses explicit URL strings with unchanged content/assertions; no production
+serialization dependency was added. All **23 feature-specific server cases** pass.
+
+A new normal-binary supervisor passes **13 real-PostgreSQL startup cases**: standalone
+and embedded shared routes, unchanged cross-mode revision, zero fabricated user/
+session/pending/audit authority, unsupported build, partial settings, forbidden root/
+address/raw-secret fields, development HTTP refusal, missing/publicly readable secret,
+valid explicit confidential file without revision rotation, policy mismatch and
+operator disable preservation. Expected refusals require exact finite stderr reasons;
+a database/bind/build failure cannot stand in for them. The supervisor removes its
+owned random database/private file and sends no provider request or mail. It uses
+child-process environments without mutating the test runner's global environment.
+CI builds both feature states and runs this supervisor with its owned PostgreSQL service.
+
+A final feature-specific TLS run initially lacked sandbox loopback-listener access:
+eight cases stopped at `PermissionDenied`/`Operation not permitted` before protocol
+assertions. The same 23-case suite then passed with the authorized local-network
+permissions used by the full workspace run. No assertion or security check changed.
+
+Final local gates pass: formatting; strict locked default/all-feature workspace/
+all-target lint; **97 default** and **513 all-feature workspace tests** (2 Axum,
+98 HTTP/database, 69 core, 321 PostgreSQL, 23 server; subprocess repeat excluded);
+**57 verification-only** core cases; advisory/license/source/npm checks; finalized
+normal-binary startup cases; and actual SMTP lifecycle in both modes with exact owned
+message/database cleanup. No failures or ignored cases in the final runs. The inactive
+SQLx/MySQL RSA advisory remains visible, with no exception. Python's optional cache
+write outside the workspace was denied; in-memory syntax validation and actual script
+execution passed instead. The complete staged diff receives redacted secret scanning.
+
+The previous HTTP head `15f89fd` has live exact-head CI run **39373559701**, last
+observed installing cargo-audit after all earlier steps with no failures and a green
+secrets job. Do not substitute observation timeout for terminal status or restart it.
+This server checkpoint still needs its own final-source hosted CI. These startup
+cases establish supported composition/configuration behavior, not real public
+provider sign-in. Native Keycloak public-login/session/logout/deletion acceptance
+through both modes remains required before completing AUTH-56. Broader release,
+independent-review and unresolved Safari recovery gates remain open.
+
+Maintainability review keeps the shared factory/entrypoints thin, typed settings,
+credential-file I/O and OIDC service construction in named owning modules, and the
+existing protocol/transaction boundaries visible. New modules stay below300lines;
+ordered startup supervision and test matrices retain prerequisites, exact reasons
+and cleanup as reviewed function-size exceptions. No unrelated cleanup is deferred.

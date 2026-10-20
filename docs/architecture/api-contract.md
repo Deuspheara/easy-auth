@@ -375,5 +375,6 @@ or revokes an ambient session. Existing provider-deletion endpoints reuse their
 original use case and stronger proof requirements with the same common callback.
 See [the concrete schema](openapi-oidc-web.json), [consumer guide](../guides/oidc-web.md)
 and [ADR 0018](adr/0018-oidc-web-composition.md) for errors, cookie transport and
-request-snapshot concurrency limits. Normal OpenAPI/server composition is unchanged;
-standalone configuration and supported-mode native acceptance remain unfinished.
+request-snapshot concurrency limits. Default OpenAPI/composition is unchanged. Explicit server `oidc-web` settings select
+the same routes through `configured_application`; supported-mode native public-login
+acceptance remains unfinished.

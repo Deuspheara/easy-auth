@@ -123,8 +123,8 @@ impl OidcHttp for Http {
     async fn get(&self, _: &OidcTarget) -> Result<OidcHttpResponse> {
         let issuer = self.url.join("/").unwrap();
         Ok(OidcHttpResponse {status:200,content_type:Some("application/json".into()),content_encoding:None,cache_seconds:300,
-            body:serde_json::to_vec(&json!({"issuer":issuer.as_str(),"authorization_endpoint":issuer.join("authorize").unwrap(),
-                "token_endpoint":self.url.as_str(),"jwks_uri":issuer.join("keys").unwrap(),
+            body:serde_json::to_vec(&json!({"issuer":issuer.as_str(),"authorization_endpoint":issuer.join("authorize").unwrap().as_str(),
+                "token_endpoint":self.url.as_str(),"jwks_uri":issuer.join("keys").unwrap().as_str(),
                 "authorization_response_iss_parameter_supported":true,"code_challenge_methods_supported":["S256"]})).unwrap()})
     }
 }

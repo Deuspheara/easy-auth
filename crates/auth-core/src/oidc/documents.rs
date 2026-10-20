@@ -46,6 +46,11 @@ pub struct OidcDocuments {
 }
 
 impl OidcDocuments {
+    /// Validate trusted URL/egress metadata before provisioning or allocating
+    /// services. This performs no I/O and establishes no current authority.
+    pub fn validate_configuration(connection: &OAuthConnection, origins: &[&str]) -> Result<()> {
+        Policy::new(connection, origins).map(|_| ())
+    }
     #[cfg(feature = "oidc-verification")]
     pub(super) fn connection(&self) -> &OAuthConnection {
         &self.connection
