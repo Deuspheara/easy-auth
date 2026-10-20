@@ -363,6 +363,13 @@ sessions. That existing guard is preserved and regression-tested; stable registr
 and concurrent native lifecycle require further design before ordinary activation.
 See the [native operation guide](../../guides/google.md#owned-native-sign-in-operation).
 
+Command-selection errors must also close the listener, before any child exists.
+The private prepared-command boundary now applies that cleanup before delegating
+to capture. A deterministic unavailable-selection case must observe actual socket
+refusal, unchanged pending expiry/no authority, explicit SQL cancellation and a
+subsequent signed commit under the same stable registration. This is error-path
+resource cleanup, not supported-OS or registered-provider acceptance evidence.
+
 
 The subsequent [ADR0020](0020-native-oauth-operation-returns.md) adds an explicit
 stable native registration profile and exact per-operation return persistence. It

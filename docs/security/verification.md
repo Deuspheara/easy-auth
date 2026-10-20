@@ -3833,3 +3833,61 @@ Remote application authority remains a separate issuer gate. Independent review,
 SAML and the unresolved AUTH-20 Safari recovery path are not completed by this
 work. No credential-manager access, device prompts or system security setting
 changes were requested; no production-readiness or interoperability claim is made.
+
+
+## AUTH-23 native command-selection failure cleanup — 2026-10-20
+
+The prior stable-registration commit09897ef has exact-head hosted acceptance:
+[run39422202699](https://github.com/Deuspheara/easy-auth/actions/runs/39422202699)
+completed successfully, including Rust job118625697725 and secrets job118625698303.
+Decoded logs confirm97 default and637 all-feature tests, the isolated native
+profile4 and owned process/PostgreSQL18 cases, and successful browser/startup/SMTP
+and security gates. That result establishes the published baseline, not this later
+cleanup change.
+
+Review found `GoogleDesktopSignIn::run` returned command-selection errors before
+capture took the listener. The socket therefore remained owned until explicit
+cancellation/drop, contradicting the documented close-on-error contract. The
+private prepared-command boundary now drops that listener on selection failure,
+then propagates the original finite error. It does not consume/cancel SQL proof,
+change expiry, launch a fallback or issue local authority. Existing spawn/capture/
+verification behavior and public API are unchanged.
+
+The new feature-owned resource regression injects unavailable selection before any
+child exists. An independent actual-socket refusal probe must prove closure. Scoped
+SQL facts must retain exactly one pending row and no user/identity/session/audit;
+the stored original expiry must match. No provider POST or signature occurs.
+Explicit cancellation then removes only that pending row. Reopening with the same
+stable registration must still permit actual process/socket delivery, RS256
+verification and atomic identity/session/audit commit. Temporarily removing the
+cleanup made this regression fail at `owned listener must be closed`; the fix was
+restored before final verification. This deterministic failure injection does not
+establish actual unsupported-OS behavior or registered-provider interoperability.
+
+Final local evidence uses CARGO_INCREMENTAL=0 and the documented real PostgreSQL17
+setup, with the two full workspace suites run sequentially:
+
+- `cargo fmt --all -- --check`: pass.
+- `cargo clippy --locked --workspace --all-targets --all-features -- -D warnings`
+  and the same command without `--all-features`: pass.
+- Focused native process/PostgreSQL suite:19 passed, zero failures/ignored.
+- `cargo test --locked --workspace --all-features`:638 passed, zero failures/ignored
+  (2 Axum unit,116 HTTP,96 core,358 PostgreSQL,54 server unit,12 desktop integration).
+  The filtered logging child repeats an included case and is not counted again.
+- `cargo test --locked --workspace`:97 passed, zero failures/ignored.
+- Compiled dependency advisory check and all-feature cargo-deny: pass, no new
+  exceptions. Inactive SQLx/MySQL RSA0.9.10 RUSTSEC-2023-0071 remains disclosed.
+
+The earlier browser reports remain immutable evidence for their recorded source,
+not new browser runs for this cleanup. The changed error path is exercised by the
+actual-socket/process/PostgreSQL regression; it performs no real OS browser launch.
+Hosted acceptance of this new commit requires its own exact-head run.
+
+Maintainability review keeps resource release in the owning operation and the
+scenario in its existing resource-test module. Both files remain below300lines;
+the new scenario remains below50lines. The small private prepared-command boundary
+permits deterministic failure coverage without a public injection API or process
+framework. No core policy, persistence logic, migration, dependency or unrelated
+cleanup changes are needed. AUTH-23 remains In Progress for actual Google/OS,
+genuine freshness and ordinary lifecycle/activation gates. No Safari prompts,
+credential-manager access or system settings were involved.

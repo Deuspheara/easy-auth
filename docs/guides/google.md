@@ -416,6 +416,10 @@ verification. Exit0 without callback waits under the original listener cap; a
 callback followed by failed handoff yields no token POST or proof. Transport,
 launcher and core/provider/storage failures remain distinguishable.
 
+Command-selection failure closes the owned listener before returning the finite
+launcher error, even when no child was created. It retains the original pending
+proof and expiry for explicit cancellation; it grants no authority.
+
 Cancellation or failure closes the owned socket and kills/reaps only the owned
 opener child, with a one-second bounded cleanup wait. Unconfirmed cleanup is an
 explicit error. It never kills the browser. Dropping a running future requests child

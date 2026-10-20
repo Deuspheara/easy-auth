@@ -58,7 +58,20 @@ impl GoogleDesktopSignIn {
         &mut self,
         cancel: impl Future<Output = ()>,
     ) -> Result<GoogleAuthorizationCompletion, GoogleDesktopSignInError> {
-        let command = launch::command(&self.start.authorization_url)?;
+        let command = launch::command(&self.start.authorization_url);
+        self.run_prepared(command, cancel).await
+    }
+
+    async fn run_prepared(
+        &mut self,
+        command: Result<Command, GoogleDesktopSignInError>,
+        cancel: impl Future<Output = ()>,
+    ) -> Result<GoogleAuthorizationCompletion, GoogleDesktopSignInError> {
+        let command = command.inspect_err(|_| {
+            // Selection can fail before capture takes ownership of the listener.
+            // Match spawn/transport failure cleanup without cancelling SQL state.
+            drop(self.listener.take());
+        })?;
         self.run_with(command, cancel).await
     }
 
