@@ -2512,3 +2512,59 @@ checks, retained native passkey/SMTP/recovery suites, real notice smoke, compile
 advisories and cargo-deny dependency/license policy. The exact head and final
 completed/success conclusion were checked before AUTH-55 completion. Ordinary OIDC
 web sign-in remains AUTH-56 work; wider release gates remain unchanged.
+
+## AUTH-56 stable startup identity policy checkpoint — 2026-10-20
+
+The trusted PostgreSQL `load_or_initialize_oidc_identity_policy` operation now
+loads an unchanged enabled full definition without DML, revision rotation,
+pending cancellation, session touch or audit rewrite. Only an absent registry key
+can initialize policy, always with a fresh revision rather than a historical caller
+snapshot. A competing initializer's committed revision is read and fully checked;
+mismatched, generic, stale or disabled records are never adopted/repaired/re-enabled.
+The private policy write was first extracted in separate commit `89d9767`, with all
+**57** existing PostgreSQL identity cases and strict lint passing before behavior
+was added. Administrative configure retains its original rotation/cancellation.
+No schema or dependency changes were introduced.
+
+All **15** new real PostgreSQL cases pass. DML-rejecting triggers prove unchanged
+loads perform no connection/policy insert/update/delete. Genuine signed sign-in
+and pending-context controls prove reload preserves existing authority. Removing/
+recreating configuration rejects a previously verified old context, and stale
+startup input reads the latest valid revision without reviving old sessions.
+Full-definition variants, cross-realm/local-client keys, global callback collision,
+existing generic OAuth, stale policy revision and operator disable fail precisely
+without overwriting state. Initial policy-write failure rolls back configuration;
+missing schema and corrupt stored revision return Unavailable, not expected
+Unauthorized. Positive controls establish usable storage/authority around faults.
+
+Concurrency cases observe **both** initial inserts blocked after absent reads before
+releasing the owned advisory gate. Equal definitions converge on one fresh revision;
+competing definitions have one winner and one exact non-mutating mismatch. Separate
+observed configuration/policy lock waits cover both startup/disable orders, and a
+snapshot returned before disable cannot become current afterward. Observers use
+independent one-connection pools to avoid the shared SQLx harness limit.
+
+A new signed core case verifies nil metadata revisions are rejected and restoring
+policy metadata cannot rewrite a verified identity's original configuration. The
+public restoration method creates only validated definition metadata; the OAuth
+mutator remains crate-private and no proof constructor is exposed. All new/affected
+modules remain below 300 lines, with configuration-before-policy checks/commit
+visible in the startup transaction and ordered test scenarios kept together.
+
+Final source passes `cargo fmt --all -- --check`, strict default/all-feature
+workspace/all-target Clippy, default workspace tests (**93**), final all-feature
+workspace tests (**475** distinct: 321 PostgreSQL, 73 HTTP, 69 core, 10 server,
+2 Axum unit), verification-only core tests (**57**), advisory/deny/npm checks and
+the complete staged secret scan. The logging child repeats one core case and is
+not counted twice. An earlier complete all-feature run passed 474 before the last
+stale-policy regression had been compiled; the recorded final run includes that
+case and all 475 tests. No failing/ignored assertion or infrastructure error was
+reclassified to make acceptance pass. Inactive SQLx/MySQL RSA remains reported
+without an ignore.
+
+This checkpoint implements only the Rust metadata/startup boundary. Ordinary OIDC
+server settings, combined browser callback/login routes and actual supported
+embedded/standalone login acceptance remain AUTH-56 work. No new native provider
+acceptance, activation, production-readiness or independent-review claim follows
+from these component tests. Hosted CI for the pushed checkpoint must be inspected
+separately before being claimed as successful.

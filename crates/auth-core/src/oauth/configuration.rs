@@ -72,6 +72,14 @@ impl OAuthConnection {
     pub fn revision(&self) -> Uuid {
         self.revision
     }
+    #[cfg(feature = "oidc-identities")]
+    pub(crate) fn with_persisted_revision(mut self, revision: Uuid) -> Result<Self> {
+        if revision.is_nil() {
+            return Err(Error::InvalidInput);
+        }
+        self.revision = revision;
+        Ok(self)
+    }
     pub fn issuer(&self) -> &str {
         &self.issuer
     }

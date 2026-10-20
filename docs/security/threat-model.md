@@ -381,3 +381,14 @@ native retry retains its operation permit through final authority validation;
 otherwise a blocked final read could exceed the declared concurrency bound.
 Controlled expiry/cancellation and actual-rotated-signature capacity tests exercise
 these invariants, while the real provider runner applies no admission pacing.
+
+
+AUTH-56 stable startup loading does not reinterpret caller/historical revisions as
+current authority. It locks registry before policy, matches the full definition and
+enable state, performs no DML on unchanged rows and initializes only a genuinely
+absent key with a fresh revision. A conflicting generic OAuth row or stale policy
+is not adopted or repaired. Recreating removed configuration cannot revive already
+claimed verified contexts. Metadata restoration cannot rewrite proof provenance;
+corrupt stored revisions and schema/write failures fail closed as unavailable.
+New startup operations create no user/session/identity. Ordinary browser/server
+OIDC activation remains unimplemented at this checkpoint.

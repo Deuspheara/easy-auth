@@ -70,6 +70,14 @@ impl OidcIdentityPolicy {
         self
     }
 
+    /// Restore validated definition metadata with a revision read by trusted
+    /// persistence. This creates no proof or authority: storage must compare the
+    /// entire definition and current enable state under locks before using it.
+    pub fn with_persisted_revision(mut self, revision: uuid::Uuid) -> Result<Self> {
+        self.connection = self.connection.with_persisted_revision(revision)?;
+        Ok(self)
+    }
+
     pub fn configuration(&self) -> &OAuthConnection {
         &self.connection
     }

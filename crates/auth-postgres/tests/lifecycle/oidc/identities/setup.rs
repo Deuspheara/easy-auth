@@ -121,6 +121,15 @@ impl Fixture {
             .unwrap();
         self.verifier = verifier(&self.policy, self.store.clone(), self.http.clone());
     }
+    pub async fn load_at_startup(&mut self) -> Result<()> {
+        let policy = self
+            .store
+            .load_or_initialize_oidc_identity_policy(&self.policy)
+            .await?;
+        self.verifier = verifier(&policy, self.store.clone(), self.http.clone());
+        self.policy = policy;
+        Ok(())
+    }
     pub async fn now_seconds(&self) -> i64 {
         sqlx::query_scalar("SELECT floor(extract(epoch FROM clock_timestamp()))::bigint")
             .fetch_one(&self.pool)

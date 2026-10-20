@@ -7,3 +7,6 @@ mod rotation;
 mod setup;
 mod validation;
 mod workers;
+
+#[cfg(feature = "oidc-identities")]
+mod persisted_policy;

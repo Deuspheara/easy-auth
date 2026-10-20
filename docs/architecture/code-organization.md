@@ -491,3 +491,16 @@ its existing public `configured_auth` signature. Named `configuration/mail.rs`,
 password-corpus attachment. Validation order, defaults, bounds, TLS/development
 rules and secret-safe errors are preserved. This structural checkpoint is verified
 before adding OIDC startup semantics; no generic configuration framework is added.
+
+
+AUTH-56's stable configuration behavior lives in PostgreSQL
+`oauth/identity_startup.rs`. Registry lock/initial-insert primitives stay with
+`oauth/configuration.rs`; the existing policy write was extracted and verified in
+a separate structural commit before reuse. Policy and configuration rechecks/commit
+stay visible in the startup use case; no provider I/O or duplicated policy is added.
+Core exposes only a narrow validated policy-metadata restoration method, with the
+OAuth field mutator crate-private and no new proof constructor. Feature tests under
+`oidc/identities/startup/` separate lifecycle, denial, faults and observed concurrency
+from reusable scoped setup. All new/affected modules stay below 300 lines. Longer
+ordered concurrency and lifecycle cases retain prerequisites, actual waits, precise
+results and cleanup together; no unrelated cleanup is deferred.

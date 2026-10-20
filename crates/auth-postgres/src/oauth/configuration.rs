@@ -104,3 +104,34 @@ pub(super) async fn check(pool: &sqlx::PgPool, connection: &OAuthConnection) -> 
     lock(&mut tx, connection).await?;
     tx.commit().await.map_err(unavailable)
 }
+
+/// Lock a registry key for startup loading; this is not a full definition check.
+#[cfg(feature = "oidc-identities")]
+pub(super) async fn current_revision(
+    tx: &mut Transaction<'_, Pg>,
+    connection: &OAuthConnection,
+) -> Result<Option<Uuid>> {
+    sqlx::query_scalar("SELECT revision FROM auth_oauth_connections WHERE realm_id=$1 AND id=$2 AND client_id=$3 FOR SHARE")
+        .bind(connection.realm()).bind(connection.connection()).bind(connection.client())
+        .fetch_optional(&mut **tx).await.map_err(unavailable)
+}
+
+/// Serialize only first creation. A conflicting registry key remains untouched;
+/// a globally conflicting callback still fails instead of selecting another key.
+#[cfg(feature = "oidc-identities")]
+pub(super) async fn insert_initial(
+    tx: &mut Transaction<'_, Pg>,
+    connection: &OAuthConnection,
+) -> Result<bool> {
+    let inserted = sqlx::query(
+        r#"
+        INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true)
+        ON CONFLICT (realm_id,id,client_id) DO NOTHING
+        "#,
+    ).bind(connection.realm()).bind(connection.connection()).bind(connection.client())
+        .bind(connection.revision()).bind(connection.issuer()).bind(connection.provider_client())
+        .bind(connection.redirect()).bind(defense(connection))
+        .execute(&mut **tx).await.map_err(unavailable)?.rows_affected();
+    Ok(inserted == 1)
+}

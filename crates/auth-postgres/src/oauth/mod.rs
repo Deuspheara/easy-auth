@@ -5,6 +5,8 @@ mod identities;
 #[cfg(feature = "oidc-identities")]
 mod identity_policy;
 #[cfg(feature = "oidc-identities")]
+mod identity_startup;
+#[cfg(feature = "oidc-identities")]
 pub(crate) use identity_policy::lock as lock_identity_policy;
 mod ownership;
 mod transactions;

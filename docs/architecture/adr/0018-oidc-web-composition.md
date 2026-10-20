@@ -1,8 +1,9 @@
 # ADR 0018: Shared OIDC browser composition
 
-Date: 2026-10-20. Status: proposed for AUTH-56 before implementation. AUTH-30 and
-AUTH-55 backend/HTTP acceptance are prerequisites, not ordinary sign-in activation.
-No behavior, schema, public route or production configuration changes with this ADR.
+Date: 2026-10-20. Status: stable startup metadata loading is implemented for
+AUTH-56; shared browser/server composition remains proposed and unimplemented.
+AUTH-30 and AUTH-55 acceptance are prerequisites, not ordinary sign-in activation.
+No new schema, public HTTP route or production configuration is enabled here.
 
 ## Context and scope
 
@@ -127,6 +128,22 @@ new identity/JIT authority by attaching policy under their old revision. Explici
 administrative changes continue to use revision rotation and state cancellation;
 loading is not reconfiguration. Any necessary core restoration API constructs only
 validated configuration metadata, never verified proof or authority.
+
+The implemented `Postgres::load_or_initialize_oidc_identity_policy` first takes a
+shared registry-key lock. Existing rows are read without attempted DML. For an
+absent key, it allocates a fresh candidate revision, inserts without conflict
+updates, reads the winning revision and writes policy only when its own registry
+insert won. A conflicting generic OAuth row never gains policy. Both paths reuse
+the existing exact configuration/policy/enable checks before commit. Matching
+concurrent initializers converge; competing definitions have one winner and a
+non-mutating mismatch. Global callback uniqueness still fails across foreign keys.
+
+`OidcIdentityPolicy::with_persisted_revision` restores validated definition metadata
+for trusted persistence; the underlying OAuth mutator is crate-private. It rejects
+nil revisions and constructs no verified proof. The adapter maps corrupt stored
+revisions to Unavailable and rechecks every field under locks. A metadata revision
+cannot rewrite a verified identity's original snapshot. Explicit administrative
+configure methods retain their existing rotation/cancellation semantics.
 
 Keep credentials outside database policy/configuration rows and public DTOs. Select
 client authentication explicitly; a missing secret never changes a confidential

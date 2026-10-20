@@ -1,5 +1,16 @@
 # HTTP contract v1
 
+AUTH-56 adds the trusted PostgreSQL
+`load_or_initialize_oidc_identity_policy(&definition)` operation and narrow core
+`OidcIdentityPolicy::with_persisted_revision` metadata API. Matching startup loads
+preserve revision and authority state; absent configuration initializes with a fresh
+revision atomically. Disabled/mismatched/generic/stale policy cannot be auto-adopted.
+These methods create no verified proof, user/session or HTTP endpoint. Existing
+administrative configure APIs retain revision rotation. See the
+[startup guide](../guides/oidc-identities.md#startup-loading-versus-administrative-changes)
+and [ADR 0018](adr/0018-oidc-web-composition.md); ordinary OIDC web composition
+remains unimplemented.
+
 AUTH-55's optional `oidc-account-deletion` Axum feature now exports an explicit
 aligned-services router with three POST operations for start/finish/cancel and static
 reference/callback pages. It derives owner/session from current authentication,

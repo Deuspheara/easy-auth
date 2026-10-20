@@ -130,3 +130,12 @@ serves static content only. These transport values confer no identity, freshness
 or erasure authority outside the existing verified core/PostgreSQL transaction.
 Owned Keycloak-to-HTTP acceptance is recorded separately; ordinary activation
 remains gated.
+
+
+AUTH-56's startup load/initial-provision operation preserves an unchanged enabled
+connection/policy revision and all existing pending/session/audit state. Only an
+absent registry key can atomically acquire a new policy, always at a fresh revision;
+existing generic/stale/disabled records cannot gain authority through loading.
+The restored core policy value is definition metadata only. Actual proof, identity
+and session authority retain their existing signature, current-source and deadline
+checks. Administrative reconfiguration remains a distinct revision-changing action.
