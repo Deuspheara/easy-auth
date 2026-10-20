@@ -1,4 +1,5 @@
 #[cfg(feature = "oidc-web")]
+#[path = "application/oidc.rs"]
 mod oidc;
 
 use crate::configuration;

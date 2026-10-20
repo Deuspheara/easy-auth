@@ -1,6 +1,10 @@
+#[path = "configuration/database.rs"]
 mod database;
+#[path = "configuration/mail.rs"]
 mod mail;
+#[path = "configuration/oidc/mod.rs"]
 pub(crate) mod oidc;
+#[path = "configuration/passwords.rs"]
 mod passwords;
 
 use auth_axum::BrowserConfig;

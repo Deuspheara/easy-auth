@@ -1,64 +1,27 @@
 'use strict';
 const assert = require('node:assert/strict');
-const {spawn,execFileSync} = require('node:child_process');
-const readline = require('node:readline');
+const {execFileSync} = require('node:child_process');
+const owned = require('./owned-process.cjs');
 
 function start(binary, configuration, root, {identityCases=false,httpDeletionCases=false}={}) {
   assert.equal(identityCases && httpDeletionCases,false,'one owned fixture mode');
-  const child = spawn(binary,[],{cwd:root,env:process.env,detached:true,stdio:['pipe','pipe','pipe']});
   const state = {removed:false,created:false,diagnostics:false,facts:null};
-  let sequence = 0, pending, readyResolve, readyReject;
-  const ready = new Promise((resolve,reject)=>{readyResolve=resolve;readyReject=reject;});
-  const lines = readline.createInterface({input:child.stdout});
-  child.stderr.on('data',()=>{state.diagnostics=true;});
-  lines.on('line',line=>{
-    try {
-      const value=JSON.parse(line);
+  const pipe=owned.start(binary,configuration,root,{observe(value) {
       if (value.database_created) {assert.equal(value.database_created,configuration.database_name);state.created=true;}
       if (['database_migration','connection_configuration','tls_configuration','document_configuration','exchange_configuration'].includes(value.phase)) state.phase=value.phase;
-      if (value.ready) {state.http_deletion_capability=value.http_deletion_capability===true;state.application_address=value.application_address;state.identity_capability=value.identity_capability===true;state.deletion_capability=value.deletion_capability===true;readyResolve();}
+      if (value.ready) {state.http_deletion_capability=value.http_deletion_capability===true;state.application_address=value.application_address;state.identity_capability=value.identity_capability===true;state.deletion_capability=value.deletion_capability===true;}
       if (['active_connections','missing_database','storage_failure'].includes(value.cleanup_failure)) state.cleanup_failure=value.cleanup_failure;
       if (value.database_removed) state.removed=true;
       if (value.facts) state.facts=value.facts;
       if (value.http_facts) state.http_facts=value.http_facts;
       if (value.identity_facts) state.identity_facts=value.identity_facts;
       if (value.deletion_facts) state.deletion_facts=value.deletion_facts;
-      if (pending && value.id===pending.id) {pending.resolve(value);pending=null;}
-    } catch {
-      const error=new Error('invalid private fixture IPC');
-      readyReject(error);pending?.reject(error);pending=null;
-    }
-  });
-  child.on('error',()=>readyReject(new Error('fixture spawn failed')));
-  const exited=new Promise(resolve=>child.on('close',code=>{
-    readyReject(new Error('fixture stopped before readiness'));
-    pending?.reject(new Error('fixture stopped during command'));pending=null;
-    resolve(code);
-  }));
-  child.stdin.on('error',()=>{ /* close is checked by the owned exit receipt */ });
-  child.stdin.write(JSON.stringify(configuration)+'\n');
-  const bounded=(promise,millis)=>Promise.race([promise,new Promise((_,reject)=>{
-    const timer=setTimeout(()=>reject(new Error('owned fixture timeout')),millis);timer.unref();
-  })]);
-  return {state,ready:bounded(ready,30000).catch(error=>{error.stageName=state.phase;throw error;}),
-    async command(command,values={}) {
-      assert.equal(Boolean(pending),false,'fixture commands are sequential');
-      const id=++sequence;
-      const result=new Promise((resolve,reject)=>{pending={id,resolve,reject};});
-      child.stdin.write(JSON.stringify({command,id,...values})+'\n');
-      return bounded(result,35000);
-    },
+  }});
+  return {state,ready:pipe.ready.catch(error=>{error.stageName=state.phase;throw error;}),
+    command:pipe.command,
     async close() {
-      child.stdin.end(JSON.stringify({command:'close'})+'\n');
-      let code;
-      try {code=await bounded(exited,10000);}
-      catch {
-        try {process.kill(-child.pid,'SIGKILL');} catch { /* exact owned group may have exited */ }
-        child.stdout.destroy();child.stderr.destroy();
-        code='timeout';
-      }
-      state.exit=code;
-      lines.close();
+      const result=await pipe.close();
+      const code=result.exit;state.exit=code;state.diagnostics=result.diagnostics;
       if (!state.removed) {
         execFileSync(binary,['--remove-owned-database',configuration.database_name],
           {cwd:root,env:process.env,stdio:['ignore','pipe','pipe'],timeout:10000});

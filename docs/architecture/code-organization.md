@@ -545,3 +545,11 @@ AUTH-56 extracts the embedded example's application-owned private route/state in
 The entrypoint retains configured factory/listener/worker composition. Existing
 standalone/embedded actual-SMTP lifecycle checks and strict lint verify unchanged
 behavior; no provider policy, credential capability or production hook is introduced.
+
+Native OIDC runners share only bounded private JSON pipes and owned process-group
+shutdown in `tests/browser/oidc/owned-process.cjs`. Existing fixture capability,
+database-cleanup and exact outcome assertions remain in `fixture.cjs`. Application
+and configuration module paths are explicit so the owned acceptance producer can
+compile the unchanged configured-factory sources without a production transport
+hook. This structural preparation is verified against all existing 6 HTTP and 23
+backend provider cases before the new public-login scenarios are introduced.
