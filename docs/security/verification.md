@@ -4128,3 +4128,36 @@ keys remain outside this repository. Required hostile parser/resource observers,
 verified-node/profile/algorithm policy, PostgreSQL correlation/replay/isolation,
 native advisory/license review and focused independent security review remain open.
 No SAML ACS or production verifier is enabled. AUTH-32 remains In Progress.
+
+## AUTH-32 bounded native parser observations — 2026-10-20
+
+The [owned parser overlay and observer](../../tests/provider/saml/native/parser-probe/README.md)
+compiled offline against the exact previously source-verified native image. No
+upstream implementation, assertion or fixture changed. The actual parser, owned
+source, executable, observer and inherited-image fingerprints are recorded in the
+[finite result](../../tests/provider/saml/native/results/2026-10-20/parser-defaults-observation.json).
+
+Eight DTD/entity/malformed inputs were accepted by the direct default parser.
+Healthy parser, real sentinel-file access and real loopback HTTP controls worked
+before and after them. The case observations saw zero sentinel-file calls,
+connection calls and HTTP requests. The driver exited 1 for candidate policy gaps,
+not as a passing SAML security suite. Actual observer executable unavailability
+instead exited 2 with an infrastructure result and no rejection observations;
+the valid run afterward reproduced the original outcomes. Child process groups,
+HTTP connections and cleanup have explicit bounds. All parser runs were network-
+disabled, read-only and without host mounts or extra capabilities.
+
+Formatting and Python syntax checks passed. Full upstream package/example strict
+Clippy failed on 20 diagnostics in unchanged library files; no owned-probe location
+was reported. That failure is retained. Separately, the owned probe passed the
+matching `clippy-driver` with `-W clippy::all -D warnings` and actual compiled
+dependency artifacts. Clippy was fetched only inside disposable lint containers;
+lint compilation was offline. Linting modified only disposable containers, leaving
+the host toolchain and assessment images intact. No exemptions or assertion changes
+were introduced.
+
+These observations reproduce default-parser policy gaps without claiming a SAML
+bypass, comprehensive resource denial or XXE safety. Signature/canonicalization/
+reduced-fragment paths, strict profile/algorithm/verified-content policy, native
+advisory/license review, application/PostgreSQL acceptance and focused independent
+security review remain open. No production verifier or SAML ACS is selected.

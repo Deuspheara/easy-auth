@@ -35,6 +35,10 @@ AUTH-32's [isolated native checkpoint](saml-assessment.md#auth-32-native-checkpo
 adds 86 passing upstream samael tests and a separately preserved ignored-positive
 failure. It resolves the unexecuted native-build gap only; it does not select a
 production verifier or clear the native advisory/license and hostile-parser gates.
+The subsequent [direct parser observations](saml-assessment.md#direct-parser-observations--auth-32)
+reproduce permissive DTD/malformed-input acceptance with working file/network
+observers. No resource access was observed for those bounded inputs; signature/
+canonicalization paths and full SAML acceptance remain unestablished.
 
 AUTH-18's [passkey enrollment source review](passkey-enrollment.md) records the
 private-state serialization boundary, RP ownership, discoverability limitations,

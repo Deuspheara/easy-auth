@@ -46,6 +46,12 @@ Independent file/network observers, hostile-input controls, native advisory/lice
 review and focused independent security review remain required. See the
 [prior assessment](../../../../docs/research/saml-assessment.md).
 
+The separate [parser-defaults probe](parser-probe/README.md) now supplies bounded
+direct-parser observations and independent positive file/network controls. It
+reproduces permissive XML acceptance, not SAML authentication. Other signature/
+canonicalization/resource paths remain open; the historical upstream result above
+is unchanged.
+
 Do not copy upstream fixture/private-key files or raw protocol payloads into this
 repository or reports. Keep new reports finite and sanitized; preserve historical
 records. Only the temporary build context contains upstream source. The context

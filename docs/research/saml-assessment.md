@@ -105,3 +105,26 @@ Strict parser/resource and verified-content controls, the easy-auth adapter and
 PostgreSQL corpus, native dependency advisory/license inventory and focused
 independent security review remain outstanding. No production verifier, SAML
 runtime dependency or ACS is selected by this checkpoint.
+
+### Direct parser observations — AUTH-32
+
+The [bounded parser probe](../../tests/provider/saml/native/parser-probe/README.md)
+now exercises the exact `libxml` 0.3.3 default interface used in the candidate.
+Inspected source confirms `parse_string` passes default options with `recover=true`
+and `no_net=false`. Eight fixed DTD/entity/malformed inputs were accepted as XML.
+Independent syscall observation and a loopback HTTP trap saw no sentinel-file
+calls, connection calls or HTTP requests during those cases. Real healthy parser,
+file-access and HTTP controls succeeded both before and after them.
+
+An actual unavailable `strace` produced a separate infrastructure result, exit 2;
+restoring the normal environment reproduced the observations, exit 1 for candidate
+parser-policy gaps. Failed observation cannot become a secure XML rejection.
+Strict full-upstream Clippy also failed on 20 unchanged library diagnostics; that
+failure is preserved. The owned Rust probe separately passed strict Clippy against
+the actual compiled dependency artifacts, without exemptions or upstream changes.
+
+The [finite record](../../tests/provider/saml/native/results/2026-10-20/parser-defaults-observation.json)
+does not establish signature acceptance, SAML authentication bypass or general XXE
+safety. Canonicalization, reduced-fragment and other signature/parser paths still
+require their own observers. The default parser's acceptance of these inputs does
+not satisfy our strict rejection policy; no production integration is selected.

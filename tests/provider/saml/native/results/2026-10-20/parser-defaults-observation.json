@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T15:13:08.361379+00:00",
+  "application_base_revision": "c635c840abdd1c63f7c13c87eb8d9b3b3c7b3ac7",
+  "scope": "bounded direct parser observations only, not SAML or signature acceptance",
+  "candidate": {
+    "repository": "https://github.com/njaremko/samael",
+    "revision": "2d27dfe4930c4632b202f32886a85b2d1f9226c2",
+    "native_baseline_record": "upstream-native.json",
+    "upstream_implementation_assertions_and_fixtures_changed": false,
+    "owned_overlay": "examples/auth32_parser_probe.rs",
+    "parser_dependency": "libxml 0.3.3",
+    "inspected_parser_defaults": {
+      "recover": true,
+      "no_net": false
+    }
+  },
+  "recipe_sources": [
+    {
+      "path": "tests/provider/saml/native/parser-probe/Dockerfile",
+      "sha256": "b81eeb425d656cc23cd409fa330abd9a52609fe0c7a77945f8d473d736bf63ec"
+    },
+    {
+      "path": "tests/provider/saml/native/parser-probe/.dockerignore",
+      "sha256": "f9ebc1872cad75d48657ff7bc7fe57bfdc9ad2ae94c346c39d768cbf5aa3c867"
+    },
+    {
+      "path": "tests/provider/saml/native/parser-probe/parser-probe.rs",
+      "sha256": "47d8b7ddf95c5a61f8c779881d1252c105007bf528bde1a480d3d299ffffbdbf"
+    },
+    {
+      "path": "tests/provider/saml/native/parser-probe/observe.py",
+      "sha256": "5c8033919c5545ca8b60e2d02cf943fe7696d4686ec0abb6c850ceaec85c7e5e"
+    }
+  ],
+  "producer": {
+    "parent_layer_prefix_verified": true,
+    "parent_image_id": "sha256:117a4d42941b594f1a55045203926312f4407216f12ebd19947656f031eecd2f",
+    "probe_image_id": "sha256:aff417dbfbbbfddd74dd81db637ebb2440a5ad28956042bec32cce92e7fbe82a",
+    "environment": {
+      "executable_sha256": "50fcf55170bcd448edf5f4a52b9a2ca99e6c33ece19d4fdc166d0aa79b586164",
+      "parser_dependency_source_sha256": "19c27f978ab2a7ae97fb824268f08be63eb1ede8a15c729478d637ac478db400",
+      "probe_source_sha256": "47d8b7ddf95c5a61f8c779881d1252c105007bf528bde1a480d3d299ffffbdbf",
+      "observer_source_sha256": "5c8033919c5545ca8b60e2d02cf943fe7696d4686ec0abb6c850ceaec85c7e5e",
+      "cargo_lock_sha256": "f1ff7a214a2cb6d7f98437cd01a02280794a1ab24b564bfe16ff0a4bfd1e05e9",
+      "python": "3.11.2",
+      "strace": "strace -- version 6.1"
+    },
+    "cargo_incremental": "0",
+    "build_network": "none",
+    "reproducible_binary_claim": false
+  },
+  "execution": {
+    "network": "none; owned loopback only",
+    "root_filesystem_read_only": true,
+    "capabilities_dropped": "ALL",
+    "no_new_privileges": true,
+    "host_mounts": false,
+    "process_timeout_seconds": 5,
+    "post_kill_reap_timeout_seconds": 2,
+    "memory_gib": 3,
+    "cpu_limit": 2,
+    "pid_limit": 128,
+    "tmpfs_mib": 128,
+    "http_connection_timeout_seconds": 2
+  },
+  "normal_run": {
+    "exit_code": 1,
+    "result": {
+      "candidate_parser_policy_passed": false,
+      "cases": [
+        {
+          "case": "doctype",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "internal-entity",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "file-entity",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": false,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "http-entity",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": false,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "external-dtd",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "parameter-entity",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "malformed",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        {
+          "case": "multiple-roots",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        }
+      ],
+      "controls_after": {
+        "file_observer": {
+          "case": "file-control",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 1
+        },
+        "healthy_parser": {
+          "case": "healthy",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        "http_observer": {
+          "case": "http-control",
+          "connect_calls": 1,
+          "diagnostics_emitted": false,
+          "http_requests": 1,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 0
+        }
+      },
+      "controls_before": {
+        "file_observer": {
+          "case": "file-control",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 1
+        },
+        "healthy_parser": {
+          "case": "healthy",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        "http_observer": {
+          "case": "http-control",
+          "connect_calls": 1,
+          "diagnostics_emitted": false,
+          "http_requests": 1,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 0
+        }
+      },
+      "execution_completed": true,
+      "policy_gap_cases": [
+        "doctype",
+        "internal-entity",
+        "file-entity",
+        "http-entity",
+        "external-dtd",
+        "parameter-entity",
+        "malformed",
+        "multiple-roots"
+      ],
+      "scope": "upstream parser defaults only; no signature or SAML acceptance",
+      "status": "candidate_policy_gaps_observed"
+    }
+  },
+  "actual_missing_observer_control": {
+    "mechanism": "PATH=/nonexistent with absolute Python entry point prevents strace lookup",
+    "exit_code": 2,
+    "result": {
+      "status": "infrastructure_failed",
+      "stage": "observer_unavailable"
+    }
+  },
+  "valid_run_after_fault": {
+    "exit_code": 1,
+    "same_observations_as_normal": true
+  },
+  "lint": {
+    "full_upstream_package_example": {
+      "status": "failed",
+      "cargo_exit_code": 101,
+      "unchanged_upstream_library_diagnostics": 20,
+      "owned_probe_diagnostics": 0,
+      "failure_preserved": true
+    },
+    "owned_probe_only": {
+      "status": "passed",
+      "exit_code": 0,
+      "method": "matching clippy-driver, --edition=2021 -W clippy::all -D warnings, exact compiled libxml/dependency artifacts, metadata output only",
+      "warning_exemptions_added": false,
+      "lint_image_id": "sha256:477284d569ac11b6952de9735a7e25cf868d3f5f0d530a6861184ec5e37e3130",
+      "probe_source_unchanged_after_lint": true
+    },
+    "component_fetch": "matching Rust 1.95 Clippy in disposable online lint containers; Cargo lint offline; no host or image changes"
+  },
+  "private_log_sha256": [
+    {
+      "name": "parser-build.log",
+      "sha256": "2c98ca51d5a3b72ff02cbb987c82bc323ff14acb0cac4b488961e9af006bb470"
+    },
+    {
+      "name": "parser-observations.json",
+      "sha256": "2a4562169a30aa2ef16767a3fbf522f0e194ed0d968f9e2e2fdd8b8a585d2326"
+    },
+    {
+      "name": "parser-observer-unavailable.json",
+      "sha256": "8bfa9f532e56dccc2609de69c5f4bcd604ed0e5b2b6f6619c4ae0fa53c16d547"
+    },
+    {
+      "name": "parser-observations-after-fault.json",
+      "sha256": "2a4562169a30aa2ef16767a3fbf522f0e194ed0d968f9e2e2fdd8b8a585d2326"
+    },
+    {
+      "name": "parser-clippy.log",
+      "sha256": "5a44b8a9808d2be0677c606f7d722d0ecf1939c5103d6125fc44c396c9dde9b9"
+    },
+    {
+      "name": "parser-owned-clippy.log",
+      "sha256": "08cc3e5ddf8fdac43e355fa0e3215ff51d62897f38c2b9748679f1984a32d562"
+    }
+  ],
+  "limits": [
+    "Accepted XML is not authenticated SAML; no identity/session authority was exercised",
+    "Zero observed resource calls applies only to these bounded inputs and this native stack",
+    "Signature/canonicalization/reduced-fragment and broader resource-limit paths still require controls",
+    "No native advisory/license or independent security clearance",
+    "No production SAML verifier, adapter or ACS selected"
+  ]
+}
