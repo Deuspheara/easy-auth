@@ -626,3 +626,14 @@ failure controls default off. All added modules remain below300lines. The cohesi
 completion function and ordered binding/failure scenarios retain validation,
 mutation, observed facts and valid controls as justified function-size exceptions;
 no unrelated cleanup is deferred.
+
+The server `google_desktop/` feature keeps socket ownership/lifetime in `listener.rs`,
+bounded Hyper request validation/fixed response in `http.rs` and opaque actual-return
+completion/finite transport errors in `callback.rs`; its entry file only declares
+and reexports. Core and PostgreSQL retain protocol/transaction policy. Feature tests
+separate wire boundaries and lifecycle/resource controls, sharing only actual-socket
+setup. The owned browser example composes the real library listener and exposes
+private parent/child fixture IPC; its named browser suite records only finite
+outcomes/source provenance. Modules stay below300lines. Ordered negative matrices
+retain rejection, unchanged receive state and valid controls as reviewed function-
+size exceptions. No generic server/client framework or unrelated cleanup is added.

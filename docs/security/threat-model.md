@@ -477,3 +477,20 @@ remains an independently budgeted abuse key, not an account credential; changing
 cannot bypass provider/browser/state/nonce/PKCE/purpose bindings. Actual SQL faults,
 signed-negative controls, concurrent callbacks and separate roaming admission
 observations distinguish these invariants from infrastructure/test assumptions.
+
+The opt-in desktop transport binds only literal127.0.0.1/::1 before authorization,
+retains its actual port/path and accepts exact Host/origin-form HTTP/1.1 GET only.
+Eight sequential connections,32headers,16KiB parser buffer, two-second header/
+three-second connection bounds and an original-expiry-derived five-minute maximum
+bound local abuse. Invalid state/issuer/query/body/host/path cannot create a captured
+return; cancellation/drop closes listener and active stream without detached tasks.
+Network/parser/request-limit failures are finite transport outcomes, never evidence
+of failed credentials. The socket can still be locally denied service or a callback
+intercepted outside the app; S256/private proof and current database authority remain
+mandatory. The opaque captured callback supplies its actual URI to core completion,
+without importing a pasted URL, granting a local session or revoking ambient state.
+Handled browser responses reflect no proof, issue no cookie and scrub query/fragment
+with a fixed CSP-allowed script under no-store/no-referrer headers. Browser history
+outside the current page and process-wide secret erasure are not claimed. Owned
+Chromium and socket checks establish transport behavior only, not registered Google,
+OS default-browser launch, mobile delivery or complete listener/database acceptance.

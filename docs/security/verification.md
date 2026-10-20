@@ -3191,3 +3191,78 @@ provider evidence and a usable reviewed provider-required deletion path remain
 unfinished. No Google/browser/device interoperability or production-readiness claim
 follows from these offline-signature/database controls. No provider/browser/security
 settings changed and AUTH-20's Safari recovery failure remains unresolved.
+
+## AUTH-23 owned desktop loopback transport — 2026-10-20
+
+The optional server-library `google-desktop` feature now owns a concrete ephemeral
+literal127.0.0.1/::1 socket before exposing exact typed redirect metadata. Bounded
+Hyper HTTP parsing checks origin-form HTTP/1.1 GET, exact Host/path, no body and
+canonical returned state/issuer through the existing decoder. Only actual delivery
+constructs an opaque callback that supplies its captured URI to shared core
+completion. No session, provider identity, remote token or database cancellation
+follows merely from receive. Explicit core cancellation remains required.
+
+One active connection/eight sequential attempts,32headers/16KiB parser buffer,
+two-second header/three-second connection timeouts and an original-expiry-derived
+five-minute maximum bound local resource use. Cancel/drop/expiry closes the owned
+listener/stream without detached tasks. Finite transport outcomes remain distinct
+from later proof, provider and storage errors. Fixed handled HTML has no reflected
+proof or cookie, no-store/no-referrer/frame protections and a CSP-hashed inline
+query/fragment scrubber. No handwritten HTTP parser or permissive fallback is added.
+
+Nine actual-socket tests pass, covering IPv4/IPv6, alias/wildcard/path refusal,
+wrong method/Host/state/issuer/body/encoding/absolute-target inputs, bounded queries,
+request/header limits, slow headers, partial-stream cancellation, close-after-drop/
+expiry and valid controls after rejected input. A test initially assumed all error
+responses use HTTP/1.1; Hyper correctly mirrors an invalid HTTP/1.0 request while
+retaining status400. Another initially treated a TCP reset after oversized unread
+input as infrastructure failure. The final test still requires an actual complete
+HTTP431 response before permitting that reset, plus unchanged receive state and a
+valid callback afterward. Reset alone proves no rejection or authentication result;
+no meaningful security check or prior regression assertion was weakened.
+
+The [owned Chromium report](../../tests/browser/google-desktop/results/2026-10-20/chromium-owned-loopback.json)
+passes its actual browser/socket case with all **712 code-source hashes** and the
+fixed producer binary matched. Real CSP-authorized script execution removes the
+query; fixed HTML reflects no state/code, and cookies/script storage remain empty.
+No external request or unexpected fixture diagnostic occurs and the owned producer
+exits0. Private parent/child protocol IPC remains in memory, without proof URLs,
+codes, trace or storage files in reports/logs. This is not Google, OS default-browser
+launch, registered native-client, identity/session or mobile interoperability.
+No user device prompts or browser/provider/security settings changes occurred.
+
+Final local checks pass using CARGO_INCREMENTAL=0 and the documented real database:
+
+```sh
+cargo fmt --all --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-server --features google-desktop google_desktop
+cargo build --locked -p easy-auth-server --features google-desktop --example google-desktop-browser
+node tests/browser/google-desktop/run.cjs
+python3 scripts/audit.py
+cargo deny --all-features check
+npm audit --audit-level=low --prefix tests/browser/passkeys
+```
+
+Results: **97 default / 563 all-feature workspace tests** (2 Axum unit,99 HTTP,
+88 core,342 PostgreSQL,32 server; logging subprocess repeat excluded), **9 isolated
+desktop socket cases** and **1 actual owned Chromium case**. Final runs have no
+failures/ignored cases. SQLx suites remain sequential under the original shared
+connection/four-worker budget. Compiled advisory, all-feature dependency/license
+and pinned browser dependency audits pass; inactive optional SQLx/MySQL RSA advisory
+remains visible. Hyper1.12.0/hyper-util0.1.21 (MIT) become optional direct edges;
+no package version/checksum or crypto changes. The full staged diff receives
+redacted Gitleaks scanning. Changed links, module boundaries and naming are reviewed.
+Socket lifetime, HTTP validation/response and captured completion/error modules
+stay below300lines; ordered boundary/resource tests retain observed failure and
+valid control as function-size exceptions. No unrelated cleanup is deferred.
+
+CI39389038579 at exactf24439a completed successfully; acceptance for each later
+head is tracked separately. Normal startup, generic callbacks, schema and older
+browser reports are unchanged. AUTH-23 remains In Progress: real listener-to-
+PostgreSQL/signed-provider acceptance, supported OS browser launch/return, registered
+Google/manual matrix and usable reviewed provider-required deletion remain open.
+AUTH-20's Safari issue, independent review and broader release gates remain open.

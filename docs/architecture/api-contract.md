@@ -118,6 +118,17 @@ remain observable. Request network source is admission metadata, while provider
 configuration/browser/state/purpose/nonce/PKCE remain authentication bindings.
 See the [shared-use-case contract](../guides/google.md#shared-authorization-use-case).
 
+The optional server-library `google-desktop` transport owns a literal IPv4/IPv6
+loopback listener before exposing its exact ephemeral-port redirect. Bounded GET
+delivery creates an opaque `GoogleDesktopCallback`; its completion supplies the
+captured URI plus original retained state/private proof to the shared core use case.
+No public constructor or pasted callback-URL API exists for that delivery value.
+Transport cancellation/expiry closes sockets without cancelling database state or
+issuing authority. Fixed browser responses scrub URL proof and issue no cookie.
+See the [desktop contract](../guides/google.md#owned-desktop-loopback-delivery) for
+resource bounds and remaining registered-provider/platform/lifecycle gates. This
+adds no ordinary startup flag, generic web route or remote application token API.
+
 Only exact configured Origin is accepted on initial browser POST endpoints, including pre-authentication. Missing/null Origin fails closed, so command-line clients must explicitly send it. No wildcard credentialed CORS. SameSite=Lax, Secure in HTTPS production, HttpOnly, Path=/, no Domain; production session uses __Host- prefix. Dev HTTP is loopback-only and explicitly enabled. Duplicate cookie names/invalid token shapes must be rejected. An Origin guard is appropriate for this constrained same-origin contract; it is not a substitute for OAuth state or SAML correlation.
 
 Outbound issuer (M07) has a distinct protocol contract: registered clients, exact redirects, code + S256, client authentication where applicable, signing keys, discovery, JWKS, audience-bound ID/access tokens, revocation and introspection. First-party alpha session introspection does not constitute OIDC support. Native refresh credentials and cross-origin apps are unavailable until that gate passes.

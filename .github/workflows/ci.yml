@@ -39,6 +39,8 @@ jobs:
         run: cargo test --locked -p easy-auth-core --features google
       - name: Verify Google PostgreSQL integration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+      - name: Verify Google desktop transport without local identity mapping
+        run: cargo test --locked -p easy-auth-server --features google-desktop google_desktop
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -51,6 +53,10 @@ jobs:
       - run: npx --no-install playwright install --with-deps chromium
         working-directory: tests/browser/passkeys
       - run: node tests/browser/oidc/deletion-client.cjs
+      - name: Verify owned Google desktop browser return
+        run: |
+          cargo build --locked -p easy-auth-server --features google-desktop --example google-desktop-browser
+          node tests/browser/google-desktop/run.cjs
       - run: node tests/browser/oidc/signin-client.cjs
       - name: Build and check supported OIDC startup composition
         run: |

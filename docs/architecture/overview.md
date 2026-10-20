@@ -88,3 +88,9 @@ operation cancellation across future web/native transports. It composes exact
 existing source snapshots, preserves private database bindings and error types,
 and returns the existing verified identity proof without a local grant. Transports
 still need actual trusted-route/listener delivery and the reviewed lifecycle gate.
+
+Server `google-desktop` now supplies owned, bounded literal-loopback HTTP delivery
+and an opaque captured callback that feeds the same core authorization use case.
+It does not own provider registration, system-browser launch, remote application
+tokens or mobile delivery. Default startup and generic web composition are unchanged;
+registered provider, complete listener/database acceptance and lifecycle remain gates.

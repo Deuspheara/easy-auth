@@ -572,6 +572,8 @@ dependencies = [
  "easy-auth-axum",
  "easy-auth-core",
  "easy-auth-postgres",
+ "hyper",
+ "hyper-util",
  "lettre",
  "rcgen",
  "reqwest",

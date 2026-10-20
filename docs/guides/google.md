@@ -1,9 +1,10 @@
 # Experimental Google code verification
 
 AUTH-23 adds the opt-in core `google` feature and `GoogleCodeExchange`. This is a
-code/identity-proof component, not supported Google web/native activation. No
-Google HTTP endpoint, server setting, native browser/listener, mobile return
-adapter, local-session grant or provider-deletion flow is supplied by this feature.
+code/identity-proof component, not supported Google web/native activation. A
+separate optional server `google-desktop` feature supplies owned loopback delivery.
+No public Google web endpoint, startup setting, OS browser launcher, mobile return
+adapter, local-session grant or provider-deletion flow is supplied by these components.
 The [ADR](../architecture/adr/0019-google-code-flow.md) records the remaining work.
 
 Enable `easy-auth-core/google` and use the existing PostgreSQL and server
@@ -133,6 +134,51 @@ budget while exact provider-configuration/browser/state/nonce/PKCE/purpose bindi
 remain mandatory. These use cases do not own a socket, establish callback delivery,
 launch a system browser or enable public Google login. Web/native transports and
 usable reviewed provider lifecycle remain required before activation.
+
+## Owned desktop loopback delivery
+
+The server library's `google-desktop` feature exports `GoogleDesktopListener`,
+`GoogleDesktopCallback` and finite `GoogleDesktopError` transport outcomes. It uses
+the existing HTTP implementation and does not change normal server startup.
+`bind` permits only literal `127.0.0.1` or `::1` and reserves an ephemeral concrete
+port before returning `redirect()`. It accepts no wildcard, hostname, address alias
+or caller-supplied fixed/wildcard port. The existing exact `OAuthRedirect` validates
+the nonroot canonical path. Preserve the owned listener and persist this exact
+redirect/revision before creating the matching core authorization services.
+Administrative reconfiguration retains its existing revision/cancellation semantics;
+the listener does not register providers or bypass configuration policy.
+
+`receive` consumes the listener and requires the retained state, original expiry
+and a cancellation future. Its local resource timer is capped at five minutes;
+PostgreSQL remains authoritative about the original operation deadline. It permits
+eight sequential connections, one active stream, HTTP/1.1 origin-form GET only,
+exact Host/path and no body/transfer encoding. Hyper enforces32headers/16KiB parser
+buffer, two-second header and three-second connection bounds. Malformed query,
+wrong state/issuer, duplicate/unsupported fields, absolute-form targets and alias
+hosts never produce a captured return. Invalid/slow requests spend connection
+budget without changing authentication state. No detached connection task survives
+cancel/drop/expiry. A local process may exhaust this bounded receive operation;
+that is a transport failure, never proof of an invalid credential or identity grant.
+
+Handled responses are fixed, nonreflective, no-store/no-referrer, framed out and
+cookie-free. Their CSP permits only the fixed inline query/fragment-scrubbing
+script; no state/code/error detail enters HTML. A parser-level refusal may use
+Hyper's own error response. Oversized unread data may reset TCP after its complete
+HTTP431 response; reset alone is not successful rejection evidence in the tests.
+
+Only actual owned-socket delivery constructs the opaque callback. Its `finish`
+method supplies the captured listener URI to the existing `GoogleAuthorization`
+use case with the original intent/state/private proof. It cannot import a pasted
+callback URL or fabricate verified identity. Receive/cancel/drop alone changes no
+database state: callers must explicitly cancel the original core operation when
+appropriate. `Expired`, `Cancelled`, `RequestLimit` and `Unavailable` are distinct
+transport outcomes, separate from later provider/storage/proof errors.
+
+The [owned transport suite](../../tests/browser/google-desktop/README.md) covers
+actual IPv4/IPv6 sockets and Chromium query scrubbing. Its fixture creates no
+Google account, verified identity or local session. Full listener-to-database/
+signed-provider acceptance, supported OS system-browser launch/return, registered
+client semantics, mobile delivery and usable reviewed lifecycle remain required.
 
 ## Evidence and remaining gates
 

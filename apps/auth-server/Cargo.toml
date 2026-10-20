@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+google-desktop = ["oidc-verification", "auth-core/google", "dep:hyper", "dep:hyper-util"]
 oidc-web = ["oidc-identities", "auth-axum/oidc-web"]
 experimental-oidc-account-deletion = ["oidc-identities", "auth-axum/oidc-account-deletion"]
 oidc-identities = ["oidc-verification", "auth-core/oidc-identities", "auth-postgres/oidc-identities"]
@@ -25,6 +26,8 @@ rcgen = { version = "=0.14.10", default-features = false, features = ["ring", "z
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
 
 [dependencies]
+hyper = { version = "1", features = ["http1", "server"], optional = true }
+hyper-util = { version = "0.1", features = ["tokio"], optional = true }
 reqwest = { workspace = true, optional = true }
 rustls = { workspace = true, optional = true }
 webpki-roots = { workspace = true, optional = true }
@@ -65,6 +68,11 @@ required-features = ["oidc-verification"]
 name = "oidc-deletion-http"
 path = "examples/oidc-deletion-http/main.rs"
 required-features = ["experimental-oidc-account-deletion"]
+
+[[example]]
+name = "google-desktop-browser"
+path = "examples/google-desktop-browser.rs"
+required-features = ["google-desktop"]
 
 [[example]]
 name = "oidc-web-native"

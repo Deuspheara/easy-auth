@@ -144,6 +144,22 @@ configuration, metadata, credential loading or token exchange failed.
 
 ## Native system-browser boundary
 
+The `google-desktop` server-library checkpoint owns an ephemeral literal IPv4/IPv6
+loopback socket before exposing typed redirect metadata. It bounds HTTP parsing,
+state/issuer/Host/path validation, sequential connections and deadlines using the
+already selected Hyper stack; no handwritten HTTP parser or detached task is added.
+Actual delivery alone creates `GoogleDesktopCallback`, whose completion supplies
+its captured URI to the shared core flow. All final private bindings and database
+caps remain in that flow. Cancellation/drop closes transport only; original pending
+state requires explicit core cancellation. Finite transport failures are distinct
+from application proof/storage failures. Fixed no-store/no-referrer/CSP responses
+scrub the browser URL without reflecting protocol values or issuing cookies.
+
+Actual-socket and owned Chromium evidence is a transport checkpoint, not registered
+Google/native authentication, OS default-browser launch or full PostgreSQL/signature
+acceptance through this listener. Those tests and the genuinely usable lifecycle
+gate remain required. Normal startup and generic web callbacks are unchanged.
+
 Native support is part of AUTH-23, not implied by a working web callback. Use an
 external system browser and the registered platform's supported return mechanism.
 An app-owned WebView, arbitrary pasted callback URL or unsolicited token upload is
@@ -151,14 +167,14 @@ not an equivalent implementation. The original state, nonce and PKCE verifier mu
 remain bound to one initiated operation in protected transient storage, with bounded
 lifetime, cancellation and cleanup. No callback returns the PKCE verifier to a URL.
 
-Current `OAuthConnection::new` admits only canonical HTTPS redirects. Desktop
-loopback therefore needs an explicit trusted native redirect boundary rather than
+`OAuthConnection::new` remains canonical HTTPS-only; the implemented explicit
+`OAuthRedirect::desktop_loopback` carries trusted native redirect metadata without
 relaxing that web constructor. A desktop listener must own its concrete loopback
 address/port before authorization, retain the exact URI through state consumption
 and token exchange, and reject aliases, external addresses, wildcard ports, URL
 credentials, fragments and injected parameters. Persistence must retain that exact
-binding and current revision; `configure_oauth_connection` currently reconstructs
-through the HTTPS constructor and needs corresponding review. Published migrations
+binding and current revision; configuration now preserves validated metadata through
+`reconfigured`, retaining disable and pending cancellation. Published migrations
 remain immutable; demonstrate any schema need before adding a migration.
 
 Loopback handling must not become a mobile fallback. Android/iOS require their
