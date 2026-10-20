@@ -61,8 +61,9 @@ through the final clock check. An explicit opt-in provider deletion HTTP/browser
 owned provider-to-HTTP acceptance is recorded and ordinary activation remains gated. [ADR 0017](adr/0017-provider-account-deletion.md)
 and the [deletion guide](../guides/oidc-account-deletion.md) record that boundary.
 
-[ADR 0018](adr/0018-oidc-web-composition.md) proposes AUTH-56's shared OIDC browser
+[ADR 0018](adr/0018-oidc-web-composition.md) records AUTH-56's shared OIDC browser
 composition, including a common exact callback, explicit session handling and stable
 startup configuration. Stable policy loading and an opt-in Axum browser boundary
 and shared standalone/embedded configuration are implemented; supported-mode
-native public-login acceptance remains unfinished. See the [browser guide](../guides/oidc-web.md).
+native public-login acceptance now has owned Keycloak evidence with explicit
+private-transport limits. Final hosted verification and broader release gates remain open. See the [browser guide](../guides/oidc-web.md).

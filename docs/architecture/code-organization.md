@@ -553,3 +553,13 @@ and configuration module paths are explicit so the owned acceptance producer can
 compile the unchanged configured-factory sources without a production transport
 hook. This structural preparation is verified against all existing 6 HTTP and 23
 backend provider cases before the new public-login scenarios are introduced.
+
+AUTH-56's owned configured-flow producer separates lifecycle entry, actual factory/
+mode serving, private concrete transport substitution, database observation and
+explicit audit/subject gates in named modules. It reuses the original owned DB/IPC
+and production transport sources without widening production APIs. Node separates
+owned resources, browser operations, sign-in scenarios, deletion/cooldown scenarios,
+case orchestration and immutable report generation. All new modules remain under
+300lines. Longer ordered scenario/factory/shutdown functions retain exact waits,
+positive controls and cleanup together as reviewed size exceptions; no generic test
+engine or unrelated cleanup is deferred.

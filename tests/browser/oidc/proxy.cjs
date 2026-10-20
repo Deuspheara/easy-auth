@@ -17,6 +17,7 @@ async function start(directory) {
   fs.chmodSync(key,0o600);
   const facts = {posts:0,token_responses:0,signature_mutations:0,token_replays:0};
   const faults = {unavailable:0};
+  const clientAuthentication = {basic:0,post:0,public:0};
   let application;
   let base, origin, callback, mode = 'normal', captured, firstRequest, lastClaims, lastKid;
   const server = https.createServer({key:fs.readFileSync(key),cert:fs.readFileSync(certificate)}, (incoming, outgoing) => {
@@ -39,6 +40,10 @@ async function start(directory) {
       const body = Buffer.concat(chunks);
       if (token) {
         facts.posts += 1;
+        if(typeof incoming.headers.authorization==='string' && /^Basic /i.test(incoming.headers.authorization))clientAuthentication.basic++;
+        else if(new URLSearchParams(body.toString()).has('client_secret'))clientAuthentication.post++;
+        else clientAuthentication.public++;
+
         firstRequest ||= {path:incoming.url,authorization:incoming.headers.authorization,body:Buffer.from(body)};
       }
       if(token && mode==='unavailable') {
@@ -92,6 +97,7 @@ async function start(directory) {
     }, faults,
     connect(value) {base=value;}, allowCallback(value) {callback=value;}, mode(value) {mode=value;},
     lastKid() {return lastKid;}, lastClaims() {return lastClaims;},
+    authentication() {return {...clientAuthentication};},
     async replayCode() {
       assert.equal(Boolean(firstRequest),true,'successful original code POST must exist');
       const response = await fetch(base+firstRequest.path,{method:'POST',redirect:'error',signal:AbortSignal.timeout(5000),

@@ -4,7 +4,8 @@ AUTH-56 is **In Progress**. The Axum `oidc-web` feature provides trusted
 `OidcWebServices`, `oidc_web_router` and `oidc_web_openapi` for one provider per
 HTTPS origin. The server `oidc-web` feature and explicit trusted startup settings
 now use the same `configured_application` factory for standalone and embedding.
-Native Keycloak public-login acceptance through both modes remains unfinished.
+Owned Keycloak public-login/lifecycle acceptance is recorded below; final hosted
+verification and broader release gates remain explicit.
 Default builds and absent settings do not activate these routes. This is not production-readiness,
 external-provider interoperability or independent-review evidence.
 
@@ -75,3 +76,32 @@ See [ADR 0018](../architecture/adr/0018-oidc-web-composition.md) and the concret
 [OpenAPI](../architecture/openapi-oidc-web.json). Follow the deployment logging
 restrictions: never log callback URLs/query strings, code/state, cookies, assertions,
 tokens or client credentials in the application or reverse proxy.
+
+## Owned public-flow evidence
+
+The [configured native suite](../../tests/browser/oidc/web/README.md) exercises
+actual Keycloak sign-in through public start/callback/finish, local session and
+embedded application use, logout/relogin, fresh provider deletion and cooldown in
+both supported composition modes. It compiles the unchanged configured factory/
+settings and embedded application-route sources with a private owned TLS transport
+name substitution; the actual public Axum/core/PostgreSQL code is reused. There is
+no fixture HTTP session bootstrap, seeded user/session or invented signed freshness.
+Normal production transport/configuration gains no certificate/address override.
+
+The eighteen cases include observed final-audit commit and verified subject-resolution
+waits through a separate max-one database observer, protected-file confidential client
+authentication and explicit503 versus401 distinctions. Only aggregate facts and
+booleans are reported. Each owned database ends with no local authority/contact/
+pending work, four deidentified audits and one live deletion cooldown, then is removed.
+This complements normal-binary startup checks and the original provider regressions;
+it is not a normal-binary public-root positive TLS test, production-provider matrix,
+independent review, protocol certification or release-readiness evidence.
+
+The [current report](../../tests/browser/oidc/results/2026-10-20/keycloak-configured-public-web-restarts.json)
+also checks real factory process restarts while a callback is pending and after
+session commit in each mode. Browser binding, persisted revision and the same local
+owner/session survive, with no extra authentication audit. Actual HTTP response and
+cookie delivery are observed to wait for the held final-audit transaction. All six
+application instances stop normally. The earlier
+[baseline report](../../tests/browser/oidc/results/2026-10-20/keycloak-configured-public-web.json)
+is immutable historical evidence; the current report still contains eighteen cases.

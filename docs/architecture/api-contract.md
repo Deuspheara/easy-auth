@@ -376,5 +376,5 @@ original use case and stronger proof requirements with the same common callback.
 See [the concrete schema](openapi-oidc-web.json), [consumer guide](../guides/oidc-web.md)
 and [ADR 0018](adr/0018-oidc-web-composition.md) for errors, cookie transport and
 request-snapshot concurrency limits. Default OpenAPI/composition is unchanged. Explicit server `oidc-web` settings select
-the same routes through `configured_application`; supported-mode native public-login
-acceptance remains unfinished.
+the same routes through `configured_application`; owned supported-mode public-login
+acceptance is described in the guide with its private-TLS/source-copy limits.

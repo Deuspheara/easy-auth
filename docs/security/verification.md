@@ -2708,3 +2708,94 @@ credential-file I/O and OIDC service construction in named owning modules, and t
 existing protocol/transaction boundaries visible. New modules stay below300lines;
 ordered startup supervision and test matrices retain prerequisites, exact reasons
 and cleanup as reviewed function-size exceptions. No unrelated cleanup is deferred.
+
+## AUTH-56 configured public-provider acceptance — 2026-10-20
+
+AUTH-56 remains **In Progress pending final exact-head hosted CI**. Its local delivery
+work now includes shared configured startup, actual public sign-in/callback/finish,
+committed session/protected application use, logout/relogin and fresh provider
+deletion in both standalone and embedded compositions. Prerequisites AUTH-30 and
+AUTH-55 were re-read in Huly as Done; native blocker relations remain intact.
+
+The owned example compiles unchanged configured-application/settings sources and
+the actual embedded application-route module. Only the concrete transport name in
+this private crate is substituted with the existing owned certificate/address port,
+which shares production TLS/GET/POST/response code. Production has no injection,
+private trust or insecure/address setting. This is explicitly **not a normal-binary
+public-root positive TLS test**, production-provider interoperability, independent
+review, conformance certification or production readiness. Normal-binary startup/
+refusal and SMTP checks remain separate. No user browser/device/security settings
+were changed and no further Safari/passkey prompts were requested.
+
+The [current immutable report](../../tests/browser/oidc/results/2026-10-20/keycloak-configured-public-web-restarts.json)
+passes **18 real Keycloak/browser cases, nine per mode**, with all **679 current
+source hashes** and the fixed producer binary matched. The
+[earlier baseline](../../tests/browser/oidc/results/2026-10-20/keycloak-configured-public-web.json)
+is preserved unchanged and must not be counted as eighteen additional cases.
+Actual public routes are the exclusive session source: initial SQL authority is
+zero and `/fixture/session` is absent. Exact confidential `client_secret_basic`
+comes from the real protected file/configuration boundary, with no seeded local
+user/session, fabricated signed freshness, bearer delivery capability or proof
+constructor. Twelve token requests use Basic; ten actual provider responses and
+two deliberate proxy503s occur, with no signature or token substitution.
+
+Cases cover fixed configured/anonymous routes; nonmutating callback GET and cancel;
+503 infrastructure rejection with no grant; genuine signed public login held at the
+actual final audit before success; ambient-session start/finish refusal, explicit
+logout and old-bearer rejection; returning owner reuse; actual fresh signed wrong
+subject denial; two-stage destructive confirmation, account erasure and old-cookie/
+callback replay; and a fresh verified public login denied during deletion cooldown.
+The cooldown case observes the actual core/PG scoped subject lock after signature/
+claim mapping, with current JIT-Allow/source and a live original pending cap, so an
+infrastructure, missing-profile or expiry failure cannot stand in for that denial.
+All expected401/503 results are exact; observer/process/TLS/cleanup failures remain
+failures rather than accepted authorization outcomes.
+
+A separate max-one PostgreSQL observer verifies real waits. Final-audit checks
+observe actual HTTP response and cookie delivery as well as page completion; no
+session cookie may arrive before the held transaction commits. Both modes restart
+the actual factory process while a callback is pending and after session commit.
+Exact pending binding, current persisted revision and original local owner/session
+survive, with no extra authentication audit. Protected file content is retained.
+All **six application instances** and both database-owner processes exit normally;
+no emergency cleanup is accepted. The fixture changes no callback state, identity,
+session, clock or signed proof; its gates are private database observations/locks.
+
+Final per-mode facts are zero users/sessions/identities/pending/contact/notices and
+retained audit subjects, four deidentified audits, and one live cooldown. Both owned
+databases, the pinned provider container and all private files are removed. Reports
+contain finite facts/source hashes only: no tokens, credentials, assertion/registration
+responses, callback URLs, raw headers, codes, storage state, traces or video.
+
+Structural preparation was committed separately: `23f57dc` extracts the embedded
+application-owned route (strict lint and both actual SMTP lifecycle modes pass);
+`9d68867` shares bounded private JSON pipes/process-group lifetime and explicit
+module paths (all existing six HTTP and23 backend provider cases pass). New scenario
+work retains every previous assertion. The final rebuilt existing **23 backend +6
+HTTP** Keycloak regressions pass again with the finite authentication observation
+added separately from their unchanged original proxy fact shape. Both controlled
+reference clients pass. No application behavior fix, schema, dependency version or
+advisory exception was required for this acceptance work.
+
+Final local gates pass: formatting; strict locked default/all-feature workspace/
+all-target lint; **97 default** and **513 all-feature workspace tests** (2 Axum,
+98 HTTP/database,69 core,321 PostgreSQL,23 server; logging subprocess repeat excluded);
+**57 verification-only** core cases; compiled advisories, cargo-deny and npm audit.
+No failures or ignored cases. The inactive SQLx/MySQL RSA advisory remains visible.
+CI now runs the public suite and uses the documented nonincremental Cargo setting.
+The full staged diff receives redacted secret scanning before publication.
+
+Configuration head `ff2df6a3c91e9c40efa90011a9c730f8ac8eea71` has exact hosted CI
+**39375349191 SUCCESS**; HTTP head `15f89fd` has **39373559701 SUCCESS**. The new
+acceptance head still requires its own exact CI before AUTH-56 completion. Broader
+release/manual-provider/native-app/SAML/outbound-issuer/independent-review gates and
+AUTH-20's unresolved Safari recovery remain open. No production-readiness or general
+provider interoperability claim follows from this owned-provider evidence.
+
+Maintainability review keeps the producer's lifecycle, mode serving, transport,
+SQL observation and audit/subject gates separate; Node owns resources/browser actions,
+sign-in and lifecycle scenarios, orchestration and immutable reporting in named
+modules. Production policy/SQL remain in their existing crates. Modules stay below
+300lines; longer ordered test/supervision functions keep exact waits, positive
+controls and cleanup visible as reviewed size exceptions. No unrelated cleanup is
+deferred and no generic test engine or widened production proof API is added.

@@ -2,7 +2,8 @@
 
 Date: 2026-10-20. Status: stable startup metadata loading and opt-in Axum browser
 composition and shared server configuration are implemented for AUTH-56;
-supported-mode native public-login acceptance remains proposed and unimplemented.
+owned supported-mode public-login acceptance is implemented with explicit private
+TLS/source-copy limits; final exact-head CI and broader release gates remain open.
 AUTH-30 and AUTH-55 acceptance are prerequisites, not ordinary sign-in activation.
 No new schema or default activation is introduced. Public routes require the
 explicit `oidc-web` feature and trusted `oidc_web_router` composition, selected

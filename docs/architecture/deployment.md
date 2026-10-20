@@ -82,5 +82,7 @@ EASY_AUTH_OIDC_UNSUPPORTED_TEST_BINARY=/tmp/easy-auth-oidc-disabled python3 scri
 Use the documented development database/Mailpit setup; CI provides its owned service
 container. The script drops only its random database and removes its private file.
 These checks are not Keycloak public-login, production-provider, independent-review
-or release-readiness evidence. AUTH-56 still requires native sign-in/lifecycle
-acceptance through both supported modes and exact-head hosted CI.
+or release-readiness evidence. AUTH-56's separate [owned public-flow suite](../guides/oidc-web.md#owned-public-flow-evidence)
+now records sign-in/lifecycle acceptance through both composition modes with explicit
+private-TLS/source-copy limits. Final exact-head hosted CI and broader release gates
+remain explicit.

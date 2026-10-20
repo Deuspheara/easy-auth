@@ -65,3 +65,8 @@ required-features = ["oidc-verification"]
 name = "oidc-deletion-http"
 path = "examples/oidc-deletion-http/main.rs"
 required-features = ["experimental-oidc-account-deletion"]
+
+[[example]]
+name = "oidc-web-native"
+path = "examples/oidc-web-native/main.rs"
+required-features = ["oidc-web"]

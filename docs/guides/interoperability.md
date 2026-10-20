@@ -13,7 +13,7 @@
 | Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
-| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 owned Keycloak/browser cases through local mapping/JIT/session commit and purpose-bound reauthentication/deletion; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session/deletion boundary and component/native-tested opt-in deletion HTTP; ordinary routes, linking and complete lifecycle remain gated |
+| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 backend, 6 HTTP-deletion and 18 configured two-mode public-flow Keycloak/browser cases; shared production HTTPS sources with explicit private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional shared browser configuration/sign-in/deletion plus backend boundaries have owned acceptance; final hosted verification, linking and broader first-release gates remain open |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
 
@@ -182,3 +182,26 @@ hashes. New HTTP final counts are zero users/sessions/identities/pending/contact
 notices, two deidentified audit facts and one live cooldown. This is email-free
 owned-provider evidence, not provider-contact SMTP, independent audit,
 production-provider interoperability or ordinary activation.
+
+## AUTH-56 configured public browser flows — 2026-10-20
+
+The [current eighteen-case report](../../tests/browser/oidc/results/2026-10-20/keycloak-configured-public-web-restarts.json)
+uses actual public sign-in/callback/finish, local session/protected application use,
+logout/relogin and fresh deletion in both supported composition modes. Each mode
+also preserves a pending callback and committed session across two real factory
+process restarts, retaining its revision and owner. No fixture HTTP session bootstrap,
+seeded authority, clock arrangement or invented authentication time is used.
+
+Actual confidential Basic client authentication comes from the protected file and
+validated settings. Real PostgreSQL waits establish response/cookie ordering at final
+commit and verified subject resolution before cooldown denial. Separate503 injection
+cannot count as401 application rejection. All six application instances and both DB
+owners stop normally, with exact private-file/provider/database cleanup. The earlier
+baseline report is preserved separately; current case count remains eighteen.
+
+The example compiles unchanged configured-factory/settings and embedded-route sources
+with the existing private owned TLS transport name substitution. This is not a normal
+binary public-root positive TLS test, production-provider/native-app matrix, independent
+audit or conformance/readiness claim. Normal binary startup/refusal and SMTP checks
+remain separate evidence. Default activation, linking, upstream-provider lifecycle,
+SAML, outbound issuer and broader release gates are unaffected.

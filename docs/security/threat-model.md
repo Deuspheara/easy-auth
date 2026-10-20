@@ -406,8 +406,9 @@ Explicit confirmation, exact binding and one-use completion remain required. Pro
 and persistence failures stay distinct from authorization rejection and never issue
 a session. Final audit failure rolls back local identity/session while consumed
 OAuth state remains consumed. Original deletion proof/freshness requirements are
-unchanged. Supported-mode native public-login acceptance remains unfinished;
-broader release and independent-review gates stay open.
+unchanged. Supported-mode public-login acceptance now uses real owned Keycloak
+with explicit private-TLS/source-copy limits; broader release and independent-review
+gates stay open.
 
 The shared AUTH-56 application factory validates a closed typed `AUTH_OIDC_*`
 contract before database loading/listening. Unknown/partial/unsupported settings,

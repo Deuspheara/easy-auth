@@ -111,9 +111,11 @@ claim. See [ADR 0015](../architecture/adr/0015-oidc-token-verification.md).
 The owned Keycloak/browser fixture now supplies named local code/signature/
 rotation/replay evidence through private test TLS/address mapping and shared
 production HTTPS sources. AUTH-30 extends the owned-provider evidence through
-atomic identity/session persistence. Supported public composition (AUTH-56),
-provider-only deletion (AUTH-55), broader provider acceptance and independent review
-remain gates; dependency adoption alone completes none of those.
+atomic identity/session persistence. AUTH-55 provides optional provider-only deletion;
+AUTH-56 adds configured public browser composition and owned two-mode acceptance,
+with the same explicit private-TLS/source-copy limits. Final hosted verification,
+broader provider acceptance and independent review remain gates; dependency adoption
+alone establishes none of those.
 
 
 AUTH-30 reuses the same pinned josekit 0.10.3 as a PostgreSQL test dependency for

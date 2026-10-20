@@ -198,3 +198,9 @@ Owned certificate/address mapping and isolated-browser certificate tolerance sta
 inside fixtures; system trust/security settings and production egress policy are
 unchanged. These runs do not establish provider-contact SMTP, independent review,
 production-provider interoperability, ordinary sign-in or general readiness.
+
+AUTH-56 adds a separate [configured public-flow suite](web/README.md): eighteen
+Keycloak/browser cases through the shared startup configuration and real public
+sign-in/session/logout/deletion routes in standalone and embedded compositions.
+It has no fixture session-bootstrap endpoint. Owned TLS/source-copy limitations
+remain explicit; it supplements rather than replaces these original backend cases.

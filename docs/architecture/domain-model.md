@@ -139,3 +139,13 @@ existing generic/stale/disabled records cannot gain authority through loading.
 The restored core policy value is definition metadata only. Actual proof, identity
 and session authority retain their existing signature, current-source and deadline
 checks. Administrative reconfiguration remains a distinct revision-changing action.
+
+AUTH-56's optional browser delivery reuses those same entities and ports: independent
+host-only HttpOnly proof cookies per sign-in/deletion purpose, exact common callback
+UI routing, deliberate local completion, and session cookies only after the original
+core/PG commit. No browser DTO selects an issuer/realm/local client/owner/JIT policy,
+and no callback GET creates authority. Trusted settings and protected credential files
+compose the existing services in both modes. Actual public-flow evidence preserves
+pending proof and a committed owner/session across factory restarts without revision
+rotation. Provider-contact attachment, linking, native refresh families and application
+business authorization remain separate domains and release work.

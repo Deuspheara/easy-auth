@@ -3,7 +3,8 @@
 The core/PostgreSQL `oidc-identities` features add local provider identity resolution
 after the [transaction-bound verifier](oidc-verification.md). They enable no HTTP
 route by themselves. The separate [opt-in Axum browser boundary](oidc-web.md) now
-provides sign-in/shared callback routes; ordinary server configuration remains unfinished. AUTH-30's backend boundary has
+provides shared sign-in/callback routes and trusted server configuration, with owned
+two-mode public-flow acceptance. AUTH-30's backend boundary has
 passed local and hosted acceptance; provider linking/unlinking is AUTH-25 and
 stronger-account recovery gates remain open.
 [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records policy.
@@ -155,6 +156,7 @@ verified proof. Prefer the PostgreSQL startup operation, which compares the enti
 stored definition/policy and enable state under locks. Never expose these administrative
 APIs, revisions, provider credentials or JIT selection as browser authority.
 
-This checkpoint is a Rust startup/persistence API. Ordinary server OIDC settings,
-combined sign-in/callback routes and supported two-mode login acceptance remain
-AUTH-56 work under [ADR 0018](../architecture/adr/0018-oidc-web-composition.md).
+This Rust startup/persistence API is used by AUTH-56's shared configured application
+factory. [OIDC web settings, routes and owned two-mode public-flow evidence](oidc-web.md)
+are implemented under [ADR 0018](../architecture/adr/0018-oidc-web-composition.md),
+with explicit private-TLS/source-copy limits and final hosted/release gates.

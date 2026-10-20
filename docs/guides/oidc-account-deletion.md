@@ -2,9 +2,12 @@
 
 The optional core/PostgreSQL `oidc-identities` boundary supports deliberate deletion
 of a `provider_required` account using a separate verified provider proof. It adds
-an explicit opt-in Axum HTTP/browser boundary, without ordinary server activation.
+an explicit opt-in Axum HTTP/browser boundary. The combined
+[OIDC web composition](oidc-web.md) also supplies trusted server settings and a
+shared callback with public sign-in; default composition remains unchanged.
 The implementation has component and owned Keycloak-to-HTTP acceptance evidence.
-Ordinary provider composition remains gated through AUTH-56. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
+AUTH-56 records owned two-mode public-flow acceptance with final hosted verification
+and broader release gates still explicit. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
 records the transaction and experimental transport.
 
 ## Prepare a separate provider proof
@@ -102,8 +105,9 @@ services)`. The Auth realm must match and the configured redirect must be exactl
 `<HTTPS browser origin>/oidc/account-delete/callback`. HTTP loopback development
 origins are deliberately insufficient for this OAuth callback. There is one trusted
 connection per router; no request selects an owner, realm, connection or redirect.
-Normal routers, server environment configuration and ordinary OIDC sign-in are
-unchanged. AUTH-56 owns ordinary provider composition.
+This legacy constructor leaves default routers unchanged. AUTH-56's separate
+[combined composition](oidc-web.md) uses the same deletion use case with its common
+`/oidc/callback`, trusted server settings and owned public-login acceptance.
 
 | POST path | Closed JSON input | Committed success |
 | --- | --- | --- |
