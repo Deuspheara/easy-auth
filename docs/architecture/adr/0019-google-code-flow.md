@@ -325,7 +325,9 @@ The separate manual matrix must identify actual registered web/native profiles,
 system browser/platform and relevant lifecycle outcomes without saving credentials,
 codes, tokens, assertions or private keys. Production credentials are not required
 by default CI. No user browser, credential-manager or security-setting changes are
-part of automated acceptance. No Google flow has been run or accepted by this ADR.
+part of automated acceptance. The later registered native checkpoint below records
+one Desktop/base-profile sign-in; the remaining web, platform and lifecycle matrix
+is not accepted by that result.
 
 ## Decisions still requiring evidence
 

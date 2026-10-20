@@ -6,9 +6,11 @@ separate optional server `google-desktop` feature supplies owned loopback delive
 An explicitly selected eligible-client session-age profile also supplies signed
 authentication-time/deletion proofs. An experimental Axum `google-web` composition
 now adds HTTPS reference pages and bound sign-in/deletion HTTP routes. Ordinary
-startup selection, actual OS/browser acceptance, mobile delivery and lifecycle
-activation remain gated. The optional server `google-desktop-launch` component
-adds a bounded external launcher around owned loopback delivery.
+startup selection, broader OS/browser acceptance, mobile delivery and lifecycle
+activation remain gated. One registered Desktop/base-profile run passed on macOS
+with operator-reported Helium; see the live record below. The optional server
+`google-desktop-launch` component adds a bounded external launcher around owned
+loopback delivery.
 The [ADR](../architecture/adr/0019-google-code-flow.md) records the remaining work.
 
 Enable `easy-auth-core/google` and use the existing PostgreSQL and server
@@ -368,8 +370,8 @@ responses remain controlled offline actual-signature fixtures, not real Google o
 system-browser interoperability. See the [verification history](../security/verification.md).
 
 Before ordinary activation, AUTH-23 still needs reviewed standalone Google
-configuration/activation, actual native system-browser/OS-return handling,
-registered-client/manual provider evidence and a
+configuration/activation, the remaining native platform/browser and registered
+web/negative/cancellation matrix beyond the recorded macOS/Helium success, and a
 usable genuinely fresh provider-required deletion path. This component does not
 request or infer provider reauthentication: issuance time, local session rotation
 and an authorization prompt cannot substitute for genuinely recent signed
