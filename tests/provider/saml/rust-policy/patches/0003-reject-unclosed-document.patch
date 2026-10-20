@@ -1,0 +1,60 @@
+--- a/src/xml/dom.rs
++++ b/src/xml/dom.rs
+@@ -351,6 +351,11 @@
+         }
+     }
+ 
++    // quick-xml reports EOF without requiring every start element to close.
++    // A completed first root must not hide a trailing unfinished element.
++    if !stack.is_empty() {
++        return Err(SamlError::Xml("unclosed XML element".into()));
++    }
+     Ok(roots)
+ }
+ 
+--- a/tests/xml_document.rs
++++ b/tests/xml_document.rs
+@@ -72,3 +72,43 @@
+     flow(&options(Binding::Post), &post_request(&xml))?;
+     Ok(())
+ }
++
++#[test]
++fn document_and_root_collection_reject_unclosed_trailing_elements() {
++    use saml_rs::xml::dom;
++    for xml in [
++        "<Root/><Open>",
++        "<Root/><Open><Child/>",
++        "<Root/><Open><Nested>",
++    ] {
++        assert!(matches!(dom::parse(xml), Err(SamlError::Xml(_))));
++        assert!(matches!(dom::parse_roots(xml), Err(SamlError::Xml(_))));
++    }
++}
++
++#[test]
++fn post_and_redirect_flow_reject_unclosed_trailing_protocol_root(
++) -> Result<(), Box<dyn std::error::Error>> {
++    let unclosed = AUTHN_REQUEST
++        .strip_suffix("</samlp:AuthnRequest>")
++        .ok_or("missing fixture closing tag")?;
++    let invalid = format!("{AUTHN_REQUEST}{unclosed}");
++    for binding in [Binding::Post, Binding::Redirect] {
++        let healthy = match binding {
++            Binding::Post => post_request(AUTHN_REQUEST),
++            _ => redirect_request(AUTHN_REQUEST)?,
++        };
++        flow(&options(binding), &healthy)?;
++        let request = match binding {
++            Binding::Post => post_request(&invalid),
++            _ => redirect_request(&invalid)?,
++        };
++        let result = flow(&options(binding), &request);
++        assert!(
++            matches!(&result, Err(SamlError::Xml(_))),
++            "binding={binding:?}, accepted={}",
++            result.is_ok()
++        );
++    }
++    Ok(())
++}

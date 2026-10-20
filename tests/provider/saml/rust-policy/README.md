@@ -157,3 +157,49 @@ license/advisory/backend review; independent security review; expanded structura
 resource-budget and concurrency qualification; any enabled metadata/encryption/
 detached-binding paths; and real application/DB authority, replay, realm and lifecycle
 acceptance. This research changes none of those activation requirements.
+
+## Complete-document follow-up
+
+[Patch0003](patches/0003-reject-unclosed-document.patch) fixes a separately confirmed
+EOF-stack bug. [Root cause and evidence](../../../../docs/research/saml-document-completeness.md)
+distinguish raw parser acceptance from the signed flow's existing later rejection;
+no authenticated identity bypass is claimed. Apply after0001/0002. In a disposable
+pinned checkout with those two applied, the red/green sequence is:
+
+```sh
+git apply --include=tests/xml_document.rs /path/to/0003-reject-unclosed-document.patch
+# Expected before source fix: exit101, two new failures and three existing passes.
+cargo test --locked --offline --no-default-features --features crypto-aws-lc --test xml_document
+git apply --include=src/xml/dom.rs /path/to/0003-reject-unclosed-document.patch
+cargo test --locked --offline --no-default-features --features crypto-aws-lc --test xml_document
+```
+
+Build the extended observation atop the original assessed image (recorded parent
+`sha256:6f40d6a8388282c249a9f5645a9db9c4eaa5d6b30db71490685ade44cf67b425`):
+
+```sh
+structure_context=$(mktemp -d)
+cp tests/provider/saml/rust-policy/structure.Dockerfile "$structure_context/Dockerfile"
+cp tests/provider/saml/rust-policy/patches/0003-reject-unclosed-document.patch "$structure_context/"
+cp tests/provider/saml/rust-policy/observe.py tests/provider/saml/rust-policy/structure_observe.py "$structure_context/"
+docker build -t easy-auth-auth32-structure:assessment "$structure_context"
+docker run --rm --network none --read-only --cap-drop ALL \
+  --security-opt no-new-privileges --pids-limit 128 --cpus 2 --memory 3g \
+  --tmpfs /tmp:rw,nosuid,nodev,size=128m easy-auth-auth32-structure:assessment
+```
+
+The Dockerfile verifies the baseline DOM hash before applying the zero-fuzz patch,
+rebuilds the same mandatory-signature exact-policy example and runs the full
+candidate suite. The extended observer preserves106 rows, adds8 malformed-document
+rows and4 healthy after-controls; all new malformed rows must be XML errors.
+The existing trace/control/report implementation is reused. Missing-tracer testing
+uses the same containment flags, `--workdir /work --entrypoint python3`, and:
+
+```sh
+-c 'import policy_observe,structure_observe; policy_observe.STRACE="/observer-unavailable"; policy_observe.main(run_report=structure_observe.run)'
+```
+
+Recorded result:1089 candidate tests pass;118 observation rows pass with live
+controls, a failing missing-tracer check and restored-observer success. The
+[finite record](results/2026-10-20-document-completeness.json) preserves prior
+failures and scope limits. Production SAML remains gated.

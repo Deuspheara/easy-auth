@@ -14,6 +14,10 @@ candidate tests and working file/network controls. Upstream adoption, independen
 security review and application acceptance remain open. The comparison below
 records the original unpatched pins; no production verifier is selected.
 
+The later [complete-document investigation](saml-document-completeness.md) found
+and patched a distinct saml-rs DOM EOF-stack bug; no authenticated identity bypass
+was demonstrated. It remains an experimental, gated dependency candidate.
+
 ## Confirmed cause and ownership
 
 The assessed Samael is **0.0.22**, commit

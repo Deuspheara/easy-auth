@@ -260,3 +260,7 @@ The [selected SAML dependency follow-up](saml-dependency-review.md) records Linu
 and macOS AWS-LC graph checks, retained inactive full-lock findings, license/source
 inventory and native advisory mapping. Independent review and SAML activation
 remain gated.
+
+The [complete-document follow-up](saml-document-completeness.md) fixes a confirmed
+EOF-stack admission bug with a minimal upstream patch and repeats signed/resource
+qualification. Independent review, upstream adoption and SAML activation stay open.

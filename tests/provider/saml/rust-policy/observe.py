@@ -73,7 +73,7 @@ def reference_inputs(values, port):
 def validate_rows(values, keys, api):
     expected = {"case", "mode", "api", "accepted", "trusted_subject",
                 "attacker_marker", "wrapper_marker", "error_class"}
-    if len(values) != 106 or {(row["case"], row["mode"]) for row in values} != keys:
+    if len(values) != len(keys) or {(row["case"], row["mode"]) for row in values} != keys:
         raise parser.InfrastructureFailure("incomplete_result_rows")
     for row in values:
         if (set(row) != expected or row["api"] != api or
@@ -102,10 +102,10 @@ def observe(data, keys, directory):
     }
 
 
-def policy_passed(exact, broad, counts):
+def policy_passed(exact, broad, counts, positive_cases=POSITIVE):
     valid_subject = lambda row: (row["trusted_subject"] and not row["attacker_marker"]
                                  and not row["wrapper_marker"])
-    return (all(row["accepted"] == (row["case"] in POSITIVE) for row in exact)
+    return (all(row["accepted"] == (row["case"] in positive_cases) for row in exact)
             and all(valid_subject(row) for row in exact if row["accepted"])
             and all(row["error_class"] in DENIALS for row in exact if not row["accepted"])
             and all(row["error_class"] == "algorithm_rejected" for row in exact
@@ -118,7 +118,7 @@ def policy_passed(exact, broad, counts):
                         ("sentinel_file_calls", "connect_calls", "http_requests")))
 
 
-def run():
+def run(corpus_builder=corpus, positive_cases=POSITIVE):
     parser.SENTINEL.write_bytes(parser.MARKER)
     trap = HTTPServer(("127.0.0.1", 0), parser.Trap)
     thread = threading.Thread(target=trap.serve_forever, daemon=True)
@@ -127,14 +127,14 @@ def run():
         with tempfile.TemporaryDirectory(prefix="auth32-exact-policy-") as value:
             directory = Path(value)
             before = parser.controls(parser.executable(), trap.server_port, directory, "before")
-            data, keys = corpus(trap.server_port)
+            data, keys = corpus_builder(trap.server_port)
             output, _diagnostics = capture([BINARY, "--strict"], data)
             broad = [row for line in output.splitlines()
                      if (row := json.loads(line))["api"] == "strict-flow"]
             validate_rows(broad, keys, "strict-flow")
             exact, counts = observe(data, keys, directory)
             after = parser.controls(parser.executable(), trap.server_port, directory, "after")
-            passed = policy_passed(exact, broad, counts)
+            passed = policy_passed(exact, broad, counts, positive_cases)
             return {"status": "controls_passed" if passed else "candidate_controls_failed",
                     "candidate_controls_passed": passed, "input_rows": len(keys),
                     "transport_sha256": hashlib.sha256(data).hexdigest(),
@@ -151,9 +151,9 @@ def run():
             raise parser.InfrastructureFailure("trap_shutdown_unconfirmed")
 
 
-def main():
+def main(run_report=run):
     try:
-        value = run()
+        value = run_report()
         print(json.dumps(value, sort_keys=True))
         raise SystemExit(0 if value["candidate_controls_passed"] else 1)
     except parser.InfrastructureFailure as error:
