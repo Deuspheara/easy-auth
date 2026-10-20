@@ -26,41 +26,51 @@ impl Postgres {
         let issuers: Vec<&str> = input.allowed_issuers().iter().map(String::as_str).collect();
         let policy = OidcIdentityPolicy::new(connection, &issuers, input.display_name_claim())?
             .with_jit(input.jit());
-        let display_claim = match policy.display_name_claim() {
-            OidcDisplayNameClaim::Subject => "sub",
-            OidcDisplayNameClaim::Name => "name",
-            OidcDisplayNameClaim::PreferredUsername => "preferred_username",
-        };
-        let jit = match policy.jit() {
-            OidcJitPolicy::Deny => "deny",
-            OidcJitPolicy::Allow => "allow",
-        };
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        let connection = policy.configuration();
-        configuration::replace(&mut tx, connection).await?;
-        sqlx::query(
-            r#"
-            INSERT INTO auth_oidc_identity_policies
-              (realm_id,connection_id,client_id,revision,allowed_issuers,display_claim,jit)
-            VALUES ($1,$2,$3,$4,$5,$6,$7)
-            ON CONFLICT (realm_id,connection_id,client_id) DO UPDATE SET
-              revision=EXCLUDED.revision,allowed_issuers=EXCLUDED.allowed_issuers,
-              display_claim=EXCLUDED.display_claim,jit=EXCLUDED.jit
-            "#,
-        )
-        .bind(connection.realm())
-        .bind(connection.connection())
-        .bind(connection.client())
-        .bind(connection.revision())
-        .bind(policy.allowed_issuers())
-        .bind(display_claim)
-        .bind(jit)
-        .execute(&mut *tx)
-        .await
-        .map_err(unavailable)?;
+        configuration::replace(&mut tx, policy.configuration()).await?;
+        replace(&mut tx, &policy).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(policy)
     }
+}
+
+/// Persist policy under the caller's already locked/configured revision.
+/// Configuration mutation and transaction commit stay explicit in the caller.
+pub(super) async fn replace(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    policy: &OidcIdentityPolicy,
+) -> Result<()> {
+    let display_claim = match policy.display_name_claim() {
+        OidcDisplayNameClaim::Subject => "sub",
+        OidcDisplayNameClaim::Name => "name",
+        OidcDisplayNameClaim::PreferredUsername => "preferred_username",
+    };
+    let jit = match policy.jit() {
+        OidcJitPolicy::Deny => "deny",
+        OidcJitPolicy::Allow => "allow",
+    };
+    let connection = policy.configuration();
+    sqlx::query(
+        r#"
+        INSERT INTO auth_oidc_identity_policies
+          (realm_id,connection_id,client_id,revision,allowed_issuers,display_claim,jit)
+        VALUES ($1,$2,$3,$4,$5,$6,$7)
+        ON CONFLICT (realm_id,connection_id,client_id) DO UPDATE SET
+          revision=EXCLUDED.revision,allowed_issuers=EXCLUDED.allowed_issuers,
+          display_claim=EXCLUDED.display_claim,jit=EXCLUDED.jit
+        "#,
+    )
+    .bind(connection.realm())
+    .bind(connection.connection())
+    .bind(connection.client())
+    .bind(connection.revision())
+    .bind(policy.allowed_issuers())
+    .bind(display_claim)
+    .bind(jit)
+    .execute(&mut **tx)
+    .await
+    .map_err(unavailable)?;
+    Ok(())
 }
 
 pub(crate) async fn lock(
