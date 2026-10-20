@@ -1,4 +1,10 @@
-use super::{FixtureResult, database::Database, read_command, send, transport::Http};
+use super::{
+    FixtureResult,
+    database::Database,
+    read_command, send,
+    transactions::{Pending, Replay},
+    transport::Http,
+};
 use auth_core::*;
 use auth_postgres::Postgres;
 use serde_json::{Value, json};
@@ -7,18 +13,7 @@ use std::{
     sync::{Arc, atomic::Ordering},
 };
 use uuid::Uuid;
-use zeroize::Zeroizing;
 
-struct Pending {
-    browser: Secret,
-    start: OAuthStart,
-}
-struct Replay {
-    browser: Secret,
-    state: Secret,
-    nonce: Zeroizing<String>,
-    pkce: Zeroizing<String>,
-}
 struct Fixture {
     store: Arc<Postgres>,
     connection: OAuthConnection,
@@ -113,58 +108,15 @@ impl Fixture {
         Ok(response)
     }
     async fn finish(&mut self, callback: &str) -> auth_core::Result<Value> {
-        let Pending { browser, start } = self.pending.take().ok_or(Error::InvalidInput)?;
-        let url = url::Url::parse(callback).map_err(|_| Error::Unauthorized)?;
-        let mut base = url.clone();
-        base.set_query(None);
-        if base.as_str() != self.connection.redirect() {
-            return Err(Error::Unauthorized);
-        }
-        let pairs: Vec<_> = url.query_pairs().collect();
-        let value = |name: &str| -> auth_core::Result<&str> {
-            let values: Vec<_> = pairs.iter().filter(|(key, _)| key == name).collect();
-            if values.len() != 1 {
-                return Err(Error::Unauthorized);
-            }
-            Ok(values[0].1.as_ref())
-        };
-        let state = Secret::parse(value("state")?.to_owned())?;
-        let proof = OAuthBrowserProof::parse(
-            start.proof.nonce().expose().to_owned(),
-            start.proof.pkce_verifier().expose().to_owned(),
-        )?;
-        let intent = OAuthIntent {
-            browser: &browser,
-            source: "owned-keycloak",
-            purpose: OAuthPurpose::SignIn,
-        };
-        let context = self
-            .transactions
-            .consume(
-                &intent,
-                &state,
-                proof,
-                OAuthCallback {
-                    redirect: self.connection.redirect(),
-                    issuer: Some(value("iss")?),
-                },
-            )
+        let pending = self.pending.take().ok_or(Error::InvalidInput)?;
+        let (context, replay, code) = pending
+            .consume(&self.transactions, &self.connection, callback)
             .await?;
-        // Retain original protected transport material only to test an exact
-        // replay of consumed PostgreSQL state. This adds no production hook.
-        self.replay = Some(Replay {
-            browser,
-            state: start.state,
-            nonce: Zeroizing::new(start.proof.nonce().expose().to_owned()),
-            pkce: Zeroizing::new(start.proof.pkce_verifier().expose().to_owned()),
-        });
+        self.replay = Some(replay);
         let cap = context.expires_us();
         let identity = self
             .exchange
-            .exchange(
-                context,
-                OidcAuthorizationCode::parse(value("code")?.to_owned())?,
-            )
+            .exchange(context, OidcAuthorizationCode::parse(code?)?)
             .await?;
         Ok(
             json!({"result":"verified","subject_matches":identity.subject()==self.expected_subject,
@@ -175,24 +127,11 @@ impl Fixture {
         )
     }
     async fn replay_state(&self) -> auth_core::Result<Value> {
-        let replay = self.replay.as_ref().ok_or(Error::InvalidInput)?;
-        let intent = OAuthIntent {
-            browser: &replay.browser,
-            source: "owned-keycloak",
-            purpose: OAuthPurpose::SignIn,
-        };
-        self.transactions
-            .consume(
-                &intent,
-                &replay.state,
-                OAuthBrowserProof::parse(replay.nonce.to_string(), replay.pkce.to_string())?,
-                OAuthCallback {
-                    redirect: self.connection.redirect(),
-                    issuer: Some(self.connection.issuer()),
-                },
-            )
-            .await?;
-        Ok(json!({"result":"unexpected-state-reuse"}))
+        self.replay
+            .as_ref()
+            .ok_or(Error::InvalidInput)?
+            .check(&self.transactions, &self.connection)
+            .await
     }
     async fn command(&mut self, command: &Value) -> auth_core::Result<Value> {
         match command["command"].as_str() {

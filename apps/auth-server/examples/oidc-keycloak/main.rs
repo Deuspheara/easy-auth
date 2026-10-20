@@ -9,6 +9,7 @@ mod fixture;
 mod post;
 #[path = "../../src/oidc_http/response.rs"]
 mod response;
+mod transactions;
 mod transport;
 
 use std::io::{BufRead, Write};
