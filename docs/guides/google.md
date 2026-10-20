@@ -96,6 +96,44 @@ must not perform a token exchange. Malformed callbacks must not cancel unrelated
 pending operations. Do not log the incoming query or save it in browser storage.
 This component adds no callback route, native return listener or Google activation.
 
+## Shared authorization use case
+
+`GoogleAuthorization::new` composes matching `Arc<OAuthTransactions>` and
+`Arc<GoogleCodeExchange>` snapshots, including exact realm/connection/local client,
+provider registration, redirect and revision. Use the same authoritative repository
+for both underlying services. It accepts only sign-in intent; linking and deletion
+are rejected before admission or provider work.
+
+`begin` returns a `GoogleAuthorizationStart`: retain its `transaction` state and
+private proof in protected transient transport storage and send only its redacted
+`authorization_url` through the reviewed external-browser boundary. The URL is
+exposed deliberately at that boundary, never logged. If URL construction/provider
+discovery fails after admission, the use case attempts cancellation of that exact
+new operation and propagates any cleanup failure instead of claiming success.
+
+`finish` requires the original retained state/private proof, actual trusted callback
+route or owned listener URI, request-local intent, and decoded
+`GoogleAuthorizationResponse`. Exact returned state/issuer/redirect is checked
+before mutation. Success consumes the original database-bound transaction once,
+then uses the existing S256/signature exchange. A denied/provider-failure outcome
+requires the same private operation binding through committed cancellation and
+makes no token POST. Storage/configuration/proof failures remain typed errors,
+distinct from `Denied` and `ProviderFailure` completion outcomes.
+
+`GoogleAuthorizationCompletion::Verified` owns a boxed existing verified identity
+proof, not a local session. Mapping consumes the enclosed proof and the existing
+atomic sign-in use case must still recheck current source/policy/deadlines. Token
+or signature failure does not resurrect consumed state. Explicit `cancel` requires
+the original private proof and cancels only that operation, preserving ambient
+sessions. No new SQL, proof constructor or retry mechanism is introduced.
+
+The intent's network source is an abuse-admission key, not an authentication
+credential or provider selector. A changed network source still spends its own
+budget while exact provider-configuration/browser/state/nonce/PKCE/purpose bindings
+remain mandatory. These use cases do not own a socket, establish callback delivery,
+launch a system browser or enable public Google login. Web/native transports and
+usable reviewed provider lifecycle remain required before activation.
+
 ## Evidence and remaining gates
 
 Feature-owned offline tests use actual RS256 signatures and public JWKS with
@@ -103,7 +141,7 @@ Google-shaped discovery/code responses. They cover original code/PKCE/redirect,
 fixed scope/egress/authentication, wrong claims/signature/algorithm, duplicate email
 flags, email-attribute semantics, cancellation, source/purpose isolation and exact
 provider-error versus infrastructure-error results. Their controlled repository is
-a component fixture. Twelve separate PostgreSQL scenarios now exercise the actual
+a component fixture. Eighteen separate PostgreSQL scenarios now exercise the actual
 Google code component through real state consumption, signature verification,
 mapping and existing local identity/session commit. They cover provider-only
 ownership without email merging, JIT, scoped identity ownership, callback and subject concurrency,

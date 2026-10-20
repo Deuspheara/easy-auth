@@ -31,6 +31,8 @@ pub(super) struct Provider {
     pub posts: AtomicUsize,
     pub signed: AtomicUsize,
     pub unavailable: AtomicBool,
+    pub documents_unavailable: AtomicBool,
+    pub document_gets: AtomicUsize,
     pub hold: AtomicBool,
     pub entered: Notify,
     pub release: Notify,
@@ -53,6 +55,8 @@ impl Provider {
             posts: AtomicUsize::new(0),
             signed: AtomicUsize::new(0),
             unavailable: AtomicBool::new(false),
+            documents_unavailable: AtomicBool::new(false),
+            document_gets: AtomicUsize::new(0),
             hold: AtomicBool::new(false),
             entered: Notify::new(),
             release: Notify::new(),
@@ -95,6 +99,10 @@ impl OidcHttp for Provider {
         Ok(vec![SocketAddr::from(([8, 8, 8, 8], port))])
     }
     async fn get(&self, target: &OidcTarget) -> Result<OidcHttpResponse> {
+        self.document_gets.fetch_add(1, Ordering::SeqCst);
+        if self.documents_unavailable.load(Ordering::SeqCst) {
+            return Err(Error::Unavailable);
+        }
         let value = match target.url().as_str() {
             "https://accounts.google.com/.well-known/openid-configuration" => {
                 json!({"issuer":ISSUER,

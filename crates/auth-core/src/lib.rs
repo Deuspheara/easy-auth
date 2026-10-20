@@ -60,7 +60,10 @@ pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 
 #[cfg(feature = "google")]
-pub use oidc::{GoogleAuthorizationOutcome, GoogleAuthorizationResponse, GoogleCodeExchange};
+pub use oidc::{
+    GoogleAuthorization, GoogleAuthorizationCompletion, GoogleAuthorizationOutcome,
+    GoogleAuthorizationResponse, GoogleAuthorizationStart, GoogleCodeExchange,
+};
 
 #[cfg(feature = "oidc-identities")]
 pub use oidc::{

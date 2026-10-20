@@ -444,7 +444,7 @@ cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
 freshness is inferred from issuance or prompts, and no provider-required account
 activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).
 
-Twelve Google-profile PostgreSQL integration scenarios now traverse the real state,
+Eighteen Google-profile PostgreSQL integration scenarios now traverse the real state,
 signature/mapping and local identity/session boundaries with controlled offline
 RS256 responses. Exact provider wire assertions and independent signed-response
 counters distinguish invalid claims/JIT/source policy from infrastructure failures.
@@ -465,3 +465,15 @@ before error cancellation. Error outcomes cannot become token requests. Real
 PostgreSQL tests preserve pending state after wrong private proof/browser and show
 one-use successful exchange or denial-only cancellation. No arbitrary callback-URL
 import, new route or issuer fallback is introduced.
+
+Shared Google authorization orchestration compares exact service snapshots and
+retained state/actual issuer/route, rejects non-sign-in purposes before I/O, and
+keeps denied/provider-failure cancellation behind the same original private proof
+as success consumption. Failed preparation cleanup/storage is never a successful
+provider denial; token/signature failures never restore consumed state. Explicit
+cancel affects no ambient session. Successful verification still confers no local
+authority until the existing mapped identity transaction commits. Network source
+remains an independently budgeted abuse key, not an account credential; changing it
+cannot bypass provider/browser/state/nonce/PKCE/purpose bindings. Actual SQL faults,
+signed-negative controls, concurrent callbacks and separate roaming admission
+observations distinguish these invariants from infrastructure/test assumptions.

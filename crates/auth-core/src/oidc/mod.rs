@@ -2,7 +2,10 @@ mod documents;
 #[cfg(feature = "google")]
 mod google;
 #[cfg(feature = "google")]
-pub use google::{GoogleAuthorizationOutcome, GoogleAuthorizationResponse, GoogleCodeExchange};
+pub use google::{
+    GoogleAuthorization, GoogleAuthorizationCompletion, GoogleAuthorizationOutcome,
+    GoogleAuthorizationResponse, GoogleAuthorizationStart, GoogleCodeExchange,
+};
 #[cfg(feature = "oidc-identities")]
 mod identities;
 mod metadata;

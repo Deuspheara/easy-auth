@@ -109,6 +109,15 @@ member set, limits and mandatory subsequent private-operation binding are specif
 in the [Google callback contract](../guides/google.md#callback-decoding-component).
 No generic HTTP callback contract is broadened by this core component.
 
+`GoogleAuthorization` composes exact matching transaction/code-service snapshots
+for sign-in-only start/finish/cancel. Callback completion compares original retained
+state and actual issuer/route before one-use consume/exchange or proof-bound
+cancellation. It returns a verified proof or finite canceled-provider outcome;
+neither issues a session. Failed cleanup and storage/provider/verification errors
+remain observable. Request network source is admission metadata, while provider
+configuration/browser/state/purpose/nonce/PKCE remain authentication bindings.
+See the [shared-use-case contract](../guides/google.md#shared-authorization-use-case).
+
 Only exact configured Origin is accepted on initial browser POST endpoints, including pre-authentication. Missing/null Origin fails closed, so command-line clients must explicitly send it. No wildcard credentialed CORS. SameSite=Lax, Secure in HTTPS production, HttpOnly, Path=/, no Domain; production session uses __Host- prefix. Dev HTTP is loopback-only and explicitly enabled. Duplicate cookie names/invalid token shapes must be rejected. An Origin guard is appropriate for this constrained same-origin contract; it is not a substitute for OAuth state or SAML correlation.
 
 Outbound issuer (M07) has a distinct protocol contract: registered clients, exact redirects, code + S256, client authentication where applicable, signing keys, discovery, JWKS, audience-bound ID/access tokens, revocation and introspection. First-party alpha session introspection does not constitute OIDC support. Native refresh credentials and cross-origin apps are unavailable until that gate passes.

@@ -3126,3 +3126,68 @@ No provider settings, user browser or credential manager were changed. AUTH-23
 remains In Progress: Google web/native delivery, registered/manual provider evidence
 and a usable reviewed provider-required deletion path remain unfinished. AUTH-20's
 Safari failure is unresolved; no new device prompts or interoperability claims.
+
+## AUTH-23 shared Google authorization orchestration — 2026-10-20
+
+`GoogleAuthorization` now composes exact transaction/code snapshots for shared
+sign-in start, decoded callback completion and explicit operation cancellation.
+Non-sign-in purposes reject before admission/provider work. Returned and retained
+state plus actual issuer/redirect must match before any mutation. Code completion
+uses the existing one-use consume/S256/signature path; denial/provider failure uses
+the same database-bound private proof for cancellation and makes no token POST.
+Failed preparation attempts exact cleanup and propagates storage failure. Verified
+completion owns a boxed existing opaque identity proof and creates no local grant.
+No alternate verifier, proof constructor, SQL, route or retry is introduced.
+
+Six new real PostgreSQL scenarios cover mixed configurations/purposes, private
+callback/cancellation bindings, concurrent one-use callbacks, observed document
+failure with start cleanup, actual cancellation-trigger storage failure and actual
+signed nonce rejection versus token transport failure. Database facts and separate
+provider GET/POST/signature counters precede final conclusions; valid signed commit
+controls follow injected faults. No meaningful existing assertion was removed.
+
+An initial new negative failed because it treated network source as a credential
+binding. ADR0013 and actual admission/transaction SQL show network source is an
+independent abuse budget, not stored pending-account authority. The corrected test
+adds wrong nonce and PKCE negatives, then proves roaming retains exact provider/
+browser/state/purpose/private-proof bindings and independently observes the changed
+network-source budget. Production admission/storage policy is unchanged; no IP-based
+authentication rule or security downgrade was added to make a test pass.
+
+Final local checks pass with CARGO_INCREMENTAL=0, documented real PostgreSQL and
+unchanged four-worker/shared connection limits:
+
+```sh
+cargo fmt --all --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-core --features google
+cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Results: **97 default / 554 all-feature workspace tests**, including 2 Axum unit,
+99 HTTP,88 core,342 PostgreSQL and23 server cases (logging subprocess repeat
+excluded), **76 isolated core Google cases** and **18 Google PostgreSQL cases with
+passkeys disabled**. Real database suites ran sequentially. Final runs have no
+failures/ignored cases. Compiled-dependency advisory and all-feature dependency/
+license checks pass; the inactive optional SQLx/MySQL RSA advisory remains visible.
+The staged diff receives redacted Gitleaks scanning before publication. Changed
+documentation file links and code organization are reviewed. The 133-line owning
+core flow and feature-specific binding/failure/setup test modules remain under
+300lines. Longer cohesive completion and ordered binding/fault scenarios retain
+private checks, mutation, observed facts and valid controls as documented size
+exceptions; no unrelated cleanup is deferred. Dependencies, migrations, generic
+browser contracts and historical provider reports are unchanged.
+
+Hosted CI39387067241 at exact25a6e8f completed successfully, including its named
+browser/SMTP/security checks. That is evidence for its own head, not the new flow.
+Final-head hosted acceptance is tracked separately in the development ticket.
+AUTH-23 remains In Progress: actual Google web/native transport, registered/manual
+provider evidence and a usable reviewed provider-required deletion path remain
+unfinished. No Google/browser/device interoperability or production-readiness claim
+follows from these offline-signature/database controls. No provider/browser/security
+settings changed and AUTH-20's Safari recovery failure remains unresolved.

@@ -82,3 +82,9 @@ untrusted outcome. Transport-independent decoding cannot consume/cancel pending
 state or issue authority. Its real PostgreSQL controls preserve private-operation
 binding before code exchange or cancellation; public web/native delivery remains
 separate work and the generic callback contract stays unchanged.
+
+Core `GoogleAuthorization` now shares sign-in-only start/callback completion and
+operation cancellation across future web/native transports. It composes exact
+existing source snapshots, preserves private database bindings and error types,
+and returns the existing verified identity proof without a local grant. Transports
+still need actual trusted-route/listener delivery and the reviewed lifecycle gate.

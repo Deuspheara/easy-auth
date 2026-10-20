@@ -75,6 +75,10 @@ impl GoogleAuthorizationResponse {
     pub fn into_outcome(self) -> GoogleAuthorizationOutcome {
         self.outcome
     }
+
+    pub(super) fn into_parts(self) -> (Secret, String, GoogleAuthorizationOutcome) {
+        (self.state, self.issuer, self.outcome)
+    }
 }
 
 #[derive(Default)]

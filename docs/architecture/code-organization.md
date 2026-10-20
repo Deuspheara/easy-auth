@@ -614,3 +614,15 @@ binding/cancellation controls each live in a named `google/callback.rs` test mod
 All three files stay below300lines. Longer ordered PostgreSQL scenarios retain
 negative binding, unchanged pending facts, valid commit and replay/cancellation
 controls together as function-size exceptions. No unrelated cleanup is deferred.
+
+The Google `flow.rs` module owns only shared sign-in start/callback completion and
+explicit operation cancellation. It delegates proof consumption, provider exchange
+and database rules to existing services without introducing a protocol plugin or
+transport/persistence dependency. Public declarations expose the deliberate use
+case and owned start/completion types; verified proof construction stays private.
+PostgreSQL tests under `google/authorization/` separate binding/concurrency,
+infrastructure failures and reusable feature setup. Existing fixture document
+failure controls default off. All added modules remain below300lines. The cohesive
+completion function and ordered binding/failure scenarios retain validation,
+mutation, observed facts and valid controls as justified function-size exceptions;
+no unrelated cleanup is deferred.

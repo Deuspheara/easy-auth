@@ -53,6 +53,24 @@ Actual registered-client and platform behavior still require the manual matrix.
 
 ## Proposed shared boundary
 
+The shared-use-case checkpoint implements `GoogleAuthorization` within core's
+owning Google feature: exact-snapshot composition, sign-in-only start, bounded
+decoded callback completion and explicit cancellation. It compares retained and
+returned state plus actual issuer/redirect before dispatch, and uses the existing
+OAuth transaction for every database/private-proof binding. URL-construction
+failure attempts exact-operation cleanup; failed cleanup is an observable error.
+Bound provider denial/failure performs cancellation without token I/O. Success
+returns the existing verified proof after one-use exchange, retaining every
+original cap and granting no local session. Web and native adapters share this
+policy rather than copying consume/cancel orchestration into transports.
+
+Request network source retains ADR0013's admission-only meaning, distinct from
+the exact configured provider source. It is not an IP-based account credential.
+Real PostgreSQL controls include roaming with an independent admission budget,
+wrong private bindings, cancellation storage failure, provider/document faults,
+actual signed negative/positive controls and concurrent one-use callbacks. No
+transport or Google activation is inferred from this use-case evidence.
+
 Keep the existing four crates and inward dependencies. Put Google-specific trusted
 configuration, callback decoding and orchestration in named modules within core's
 owning OIDC feature. Reuse the existing opaque exchange, signature verifier and
