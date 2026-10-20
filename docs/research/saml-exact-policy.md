@@ -68,6 +68,10 @@ no-I/O, no-XXE, platform or protocol-compliance claim. Raw assertions, certifica
 keys and errors are absent from public reports; synthetic transport remains in
 memory. Source/archive/patch/lock/image hashes and compiler version are recorded.
 
+The subsequent [selected dependency review](saml-dependency-review.md) records
+clean target-scoped checks, full-lock failures and native advisory mapping. It
+does not clear the independent dependency/security or distribution review gates.
+
 ## Remaining acceptance gates
 
 - Obtain upstream policy/API acceptance or an explicitly reviewed maintained
