@@ -114,6 +114,15 @@ Rust permits one implementation of a trait for a type. PostgreSQL's `repository.
 
 ## Reviewed size exceptions
 
+Account deletion delegates its already-authorized destructive tail to
+`account/erasure.rs`. This private operation owns account-related proof/admission
+cleanup, audit erasure, user deletion and the established deletion notice. It
+performs no authorization and does not commit: the caller keeps its owner/session
+locks and original deadline, then checks database time after the entire tail.
+The longer ordered helper keeps this cleanup boundary visible. Its initial
+extraction preserves mailbox behavior and is verified separately from provider
+deletion changes.
+
 The PostgreSQL `finish_email`, `enroll_password`, `finish_password_reset`, `confirm_email_change`, `finish_account_deletion`, `list_sessions` and `revoke_all_sessions` functions exceed the approximate 50-line review trigger. Each keeps its lock acquisition, proof revalidation, identity/credential mutation, session invalidation, audit/notice write and commit in a single visible transaction. SQL and bind chains are laid out explicitly. Splitting these functions into arbitrary steps would hide ordering and rollback invariants; add a helper only for a meaningful operation whose dependencies remain clear.
 
 `configured_auth` likewise keeps the ordered, fail-closed startup composition together. Longer integration scenarios keep their arrange/action/assert sequence together to prove complete state transitions, isolation and rollback. They are now grouped by feature rather than collected in one large suite file. These are reasons for the current exceptions, not exemptions from reviewing future growth.

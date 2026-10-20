@@ -2,6 +2,7 @@ mod admission;
 mod deletion;
 mod email_attachment;
 mod email_change;
+mod erasure;
 
 use crate::{Postgres, unavailable};
 use auth_core::{Error, Result, Verifier};
