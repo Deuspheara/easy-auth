@@ -9,6 +9,7 @@ Both server compositions record the same committed lifecycle facts through the s
 | Kind | Actor session | Issued/affected session | Meaning |
 | --- | --- | --- | --- |
 | `email_authenticated` | none | newly issued session | Verified bound mailbox proof committed |
+| `oidc_authenticated` | none | newly issued session | Optional verified provider proof, current policy and scoped identity resolution/session committed together; no claims, email, tokens or raw subject in audit |
 | `password_authenticated` | none | newly issued session | Password verification and exact stored-credential recheck committed |
 | `password_enrolled` | fresh initiating session | replacement session | First credential enrollment and rotation committed |
 | `passkey_enrolled` | fresh initiating session | none | Optional core/PostgreSQL registration verified, state consumed and unique credential inserted; no new authenticated session |

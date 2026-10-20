@@ -1,5 +1,7 @@
 use crate::{Postgres, unavailable};
-use auth_core::{Result, SessionInfo, SessionPage, Verifier};
+#[cfg(not(feature = "oidc-identities"))]
+use auth_core::Error;
+use auth_core::{AuthenticationPolicy, Result, SessionInfo, SessionPage, Verifier};
 use sqlx::Row;
 use uuid::Uuid;
 
@@ -15,7 +17,25 @@ impl Postgres {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         let (user, current_id, deadline) =
             super::validation::active_caller(&mut tx, realm, current).await?;
-        let rows = sqlx::query(r#"
+        let rows = if user.authentication_policy == AuthenticationPolicy::ProviderRequired {
+            #[cfg(feature = "oidc-identities")]
+            {
+                super::oidc::list(
+                    &mut tx,
+                    realm,
+                    user.id,
+                    current_id,
+                    after,
+                    (PAGE_SIZE + 1) as i64,
+                )
+                .await?
+            }
+            #[cfg(not(feature = "oidc-identities"))]
+            {
+                return Err(Error::Unauthorized);
+            }
+        } else {
+            sqlx::query(r#"
             SELECT id,id=$3 AS current,
                 floor(extract(epoch FROM created_at)*1000)::bigint AS created_at_ms,
                 floor(extract(epoch FROM last_seen_at)*1000)::bigint AS last_seen_at_ms,
@@ -41,7 +61,8 @@ impl Postgres {
             .bind((PAGE_SIZE+1) as i64)
             .fetch_all(&mut *tx)
             .await
-            .map_err(unavailable)?;
+            .map_err(unavailable)?
+        };
         let more = rows.len() > PAGE_SIZE;
         let sessions: Vec<SessionInfo> = rows
             .into_iter()

@@ -1,6 +1,9 @@
 use super::configuration;
 use crate::{Postgres, unavailable};
-use auth_core::{OAuthConnection, OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, Result};
+use auth_core::{
+    Error, OAuthConnection, OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, Result,
+};
+use sqlx::Row;
 
 impl Postgres {
     /// Trusted administration only. Policy changes allocate a new configuration
@@ -58,4 +61,38 @@ impl Postgres {
         tx.commit().await.map_err(unavailable)?;
         Ok(policy)
     }
+}
+
+pub(super) async fn lock(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    expected: &OidcIdentityPolicy,
+) -> Result<()> {
+    let c = expected.configuration();
+    configuration::lock(tx, c).await?;
+    let row = sqlx::query("SELECT allowed_issuers,display_claim,jit FROM auth_oidc_identity_policies WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision=$4 FOR SHARE")
+        .bind(c.realm()).bind(c.connection()).bind(c.client()).bind(c.revision())
+        .fetch_optional(&mut **tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
+    let issuers: Vec<String> = row.try_get("allowed_issuers").map_err(unavailable)?;
+    let display = match row
+        .try_get::<&str, _>("display_claim")
+        .map_err(unavailable)?
+    {
+        "sub" => OidcDisplayNameClaim::Subject,
+        "name" => OidcDisplayNameClaim::Name,
+        "preferred_username" => OidcDisplayNameClaim::PreferredUsername,
+        _ => return Err(Error::Unavailable),
+    };
+    let jit = match row.try_get::<&str, _>("jit").map_err(unavailable)? {
+        "deny" => OidcJitPolicy::Deny,
+        "allow" => OidcJitPolicy::Allow,
+        _ => return Err(Error::Unavailable),
+    };
+    let issuer_refs: Vec<&str> = issuers.iter().map(String::as_str).collect();
+    let actual = OidcIdentityPolicy::new(c.clone(), &issuer_refs, display)
+        .map_err(|_| Error::Unavailable)?
+        .with_jit(jit);
+    if &actual != expected {
+        return Err(Error::Unauthorized);
+    }
+    Ok(())
 }

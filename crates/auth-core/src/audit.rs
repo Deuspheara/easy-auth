@@ -4,6 +4,10 @@ use uuid::Uuid;
 /// Only the repository transaction that commits a verified operation records its event.
 #[derive(Debug)]
 pub enum AuditEvent {
+    OidcAuthenticated {
+        user_id: Uuid,
+        session_id: Uuid,
+    },
     EmailAuthenticated {
         user_id: Uuid,
         session_id: Uuid,
@@ -103,6 +107,7 @@ impl AuditEvent {
 
     pub fn kind(&self) -> &'static str {
         match self {
+            Self::OidcAuthenticated { .. } => "oidc_authenticated",
             Self::EmailAuthenticated { .. } => "email_authenticated",
             Self::PasswordAuthenticated { .. } => "password_authenticated",
             Self::PasswordEnrolled { .. } => "password_enrolled",
@@ -126,6 +131,7 @@ impl AuditEvent {
     pub fn user_id(&self) -> Option<Uuid> {
         match self {
             Self::EmailAuthenticated { user_id, .. }
+            | Self::OidcAuthenticated { user_id, .. }
             | Self::PasswordAuthenticated { user_id, .. }
             | Self::PasswordEnrolled { user_id, .. }
             | Self::PasskeyEnrolled { user_id, .. }
@@ -178,6 +184,7 @@ impl AuditEvent {
                 actor_session_id, ..
             } => Some(*actor_session_id),
             Self::EmailAuthenticated { .. }
+            | Self::OidcAuthenticated { .. }
             | Self::PasskeyAuthenticated { .. }
             | Self::PasskeySignedUp { .. }
             | Self::PasskeyRecovered { .. }
@@ -190,6 +197,7 @@ impl AuditEvent {
     pub fn session_id(&self) -> Option<Uuid> {
         match self {
             Self::EmailAuthenticated { session_id, .. }
+            | Self::OidcAuthenticated { session_id, .. }
             | Self::PasskeyAuthenticated { session_id, .. }
             | Self::PasskeySignedUp { session_id, .. }
             | Self::PasskeyRecovered { session_id, .. }

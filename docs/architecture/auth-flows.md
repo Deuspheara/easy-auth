@@ -85,8 +85,8 @@ sequenceDiagram
 The optional AUTH-22 core/PostgreSQL browser-bound transaction boundary is
 implemented: [guide](../guides/oauth-transactions.md),
 [ADR 0013](adr/0013-oauth-state-transactions.md). It consumes state once and returns
-exchange context without authenticating a user. Final local identity resolution
-and session issuance below remain target design.
+exchange context without authenticating a user. AUTH-30 now adds optional library
+identity resolution and session issuance after full provider verification.
 AUTH-28 additionally implements constrained discovery/JWKS fetching with no
 authentication grant: [document guide](../guides/oidc-egress.md),
 [ADR 0014](adr/0014-oidc-egress.md). Optional AUTH-29 [code/S256 exchange and signature/claim verification](../guides/oidc-verification.md)
@@ -94,10 +94,13 @@ now return transaction-bound verified identity data. The owned local Keycloak/
 browser/PostgreSQL suite covers code, claims/signatures, rotation and replay with
 shared production HTTPS sources and private fixture root/address mapping. The
 code flow handles first-fetch admission under unchanged bounds and retains its
-operation lease through final authority checks. No ordinary callback route,
-identity/JIT persistence or local session grant is implemented.
-The final local transaction must recheck original deadline, enabled configuration
-revision and linking authority after network exchange.
+operation lease through final authority checks. AUTH-30's final local transaction
+rechecks the original deadline, enabled configuration, full mapping/JIT policy and
+subject ownership after network exchange, committing provider-only user/identity/
+session/audit atomically. No ordinary callback route is enabled; linking-purpose
+proof rejects until AUTH-25. Missing optional display data cannot lock out a bound
+subject but cannot provision a new owner. Current source/revision checks govern
+subsequent provider session use.
 
 ```mermaid
 sequenceDiagram
@@ -113,9 +116,9 @@ sequenceDiagram
   authService->>database: Claim unexpired connection-bound transaction
   authService->>providerService: Redeem code with verifier
   authService->>authService: Verify signature, issuer, audience and nonce
-  Note over authService,database: Final identity/JIT/session transaction remains planned
-  authService->>database: Resolve issuer/subject under JIT policy (planned)
-  authService-->>browserClient: New application session (planned)
+  Note over authService,database: Optional library boundary; ordinary callback remains gated
+  authService->>database: Recheck current policy/cap, resolve scoped subject, commit session/audit
+  authService-->>browserClient: Application-owned protected transport (not shipped)
 ```
 
 Apple uses signed client secrets and distinct native/web client identifiers; profile fields may appear only on first grant. Native code exchange binds to a backend-created nonce transaction and allowlisted audience. Private relay emails are contact attributes. Google sub is identity; email_verified is explicit claim policy. No email-based merging. Disable connections before accepting callbacks. Remote discovery/JWKS has bounded egress, DNS rebinding defense and no redirects.

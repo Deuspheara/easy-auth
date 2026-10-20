@@ -6,7 +6,10 @@ mod policy;
 mod ports;
 mod public_address;
 #[cfg(feature = "oidc-identities")]
-pub use identities::{OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, OidcMappedIdentity};
+pub use identities::{
+    OidcDisplayNameClaim, OidcIdentityPolicy, OidcIdentityRepository, OidcJitPolicy,
+    OidcMappedIdentity, OidcSignIn,
+};
 #[cfg(test)]
 mod tests;
 

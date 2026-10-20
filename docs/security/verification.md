@@ -2013,3 +2013,95 @@ commit races, deletion behavior and provider account/session provenance remain
 required AUTH-30 work. Explicit linking/unlinking is the separate AUTH-25 boundary;
 the eventual sign-in resolver must reject linking-purpose proofs until it exists.
 No new browser/provider run, ordinary activation or release/audit claim is made.
+
+
+## AUTH-30 final identity/JIT/session checkpoint — 2026-10-20
+
+AUTH-30 remains **In Progress** pending updated owned-Keycloak acceptance and hosted
+publication evidence. Optional core/PostgreSQL now implement final sign-in resolution:
+consume the opaque mapped proof, reject linking purpose, lock current exact configuration/
+policy, serialize scoped subject ownership and atomically create/resolve provider-only
+user, identity, source-bound session and fixed-schema oidc_authenticated audit. All writes
+precede the last original-proof database clock check. Policy/storage errors remain finite;
+no raw token, subject or provider attributes enter audit/log output.
+
+Migration 0018 adds provider_required policy, exact C-collated issuer/subject identity keys,
+composite source/owner session constraints and pseudonymous deletion cooldown metadata.
+Current-source checks precede owner/session locks. Old/missing auth_time never becomes
+freshness; a genuine recent provider time can authorize owned session revocation. Neither
+verified contact, provider amr nor preverified passkey/retained recovery proof bypasses
+method policy. Ordinary activation, linking and provider-only public lifecycle remain gated.
+See [ADR0016](../architecture/adr/0016-oidc-identity-mapping.md) and the
+[identity guide](../guides/oidc-identities.md) for exact API, lock and retention limits.
+
+A new signed-token/real-PostgreSQL regression first failed at the mapper with actual
+Unauthorized after successful verification: an already-bound subject lost access when
+optional name was absent. The mapped display candidate now returns Option<&str>; the
+final new-owner branch still requires the selected usable field, with no alternate/email
+fallback. Repeat login preserves stored presentation. Existing malformed-profile cases
+now require an absent candidate; new-owner denial is asserted in the database transaction.
+This is an explicit refinement of the new feature-branch API, not a removed released API.
+
+**29 signed identity PostgreSQL scenarios** now pass, covering:
+
+- Default-deny JIT versus existing-subject resolution and explicit persisted allow;
+  unpersisted policy changes and old-revision proofs reject without creating authority.
+- Genuine source/authentication-time provenance, stable owner/profile, matching verified
+  provider email without merge, optional-profile login and missing-profile new-owner denial.
+- Real same-subject isolation by realm/local client, issuer reconfiguration without owner
+  transfer, and explicit case-sensitive identity storage independent of database locale.
+- Concurrent independent valid proofs resolve one owner and create distinct sessions;
+  the final transaction never revives consumed OAuth state.
+- Observed configuration locks prove both callback/disable orders. A callback committing
+  first has unusable authority after waiting disable commits; disable first prevents all
+  provisioning. Session validation/inventory also reject disable after an observed source wait.
+- Session/audit write faults are exactly Unavailable with complete rollback and a new-flow
+  valid control. A missing policy table is infrastructure failure, not a passing JIT denial.
+- Observed final-audit expiry rolls back user/identity/session/audit. Observed unchanged-source
+  waits cross original idle/provider freshness caps, with unchanged session touch/state.
+- Both deletion/owner-lock orders and anonymous callbacks obey cascade/cooldown/original
+  caps. The owned deletion fixture follows owner lock and audit erasure; it is not a new
+  provider-only deletion endpoint. Retention fixtures explicitly arrange expiry; no real
+  five-minute/provider/device wait or autonomous cleanup is claimed.
+- Migration 0017->0018 preserves mailbox users, sessions and trusted policy, without inventing
+  sources. Exact 23514/23503 errors prove missing source and wrong-owner FK constraints.
+
+Two additional actual-passkey/PostgreSQL cases reject a preverified assertion/new admission
+and a retained saved recovery code after provider-required policy, preserving credential/
+session/audit/pending state and leaving the recovery code unconsumed. Existing passkey,
+mailbox/password/lifecycle/realm/concurrency negative assertions remain intact.
+
+Final local checks use the documented PostgreSQL setup, four workers and sequential database
+suites with CARGO_INCREMENTAL=0:
+
+- cargo fmt --all -- --check and strict locked default/all-feature workspace/all-target Clippy pass.
+- cargo test --locked --workspace: **93 distinct tests** pass.
+- cargo test --locked --workspace --all-features: **411 distinct tests** pass
+  (2 Axum unit, 55 HTTP/PostgreSQL, 66 core, 278 PostgreSQL, 10 server).
+  The logging subprocess repeats one included core case; no failures or ignored tests.
+- Compiled-dependency advisory and all-feature cargo-deny gates pass. The existing SQLx/MySQL
+  RSA advisory remains visible only in the inactive optional lockfile graph.
+- No package version or production crypto dependency is added. Existing pinned josekit is
+  now a PostgreSQL test dependency; Cargo.lock changes only that package's dependency entry.
+- Documentation links/diff whitespace and redacted staged secret scanning precede publication.
+
+An initial new recovery test used a nonexistent start method; it was corrected to the
+existing begin API without a production API change. A formatting-only edit briefly left
+whitespace rejected by rustfmt; it was corrected before final gates. Neither failed attempt
+is counted as passing evidence. The intentional optional-profile pre-fix failure is retained
+separately from infrastructure outcomes.
+
+Maintainability review separates core port/sign-in, PostgreSQL policy/ownership/completion,
+session source/guard/inventory and feature test scenarios. New transaction/test entry
+modules contain declarations; existing facades add only declarations/reexports.
+All new modules stay under 300 lines. Longer owning transactions and ordered lock/fault/
+migration tables retain setup, snapshot checks, original caps, writes and rollback in visible
+order as documented size exceptions; no unrelated cleanup is deferred. Local sessions gain
+a method-snapshot query, and provider sessions add current-source reads/locks; old latency
+measurements are historical, with no new performance claim.
+
+Earlier checkpoint CI39346346832 (058579a) and CI39347344289 (afd4cb3) both completed SUCCESS.
+These results do not establish hosted/native acceptance of the newer final resolver. Existing
+Keycloak/browser reports remain immutable; the next provider run must exercise actual local
+JIT/session behavior with its own current source/binary fingerprint. AUTH-25 linking and
+AUTH-20's unresolved Safari recovery/independent-review gates remain open.

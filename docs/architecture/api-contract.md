@@ -5,8 +5,13 @@ policy and an opaque proof. The administrative `configure_oidc_identity_policy`
 returns a policy bound to a fresh persisted revision, atomically cancelling old
 pending state without clearing disable. It is never browser input. HTTP DTOs and
 OpenAPI are unchanged; no callback/session endpoint is added. Provider email never
-becomes local verified contact. JIT defaults to deny; identity resolution and
-issuance remain unimplemented. See
+becomes local verified contact. JIT defaults to deny. The library `OidcSignIn::finish`
+now returns `(User, Secret)` only after atomic current-policy identity/session/audit
+commit. Core `AuthenticationPolicy` adds `ProviderRequired` (`provider_required`),
+and the new feature's mapped display candidate is `Option<&str>`: required for new
+JIT users, optional for an already-bound subject. Missing auth_time remains unknown
+in the existing nullable session inventory field. No HTTP DTO/schema change or
+ordinary provider activation is introduced. See
 [ADR 0016](adr/0016-oidc-identity-mapping.md).
 
 AUTH-19 adds explicit experimental passkey HTTP sign-in, separately enabled from

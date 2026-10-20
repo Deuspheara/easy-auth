@@ -2,7 +2,7 @@
 
 A realm is an authentication security partition; it is not a workspace/business organization. A registered client belongs to a realm and has exact redirects, origin policy and audience. The first slice binds one realm per server/router in trusted configuration; no request body may select it.
 
-User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. Planned ExternalIdentity records are unique by (realm, connection, trusted issuer, subject); matching emails must never merge users. Planned linking must prove the current fresh session and a new provider transaction. Unlinking must preserve a usable credential/recovery path. Merges are disabled until separately reviewed.
+User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. Optional OIDC identity records are unique by (realm, connection, local client, exact issuer, subject), with bytewise issuer/subject equality; matching emails never merge users. Provider-only JIT users have null contact and explicit provider_required policy, with source/revision-bound oidc sessions and optional original provider authentication time. Planned linking must prove the current fresh session and a new provider transaction. Unlinking must preserve a usable credential/recovery path. Merges are disabled until separately reviewed.
 
 Password credentials now store a salted Argon2id PHC string under a realm/user composite key, with single-enrollment uniqueness. Enrollment requires a fresh verified session and replaces existing sessions atomically. Credentials (password, passkey) are distinct from provider accounts and user records. The optional passkey enrollment boundary stores RP-scoped credential/public-key state, counter/backup state, last-use metadata and a user label; ordinary activation and credential management remain unfinished. Planned discoverable enrollment must provision a passkey-first user under a reviewed enrollment transaction. Recovery cannot silently replace stronger assurance with email; explicit policy, delays/notifications and audit required.
 
@@ -13,10 +13,13 @@ creating an identity/session. AUTH-29 implements the optional backend code/S256
 exchange and signature/claim verifier, returning only opaque transaction-bound
 verified identity proof. Its owned Keycloak/browser/PostgreSQL acceptance is
 recorded in [ADR 0015](adr/0015-oidc-token-verification.md); no ordinary provider
-callback, identity/JIT persistence or local session grant is implemented.
+callback is enabled. AUTH-30's optional final transaction now resolves/provisions
+identity and source-bound session/audit under current configuration/policy and
+original caps; ordinary activation and provider acceptance remain gated.
 See [ADR 0013](adr/0013-oauth-state-transactions.md) for original authority binding
-and mandatory final revalidation. Future identity/session persistence must consume
-the proof and recheck configuration, original caps and linking authority under locks.
+and mandatory final revalidation. Final sign-in persistence consumes the proof and
+rechecks configuration, full mapping/JIT policy and original caps under locks.
+Linking-purpose proofs reject until AUTH-25 implements that separate boundary.
 
 VerificationChallenge holds only token/browser verifiers, email/purpose and expiry. Email proof consumption commits atomically with user/session creation; a failed session insert rolls back that consumption. Password-reset proofs use a separate table/cookie and bind the current credential version; consumption, password/version update, session/proof invalidation, audit and non-secret notification enqueue commit atomically. Delivery claims are leased and realm scoped. Parallel consumption yields one winner. PostgreSQL constraints include realm in all identity relations.
 
@@ -43,7 +46,7 @@ session controls and additional enrollment. Full stronger-account recovery and
 lifecycle operations remain required before ordinary activation. No MFA/AAL
 certification is inferred.
 
-Planned entities are not implemented tables until their milestone. Account deletion now transactionally removes implemented credentials/sessions/proofs and deidentifies live audit subjects; future external identities must join this same lifecycle. A subject-free deletion notice temporarily retains the established recipient for delivery.
+Planned entities are not implemented tables until their milestone. Account deletion now transactionally removes implemented credentials/sessions/proofs and deidentifies live audit subjects; implemented OIDC identities and source-bound sessions cascade with deletion, with a scoped five-minute subject cooldown preventing old anonymous callbacks from re-provisioning. Provider-only public deletion remains a separate lifecycle gate. A subject-free deletion notice temporarily retains the established recipient for delivery.
 
 AUTH-53's accepted [email-free identity design](adr/0009-passkey-first-identity.md)
 separates optional verified contact information from account authentication policy.
@@ -106,5 +109,8 @@ and a commit cap no later than the original OAuth deadline, ID-token expiry or
 original token-age window. It retains no nonce/PKCE/raw token and has no public
 constructor, Clone or Serialize. Issuance time and optional provider authentication
 time remain distinct; email verification is a provider attribute, never a local
-contact or linking grant. Final identity/session persistence is still unimplemented
-and must recheck this authority under locks.
+contact or linking grant. AUTH-30's final identity/session transaction consumes a
+mapped proof, checks current exact policy and original caps under locks, and commits
+provider-only ownership/session/audit atomically. Display metadata is required only
+for a new owner and never changes stored presentation on repeat login. See
+[ADR 0016](adr/0016-oidc-identity-mapping.md).

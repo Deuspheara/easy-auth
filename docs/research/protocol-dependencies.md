@@ -112,3 +112,11 @@ The owned Keycloak/browser fixture now supplies named local code/signature/
 rotation/replay evidence through private test TLS/address mapping and shared
 production HTTPS sources. Broader provider acceptance, final identity persistence
 and independent review remain gates; dependency adoption alone completes none of those.
+
+
+AUTH-30 reuses the same pinned josekit 0.10.3 as a PostgreSQL test dependency for
+actual ES256-signed identity/JIT/session integration scenarios. No package version,
+production crypto dependency or advisory/license exception is added. The SQL
+scoped-subject digest uses PostgreSQL's existing SHA-256 over a JSON tuple for
+serialization/cooldown metadata, not custom signature or credential verification.
+No raw provider token/key/nonce is persisted by the new identity transaction.

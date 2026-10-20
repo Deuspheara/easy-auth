@@ -40,12 +40,14 @@ authority. Its optional code exchange uses original S256 proof and explicit
 registered client authentication through the same pinned HTTPS adapter. An owned
 local Keycloak/browser/PostgreSQL suite verifies that boundary using a private
 fixture certificate/address mapping and shared production request code. Final
-identity mapping/JIT/session issuance and ordinary provider activation remain open.
+ordinary provider activation and complete lifecycle acceptance remain open.
 [ADR 0015](adr/0015-oidc-token-verification.md) records the boundary.
 
 The explicit core/PostgreSQL `oidc-identities` features add exact-connection mapping
 policy, an issuer allowlist and default-deny JIT configuration. Trusted policy
 application rotates connection revision and cancels pending state atomically while
-retaining disable. Mapping grants no local user/session. Identity resolution,
-provisioning and method policy remain AUTH-30 work.
+retaining disable. Mapping alone grants nothing; `OidcSignIn` consumes the mapped
+proof in an atomic current-policy/JIT/subject/session/audit transaction. Provider-only
+users have explicit policy and current source-bound sessions. Ordinary routes,
+linking and complete provider lifecycle/acceptance remain gated.
 [ADR 0016](adr/0016-oidc-identity-mapping.md) records that boundary.

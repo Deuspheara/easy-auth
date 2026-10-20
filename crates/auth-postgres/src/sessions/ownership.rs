@@ -1,4 +1,4 @@
-use crate::locking::{fresh_session, lock_email};
+use crate::locking::lock_email;
 use crate::unavailable;
 use auth_core::{Error, Result, Verifier};
 use sqlx::{PgPool, Postgres, Transaction};
@@ -34,6 +34,7 @@ impl Owner {
         realm: Uuid,
         current: Verifier,
     ) -> Result<Uuid> {
+        let source = super::source::Source::lock(tx, realm, current).await?;
         // Never acquire an email lock after the user lock. An attachment/change
         // that wins first must invalidate this snapshot, including NULL -> email.
         if let Some(email) = &self.email {
@@ -52,6 +53,6 @@ impl Owner {
         .await
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
-        fresh_session(tx, realm, self.user, current).await
+        source.fresh_session(tx, realm, self.user, current).await
     }
 }

@@ -3,6 +3,7 @@ mod cancellation;
 mod concurrency;
 mod lifecycle;
 mod migration;
+mod provider_policy;
 mod receipts;
 mod replacement;
 mod waiting;

@@ -1,8 +1,10 @@
 mod mapped;
 mod policy;
+mod signin;
 
 pub use mapped::OidcMappedIdentity;
 pub use policy::{OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy};
+pub use signin::{OidcIdentityRepository, OidcSignIn};
 
 const MAX_DISPLAY_NAME_BYTES: usize = 256;
 

@@ -95,8 +95,7 @@ impl OidcIdentityPolicy {
             OidcDisplayNameClaim::PreferredUsername => identity.preferred_username(),
         }
         .filter(|value| usable_display_name(value))
-        .ok_or(Error::Unauthorized)?
-        .to_owned();
+        .map(str::to_owned);
         Ok(OidcMappedIdentity::new(
             self.clone(),
             identity,

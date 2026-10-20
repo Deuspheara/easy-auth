@@ -60,7 +60,7 @@ pub(super) async fn commit(
     // Every issuer and lifecycle mutation serializes on the owner first. Recheck
     // all mutable proof state and clock time after waiting; no stale verification write.
     let owner: Option<Uuid> =
-        sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE")
+        sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 AND authentication_policy IN ('mailbox','passkey_required') FOR UPDATE")
             .bind(request.realm)
             .bind(proof.user_id())
             .fetch_optional(&mut *tx)

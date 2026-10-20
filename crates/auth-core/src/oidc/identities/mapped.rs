@@ -8,14 +8,14 @@ use std::fmt;
 pub struct OidcMappedIdentity {
     policy: OidcIdentityPolicy,
     identity: VerifiedOidcIdentity,
-    display_name: String,
+    display_name: Option<String>,
 }
 
 impl OidcMappedIdentity {
     pub(super) fn new(
         policy: OidcIdentityPolicy,
         identity: VerifiedOidcIdentity,
-        display_name: String,
+        display_name: Option<String>,
     ) -> Self {
         Self {
             policy,
@@ -29,8 +29,10 @@ impl OidcMappedIdentity {
     pub fn identity(&self) -> &VerifiedOidcIdentity {
         &self.identity
     }
-    pub fn display_name(&self) -> &str {
-        &self.display_name
+    /// Initial metadata candidate. Absence blocks creating a new local owner,
+    /// not authentication of an already-bound subject with stored presentation.
+    pub fn display_name(&self) -> Option<&str> {
+        self.display_name.as_deref()
     }
 }
 

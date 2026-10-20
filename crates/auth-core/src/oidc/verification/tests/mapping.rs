@@ -30,7 +30,7 @@ async fn signed_mapping_preserves_subject_deadline_email_and_authentication_prov
         let mapped = policy(f.store.connection.clone(), claim)
             .map(identity)
             .unwrap();
-        assert_eq!(mapped.display_name(), expected);
+        assert_eq!(mapped.display_name(), Some(expected));
         assert_eq!(mapped.identity().subject(), "subject");
         assert_eq!(mapped.identity().expires_us(), cap);
         assert_eq!(mapped.identity().issued_at(), issued);
@@ -187,7 +187,7 @@ async fn signed_subject_cannot_cross_realm_connection_client_revision_or_provide
 }
 
 #[tokio::test]
-async fn unusable_selected_profile_claim_never_falls_back_to_subject_username_or_email() {
+async fn unusable_selected_profile_claim_stays_absent_without_subject_username_or_email_fallback() {
     let f = Fixture::new(OidcSigningAlgorithm::ES256, &[]);
     for claim in [
         OidcDisplayNameClaim::Name,
@@ -219,10 +219,13 @@ async fn unusable_selected_profile_claim_never_falls_back_to_subject_username_or
                 .verify(exchange, f.key.token(&claims))
                 .await
                 .unwrap();
-            assert!(matches!(
-                policy(f.store.connection.clone(), claim).map(identity),
-                Err(Error::Unauthorized)
-            ));
+            assert_eq!(
+                policy(f.store.connection.clone(), claim)
+                    .map(identity)
+                    .unwrap()
+                    .display_name(),
+                None
+            );
         }
         let (exchange, claims) = f.exchange().await;
         let identity = f
@@ -230,10 +233,13 @@ async fn unusable_selected_profile_claim_never_falls_back_to_subject_username_or
             .verify(exchange, f.key.token(&claims))
             .await
             .unwrap();
-        assert!(matches!(
-            policy(f.store.connection.clone(), claim).map(identity),
-            Err(Error::Unauthorized)
-        ));
+        assert_eq!(
+            policy(f.store.connection.clone(), claim)
+                .map(identity)
+                .unwrap()
+                .display_name(),
+            None
+        );
     }
 }
 
@@ -253,7 +259,7 @@ async fn unselected_profile_data_is_not_identity_authority_and_unicode_is_byte_b
     let mapped = policy(f.store.connection.clone(), OidcDisplayNameClaim::Name)
         .map(identity)
         .unwrap();
-    assert_eq!(mapped.display_name().len(), 256);
+    assert_eq!(mapped.display_name().unwrap().len(), 256);
     assert_eq!(mapped.identity().authenticated_at(), authenticated_at);
     assert!(authenticated_at.is_some());
     assert_eq!(mapped.identity().preferred_username(), None);

@@ -9,7 +9,7 @@ pub(super) async fn owner(
     user: Uuid,
 ) -> Result<()> {
     sqlx::query_scalar::<_, Uuid>(
-        "SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE",
+        "SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 AND authentication_policy IN ('mailbox','passkey_required') FOR UPDATE",
     )
     .bind(realm)
     .bind(user)

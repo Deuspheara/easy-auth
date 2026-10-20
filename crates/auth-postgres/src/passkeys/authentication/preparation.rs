@@ -22,7 +22,10 @@ pub(super) async fn prepare(
     let rows: Vec<(Vec<u8>, Vec<u8>)> = sqlx::query_as(
         r#"
         SELECT credential_id,credential FROM auth_passkeys
-        WHERE realm_id=$1 AND user_id=$2 AND rp_id=$3 ORDER BY id LIMIT $4
+        WHERE realm_id=$1 AND user_id=$2 AND rp_id=$3
+          AND EXISTS (SELECT 1 FROM auth_users u WHERE u.realm_id=$1 AND u.id=$2
+            AND u.authentication_policy IN ('mailbox','passkey_required'))
+        ORDER BY id LIMIT $4
     "#,
     )
     .bind(request.realm)
@@ -61,7 +64,7 @@ pub(super) async fn save(pool: &PgPool, pending: PasskeyAuthenticationStart) -> 
     .map_err(unavailable)?;
     if let Some(owner) = pending.state.owner() {
         let user: Option<Uuid> =
-            sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE")
+            sqlx::query_scalar("SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 AND authentication_policy IN ('mailbox','passkey_required') FOR UPDATE")
                 .bind(request.realm)
                 .bind(owner)
                 .fetch_optional(&mut *tx)

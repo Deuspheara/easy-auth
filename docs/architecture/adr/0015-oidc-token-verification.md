@@ -3,7 +3,8 @@
 Date: 2026-10-20. Status: accepted for AUTH-29's optional core/PostgreSQL
 verification and code-exchange boundary.
 Owned local Keycloak acceptance is implemented below; hosted publication is
-tracked separately. Final local identity/session issuance remains a separate gate;
+tracked separately. Final local identity/session issuance belongs to the separate
+[AUTH-30 boundary](0016-oidc-identity-mapping.md), with its own acceptance gate;
 this decision activates no provider route or ordinary authentication composition.
 
 ## Context and dependency choice

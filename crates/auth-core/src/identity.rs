@@ -8,6 +8,7 @@ use uuid::Uuid;
 pub enum AuthenticationPolicy {
     Mailbox,
     PasskeyRequired,
+    ProviderRequired,
 }
 
 impl TryFrom<&str> for AuthenticationPolicy {
@@ -17,6 +18,7 @@ impl TryFrom<&str> for AuthenticationPolicy {
         match value {
             "mailbox" => Ok(Self::Mailbox),
             "passkey_required" => Ok(Self::PasskeyRequired),
+            "provider_required" => Ok(Self::ProviderRequired),
             _ => Err(Error::Unauthorized),
         }
     }

@@ -139,8 +139,9 @@ its own first fetch within the unchanged budget. The test preserves actual provi
 cache headers, scopes and client configuration;
 controlled proxy faults are labeled separately from provider-signed claims. It
 requires normal owned resource cleanup and creates no local user/session/contact.
-Final identity mapping/JIT and session issuance remain separate work; AUTH-30
-owns the mapping/JIT policy boundary.
+The separate optional [AUTH-30 identity boundary](oidc-identities.md) now implements
+mapping/JIT/session persistence. This historical verifier report does not establish
+acceptance of that newer boundary; its provider evidence is tracked separately.
 
 
 The [current fast-callback record](../../tests/browser/oidc/results/2026-10-20/keycloak-fast-callbacks.json)

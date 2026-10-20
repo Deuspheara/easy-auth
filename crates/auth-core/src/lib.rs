@@ -60,7 +60,10 @@ pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 
 #[cfg(feature = "oidc-identities")]
-pub use oidc::{OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, OidcMappedIdentity};
+pub use oidc::{
+    OidcDisplayNameClaim, OidcIdentityPolicy, OidcIdentityRepository, OidcJitPolicy,
+    OidcMappedIdentity, OidcSignIn,
+};
 
 #[cfg(feature = "oidc-verification")]
 pub use oidc::{

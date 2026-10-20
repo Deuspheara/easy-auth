@@ -1,17 +1,21 @@
 # Code organization
 
-AUTH-30's optional core `oidc/identities/` separates trusted mapping policy and
-opaque mapped proof. Signed presentation decoding stays in a focused verification
-profile module. PostgreSQL `oauth/identity_policy.rs` owns policy storage, reusing
-the private configuration transaction write. Its longer administrative operation
-keeps revision/pending cancellation, policy write and commit in one visible
-transaction. Schema/upgrade and policy rollback/isolation tests have separate
-modules. No HTTP, new crate or generic mapping framework is added.
-The longer issuer-bound, cross-registration and invalid-attribute tables keep their
-negative cases and controls together as reviewed test-size exceptions. Longer
-ordered PostgreSQL migration/rollback/isolation cases likewise retain setup,
-actual operation, database observation and valid controls together. No new file
-exceeds 300 lines. Database identity resolution remains required subsequent work.
+AUTH-30 keeps core mapping, opaque proof and sign-in/port in focused
+`oidc/identities/` modules; signed profile decoding stays with verification.
+PostgreSQL `oauth/identity_policy.rs` owns configuration and exact current-policy
+locking. `oauth/identities/completion.rs` owns the visible final transaction;
+`ownership.rs` owns scoped subject serialization and existing/new owner branches.
+Session source snapshot/composition, provider guard and provider inventory have
+separate modules. No new crate, HTTP policy copy or generic identity engine is added.
+
+The owning completion/subject-resolution transactions keep lock order, original
+caps, writes and rollback visible; their longer functions are reviewed exceptions.
+Likewise, longer ordered signature/registration, fault, migration and lock-wait
+cases keep setup/observed wait/release/negative result/valid controls together.
+Test setup remains feature-specific; it adds no production proof constructor or
+verification bypass. All new source/test modules stay below 300 lines. No unrelated
+cleanup is deferred. Adding another test responsibility should use another named
+module rather than accumulating it in an entry file.
 
 AUTH-22's optional `oauth/` modules keep core configuration validation, transient
 proofs, repository contract and use cases separate. PostgreSQL `oauth/` owns

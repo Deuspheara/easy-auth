@@ -44,9 +44,10 @@ and bounded caches. It creates no identity or session and enables no provider ro
 The experimental [OIDC token verifier](docs/guides/oidc-verification.md) now checks
 transaction-bound signatures and required claims, with explicit S256 code exchange
 and owned Keycloak evidence. Optional [identity mapping](docs/architecture/adr/0016-oidc-identity-mapping.md)
-adds typed display selection, exact issuer allowlists and transactional trusted
-policy storage. Local identity provisioning/session issuance and ordinary provider
-activation remain unfinished.
+adds typed display selection, exact issuer allowlists, explicit JIT and atomic local
+identity/session issuance with provider source/provenance checks. Public callback
+routes, complete provider lifecycle and ordinary activation remain gated. See the
+[identity guide](docs/guides/oidc-identities.md) for scope and limitations.
 
 ## Run locally
 

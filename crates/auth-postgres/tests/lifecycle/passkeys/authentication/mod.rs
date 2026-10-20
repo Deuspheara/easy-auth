@@ -1,6 +1,7 @@
 mod binding;
 mod concurrency;
 mod migration;
+mod provider_policy;
 mod waiting;
 
 use super::{Fixture, ORIGIN, SOURCE};

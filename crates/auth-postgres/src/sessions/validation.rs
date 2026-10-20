@@ -21,6 +21,7 @@ pub(super) async fn active_caller(
     realm: Uuid,
     current: Verifier,
 ) -> Result<(User, Uuid, Deadline)> {
+    let source = super::source::Source::lock(tx, realm, current).await?;
     let user: Uuid = sqlx::query_scalar(
         r#"
         SELECT u.id FROM auth_users u
@@ -44,6 +45,8 @@ pub(super) async fn active_caller(
     .await
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
+    #[cfg(feature = "oidc-identities")]
+    source.recheck(tx, realm, current).await?;
     let row = sqlx::query(
         r#"
         SELECT u.id,u.email,u.display_name,u.authentication_policy
@@ -51,13 +54,16 @@ pub(super) async fn active_caller(
         WHERE u.realm_id=$1 AND u.id=$2 AND s.id=$3 AND s.revoked_at IS NULL
           AND s.expires_at>clock_timestamp()
           AND s.last_seen_at>clock_timestamp()-interval '30 minutes'
-          AND (u.authentication_policy='mailbox'
-            OR (u.authentication_policy='passkey_required' AND s.authentication_method='passkey'))
+          AND s.authentication_method=$4
+          AND ((u.authentication_policy='mailbox' AND s.authentication_method<>'oidc')
+            OR (u.authentication_policy='passkey_required' AND s.authentication_method='passkey')
+            OR (u.authentication_policy='provider_required' AND s.authentication_method='oidc'))
         "#,
     )
     .bind(realm)
     .bind(user)
     .bind(session)
+    .bind(source.method())
     .fetch_optional(&mut **tx)
     .await
     .map_err(unavailable)?

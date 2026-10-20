@@ -5,9 +5,17 @@ the exact trusted realm/connection/client/revision and explicit issuer allowlist
 Display selection has no email/alternate-field fallback. JIT configuration defaults
 to deny; mapping grants no local identity/session. Trusted policy persistence uses
 a fresh revision and cancels old pending state in the same transaction; faults roll
-back both. Disable is preserved. Final identity-transaction database policy checks,
-JIT enforcement, subject uniqueness, deletion races and provider session provenance
-remain required work. [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md)
+back both. Disable is preserved. The final sign-in transaction locks configuration/
+policy, serializes the exact scoped subject and rechecks original authority after
+all writes before committing user/identity/session/audit together. JIT deny blocks
+new owners; matching provider email cannot select an existing account. Provider
+sessions retain exact identity/revision and optional true auth_time; current source
+checks precede owner/session locks and cannot invent freshness. Provider-required
+policy rejects mailbox/password/passkey/recovery fallback even with verified contact.
+Deletion installs a scoped five-minute cooldown without raw subject/user reference;
+expired pseudonymous hashes are pruned opportunistically, not on an autonomous timer.
+Linking, provider-only lifecycle endpoints, ordinary activation and final acceptance
+remain gated. [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md)
 distinguishes implemented mapping from those unimplemented safeguards.
 
 AUTH-22's optional core/PostgreSQL OAuth transaction boundary binds realm,
