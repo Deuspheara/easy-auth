@@ -326,7 +326,7 @@ system browser/platform and relevant lifecycle outcomes without saving credentia
 codes, tokens, assertions or private keys. Production credentials are not required
 by default CI. No user browser, credential-manager or security-setting changes are
 part of automated acceptance. The later registered native checkpoint below records
-one Desktop/base-profile sign-in; the remaining web, platform and lifecycle matrix
+Desktop/base-profile IPv4 and IPv6 sign-ins; the remaining web, platform and lifecycle matrix
 is not accepted by that result.
 
 ## Decisions still requiring evidence
@@ -411,3 +411,6 @@ Helium. Existing verification and transaction boundaries produced the local sess
 validated and revoked it, and removed the owned database. No signed `auth_time` was
 returned. This evidence narrows the basic native interoperability gap; it does not
 change the freshness/deletion policy or authorize ordinary activation.
+The separate [IPv6 result](../../../tests/provider/google/results/2026-10-20/registered-native-signin-ipv6.json)
+subsequently passed on the same platform/browser through the literal `::1` owned
+return, with the same session/audit checks and independent database cleanup.

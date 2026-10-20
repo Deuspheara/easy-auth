@@ -4,8 +4,9 @@ The optional `google-native-acceptance` example prepares the remaining registere
 Google/OS-browser matrix. Its configuration and owned-setup checks do not establish
 registered-client acceptance. The actual sign-in mode is deliberately separate;
 a [registered native sign-in](results/2026-10-20/registered-native-signin.json)
-passed on macOS with the operator-reported Helium browser. This is one base-profile
-result, not a complete provider/platform matrix.
+passed on macOS with the operator-reported Helium browser. A separate
+[IPv6 run](results/2026-10-20/registered-native-signin-ipv6.json) passed on the same
+platform/browser. These base-profile results do not complete the provider/platform matrix.
 
 ## Inputs and local ownership
 
@@ -121,7 +122,9 @@ records actual manual sign-in as unperformed at preparation time. The separate
 [live result](results/2026-10-20/registered-native-signin.json) records the later
 registered Desktop/base-profile completion, session validation/revocation and
 independently checked database cleanup. Signed `auth_time` was absent; freshness
-and deletion remain unaccepted. Record each real platform/client/
+and deletion remain unaccepted. The later
+[IPv6 record](results/2026-10-20/registered-native-signin-ipv6.json) independently
+verifies the same outcomes through the literal `::1` callback. Record each real platform/client/
 profile/outcome separately using only finite sanitized results; do not turn the
 setup checks or offline signatures into registered Google/OS evidence. Broader
 native persistence/concurrency, genuine freshness/deletion, ordinary activation

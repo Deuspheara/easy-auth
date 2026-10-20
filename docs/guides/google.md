@@ -7,7 +7,7 @@ An explicitly selected eligible-client session-age profile also supplies signed
 authentication-time/deletion proofs. An experimental Axum `google-web` composition
 now adds HTTPS reference pages and bound sign-in/deletion HTTP routes. Ordinary
 startup selection, broader OS/browser acceptance, mobile delivery and lifecycle
-activation remain gated. One registered Desktop/base-profile run passed on macOS
+activation remain gated. Registered Desktop/base-profile IPv4 and IPv6 runs passed on macOS
 with operator-reported Helium; see the live record below. The optional server
 `google-desktop-launch` component adds a bounded external launcher around owned
 loopback delivery.
@@ -371,7 +371,7 @@ system-browser interoperability. See the [verification history](../security/veri
 
 Before ordinary activation, AUTH-23 still needs reviewed standalone Google
 configuration/activation, the remaining native platform/browser and registered
-web/negative/cancellation matrix beyond the recorded macOS/Helium success, and a
+web/negative/cancellation matrix beyond the recorded macOS/Helium loopback results, and a
 usable genuinely fresh provider-required deletion path. This component does not
 request or infer provider reauthentication: issuance time, local session rotation
 and an authorization prompt cannot substitute for genuinely recent signed
@@ -565,8 +565,10 @@ free public owned-setup checks. A later
 [registered Desktop/base-profile result](../../tests/provider/google/results/2026-10-20/registered-native-signin.json)
 passed on macOS with operator-reported Helium: actual signature verification,
 local session commit/validation/revocation and independent disposable DB cleanup.
-Signed `auth_time` was absent. This single result does not establish other browser/
-platform combinations or freshness/deletion acceptance.
+A separate [IPv6 run](../../tests/provider/google/results/2026-10-20/registered-native-signin-ipv6.json)
+passed on the same platform/browser through `::1`. Signed `auth_time` was absent in
+both runs. These results do not establish other browser/platform combinations or
+freshness/deletion acceptance.
 The explicit session-age profile cannot manufacture recent authentication or waive
 Google application eligibility. Ordinary activation, genuine freshness/deletion
 and broader lifecycle review remain gated.

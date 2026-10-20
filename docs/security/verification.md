@@ -4087,3 +4087,18 @@ broader persistence/lifecycle, ordinary activation and independent review retain
 their separate gates. Local session revocation/database cleanup does not establish
 Google authorization-grant revocation. Historical preflight and preparation reports
 are unchanged and retain their narrower claims. AUTH-23 remains In Progress.
+
+## AUTH-23 registered Google IPv6 native sign-in — 2026-10-20
+
+After the owner explicitly selected the IPv6 test and completed sign-in in Helium,
+the same fixed producer passed through the literal `::1` callback. The
+[separate IPv6 record](../../tests/provider/google/results/2026-10-20/registered-native-signin-ipv6.json)
+retains the finite successful result and provenance. Runtime overlays, reused-source
+hashes, lockfile and fixed producer were reverified against the preparation record;
+only documentation had changed since the producing revision. Owned setup and real
+sign-in each exited zero. Actual signature verification, local session commit,
+validation/revocation and scoped facts matched the IPv4 result. An independent
+same-server catalog query found zero owned probe databases after completion.
+Signed `auth_time` was again absent. This adds IPv6 registered return evidence on
+the same macOS/Helium setup; other platforms, web/negative/cancellation matrix,
+genuine freshness/deletion, ordinary activation and independent review remain gated.
