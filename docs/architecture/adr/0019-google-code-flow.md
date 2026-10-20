@@ -10,6 +10,15 @@ and native-configuration PostgreSQL regressions. No Google profile, native callb
 listener or web/native activation is implemented by that checkpoint. The remaining
 proposal below must still be resolved and verified.
 
+The next checkpoint implements an opt-in core `GoogleCodeExchange`: canonical
+issuer/RequireIssuer, fixed three Google endpoint origins, RS256 without additional
+audiences, fixed openid/email/profile scopes and explicit Basic/Post registration.
+It reuses the existing opaque sign-in exchange and verifier, rejects other purposes
+and adds no browser/native transport or local grant. Offline actual-signature
+component evidence is separate from the still-required Google/PostgreSQL lifecycle,
+registered native client and manual provider acceptance. The
+[component guide](../../guides/google.md) states its exact supported boundary.
+
 ## Context
 
 Google web and native system-browser flows need the existing one-use OAuth state,

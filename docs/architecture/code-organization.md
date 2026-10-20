@@ -574,3 +574,15 @@ modules. All affected modules remain below300lines. Longer ordered callback-race
 signed-session lifecycle cases keep valid controls, invalid attempts, reconfiguration
 and final assertions together as reviewed function-size exceptions. No listener,
 generic provider engine, widened proof constructor or unrelated cleanup is added.
+
+Google code composition lives in `oidc/google/exchange.rs`, with its entry module
+limited to declaration/reexport. It assembles existing transport/verifier/opaque
+proof types rather than duplicating crypto, claim decoding, policy persistence or
+SQL. Offline scenarios are grouped under verification's named `tests/google/`
+modules and reuse private actual-signature/token-response fixtures extracted and
+verified in a separate structural commit. Fixture configuration now accepts an
+explicit test connection/metadata without changing legacy defaults/assertions.
+All affected modules remain below300lines. Longer ordered fixture composition,
+wire matrices and proof-rejection scenarios retain valid controls and exact results
+together as reviewed function-size exceptions. No generic plugin or unrelated
+cleanup is added.

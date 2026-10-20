@@ -35,6 +35,8 @@ jobs:
       - run: cargo test --locked --workspace --all-features
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
+      - name: Verify Google without optional local identity mapping
+        run: cargo test --locked -p easy-auth-core --features google
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

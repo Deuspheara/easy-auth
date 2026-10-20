@@ -432,3 +432,14 @@ Google verifier/profile, weaker client authentication or mobile fallback is adde
 Tests use explicit metadata and real signed generic OIDC controls, not real Google
 or OS-return evidence. Native transport and provider-required fresh deletion remain
 activation gates.
+
+The optional Google code component constrains canonical issuer, response issuer
+defense, three endpoint origins, RS256, exact client/nonce/presenter and fixed
+identity scopes through the existing verifier/egress/opaque proof boundary. It
+rejects public authentication and non-sign-in purposes without selecting fallback
+methods or constructing local authority. Email verification remains a typed signed
+attribute, not mailbox ownership or linking permission. Offline actual signatures
+and Google-shaped documents prove component behavior only; the in-memory repository
+cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
+freshness is inferred from issuance or prompts, and no provider-required account
+activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).

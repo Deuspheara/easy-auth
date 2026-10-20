@@ -59,6 +59,9 @@ pub use ports::{EmailDelivery, Repository};
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 
+#[cfg(feature = "google")]
+pub use oidc::GoogleCodeExchange;
+
 #[cfg(feature = "oidc-identities")]
 pub use oidc::{
     MAX_OIDC_DELETION_AUTH_AGE_SECONDS, OidcAccountDeletion, OidcAccountDeletionRepository,

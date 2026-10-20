@@ -129,7 +129,6 @@ pub(super) struct Fixture {
 }
 impl Fixture {
     pub fn new(algorithm: OidcSigningAlgorithm, additional: &[&str]) -> Self {
-        let key = Signing::new(algorithm, "current");
         let connection = OAuthConnection::new(
             Uuid::new_v4(),
             Uuid::new_v4(),
@@ -140,6 +139,23 @@ impl Fixture {
             OAuthMixupDefense::RequireIssuer,
         )
         .unwrap();
+        let metadata = json!({"issuer":"https://issuer.example","authorization_endpoint":"https://issuer.example/authorize","token_endpoint":"https://issuer.example/token","jwks_uri":"https://issuer.example/keys","authorization_response_iss_parameter_supported":true,"code_challenge_methods_supported":["S256"]});
+        Self::configured(
+            algorithm,
+            additional,
+            connection,
+            &["https://issuer.example"],
+            metadata,
+        )
+    }
+    pub fn configured(
+        algorithm: OidcSigningAlgorithm,
+        additional: &[&str],
+        connection: OAuthConnection,
+        origins: &[&str],
+        metadata: Value,
+    ) -> Self {
+        let key = Signing::new(algorithm, "current");
         let store = Arc::new(Store {
             connection: connection.clone(),
             state: Mutex::new(None),
@@ -153,9 +169,7 @@ impl Fixture {
             check_release: Notify::new(),
         });
         let http = Arc::new(Http {
-            metadata: Mutex::new(
-                json!({"issuer":"https://issuer.example","authorization_endpoint":"https://issuer.example/authorize","token_endpoint":"https://issuer.example/token","jwks_uri":"https://issuer.example/keys","authorization_response_iss_parameter_supported":true,"code_challenge_methods_supported":["S256"]}),
-            ),
+            metadata: Mutex::new(metadata),
             cache_seconds: AtomicUsize::new(300),
             hold_dns: AtomicBool::new(false),
             dns_entered: Notify::new(),
@@ -166,15 +180,8 @@ impl Fixture {
             entered: Notify::new(),
             release: Notify::new(),
         });
-        let documents = Arc::new(
-            OidcDocuments::new(
-                connection,
-                &["https://issuer.example"],
-                store.clone(),
-                http.clone(),
-            )
-            .unwrap(),
-        );
+        let documents =
+            Arc::new(OidcDocuments::new(connection, origins, store.clone(), http.clone()).unwrap());
         let policy = OidcVerificationPolicy::new(&[algorithm], additional).unwrap();
         let verifier = Arc::new(OidcTokenVerifier::new(
             documents.clone(),
@@ -199,7 +206,7 @@ impl Fixture {
             purpose: OAuthPurpose::SignIn,
         };
         let start = transactions.begin(&intent).await.unwrap();
-        let claims = json!({"iss":self.store.connection.issuer(),"sub":"subject","aud":"client","iat":NOW_US/1_000_000,"exp":NOW_US/1_000_000+60,"nonce":start.proof.nonce().expose()});
+        let claims = json!({"iss":self.store.connection.issuer(),"sub":"subject","aud":self.store.connection.provider_client(),"iat":NOW_US/1_000_000,"exp":NOW_US/1_000_000+60,"nonce":start.proof.nonce().expose()});
         let exchange = transactions
             .consume(
                 &intent,

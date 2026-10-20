@@ -131,3 +131,15 @@ cryptography, license or advisory exception. The HTTPS web constructor and provi
 network restrictions remain unchanged. Typed exact loopback metadata is not a
 Google exchange adapter, native transport or real-provider acceptance result;
 [ADR 0019](../architecture/adr/0019-google-code-flow.md) retains those gates.
+
+The subsequent optional core Google component reuses the selected josekit RS256,
+typed claim checks and constrained document/token transport with no package/version
+change. Its canonical issuer, S256, response issuer support, RS256 and Basic/Post
+wire choices were compared with Google's public
+[discovery](https://accounts.google.com/.well-known/openid-configuration) and
+[OIDC guide](https://developers.google.com/identity/openid-connect/openid-connect)
+on 2026-10-20. This is metadata research and offline actual-signature evidence,
+not registered-client or Google web/native interoperability. Installed shared
+credentials are not application-authenticity proof; real native registration,
+provider freshness/deletion and manual matrix remain gates. No advisory or
+license exception is introduced.

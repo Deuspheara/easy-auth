@@ -1,4 +1,8 @@
 mod documents;
+#[cfg(feature = "google")]
+mod google;
+#[cfg(feature = "google")]
+pub use google::GoogleCodeExchange;
 #[cfg(feature = "oidc-identities")]
 mod identities;
 mod metadata;

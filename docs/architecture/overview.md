@@ -69,3 +69,10 @@ native public-login acceptance now has owned Keycloak evidence with explicit
 private-transport limits. See the [verification history](../security/verification.md)
 for dated checks and the [browser guide](../guides/oidc-web.md) for the opt-in
 contract. Broader release gates remain open.
+
+AUTH-23's optional core `google` component fixes Google issuer/egress/RS256/scope
+and registered wire-authentication policy around the same opaque sign-in exchange.
+It returns the existing verified identity proof and adds no SQL, route, native
+transport or local-session grant. The [component guide](../guides/google.md) and
+[ADR 0019](adr/0019-google-code-flow.md) distinguish offline signature controls from
+the remaining Google/PostgreSQL lifecycle, native transport and manual acceptance.

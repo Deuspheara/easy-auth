@@ -157,3 +157,9 @@ Configuration values have no deserialization or arbitrary field mutation API;
 `reconfigured` copies their validated definition with a fresh revision. PostgreSQL
 retains global redirect uniqueness, realm/client scope and current-policy locking.
 The existing HTTPS constructor and web configuration retain their restrictions.
+
+The optional `GoogleCodeExchange` composes that same configuration and consumed
+sign-in context into the existing `VerifiedOidcIdentity`; it defines no alternative
+identity, contact, session, token or persistence entity. Fixed provider policy grants
+no authority by itself. Email attributes remain distinct from verified local contact,
+and linking/provider-deletion purposes cannot use this sign-in-only component.

@@ -2885,3 +2885,89 @@ metadata and original PostgreSQL transaction ownership separate. All affected
 modules remain below300lines. Longer ordered race and signed-session cases retain
 their valid controls, precise rejection and lifecycle assertions as reviewed
 function-size exceptions; no unrelated cleanup or generic provider engine is added.
+
+## AUTH-23 Google sign-in code component — 2026-10-20
+
+AUTH-23 remains In Progress. The opt-in core `google` feature now composes the
+existing opaque OAuth exchange, constrained document/token ports and reviewed
+signature/claim verifier as `GoogleCodeExchange`. It fixes canonical Google issuer,
+RequireIssuer, three exact endpoint origins, RS256 with no additional audience trust,
+fixed openid/email/profile scopes and explicit registered Basic/Post authentication.
+Public authentication and non-sign-in purposes are rejected without token POST.
+The result is the existing verified identity proof, not local session authority.
+No SQL/schema, HTTP route, browser/native transport, server setting, dependency
+version or cryptographic implementation is added. The
+[component guide](../guides/google.md) records exact limits and usage.
+
+Structural commit `2ecb534` first extracts the unchanged actual-signature and
+protected token-response fixtures into private named test support. A missing Value
+import was caught by compilation and corrected before completing that extraction;
+its final72 all-feature core cases,60 verification-only cases and strict core lint
+pass. Existing assertions/defaults are retained. Google's test configuration then
+uses an explicit fixture connection/metadata, retaining the legacy defaults.
+The new tests initially fail compilation because GoogleCodeExchange is absent;
+this is a missing API, not an exploited application failure.
+
+All **10 new offline Google component scenarios pass** with genuine library-generated
+RS256 signatures/JWKS and controlled Google-shaped metadata/code responses. They
+exercise canonical issuer/response defense/authentication refusal without I/O;
+fixed scopes and original state/nonce/S256; explicit cancellation/replay denial;
+foreign/private endpoint, missing S256/authentication and response-issuer failures
+before code disclosure; disabled-source Unauthorized versus storage Unavailable;
+wrong issuer/audience/presenter/nonce/subject/time and invalid email flag types;
+actual foreign signatures/another algorithm; original signed duplicate flag fields;
+and valid matching presenter/email-attribute controls. An absent email value never
+becomes verified from a standalone flag; false/absent flags do not erase a valid
+signed subject or establish local contact.
+
+Both HTTPS and explicit desktop-loopback metadata retain the exact original code,
+PKCE verifier, redirect and selected Basic/Post wire method. A missing signed
+authentication time is preserved as missing. Cross-source, linking and provider
+deletion contexts fail before token POST. Invalid grant remains Unauthorized while
+credential/provider infrastructure failures are Unavailable, with no foreign detail
+in diagnostics. The component fixture's in-memory repository is not proof of
+Google/PostgreSQL authority or real system-browser registration/return handling.
+Those tests and the manual provider matrix remain required under AUTH-23.
+
+Final local commands pass with `CARGO_INCREMENTAL=0` and the documented real DB
+setup; workspace DB runs execute sequentially:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-core --features google
+cargo test --locked -p easy-auth-core --features oidc-verification
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Results are **97 default**, **529 all-feature** workspace cases (2 Axum,98 HTTP,
+82 core,324 PostgreSQL,23 server; included logging-subprocess repeat excluded),
+**70 Google-only** and **60 verification-only** cases. No failures or ignored cases
+in final runs. Strict lint, compiled advisory and all-feature license/source/bans
+checks pass. The inactive optional SQLx/MySQL RSA finding remains visible with no
+exception. Dependency versions/browser assets/lockfiles are unchanged. The complete
+staged diff receives redacted secret scanning before publication. CI additionally
+runs Google without optional local identity mapping to catch feature unification.
+Hosted/native/browser/SMTP checks remain required; no new local Google browser or
+production-provider run is claimed.
+
+The exact native-metadata checkpoint `d16674a` retains its separate hosted run;
+the earlier ADR head `7be4cf6` has hosted39380816271 SUCCESS. New Google component
+changes need their own final-head hosted evidence. Earlier public reports remain
+immutable historical evidence, not a new Google/provider run or current-source
+certificate for this checkpoint. Safe provider-required fresh deletion, native
+transport/registration, Google callback handling and the manual matrix remain open.
+No local iat/rotation/prompt substitutes for signed provider authentication time.
+Broader release, independent review, SAML/outbound and AUTH-20 recovery gates remain.
+
+Maintainability review keeps concrete Google composition in its named feature
+module with a thin entry. Tests separate configuration, claims, exchange and shared
+setup; established signing/token fixtures stay private and reusable without a
+production bypass. All affected modules remain below300lines. Longer ordered wire,
+claim and purpose matrices keep valid controls and exact errors together as
+reviewed function-size exceptions. No duplicated verifier, SQL, generic provider
+engine or unrelated cleanup is added.
