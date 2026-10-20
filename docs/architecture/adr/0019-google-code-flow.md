@@ -15,9 +15,17 @@ issuer/RequireIssuer, fixed three Google endpoint origins, RS256 without additio
 audiences, fixed openid/email/profile scopes and explicit Basic/Post registration.
 It reuses the existing opaque sign-in exchange and verifier, rejects other purposes
 and adds no browser/native transport or local grant. Offline actual-signature
-component evidence is separate from the still-required Google/PostgreSQL lifecycle,
+component evidence is separate from supported web/native lifecycle,
 registered native client and manual provider acceptance. The
 [component guide](../../guides/google.md) states its exact supported boundary.
+
+Real PostgreSQL acceptance now includes ten Google-profile scenarios through actual
+state consumption, offline RS256 code/JWKS responses, verified mapping and the
+existing identity/session transaction. Exact provider request assertions and signed
+response counters prevent infrastructure/fixture failures from standing in for an
+authorization rejection. Independent one-connection lock/clock observers cover a
+real final audit wait; no new persistence policy or schema is introduced. This is
+not a real Google, browser, registered-client or native OS-return result.
 
 ## Context
 

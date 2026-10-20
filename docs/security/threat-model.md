@@ -443,3 +443,13 @@ and Google-shaped documents prove component behavior only; the in-memory reposit
 cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
 freshness is inferred from issuance or prompts, and no provider-required account
 activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).
+
+Ten Google-profile PostgreSQL integration scenarios now traverse the real state,
+signature/mapping and local identity/session boundaries with controlled offline
+RS256 responses. Exact provider wire assertions and independent signed-response
+counters distinguish invalid claims/JIT/source policy from infrastructure failures.
+Observed audit/clock waits retain the original cap, and races/rollback/realm-client
+tests preserve one-use and ownership. The fixture's signed authentication-time
+controls do not establish claim availability from an actual Google registration;
+token issuance never creates freshness and later proof does not rewrite old
+sessions. No Google callback/native/deletion activation follows from these tests.

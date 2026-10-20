@@ -586,3 +586,21 @@ All affected modules remain below300lines. Longer ordered fixture composition,
 wire matrices and proof-rejection scenarios retain valid controls and exact results
 together as reviewed function-size exceptions. No generic plugin or unrelated
 cleanup is added.
+
+Google/PostgreSQL acceptance lives in `tests/lifecycle/oidc/google/`: provider code/
+signature responses, configured setup and exact pending caps, independent wait
+observation, lifecycle, bindings and atomicity each have a named module. The provider
+checks original code/client/redirect/PKCE/credential before signing rather than
+silently returning a token for any request. Production SQL/locks remain unchanged.
+The feature alias selects existing identity ports and the core Google component.
+All modules remain below300lines; longer ordered provider/fixture, claim-race,
+disable and final-audit scenarios retain controls and exact outcomes together as
+reviewed function-size exceptions. No production hook, verifier duplication or
+unrelated cleanup is added.
+
+The OIDC web test fixture exposes a default-off private discovery gate solely for
+deterministic admission observation. Its dedicated `admission.rs` case retains
+the 429 response during a cold fetch, without cookies or authority; the independent overlapping-proof
+case explicitly warms/cancels a valid attempt before preserving its original two
+successes and separate cancellation assertions. No production wait, limit or policy
+changes are needed to distinguish these two scenarios.

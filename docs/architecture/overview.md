@@ -75,4 +75,4 @@ and registered wire-authentication policy around the same opaque sign-in exchang
 It returns the existing verified identity proof and adds no SQL, route, native
 transport or local-session grant. The [component guide](../guides/google.md) and
 [ADR 0019](adr/0019-google-code-flow.md) distinguish offline signature controls from
-the remaining Google/PostgreSQL lifecycle, native transport and manual acceptance.
+the remaining public callback/native transport and real-provider lifecycle acceptance.

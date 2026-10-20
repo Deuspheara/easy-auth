@@ -8,6 +8,8 @@ The [ADR](../architecture/adr/0019-google-code-flow.md) records the remaining wo
 
 Enable `easy-auth-core/google` and use the existing PostgreSQL and server
 `oidc-verification` features for the repository ports and production `OidcHttps`.
+The PostgreSQL `google` feature additionally selects its existing `oidc-identities`
+ports and the core Google component; it adds no Google-specific SQL or schema.
 Construct the component from the exact persisted connection snapshot, the same
 authoritative repository for registry/exchange checks, and an explicitly registered
 Basic or Post client authentication choice:
@@ -71,12 +73,16 @@ Google-shaped discovery/code responses. They cover original code/PKCE/redirect,
 fixed scope/egress/authentication, wrong claims/signature/algorithm, duplicate email
 flags, email-attribute semantics, cancellation, source/purpose isolation and exact
 provider-error versus infrastructure-error results. Their controlled repository is
-a component fixture; it does not establish Google/PostgreSQL lifecycle integration
-or real provider/system-browser interoperability. Existing real-database regressions
-remain required. See the [verification history](../security/verification.md).
+a component fixture. Ten separate PostgreSQL scenarios now exercise the actual
+Google code component through real state consumption, signature verification,
+mapping and existing local identity/session commit. They cover provider-only
+ownership without email merging, JIT, scoped identity ownership, callback and subject concurrency,
+rollback, current-source revalidation and final-audit deadline waits. Token/JWKS
+responses remain controlled offline actual-signature fixtures, not real Google or
+system-browser interoperability. See the [verification history](../security/verification.md).
 
 Before ordinary activation, AUTH-23 still needs reviewed Google callback decoding/
-web transport, real PostgreSQL Google-profile integration, actual native
+web transport integrated with the tested PostgreSQL flow, actual native
 system-browser/OS-return handling, registered-client/manual provider evidence and a
 usable genuinely fresh provider-required deletion path. This component does not
 request or infer provider reauthentication: issuance time, local session rotation

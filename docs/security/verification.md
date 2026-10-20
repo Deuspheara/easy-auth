@@ -2971,3 +2971,100 @@ production bypass. All affected modules remain below300lines. Longer ordered wir
 claim and purpose matrices keep valid controls and exact errors together as
 reviewed function-size exceptions. No duplicated verifier, SQL, generic provider
 engine or unrelated cleanup is added.
+
+## AUTH-23 Google/PostgreSQL and cold-discovery regression — 2026-10-20
+
+AUTH-23 remains In Progress. The PostgreSQL `google` feature selects the existing
+identity ports plus the core Google component; no production SQL, schema, verifier,
+network policy, HTTP activation or native transport is added. Ten feature-owned
+integration scenarios exercise actual PostgreSQL state consumption, Google profile
+exchange, RS256 verification, mapping and existing local identity/session commit.
+The external provider is a controlled offline fixture, not actual Google.
+
+Its one-use code registry requires the exact original registered client, redirect,
+PKCE and credential before emitting a signed response. Separate POST/signature
+counters prevent a missing/invalid fixture response from satisfying an expected
+authorization rejection. Real flows create provider-required owners without
+fabricated contact or matching-email linking; returning signed subjects retain
+ownership across email-attribute changes. JIT denial occurs after verified code,
+with valid controls after policy changes. Shared provider issuer/client/key/subject
+data remains isolated by realm/local-client/callback source. Concurrent callback
+claims produce one code exchange and commit; distinct verified proofs serialize
+one owner with separate sessions.
+
+Wrong signed nonce is Unauthorized after an actual signed response, while a
+controlled provider failure and a final audit write fault are Unavailable. Local
+authority rolls back and consumed state does not revive; valid fresh flows recover.
+Disable during an observed token POST and later revision changes reject old
+authority. A real final audit table wait uses an independent one-connection observer,
+confirms the original cap was live on entry, then observes its database expiry and
+requires Unauthorized with zero committed user/identity/session/audit or pending
+state. The arranged row preserves the exact original five-minute preparation window;
+no production clock, proof constructor or final policy is bypassed.
+
+Issuance never fabricates provider authentication time. Controlled offline signed
+authentication-time claims can qualify a later session without rewriting an earlier
+one; these are fixture-signature controls, not proof that an actual registered Google
+client supplies the claim. Real provider freshness and usable provider-required
+deletion remain activation gates alongside callback/native transport and the manual
+matrix. No real Google or OS/browser return run is claimed.
+
+### Hosted failure diagnosis and retained HTTP assertions
+
+Component-head run [39383836570](https://github.com/Deuspheara/easy-auth/actions/runs/39383836570)
+at `9dff398` failed the all-feature HTTP suite: the pre-existing
+`overlapping_starts_remain_distinct_and_cancel_independently` expected200 but received
+429, with97 other HTTP cases passing. Source review and deterministic reproduction
+identify an invalid cold-cache setup assumption. Bounded discovery-slot contention
+is intentionally RateLimited; overlapping cold starts are not guaranteed success.
+The failed run was inspected, not restarted or relabeled successful.
+
+Separate commit `3f3fe99` keeps every original two200/distinct-proof/pending-count/
+independent-cancel/no-session/no-token assertion, first explicitly warming and
+cancelling a valid attempt. A new held-discovery test requires prompt429 without
+cookies/authority, cancellation of the denied pending attempt, continued blocking
+of the admitted start until release, valid200 recovery and explicit cleanup. All
+26 OIDC web cases pass with exact outcomes. No production cache, worker, admission,
+timeout or queue policy changes. The gate is default-off private test support.
+The earlier native-metadata head `d16674a` separately has complete hosted
+[39382065934 SUCCESS](https://github.com/Deuspheara/easy-auth/actions/runs/39382065934).
+
+The ten focused Google/PostgreSQL cases pass with the explicit feature combination,
+and strict default/all-feature workspace/all-target lint passes. Full workspace
+revalidation follows the hosted failure and additional deterministic regression;
+final evidence is recorded below before publication. CI also runs the isolated
+Google/PostgreSQL feature without passkeys to detect accidental feature unification.
+
+All new modules remain below300lines. Provider signing/wire validation, configured
+setup/caps, independent observer, lifecycle, binding and atomicity responsibilities
+are separate. Longer ordered race/wait/fixture functions keep valid controls and
+exact results together as reviewed function-size exceptions. Existing assertions
+and published reports remain unchanged; no unrelated cleanup or production hook.
+
+Final local revalidation passes after the cold-cache regression correction, using
+`CARGO_INCREMENTAL=0` and the documented PostgreSQL setup, with DB variants
+executed sequentially:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+cargo test --locked -p easy-auth-axum --all-features --test browser oidc_web::
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Results are **97 default** and **540 all-feature** workspace cases (2 Axum,99 HTTP,
+82 core,334 PostgreSQL,23 server; logging subprocess repeat excluded). The focused
+Google/PostgreSQL10 and OIDC-web26 cases also pass. No failures/ignored cases in
+final local runs. Compiled advisory and all-feature license/source/bans checks pass;
+inactive optional SQLx/MySQL RSA finding remains visible without an exception.
+The full staged diff receives redacted secret scanning before publication. Changed
+documentation links and module boundaries are reviewed. Lockfiles, migrations and
+earlier public provider reports are unchanged. Native/browser/SMTP and final-head
+hosted acceptance remain required; no new real-provider or browser run is claimed
+from these local SQL/HTTP tests. AUTH-23's callback, native OS return, registration,
+actual provider freshness/deletion and manual matrix remain open.

@@ -64,6 +64,11 @@ proof checks and deliberate confirmation remain mandatory. No browser-wide atomi
 account-switch guarantee is claimed. Trusted peer address contributes abuse admission,
 not identity binding; browser forwarding headers cannot select that address.
 
+Available capacity and metadata still govern admission: a concurrent start can
+receive 429 while another owns a cold discovery fetch. This bounded rejection grants
+no session; failed authorization-URL preparation cancels its own new pending attempt.
+Successful overlapping starts retain separate proof and cancellation namespaces.
+
 The same router includes the [provider-deletion routes](oidc-account-deletion.md).
 They retain current initiating-session/subject binding, two destructive confirmations
 and genuine newly signed recent provider authentication; sign-in or callback routing

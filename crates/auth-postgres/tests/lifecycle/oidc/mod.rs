@@ -1,4 +1,6 @@
 mod binding;
+#[cfg(feature = "google")]
+mod google;
 #[cfg(feature = "oidc-identities")]
 mod identities;
 #[cfg(feature = "oidc-identities")]
