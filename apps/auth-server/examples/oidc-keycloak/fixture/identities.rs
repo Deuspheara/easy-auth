@@ -45,6 +45,25 @@ impl Fixture {
     }
     pub(super) async fn identity_command(&mut self, command: &Value) -> auth_core::Result<Value> {
         match command["command"].as_str() {
+            Some("identity_deletion_begin") => {
+                let purpose = self
+                    .identities
+                    .as_ref()
+                    .ok_or(Error::InvalidInput)?
+                    .deletion_purpose()?;
+                self.begin(purpose).await
+            }
+            Some("identity_reenable") => {
+                self.store.enable_oauth_connection(&self.connection).await?;
+                Ok(json!({"result":"identity_reenabled"}))
+            }
+            Some("identity_deletion_status") => {
+                self.identities
+                    .as_ref()
+                    .ok_or(Error::InvalidInput)?
+                    .deletion_status()
+                    .await
+            }
             Some("identity_configure") => {
                 self.configure_identity(match command["jit"].as_str() {
                     Some("deny") => OidcJitPolicy::Deny,

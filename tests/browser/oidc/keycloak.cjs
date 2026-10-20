@@ -76,6 +76,7 @@ async function start(directory, origin, redirect) {
     assert.equal(clients.length, 1);assert.equal(users.length, 1);
     const clientId = clients[0].id;
     let mapper;
+    let anotherUserSequence=0;
     return {image:IMAGE, base, issuer:origin+'/realms/'+realm, client, secret, username, password,
       subject:users[0].id, email:username+'@localhost.test', realm, stop,
       async identityClaims() {
@@ -92,8 +93,15 @@ async function start(directory, origin, redirect) {
         await admin('/clients/'+clientId+'/default-client-scopes/'+profile.id,'DELETE');
         await admin('/clients/'+clientId+'/optional-client-scopes/'+profile.id,'PUT');
       },
+      async reauthenticationClaims() {
+        const scopes=await admin('/client-scopes');
+        const basic=scopes.find(value=>value.name==='basic');
+        assert.equal(typeof basic?.id,'string','owned basic scope with provider authentication-time mapper exists');
+        await admin('/clients/'+clientId+'/default-client-scopes/'+basic.id,'PUT');
+      },
       async anotherUser() {
-        const username='other-'+owner,password=random();
+        const username='other-'+owner+'-'+(++anotherUserSequence),password=random();
+        assert.equal(Buffer.byteLength(username)<=64,true,'owned disposable mailbox local part fits provider policy');
         await admin('/users','POST',{username,enabled:true,email:username+'@localhost.test',emailVerified:true,
           firstName:'Other',lastName:'Fixture',credentials:[{type:'password',value:password,temporary:false}]});
         const users=await admin('/users?username='+encodeURIComponent(username)+'&exact=true');

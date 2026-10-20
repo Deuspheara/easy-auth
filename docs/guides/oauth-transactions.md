@@ -54,9 +54,10 @@ updates that time. The original idle/absolute cap still bounds preparation,
 consumption and context checks. Sign-in/linking cannot consume this purpose, and
 neither the sign-in use case nor repository can issue a session from its proof.
 Migration 0019 extends the closed purpose/session binding without changing old
-pending rows or granting deletion authority. No provider deletion endpoint or
-final deletion transaction exists at this checkpoint; see
-[proposed ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
+pending rows or granting deletion authority. The separate
+[provider deletion use case](oidc-account-deletion.md) now implements final
+exact-subject and signed-freshness authorization in PostgreSQL. No HTTP deletion
+endpoint exists; see [ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
 
 `OidcCodeExchange::reauthentication_url` adds fixed `max_age=0` and `prompt=login`
 to the existing exact state/nonce/S256 authorization request. Provider metadata

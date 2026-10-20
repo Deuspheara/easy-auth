@@ -52,3 +52,11 @@ users have explicit policy and current source-bound sessions. Ordinary routes,
 linking and complete provider lifecycle remain gated. Owned Keycloak acceptance now
 extends through final JIT/session commit, with publication tracked separately.
 [ADR 0016](adr/0016-oidc-identity-mapping.md) records that boundary.
+
+AUTH-55's optional provider deletion use case consumes a separate purpose-bound
+proof and requires the initiating source's exact subject and genuine recent signed
+authentication. The shared account erasure tail supports absent verified contact;
+the caller holds source/owner/session/identity locks and retains every original cap
+through the final clock check. No provider deletion HTTP/browser composition or
+ordinary activation is enabled. [ADR 0017](adr/0017-provider-account-deletion.md)
+and the [deletion guide](../guides/oidc-account-deletion.md) record that boundary.

@@ -101,10 +101,12 @@ mailbox deletion, passkey sign-in or saved-code passkey recovery as implicit fal
 Verified local contact does not relax policy. Preverified passkey proofs and retained
 recovery codes reject after this policy change. No public policy-transition, provider
 contact attachment or provider-only account-deletion endpoint is added. AUTH-55 owns
-provider-only deletion; AUTH-56 owns embedded/standalone OIDC web composition with
-deletion as a prerequisite. Those lifecycle/activation capabilities require their
-own reviewed boundary; account-deletion
-race tests use an owned persistence fixture following owner lock and audit erasure.
+provider-only deletion, with its optional backend transaction now implemented under
+[ADR 0017](0017-provider-account-deletion.md) and its HTTP/browser boundary still open.
+AUTH-56 owns embedded/standalone OIDC web composition with deletion as a prerequisite.
+Those lifecycle/activation capabilities require their own reviewed boundary. The
+original AUTH-30 account-deletion races use an owned persistence fixture; AUTH-55
+adds actual purpose-bound use-case deletion and ordered concurrency tests.
 
 ## Deletion and retention
 

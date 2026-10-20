@@ -1,3 +1,12 @@
+mod claim_time;
+mod completion;
+mod completion_authority_waits;
+mod completion_concurrency;
+mod completion_disable;
+mod completion_faults;
+mod completion_setup;
+mod completion_waits;
+mod denial;
 mod invalidation;
 mod ordering;
 mod purpose;

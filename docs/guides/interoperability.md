@@ -13,7 +13,7 @@
 | Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
-| Enterprise OIDC verification/code exchange and JIT | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 19 owned Keycloak/browser cases through actual local mapping/JIT/session commit; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session boundary; public routes, linking and complete provider lifecycle remain gated |
+| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 owned Keycloak/browser cases through local mapping/JIT/session commit and purpose-bound reauthentication/deletion; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session/deletion boundary; public routes, linking and complete provider lifecycle remain gated |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
 
@@ -146,3 +146,21 @@ repository proof rather than SMTP delivery; no account IDs/tokens/credentials ar
 report fields. Cross-realm/client/issuer isolation and ordered lock races retain
 separate real-PostgreSQL signed-software evidence. No wider provider/native-device,
 conformance, ordinary route/activation or independent security claim is implied.
+
+## AUTH-55 owned provider deletion backend — 2026-10-20
+
+The [twenty-three-case report](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion.json)
+retains those nineteen cases and adds a current-source control, genuine provider
+reauthentication, signed wrong-subject deletion denial, exact-owner atomic deletion
+and a subsequent fresh JIT cooldown denial. Only the new phase assigns Keycloak's
+built-in authentication-time scope; no claim is rewritten at the proxy or invented
+from token/local-session issuance. Missing authentication time remains a rejection.
+The actual provider user signs in through an isolated owned browser context; the
+final mutation uses core/PostgreSQL directly through private fixture IPC.
+
+Final counts require the surviving mailbox user/session, six audits with four
+provider facts deidentified, one deletion/cooldown and no provider identity/session
+authority. This is backend acceptance, not a supported public HTTP deletion flow,
+production-provider acceptance or SMTP provider-contact evidence. The HTTP/browser
+confirmation and transport boundary remains AUTH-55 work; ordinary composition is
+AUTH-56. No independent review or ordinary activation claim follows.

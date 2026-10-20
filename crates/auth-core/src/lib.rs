@@ -61,6 +61,7 @@ pub use sessions::{SessionInfo, SessionPage};
 
 #[cfg(feature = "oidc-identities")]
 pub use oidc::{
+    MAX_OIDC_DELETION_AUTH_AGE_SECONDS, OidcAccountDeletion, OidcAccountDeletionRepository,
     OidcDisplayNameClaim, OidcIdentityPolicy, OidcIdentityRepository, OidcJitPolicy,
     OidcMappedIdentity, OidcSignIn,
 };

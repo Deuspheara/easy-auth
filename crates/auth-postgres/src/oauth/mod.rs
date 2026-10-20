@@ -4,6 +4,8 @@ mod configuration;
 mod identities;
 #[cfg(feature = "oidc-identities")]
 mod identity_policy;
+#[cfg(feature = "oidc-identities")]
+pub(crate) use identity_policy::lock as lock_identity_policy;
 mod ownership;
 mod transactions;
 #[cfg(feature = "oidc-verification")]

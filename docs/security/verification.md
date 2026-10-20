@@ -2291,3 +2291,101 @@ production HTTP route or ordinary activation is introduced. ADR 0017 remains
 proposed for the final deletion/HTTP boundary. AUTH-55 stays In Progress pending
 those operations, their actual rollback/race/negative and native acceptance tests,
 full gates and hosted evidence. AUTH-56 remains a separate composition gate.
+
+## AUTH-55 final provider deletion backend (2026-10-20)
+
+The optional `OidcAccountDeletion` use case/port now consumes a mapped deletion-purpose
+proof. Both core and PostgreSQL reject sign-in/linking or missing-time proof. The
+owning transaction reuses the full current-policy/configuration guard and active
+provider authorization locks, matches the initiating session's exact existing subject,
+and requires genuine signed authentication within the public 300-second policy.
+Future time is rejected upstream and checked against database time again. No profile
+display, provider email, token issuance or local session creation becomes authority.
+
+Before erasure, retain the earliest original OAuth/token, active-session and signed
+freshness deadline. Shared account erasure now supports absent verified contact:
+email-free deletion fabricates no recipient; stored verified contact queues only the
+existing subject-free notice, never a provider-supplied attribute. Original mailbox
+authorization and its Some-contact path remain intact. Final table-free database time
+after every destructive/audit/notice write rolls expiry back atomically, including
+already-deleted rows, erased audit attribution and inserted subject cooldown. Consumed
+OAuth state is not resurrected. No lock spans provider I/O/signature verification.
+
+The focused real-PostgreSQL group now has **28 tests**, including eighteen new final
+deletion scenarios alongside the ten preparation cases. They cover successful email-free
+erasure, stored-contact notice and mailbox fallback denial, unrelated mailbox/realm
+preservation, profile-free deletion under JIT-Deny, exact signed subject/case and
+purpose denial in both layers, missing/old/future time, revocation/policy/disable/revision,
+audit/notice storage faults, unavailable policy storage, concurrent one-winner and both
+sign-in/disable orderings. A future-time test identifies token verification as the
+rejecting layer, rather than claiming an invalid proof reached deletion.
+
+Two ordered matrices cross all three proof/session/signed-freshness caps during
+unchanged configuration/owner waits and exact final audit/notice INSERT triggers.
+Each observes the actual wait before expiry, retains exact private account/session/
+audit/notice/pending/cooldown snapshots, requires Unauthorized rather than infrastructure
+failure and completes a new genuine login/flow as valid control. Storage faults require
+Unavailable and exact rollback; duplicate valid deletions produce one deletion fact.
+A callback admitted before deletion can commit, after which its new session is erased;
+deletion winning first rejects the waiting callback without JIT resurrection.
+
+Final local gates pass with `CARGO_INCREMENTAL=0` and sequential database suites:
+formatting; strict locked default/all-feature workspace/all-target Clippy; verification-only
+example compilation; **93 default** and **441 distinct all-feature** workspace tests
+(306 PostgreSQL, 55 HTTP/PostgreSQL, 68 core, 10 server, 2 Axum; the logging subprocess
+repeats an included core case); **57 verification-only core tests**; and the separate
+feature-disabled PostgreSQL case. No failed/ignored cases in these final suites. Compiled
+advisory, all-feature license/source/bans and npm audits pass, retaining the visible
+inactive SQLx/MySQL RSA advisory and no exception/dependency/version changes. Published
+migrations, including the preceding purpose migration 0019, remain immutable.
+
+All **23 owned Keycloak cases pass**, preserving the original nineteen assertions and
+their exact pre-deletion counts. The immutable
+[report](../../tests/browser/oidc/results/2026-10-20/keycloak-provider-deletion.json)
+matches **585 selected source/configuration hashes** and its frozen producer binary.
+Four new cases establish a genuinely current source without reviving old sessions,
+actual fixed-parameter reauthentication and signed wrong-subject rejection, exact-owner
+deletion without optional profile, and a fresh usable-profile JIT request rejected under
+live cooldown/current enabled JIT-Allow. The native fixture retains the original typed
+purpose in private pending/replay state; callers supply no owner/session selector.
+
+Final native counts are one surviving mailbox user/session, six audits, zero pending/
+identity/provider/oidc/weak-provider rows, one deletion, four erased provider audits,
+one intact mailbox audit and one live cooldown. Proxy totals are 19 posts/18 successful
+responses with the unchanged one signature mutation/replay. Native exit is zero; owned
+database/container/private files are removed, without emergency cleanup or unexpected
+diagnostics. No raw credential, callback, token, account ID or signed authentication-time
+value is report data.
+
+The initial extension hit fixture provisioning failures: a reused additional-user name,
+then an overlong generated mailbox local part. Per-run bounded sequence names correct
+both without changing application assertions. A later wrong-subject case could not
+count as acceptance because required signed authentication time was absent. A fixed
+diagnostic confirmed that exact missing field; the minimal client had omitted
+Keycloak's documented built-in `basic` scope. Assigning that authentic server-session
+mapper only for the new phase makes the signed claim available; no timestamp is seeded
+or inferred, and missing-time rejection remains mandatory. All failed native attempts
+exited/cleaned normally; none is a passing case or a claimed application defect.
+
+The existing documented `scripts/smoke.py --lifecycle` also passes against actual
+PostgreSQL/Mailpit in **standalone and embedded modes**, including real password
+enrollment, two-address email change, stable identity, old-session rejection, mailbox
+deletion and safe notices. An owned supervisor uses the existing development environment
+and transport setup with separate random databases/ports/realms. It stops both owned
+servers, removes both databases and deletes exactly six matching test-recipient messages
+per mode (twelve total), never an empty Mailpit deletion list or unrelated mail. This is
+mailbox lifecycle/SMTP regression evidence for shared erasure, not provider-contact SMTP
+or user-device evidence.
+
+Responsibility review keeps core use case/port, PostgreSQL authorization/completion,
+shared erasure and fixture deletion evidence in focused named modules. Only crate-private
+policy-guard visibility widens for concrete reuse. Longer ordered transactions/test
+matrices keep original caps, lock order and cleanup visible; all new modules are below
+300 lines, with no generic deletion engine or unrelated cleanup. HTTP/browser proof
+transport and explicit destructive confirmation remain unimplemented; AUTH-55 stays
+In Progress until that boundary and final hosted acceptance are complete. AUTH-56,
+AUTH-25, AUTH-20's Safari/recovery failure and the broader first-release gates remain open.
+
+The preceding purpose checkpoint's exact-head CI39357516806 at `c887386` completed
+SUCCESS. This extended backend/23-case checkpoint requires its own hosted run;
+the earlier result is not substituted for its acceptance.

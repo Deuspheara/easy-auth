@@ -63,7 +63,7 @@ impl Postgres {
     }
 }
 
-pub(super) async fn lock(
+pub(crate) async fn lock(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     expected: &OidcIdentityPolicy,
 ) -> Result<()> {

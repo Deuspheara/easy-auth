@@ -114,6 +114,18 @@ Rust permits one implementation of a trait for a type. PostgreSQL's `repository.
 
 ## Reviewed size exceptions
 
+Provider deletion now has a separate core use-case/port and PostgreSQL
+`account/provider_deletion/completion.rs` transaction. It reuses the full identity
+policy guard and owning active-provider authorization operation; only crate-private
+visibility widens for that concrete reuse. The shared erasure tail takes optional
+stored verified contact and never acquires authority or commits. Its longer body
+retains the ordered cleanup, audit, user deletion and optional notice together.
+Feature test setup keeps private snapshots/proof and exact tail gates separate;
+completion, denial, claim-time, storage-fault, deadline, concurrency and disable
+scenarios have named modules. Longer ordered tests keep observed waits, original
+caps, explicit error classes and successful controls visible. All new modules
+remain below 300 lines; no generic deletion engine or unrelated cleanup is added.
+
 AUTH-55's `account/provider_deletion/authorization.rs` owns the concrete active
 provider-session preparation locks shared by OAuth start/consume/context checks.
 It takes no unrelated source-configuration lock and performs no deletion or

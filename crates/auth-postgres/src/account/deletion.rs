@@ -77,7 +77,7 @@ impl Postgres {
         .await
         .map_err(unavailable)?;
         let deadline = deadline.with_proof(expires_us.ok_or(Error::Unauthorized)?);
-        super::erasure::erase(&mut tx, realm, user, &email).await?;
+        super::erasure::erase(&mut tx, realm, user, Some(&email)).await?;
         deadline.check(&mut tx).await?;
         tx.commit().await.map_err(unavailable)
     }

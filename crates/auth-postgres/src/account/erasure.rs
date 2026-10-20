@@ -9,24 +9,26 @@ pub(super) async fn erase(
     tx: &mut Transaction<'_, Postgres>,
     realm: Uuid,
     user: Uuid,
-    email: &str,
+    email: Option<&str>,
 ) -> Result<()> {
-    for table in ["auth_email_challenges", "auth_password_resets"] {
-        sqlx::query(&format!(
-            "DELETE FROM {table} WHERE realm_id=$1 AND email=$2"
-        ))
-        .bind(realm)
-        .bind(email)
-        .execute(&mut **tx)
-        .await
-        .map_err(unavailable)?;
-    }
-    sqlx::query("DELETE FROM auth_rate_buckets WHERE realm_id=$1 AND dimension IN ('email','password_email') AND key_hash=sha256($2)")
+    if let Some(email) = email {
+        for table in ["auth_email_challenges", "auth_password_resets"] {
+            sqlx::query(&format!(
+                "DELETE FROM {table} WHERE realm_id=$1 AND email=$2"
+            ))
+            .bind(realm)
+            .bind(email)
+            .execute(&mut **tx)
+            .await
+            .map_err(unavailable)?;
+        }
+        sqlx::query("DELETE FROM auth_rate_buckets WHERE realm_id=$1 AND dimension IN ('email','password_email') AND key_hash=sha256($2)")
         .bind(realm)
         .bind(email.as_bytes())
         .execute(&mut **tx)
         .await
         .map_err(unavailable)?;
+    }
     sqlx::query(
         r#"
         DELETE FROM auth_rate_buckets
@@ -62,12 +64,14 @@ pub(super) async fn erase(
         .await
         .map_err(unavailable)?;
     audit::record(tx, realm, AuditEvent::AccountDeleted).await?;
-    sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) VALUES ($1,$2,NULL,$3,'account_deleted')")
+    if let Some(email) = email {
+        sqlx::query("INSERT INTO auth_security_notifications(realm_id,id,user_id,recipient,kind) VALUES ($1,$2,NULL,$3,'account_deleted')")
         .bind(realm)
         .bind(Uuid::new_v4())
         .bind(email)
         .execute(&mut **tx)
         .await
         .map_err(unavailable)?;
+    }
     Ok(())
 }

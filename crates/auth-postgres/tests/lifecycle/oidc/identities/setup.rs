@@ -138,6 +138,17 @@ impl Fixture {
         purpose: OAuthPurpose,
         cap_seconds: Option<i32>,
     ) -> OidcMappedIdentity {
+        self.try_mapped_for(subject, attributes, purpose, cap_seconds)
+            .await
+            .unwrap()
+    }
+    pub async fn try_mapped_for(
+        &self,
+        subject: &str,
+        attributes: Value,
+        purpose: OAuthPurpose,
+        cap_seconds: Option<i32>,
+    ) -> Result<OidcMappedIdentity> {
         let c = self.policy.configuration();
         let flow = OAuthTransactions::new(c.clone(), self.store.clone());
         let browser = Secret::generate().unwrap();
@@ -180,9 +191,8 @@ impl Fixture {
         let verified = self
             .verifier
             .verify(exchange, OidcIdToken::parse(raw).unwrap())
-            .await
-            .unwrap();
-        self.policy.map(verified).unwrap()
+            .await?;
+        self.policy.map(verified)
     }
     pub async fn facts(&self) -> (i64, i64, i64, i64, i64) {
         sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_oidc_identities),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)")

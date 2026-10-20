@@ -8,6 +8,8 @@ use uuid::Uuid;
 pub(crate) struct ProviderOwner {
     pub(crate) user: Uuid,
     pub(crate) session: Uuid,
+    pub(super) identity: Uuid,
+    pub(super) email: Option<String>,
     pub(crate) deadline: Deadline,
 }
 
@@ -74,6 +76,8 @@ pub(crate) async fn lock(
     Ok(ProviderOwner {
         user,
         session,
+        identity,
+        email,
         deadline,
     })
 }

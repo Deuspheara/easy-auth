@@ -3,10 +3,12 @@ use serde_json::{Value, json};
 use zeroize::Zeroizing;
 
 pub(super) struct Pending {
+    pub(super) purpose: OAuthPurpose,
     pub(super) browser: Secret,
     pub(super) start: OAuthStart,
 }
 pub(super) struct Replay {
+    purpose: OAuthPurpose,
     browser: Secret,
     state: Secret,
     nonce: Zeroizing<String>,
@@ -20,7 +22,11 @@ impl Pending {
         connection: &OAuthConnection,
         callback: &str,
     ) -> Result<(OAuthExchange, Replay, Result<String>)> {
-        let Self { browser, start } = self;
+        let Self {
+            browser,
+            start,
+            purpose,
+        } = self;
         let url = url::Url::parse(callback).map_err(|_| Error::Unauthorized)?;
         let mut base = url.clone();
         base.set_query(None);
@@ -43,7 +49,7 @@ impl Pending {
         let intent = OAuthIntent {
             browser: &browser,
             source: "owned-keycloak",
-            purpose: OAuthPurpose::SignIn,
+            purpose: purpose.clone(),
         };
         let context = transactions
             .consume(
@@ -59,6 +65,7 @@ impl Pending {
         // Original protected material only for exact consumed-state replay. This
         // tuple and code stay in private fixture memory/IPC and are never logged.
         let replay = Replay {
+            purpose,
             browser,
             state: start.state,
             nonce: Zeroizing::new(start.proof.nonce().expose().to_owned()),
@@ -76,7 +83,7 @@ impl Replay {
         let intent = OAuthIntent {
             browser: &self.browser,
             source: "owned-keycloak",
-            purpose: OAuthPurpose::SignIn,
+            purpose: self.purpose.clone(),
         };
         transactions
             .consume(

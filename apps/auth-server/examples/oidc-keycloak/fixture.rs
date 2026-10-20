@@ -91,7 +91,7 @@ impl Fixture {
             credential,
         })
     }
-    async fn begin(&mut self) -> auth_core::Result<Value> {
+    async fn begin(&mut self, purpose: OAuthPurpose) -> auth_core::Result<Value> {
         if self.pending.is_some() {
             return Err(Error::InvalidInput);
         }
@@ -99,7 +99,7 @@ impl Fixture {
         let intent = OAuthIntent {
             browser: &browser,
             source: "owned-keycloak",
-            purpose: OAuthPurpose::SignIn,
+            purpose: purpose.clone(),
         };
         let start = self.transactions.begin(&intent).await?;
         #[cfg(feature = "oidc-identities")]
@@ -109,9 +109,17 @@ impl Fixture {
             .map_or(&["profile"][..], Identities::scopes);
         #[cfg(not(feature = "oidc-identities"))]
         let scopes = &["profile"];
-        let authorization = self.exchange.authorization_url(&start, scopes).await?;
+        let authorization = if matches!(purpose, OAuthPurpose::DeleteProviderAccount { .. }) {
+            self.exchange.reauthentication_url(&start, scopes).await?
+        } else {
+            self.exchange.authorization_url(&start, scopes).await?
+        };
         let response = json!({"result":"started","authorization":authorization.expose()});
-        self.pending = Some(Pending { browser, start });
+        self.pending = Some(Pending {
+            browser,
+            start,
+            purpose,
+        });
         Ok(response)
     }
     async fn finish(&mut self, callback: &str, hold: bool) -> auth_core::Result<Value> {
@@ -151,7 +159,7 @@ impl Fixture {
     }
     async fn command(&mut self, command: &Value) -> auth_core::Result<Value> {
         match command["command"].as_str() {
-            Some("begin") => self.begin().await,
+            Some("begin") => self.begin(OAuthPurpose::SignIn).await,
             Some("finish") => {
                 self.finish(
                     command["callback"].as_str().ok_or(Error::InvalidInput)?,
@@ -192,7 +200,9 @@ pub(super) async fn run(
     input: &mut impl BufRead,
 ) -> FixtureResult<()> {
     let mut fixture = Fixture::new(config, database).await?;
-    send(json!({"ready":true,"identity_capability":cfg!(feature="oidc-identities")}))?;
+    send(
+        json!({"ready":true,"identity_capability":cfg!(feature="oidc-identities"),"deletion_capability":cfg!(feature="oidc-identities")}),
+    )?;
     while let Some(command) = read_command(input)? {
         if command["command"].as_str() == Some("close") {
             break;
@@ -210,6 +220,7 @@ pub(super) async fn run(
         let mut value = final_facts;
         if let Some(cases) = &fixture.identities {
             value["identity_facts"] = cases.facts().await?;
+            value["deletion_facts"] = cases.deletion_facts().await?;
         }
         value
     };

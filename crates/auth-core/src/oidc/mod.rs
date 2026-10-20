@@ -7,6 +7,7 @@ mod ports;
 mod public_address;
 #[cfg(feature = "oidc-identities")]
 pub use identities::{
+    MAX_OIDC_DELETION_AUTH_AGE_SECONDS, OidcAccountDeletion, OidcAccountDeletionRepository,
     OidcDisplayNameClaim, OidcIdentityPolicy, OidcIdentityRepository, OidcJitPolicy,
     OidcMappedIdentity, OidcSignIn,
 };

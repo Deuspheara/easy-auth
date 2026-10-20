@@ -10,11 +10,11 @@ struct Held {
     evidence: Value,
 }
 pub(crate) struct Identities {
-    store: Arc<Postgres>,
-    pool: PgPool,
-    policy: OidcIdentityPolicy,
+    pub(super) store: Arc<Postgres>,
+    pub(super) pool: PgPool,
+    pub(super) policy: OidcIdentityPolicy,
     mailbox: Option<(User, Secret)>,
-    provider: Option<(User, Secret)>,
+    pub(super) provider: Option<(User, Secret)>,
     held: Option<Held>,
     profile: bool,
 }
@@ -90,13 +90,33 @@ impl Identities {
         if self.held.is_some() {
             return Err(Error::InvalidInput);
         }
+        let cap_live: bool = sqlx::query_scalar(
+            "SELECT (extract(epoch FROM clock_timestamp())*1000000)::bigint < $1",
+        )
+        .bind(identity.expires_us())
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|_| Error::Unavailable)?;
+        if !cap_live {
+            return Err(Error::Unavailable);
+        }
         let mut details = json!({"verified_before_resolution":true,"subject_matches_original":identity.subject()==subject,
             "verified_configuration_matched":identity.configuration()==self.policy.configuration(),
             "original_cap_retained":identity.expires_us()<=cap,
             "provider_email_matches_mailbox":identity.email().is_some() && identity.email()==self.mailbox.as_ref().and_then(|(user,_)|user.email.as_deref()),
             "provider_email_verified":identity.email_verified(),"provider_name_absent":identity.name().is_none()});
         let mapped = self.policy.map(identity)?;
+        details["original_cap_live"] = true.into();
         details["selected_display_present"] = mapped.display_name().is_some().into();
+        if matches!(
+            mapped.identity().purpose(),
+            OAuthPurpose::DeleteProviderAccount { .. }
+        ) {
+            if hold {
+                return Err(Error::InvalidInput);
+            }
+            return self.resolve_deletion(mapped, details).await;
+        }
         if hold {
             self.held = Some(Held {
                 proof: mapped,
@@ -169,7 +189,7 @@ impl Identities {
         details["mailbox_session_valid"] = self.mailbox_valid().await?.into();
         Ok(details)
     }
-    async fn mailbox_valid(&self) -> Result<bool> {
+    pub(super) async fn mailbox_valid(&self) -> Result<bool> {
         match &self.mailbox {
             Some((user, session)) => match self
                 .store

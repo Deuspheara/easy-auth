@@ -1,13 +1,16 @@
 # ADR 0017: Purpose-bound provider account deletion
 
-Date: 2026-10-20. Status: proposed for AUTH-55; provider deletion is not implemented
-or activated by this design. AUTH-56 owns ordinary OIDC sign-in composition.
+Date: 2026-10-20. Status: accepted for AUTH-55's optional core/PostgreSQL deletion
+transaction; HTTP/browser composition remains proposed and ordinary activation is
+not enabled. AUTH-56 owns ordinary OIDC sign-in composition.
 
 The preparation checkpoint implements the distinct OAuth purpose, migration 0019,
 current active provider-session/source authorization and fixed reauthentication
-URL API. Those operations can request/consume exchange context only. Final
-subject/freshness-authorized erasure and the HTTP/browser boundary below remain
-proposed, with no deletion capability claimed.
+URL API. Preparation can request/consume exchange context only. The subsequent
+`OidcAccountDeletion` use case now consumes the separately verified mapped proof
+in a current-policy, exact-subject, original-session and signed-freshness-authorized
+erasure transaction. The [deletion guide](../../guides/oidc-account-deletion.md)
+documents this explicit Rust API; its HTTP/browser boundary remains proposed.
 
 ## Context
 
@@ -23,11 +26,11 @@ private `account/erasure.rs` before adding behavior. Authorization, owner/sessio
 locks, original deadlines and commit remain in the caller. Existing proof cleanup,
 audit deidentification, deletion event/notice and rollback behavior are preserved.
 
-## Intended proof boundary
+## Implemented proof boundary
 
-Add a distinct OAuth purpose, `DeleteProviderAccount { user, session }`, bound to
+The distinct OAuth purpose, `DeleteProviderAccount { user, session }`, binds to
 the exact initiating provider session. It cannot be consumed as sign-in or linking.
-An additive migration must extend closed purpose/binding constraints; published
+Additive migration 0019 extends closed purpose/binding constraints; published
 migrations remain immutable. The existing state/browser/nonce/S256, exact configured
 issuer/client/redirect/revision, original-cap and one-use checks remain mandatory.
 
@@ -51,7 +54,7 @@ The [OIDC authorization request specification](https://openid.net/specs/openid-c
 describes these parameters and the required authentication-time claim; a fresh
 token/request is not itself proof of a new user gesture.
 
-## Intended transaction and lifecycle
+## Implemented transaction and lifecycle
 
 After signature verification and provider I/O finish, lock current configuration
 and policy before optional email, owner, session and identity authority. Snapshot
@@ -60,7 +63,7 @@ trusted configuration/policy and exact purpose/session/identity binding. Retain
 the earliest original OAuth/token, active-session and new signed-authentication
 freshness deadline before deleting authorizing rows.
 
-Reuse the account erasure operation, extending it explicitly for absent verified
+The shared account erasure operation now explicitly supports absent verified
 contact. Erase implemented credential/session/pending state and owned admission,
 deidentify audit, record the existing subject-free deletion event, and queue the
 existing notice only for a genuine verified contact. Preserve the subject cooldown
@@ -94,9 +97,9 @@ unknown and malformed callback parameters, cancellation and navigation cleanup;
 never echo provider error descriptions. No success cookie/response precedes commit.
 Refresh or lost response does not justify replay, fallback or identity recreation.
 
-## Required verification before acceptance
+## Verification and remaining acceptance
 
-Add real PostgreSQL purpose/owner/source/session/realm/revision binding, wrong signed
+Real PostgreSQL cases cover purpose/owner/source/session/realm/revision binding, wrong signed
 subject, missing/old/future `auth_time`, original deadline/freshness wait, rollback,
 concurrent one-winner, disable and deletion-vs-callback ordering tests. Preserve the
 mailbox denial, no-email-merge and last-credential corpus. Upgrade tests must show
@@ -107,5 +110,7 @@ Add HTTP contract/Origin/cookie/callback/redaction/confirmation negatives and ac
 owned Keycloak browser reauthentication-to-deletion acceptance with normal cleanup.
 Keep all existing native/SMTP cases. Record formatting, strict default/all-feature
 lint, full default/all-feature real-DB suites, security/license/secret scans and
-exact-code hosted CI. Until that evidence exists, this is design, not a completed
-capability, interoperability pass, independent review or activation approval.
+exact-code hosted CI. Until the remaining transport and acceptance evidence exists,
+AUTH-55 stays open; backend/component acceptance is not an independent review or
+ordinary activation approval. Exact results and limits are recorded in
+[verification evidence](../../security/verification.md).

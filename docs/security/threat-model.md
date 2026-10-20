@@ -6,9 +6,13 @@ locks. Old/unknown authentication time may initiate reauthentication but grants
 no deletion; idle/absolute expiry, revocation and policy/source changes still deny.
 Sign-in/linking purposes cannot substitute for it, and its verified proof cannot
 mint a session through either sign-in layer. Maximum-age/login request parameters
-are not authentication evidence. Final subject/freshness-authorized deletion and
-HTTP/browser composition remain unimplemented; ordinary activation stays gated.
-See [proposed ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
+are not authentication evidence. The optional final transaction now requires the
+initiating session's exact subject/source and genuine recent signed `auth_time`,
+retaining the earliest proof/session/freshness cap through destructive writes.
+Final expiry or storage failure restores account/audit/notice/cooldown state;
+consumed OAuth state stays consumed. No verified contact means no invented notice.
+HTTP/browser composition remains unimplemented; ordinary activation stays gated.
+See [ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
 
 AUTH-30's optional core mapping consumes only a verified signed identity bound to
 the exact trusted realm/connection/client/revision and explicit issuer allowlist.

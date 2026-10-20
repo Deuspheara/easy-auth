@@ -23,9 +23,11 @@ Linking-purpose proofs reject until AUTH-25 implements that separate boundary.
 AUTH-55 adds a distinct deletion-purpose preparation bound to an active original
 provider-required owner/session and exact source revision. It cannot become sign-in
 or linking authority and does not refresh authentication time. The purpose's state
-is one-use and capped by the original active session. Final provider deletion,
-signed freshness authorization and its HTTP composition remain unimplemented at
-this checkpoint; [ADR 0017](adr/0017-provider-account-deletion.md) records the design.
+is one-use and capped by the original active session. The optional final deletion
+use case now rechecks the exact existing subject/source, genuine signed freshness
+and all original caps before shared atomic erasure, audit deidentification and a
+notice only for stored verified contact. Its HTTP composition remains unimplemented;
+[ADR 0017](adr/0017-provider-account-deletion.md) records both boundaries.
 
 VerificationChallenge holds only token/browser verifiers, email/purpose and expiry. Email proof consumption commits atomically with user/session creation; a failed session insert rolls back that consumption. Password-reset proofs use a separate table/cookie and bind the current credential version; consumption, password/version update, session/proof invalidation, audit and non-secret notification enqueue commit atomically. Delivery claims are leased and realm scoped. Parallel consumption yields one winner. PostgreSQL constraints include realm in all identity relations.
 

@@ -78,7 +78,9 @@ Logout can dispose of an owned bearer even if its provider source is disabled.
 Provider-required users do not acquire mailbox/password, passkey sign-in or saved-code
 passkey recovery fallback, even if trusted storage later has verified contact. No public
 provider contact attachment, policy transition or provider-only deletion endpoint is
-provided here. AUTH-55 owns provider-only deletion; AUTH-56 owns supported embedded
+provided here. AUTH-55 now has an optional
+[backend provider deletion use case](oidc-account-deletion.md); its HTTP/browser
+boundary remains unfinished. AUTH-56 owns supported embedded
 and standalone OIDC web composition and depends on that lifecycle boundary.
 Ordinary provider activation and complete first-release lifecycle remain
 separate gates. Applications must not fabricate contact or weaken policy to work around
@@ -106,10 +108,12 @@ limits. Signed software fixtures are not live-provider interoperability or an in
 security review. No conformance, MFA/AAL certification or production-readiness claim is made.
 
 
-The [owned Keycloak acceptance](../../tests/browser/oidc/README.md) now runs nineteen
+The [owned Keycloak acceptance](../../tests/browser/oidc/README.md) now runs twenty-three
 cases, including actual local JIT/session commits, matching-email separation, signed
 missing-profile login, new-subject denial and live held-proof revision/disable
-rejection. It uses no production-provider credentials or user-device prompts. Its
+rejection, plus purpose-bound reauthentication, wrong-subject deletion denial,
+atomic provider erasure and subsequent JIT cooldown. It uses no production-provider
+credentials or user-device prompts. Its
 mailbox control is repository-bound proof, not SMTP delivery. This does not enable
 ordinary provider routes or complete linking/provider-only lifecycle gates.
 
