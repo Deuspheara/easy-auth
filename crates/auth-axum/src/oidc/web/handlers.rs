@@ -1,4 +1,4 @@
-use super::super::cookies::SIGN_IN_COOKIES as COOKIES;
+use super::super::cookies::{SIGN_IN_COOKIES as COOKIES, require_anonymous};
 use super::{routing::WebState, types::*};
 use crate::{
     error::ApiError,
@@ -11,7 +11,7 @@ use axum::{
         ConnectInfo, Query, State,
         rejection::{JsonRejection, QueryRejection},
     },
-    http::{HeaderMap, StatusCode, header},
+    http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
 use std::net::SocketAddr;
@@ -29,7 +29,7 @@ pub(super) async fn start(
 ) -> Result<Response, ApiError> {
     query.map_err(|_| ApiError::Body(StatusCode::BAD_REQUEST))?;
     let Json(_) = body?;
-    require_anonymous(&state, &headers)?;
+    require_anonymous(&state.base.browser, &headers)?;
     COOKIES.require_absent(&headers)?;
     let browser = Secret::generate()?;
     let source = source_key(source);
@@ -91,7 +91,7 @@ async fn complete(
     source: &str,
     input: OidcSignInFinishInput,
 ) -> auth_core::Result<Secret> {
-    require_anonymous(state, headers)?;
+    require_anonymous(&state.base.browser, headers)?;
     let transaction = COOKIES.read(headers)?;
     let returned = Secret::parse(input.state)?;
     if returned.verifier() != transaction.state.verifier() {
@@ -163,17 +163,4 @@ async fn cancel_pending(
         .transactions
         .cancel(&intent, &transaction.state, &transaction.proof)
         .await
-}
-
-fn require_anonymous(state: &WebState, headers: &HeaderMap) -> auth_core::Result<()> {
-    for value in headers.get_all(header::COOKIE) {
-        let value = value.to_str().map_err(|_| Error::Unauthorized)?;
-        for pair in value.split(';').map(str::trim) {
-            let name = pair.split_once('=').map_or(pair, |(name, _)| name);
-            if name == state.base.browser.session_name() {
-                return Err(Error::Unauthorized);
-            }
-        }
-    }
-    Ok(())
 }

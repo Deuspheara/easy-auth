@@ -678,3 +678,11 @@ All changed implementation/scenario files remain below300lines. Longer ordered
 binding/fault matrices retain setup, unchanged-state assertions and actual signed
 positive controls together as reviewed function-size exceptions. No unrelated
 structural cleanup is deferred.
+
+
+The OIDC cookie boundary owns the anonymous-session presence guard and explicit
+proof-cookie clearing on session revocation. Existing sign-in/deletion handlers
+and middleware call those focused helpers with their original cookie sets; no
+session selection, proof parsing, cancellation or storage policy moves. This
+behavior-preserving extraction precedes Google HTTP behavior and preserves all44
+existing OIDC HTTP/database regressions and strict all-target/all-feature Axum lint.

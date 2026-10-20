@@ -90,3 +90,38 @@ impl Cookies {
         }
     }
 }
+
+#[cfg(feature = "oidc-web")]
+pub(super) fn require_anonymous(
+    config: &BrowserConfig,
+    headers: &HeaderMap,
+) -> auth_core::Result<()> {
+    for value in headers.get_all(header::COOKIE) {
+        let value = value.to_str().map_err(|_| Error::Unauthorized)?;
+        for pair in value.split(';').map(str::trim) {
+            let name = pair.split_once('=').map_or(pair, |(name, _)| name);
+            if name == config.session_name() {
+                return Err(Error::Unauthorized);
+            }
+        }
+    }
+    Ok(())
+}
+
+pub(super) fn clear_revoked_proofs(
+    response: &mut Response,
+    config: &BrowserConfig,
+    proofs: &[&Cookies],
+) {
+    let prefix = format!("{}=;", config.session_name());
+    if response
+        .headers()
+        .get_all(header::SET_COOKIE)
+        .iter()
+        .any(|value| value.to_str().is_ok_and(|value| value.starts_with(&prefix)))
+    {
+        for proof in proofs {
+            proof.clear(response, config);
+        }
+    }
+}

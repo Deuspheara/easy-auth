@@ -16,7 +16,6 @@ use auth_core::{
 use axum::{
     Router,
     extract::{DefaultBodyLimit, Request, State},
-    http::header,
     middleware::{self, Next},
     response::Response,
     routing::{get, post},
@@ -101,15 +100,10 @@ async fn clear_revoked_proof(
     next: Next,
 ) -> Response {
     let mut response = next.run(request).await;
-    let prefix = format!("{}=;", state.browser.session_name());
-    if response
-        .headers()
-        .get_all(header::SET_COOKIE)
-        .iter()
-        .any(|value| value.to_str().is_ok_and(|value| value.starts_with(&prefix)))
-    {
-        SIGN_IN_COOKIES.clear(&mut response, &state.browser);
-        ACCOUNT_DELETION_COOKIES.clear(&mut response, &state.browser);
-    }
+    super::super::cookies::clear_revoked_proofs(
+        &mut response,
+        &state.browser,
+        &[&SIGN_IN_COOKIES, &ACCOUNT_DELETION_COOKIES],
+    );
     response
 }
