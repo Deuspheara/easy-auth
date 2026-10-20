@@ -729,3 +729,19 @@ completion, cancellation, process actor and feature setup. The existing socket
 fixture is imported once per test binary rather than duplicated per feature subtree.
 Production visibility remains private except the deliberate library operation/error
 API. No policy, transaction, HTTP route or unrelated cleanup is moved into the server.
+
+
+ADR0020 keeps stable return policy/canonical admission in core OAuth configuration
+and redirect modules, protected operation binding in OAuthTransactions, and exact
+wire return selection in the existing OIDC/Google exchange modules. PostgreSQL
+configuration/transaction/verification modules retain visible lock order and final
+clock checks; server composition only matches the actual owned listener. No policy
+or SQL is moved to handlers. New PostgreSQL cases live in `oauth/desktop/` with
+separate binding, registration, upgrade and feature setup; native process cases stay
+with the owned operation. Historical migration fixtures use original columns in
+`tests/support/legacy_oauth.rs` and finish later schema before today's adapter. They
+model stored legacy state and do not claim a new protocol ceremony. Ordered race/
+upgrade/negative-plus-positive cases retain their sequence as function-size
+exceptions; all new or extended implementation/test files remain below300lines.
+Public Start/Request layouts and existing repository implementations are preserved;
+new exact-return methods have fail-closed defaults. No unrelated cleanup is deferred.

@@ -39,6 +39,8 @@ jobs:
         run: cargo test --locked -p easy-auth-core --features google
       - name: Verify Google PostgreSQL integration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+      - name: Verify stable native OAuth registration without passkeys
+        run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oauth::desktop
       - name: Verify Google desktop transport without local identity mapping
         run: cargo test --locked -p easy-auth-server --features google-desktop google_desktop
       - name: Verify Google native launcher without local identity mapping

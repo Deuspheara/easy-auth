@@ -56,4 +56,25 @@ pub trait OAuthTransactionRepository: Send + Sync {
     async fn consume_oauth(&self, request: &OAuthRequest) -> Result<i64>;
     /// Denial only. No provider exchange, identity, session or authentication audit.
     async fn cancel_oauth(&self, request: &OAuthRequest) -> Result<()>;
+    /// Exact per-operation return. Older backends fail closed on any variation.
+    async fn save_oauth_return(&self, request: &OAuthRequest, redirect: &str) -> Result<i64> {
+        if redirect != request.configuration.redirect() {
+            return Err(crate::Error::InvalidInput);
+        }
+        self.save_oauth(request).await
+    }
+    /// Require the admitted exact return along with every original private binding.
+    async fn consume_oauth_return(&self, request: &OAuthRequest, redirect: &str) -> Result<i64> {
+        if redirect != request.configuration.redirect() {
+            return Err(crate::Error::InvalidInput);
+        }
+        self.consume_oauth(request).await
+    }
+    /// Cancel only the original exact return; registration admission is insufficient.
+    async fn cancel_oauth_return(&self, request: &OAuthRequest, redirect: &str) -> Result<()> {
+        if redirect != request.configuration.redirect() {
+            return Err(crate::Error::InvalidInput);
+        }
+        self.cancel_oauth(request).await
+    }
 }

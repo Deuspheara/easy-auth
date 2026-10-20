@@ -37,6 +37,7 @@ async fn migration_preserves_existing_identity_session_and_audit(pool: PgPool) {
     let after:(i64,i64,i64)=sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit)")
         .fetch_one(&pool).await.unwrap();
     assert_eq!(before, after);
+    crate::support::schema::finish_upgrade_after(&pool, 16).await;
     let connection = super::setup::connection(realm, uuid::Uuid::new_v4(), uuid::Uuid::new_v4());
     let connection = store.configure_oauth_connection(&connection).await.unwrap();
     let flow = OAuthTransactions::new(connection, Arc::new(store));

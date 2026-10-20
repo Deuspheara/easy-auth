@@ -64,10 +64,19 @@ impl GoogleAuthorization {
         self.transactions.configuration()
     }
 
+    /// Exact operation return, distinct from the stable registration anchor.
+    pub fn redirect(&self) -> &str {
+        self.transactions.redirect()
+    }
+
     pub async fn begin(&self, intent: &OAuthIntent<'_>) -> Result<GoogleAuthorizationStart> {
         self.exchange.require_purpose(&intent.purpose)?;
         let transaction = self.transactions.begin(intent).await?;
-        match self.exchange.authorization_url(&transaction).await {
+        match self
+            .exchange
+            .authorization_url(&transaction, self.transactions.redirect())
+            .await
+        {
             Ok(authorization_url) => Ok(GoogleAuthorizationStart {
                 transaction,
                 authorization_url,
@@ -97,7 +106,7 @@ impl GoogleAuthorization {
         self.exchange.require_purpose(&intent.purpose)?;
         let (state, issuer, outcome) = response.into_parts();
         if state.verifier() != expected_state.verifier()
-            || actual_redirect != self.configuration().redirect()
+            || actual_redirect != self.transactions.redirect()
             || issuer != self.configuration().issuer()
         {
             return Err(Error::Unauthorized);

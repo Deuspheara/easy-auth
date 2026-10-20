@@ -15,32 +15,35 @@ async fn identity_migration_preserves_existing_mailbox_and_policy_state_without_
     {
         sqlx::raw_sql(&migration.sql).execute(&pool).await.unwrap();
     }
-    let f = Fixture::new(pool, OidcJitPolicy::Allow).await;
-    let session = signed_in(&f.store, f.realm(), "upgrade@example.test").await;
-    let before = f
-        .store
-        .authenticate(f.realm(), session.verifier())
-        .await
-        .unwrap();
+    let (store, realm) = crate::support::realm(pool.clone()).await;
+    let store = std::sync::Arc::new(store);
+    let connection = crate::support::legacy_oauth::connection(&pool, realm).await;
+    crate::support::legacy_oauth::policy(&pool, &connection).await;
+    let session = signed_in(&store, realm, "upgrade@example.test").await;
+    let before = store.authenticate(realm, session.verifier()).await.unwrap();
     sqlx::raw_sql(include_str!(
         "../../../../migrations/0018_oidc_identities_sessions.sql"
     ))
-    .execute(&f.pool)
+    .execute(&pool)
     .await
     .unwrap();
+    crate::support::schema::finish_upgrade_after(&pool, 18).await;
     assert_eq!(
-        f.store
-            .authenticate(f.realm(), session.verifier())
-            .await
-            .unwrap(),
+        store.authenticate(realm, session.verifier()).await.unwrap(),
         before
     );
-    f.store
-        .check_oidc_connection(f.policy.configuration())
-        .await
-        .unwrap();
-    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_sessions WHERE oidc_identity_id IS NOT NULL OR oidc_revision IS NOT NULL").fetch_one(&f.pool).await.unwrap();
+    store.check_oidc_connection(&connection).await.unwrap();
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_sessions WHERE oidc_identity_id IS NOT NULL OR oidc_revision IS NOT NULL").fetch_one(&pool).await.unwrap();
     assert_eq!(count, 0);
+    let f = Fixture::scoped(
+        pool,
+        store,
+        realm,
+        connection.connection(),
+        connection.client(),
+        OidcJitPolicy::Allow,
+    )
+    .await;
     f.sign_in
         .finish(f.mapped("subject", json!({})).await)
         .await

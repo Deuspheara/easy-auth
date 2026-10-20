@@ -1,4 +1,6 @@
 pub(crate) mod legacy;
+#[cfg(feature = "oauth-transactions")]
+pub(crate) mod legacy_oauth;
 pub(crate) mod schema;
 
 use auth_core::{Repository, Secret};

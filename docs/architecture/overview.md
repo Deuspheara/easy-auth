@@ -129,3 +129,12 @@ bounded callback capture, child cleanup and shared core verification. Local gran
 still requires existing mapping/commit. It adds no remote tokens or ordinary startup
 activation. Source reconfiguration invalidates earlier source sessions; actual OS/
 registered Google and reviewed native lifecycle acceptance remain open.
+
+
+[ADR0020](adr/0020-native-oauth-operation-returns.md) separates an explicit stable
+desktop registration from each exact owned loopback return. Core owns profile and
+operation binding, PostgreSQL persists profile/return under existing locks and
+original final caps, and Google/native composition uses the retained actual URI.
+Reopened/concurrent ports preserve source sessions; real administrative revision
+changes and disable remain authoritative. Exact HTTPS/native defaults and ordinary
+startup stay unchanged. Actual provider/OS and broader native lifecycle remain gates.

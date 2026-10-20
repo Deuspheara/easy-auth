@@ -28,6 +28,17 @@ impl GoogleSessionAgeCodeExchange {
             .with_google_session_age()
     }
 
+    pub(super) async fn authorization_for_return(
+        &self,
+        start: &OAuthStart,
+        redirect: &str,
+    ) -> Result<OidcAuthorizationUrl> {
+        self.exchange
+            .authorization_for_return(start, IDENTITY_SCOPES, redirect)
+            .await?
+            .with_google_session_age()
+    }
+
     pub async fn exchange(
         &self,
         exchange: OAuthExchange,

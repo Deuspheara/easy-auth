@@ -18,51 +18,46 @@ async fn policy_migration_preserves_mailbox_sessions_registry_and_pending_oauth_
     {
         sqlx::raw_sql(&migration.sql).execute(&pool).await.unwrap();
     }
-    let f = Fixture::new(pool).await;
-    let realm = f.connection.realm();
-    let session = signed_in(&f.store, realm, "policy-upgrade@example.test").await;
-    let user = f
-        .store
-        .authenticate(realm, session.verifier())
-        .await
-        .unwrap();
+    let (store, realm) = crate::support::realm(pool.clone()).await;
+    let store = std::sync::Arc::new(store);
+    let connection = crate::support::legacy_oauth::connection(&pool, realm).await;
+    let session = signed_in(&store, realm, "policy-upgrade@example.test").await;
+    let user = store.authenticate(realm, session.verifier()).await.unwrap();
     let browser = Secret::generate().unwrap();
-    let flow = OAuthTransactions::new(f.connection.clone(), f.store.clone());
     let intent = OAuthIntent {
         browser: &browser,
         source: "policy-upgrade",
         purpose: OAuthPurpose::SignIn,
     };
-    let start = flow.begin(&intent).await.unwrap();
-    let before: (i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)").fetch_one(&f.pool).await.unwrap();
+    let start = crate::support::legacy_oauth::pending(&pool, &connection, &browser).await;
+    let before: (i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)").fetch_one(&pool).await.unwrap();
     sqlx::raw_sql(include_str!(
         "../../../migrations/0017_oidc_identity_policies.sql"
     ))
-    .execute(&f.pool)
+    .execute(&pool)
     .await
     .unwrap();
-    let after: (i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)").fetch_one(&f.pool).await.unwrap();
+    let after: (i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)").fetch_one(&pool).await.unwrap();
     assert_eq!(before, after);
     let policies: i64 = sqlx::query_scalar("SELECT count(*) FROM auth_oidc_identity_policies")
-        .fetch_one(&f.pool)
+        .fetch_one(&pool)
         .await
         .unwrap();
     assert_eq!(policies, 0, "migration grants no implicit JIT policy");
+    crate::support::schema::finish_upgrade_after(&pool, 17).await;
+    let flow = OAuthTransactions::new(connection.clone(), store.clone());
     assert_eq!(
-        f.store
-            .authenticate(realm, session.verifier())
-            .await
-            .unwrap(),
+        store.authenticate(realm, session.verifier()).await.unwrap(),
         user
     );
-    f.store.check_oidc_connection(&f.connection).await.unwrap();
+    store.check_oidc_connection(&connection).await.unwrap();
     flow.consume(
         &intent,
         &start.state,
         start.proof,
         OAuthCallback {
-            redirect: f.connection.redirect(),
-            issuer: Some(f.connection.issuer()),
+            redirect: connection.redirect(),
+            issuer: Some(connection.issuer()),
         },
     )
     .await

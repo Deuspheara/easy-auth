@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod backend_tests;
 mod configuration;
 mod flow;
 #[cfg(test)]
@@ -8,7 +10,7 @@ mod repository;
 #[cfg(test)]
 mod tests;
 
-pub use configuration::{OAuthConnection, OAuthMixupDefense};
+pub use configuration::{OAuthConnection, OAuthMixupDefense, OAuthRedirectPolicy};
 pub use flow::{OAuthExchange, OAuthStart, OAuthTransactions};
 pub use proofs::OAuthBrowserProof;
 pub use redirect::OAuthRedirect;

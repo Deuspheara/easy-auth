@@ -24,14 +24,14 @@ pub struct GoogleDesktopSignIn {
     source: String,
 }
 impl GoogleDesktopSignIn {
-    /// Bind/persist the listener's exact redirect first, then construct its matching
-    /// core service. A different listener/service pair fails before admission.
+    /// Bind first, persist/load the trusted registration, then construct the core
+    /// service for this exact operation return. A mismatched pair fails before admission.
     pub async fn begin(
         listener: GoogleDesktopListener,
         service: Arc<GoogleAuthorization>,
         source: &str,
     ) -> Result<Self, GoogleDesktopSignInError> {
-        if listener.redirect().as_str() != service.configuration().redirect() {
+        if listener.redirect().as_str() != service.redirect() {
             return Err(GoogleDesktopError::InvalidInput.into());
         }
         let browser = Secret::generate()?;

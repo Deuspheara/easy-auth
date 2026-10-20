@@ -1,5 +1,5 @@
 use crate::{Postgres, unavailable};
-use auth_core::{Error, OAuthConnection, OAuthMixupDefense, Result};
+use auth_core::{Error, OAuthConnection, OAuthMixupDefense, OAuthRedirectPolicy, Result};
 use sqlx::{Postgres as Pg, Transaction};
 use uuid::Uuid;
 
@@ -7,6 +7,13 @@ fn defense(connection: &OAuthConnection) -> &'static str {
     match connection.defense() {
         OAuthMixupDefense::RequireIssuer => "issuer",
         OAuthMixupDefense::DedicatedRedirect => "dedicated_redirect",
+    }
+}
+
+fn redirect_policy(connection: &OAuthConnection) -> &'static str {
+    match connection.redirect_policy() {
+        OAuthRedirectPolicy::Exact => "exact",
+        OAuthRedirectPolicy::DesktopLoopback => "desktop_loopback",
     }
 }
 
@@ -60,15 +67,15 @@ pub(super) async fn replace(
 ) -> Result<()> {
     sqlx::query(
         r#"
-        INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true)
+        INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled,redirect_policy)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true,$9)
         ON CONFLICT (realm_id,id,client_id) DO UPDATE SET
           revision=EXCLUDED.revision,issuer=EXCLUDED.issuer,provider_client=EXCLUDED.provider_client,
-          redirect_uri=EXCLUDED.redirect_uri,defense=EXCLUDED.defense
+          redirect_uri=EXCLUDED.redirect_uri,defense=EXCLUDED.defense,redirect_policy=EXCLUDED.redirect_policy
         "#,
     ).bind(connection.realm()).bind(connection.connection()).bind(connection.client())
         .bind(connection.revision()).bind(connection.issuer()).bind(connection.provider_client())
-        .bind(connection.redirect()).bind(defense(connection)).execute(&mut **tx).await.map_err(unavailable)?;
+        .bind(connection.redirect()).bind(defense(connection)).bind(redirect_policy(connection)).execute(&mut **tx).await.map_err(unavailable)?;
     sqlx::query("DELETE FROM auth_oauth_transactions WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision<>$4")
         .bind(connection.realm()).bind(connection.connection()).bind(connection.client()).bind(connection.revision())
         .execute(&mut **tx).await.map_err(unavailable)?;
@@ -79,11 +86,11 @@ pub(super) async fn lock(tx: &mut Transaction<'_, Pg>, connection: &OAuthConnect
     let enabled: Option<bool> = sqlx::query_scalar(
         r#"
         SELECT enabled FROM auth_oauth_connections WHERE realm_id=$1 AND id=$2 AND client_id=$3
-          AND revision=$4 AND issuer=$5 AND provider_client=$6 AND redirect_uri=$7 AND defense=$8 FOR SHARE
+          AND revision=$4 AND issuer=$5 AND provider_client=$6 AND redirect_uri=$7 AND defense=$8 AND redirect_policy=$9 FOR SHARE
         "#,
     ).bind(connection.realm()).bind(connection.connection()).bind(connection.client())
         .bind(connection.revision()).bind(connection.issuer()).bind(connection.provider_client())
-        .bind(connection.redirect()).bind(defense(connection)).fetch_optional(&mut **tx).await.map_err(unavailable)?;
+        .bind(connection.redirect()).bind(defense(connection)).bind(redirect_policy(connection)).fetch_optional(&mut **tx).await.map_err(unavailable)?;
     if enabled != Some(true) {
         return Err(Error::Unauthorized);
     }
@@ -117,13 +124,13 @@ pub(super) async fn insert_initial(
 ) -> Result<bool> {
     let inserted = sqlx::query(
         r#"
-        INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true)
+        INSERT INTO auth_oauth_connections(realm_id,id,client_id,revision,issuer,provider_client,redirect_uri,defense,enabled,redirect_policy)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true,$9)
         ON CONFLICT (realm_id,id,client_id) DO NOTHING
         "#,
     ).bind(connection.realm()).bind(connection.connection()).bind(connection.client())
         .bind(connection.revision()).bind(connection.issuer()).bind(connection.provider_client())
-        .bind(connection.redirect()).bind(defense(connection))
+        .bind(connection.redirect()).bind(defense(connection)).bind(redirect_policy(connection))
         .execute(&mut **tx).await.map_err(unavailable)?.rows_affected();
     Ok(inserted == 1)
 }

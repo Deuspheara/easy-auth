@@ -70,6 +70,16 @@ impl GoogleCodeExchange {
             .await
     }
 
+    pub(super) async fn authorization_for_return(
+        &self,
+        start: &OAuthStart,
+        redirect: &str,
+    ) -> Result<OidcAuthorizationUrl> {
+        self.exchange
+            .authorization_for_return(start, IDENTITY_SCOPES, redirect)
+            .await
+    }
+
     /// Consume only a previously claimed sign-in context. No token-upload API,
     /// linking authority or inferred provider authentication freshness is added.
     pub async fn exchange(

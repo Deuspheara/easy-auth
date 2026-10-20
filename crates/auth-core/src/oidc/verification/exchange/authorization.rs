@@ -43,7 +43,11 @@ impl OidcAuthorizationUrl {
         start: &OAuthStart,
         scopes: &[&str],
         reauthenticate: bool,
+        redirect: &str,
     ) -> Result<Self> {
+        if !connection.permits_return(redirect) {
+            return Err(Error::InvalidInput);
+        }
         if !discovery.supports_s256() {
             return Err(Error::Unavailable);
         }
@@ -72,7 +76,7 @@ impl OidcAuthorizationUrl {
         url.query_pairs_mut()
             .append_pair("response_type", "code")
             .append_pair("client_id", connection.provider_client())
-            .append_pair("redirect_uri", connection.redirect())
+            .append_pair("redirect_uri", redirect)
             .append_pair("scope", &accepted.join(" "))
             .append_pair("state", start.state.expose())
             .append_pair("nonce", start.proof.nonce().expose())

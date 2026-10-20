@@ -201,3 +201,11 @@ selection constraints, not an interoperability or vendor-defect claim. The chose
 OS handler is trusted configuration and remains unverified by automated private
 process actors. See upstream [open source](https://github.com/Byron/open-rs/tree/v5.4.4)
 and the [native contract](../guides/google.md#owned-native-sign-in-operation).
+
+
+AUTH-23's stable native return profile reuses the existing reviewed URL parser,
+S256, SQLx/PostgreSQL and Google verifier. It adds no package/version, crypto, trust
+root, advisory or license exception. RFC8252 section7.3 and Google's desktop flow
+were rechecked on2026-10-20 for ephemeral literal-loopback ports and IPv4/IPv6.
+That protocol research is not registered-client/OS-browser acceptance evidence.
+See [ADR0020](../architecture/adr/0020-native-oauth-operation-returns.md).

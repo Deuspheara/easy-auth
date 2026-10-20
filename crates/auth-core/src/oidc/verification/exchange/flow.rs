@@ -59,7 +59,11 @@ impl OidcCodeExchange {
         start: &OAuthStart,
         scopes: &[&str],
     ) -> Result<OidcAuthorizationUrl> {
-        self.authorization(start, scopes, false).await
+        if self.configuration().redirect_policy() != crate::OAuthRedirectPolicy::Exact {
+            return Err(Error::InvalidInput);
+        }
+        self.authorization(start, scopes, false, self.configuration().redirect())
+            .await
     }
     /// Request fresh provider authentication without accepting arbitrary extra
     /// parameters. The request is not proof of freshness: consumers must require
@@ -69,13 +73,27 @@ impl OidcCodeExchange {
         start: &OAuthStart,
         scopes: &[&str],
     ) -> Result<OidcAuthorizationUrl> {
-        self.authorization(start, scopes, true).await
+        if self.configuration().redirect_policy() != crate::OAuthRedirectPolicy::Exact {
+            return Err(Error::InvalidInput);
+        }
+        self.authorization(start, scopes, true, self.configuration().redirect())
+            .await
+    }
+    #[cfg(feature = "google")]
+    pub(crate) async fn authorization_for_return(
+        &self,
+        start: &OAuthStart,
+        scopes: &[&str],
+        redirect: &str,
+    ) -> Result<OidcAuthorizationUrl> {
+        self.authorization(start, scopes, false, redirect).await
     }
     async fn authorization(
         &self,
         start: &OAuthStart,
         scopes: &[&str],
         reauthenticate: bool,
+        redirect: &str,
     ) -> Result<OidcAuthorizationUrl> {
         let _lease = self.verifier.lease_operation()?;
         let discovery = self.documents.discovery_when_admitted().await?;
@@ -86,6 +104,7 @@ impl OidcCodeExchange {
             start,
             scopes,
             reauthenticate,
+            redirect,
         )
     }
     pub async fn exchange(
@@ -104,7 +123,9 @@ impl OidcCodeExchange {
         code: OidcAuthorizationCode,
         lease: Arc<OwnedSemaphorePermit>,
     ) -> Result<VerifiedOidcIdentity> {
-        if exchange.configuration() != self.documents.connection() {
+        if exchange.configuration() != self.documents.connection()
+            || !exchange.configuration().permits_return(exchange.redirect())
+        {
             return Err(Error::Unauthorized);
         }
         self.repository.check_oidc_exchange(&exchange).await?;

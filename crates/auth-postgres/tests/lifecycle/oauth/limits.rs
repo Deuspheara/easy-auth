@@ -35,7 +35,7 @@ async fn realm_capacity_and_source_admission_are_independent_of_browser_identity
     let f = Fixture::new(pool).await;
     let first = f.start().await;
     // Capacity-only fixtures: these hashes are not evidence of usable proof.
-    sqlx::query("INSERT INTO auth_oauth_transactions(realm_id,connection_id,client_id,revision,state_hash,browser_hash,nonce_hash,pkce_hash,purpose,created_at,expires_at) SELECT realm_id,connection_id,client_id,revision,sha256(int4send(n)),sha256(int4send(n)),nonce_hash,pkce_hash,purpose,created_at,expires_at FROM auth_oauth_transactions CROSS JOIN generate_series(1,255) n")
+    sqlx::query("INSERT INTO auth_oauth_transactions(realm_id,connection_id,client_id,revision,state_hash,browser_hash,nonce_hash,pkce_hash,purpose,created_at,expires_at,redirect_uri) SELECT realm_id,connection_id,client_id,revision,sha256(int4send(n)),sha256(int4send(n)),nonce_hash,pkce_hash,purpose,created_at,expires_at,redirect_uri FROM auth_oauth_transactions CROSS JOIN generate_series(1,255) n")
         .execute(&f.pool).await.unwrap();
     assert!(matches!(
         f.flow.begin(&f.intent(OAuthPurpose::SignIn)).await,

@@ -3740,3 +3740,96 @@ private to tests. The longer ordered control retains budget/non-success/error an
 actual-network assertions together as a function-size exception. The fixture is
 imported once per binary; repeated controls are not additional authentication
 scenarios. No unrelated cleanup is deferred.
+
+## AUTH-23 stable native registration and exact operation returns — 2026-10-20
+
+[ADR0020](../architecture/adr/0020-native-oauth-operation-returns.md) records the
+explicit stable desktop source profile and per-operation return binding. Exact
+HTTPS/native profiles remain the default. The new profile requires RequireIssuer,
+canonical literal127.0.0.1/::1, fixed registered path and a concrete nonzero/nondefault
+port. Actual listener ownership still belongs to transport. Each pending operation
+persists its exact return; callback and cancellation require that same value with
+all original private/browser/state/nonce/S256/purpose/source/deadline bindings.
+Code exchange sends the retained operation URI; identity mapping/local commit keeps
+the stable source snapshot. A port-only reopen no longer changes source authority.
+Real operator disable or administrative revision changes still invalidate it.
+
+The shared Google authorization composition propagates its exact operation URI.
+Old anchor-only URL helpers reject the new profile before I/O because a bare start
+cannot carry the return. They retain exact-profile behavior. Public Start/Request
+layouts and old repository methods are unchanged; new return-aware methods have
+fail-closed defaults for alternate returns. PostgreSQL uses the same locked
+transactions and original final database-time caps. No public route, remote token
+family, default startup activation, dependency, crypto or trust-root change appears.
+
+Additive migration0020 stores profile/return, defaults old sources to exact and
+backfills existing pending returns without changing proof hashes, revision, binding
+or cap. Published migrations/global callback uniqueness are unchanged. Deploy the
+matching adapter/schema together and drain older OAuth writers before migration;
+older SQL lacks the new required field. Mixed-version rolling upgrade/downgrade is
+not supported. Historical migration fixtures now use original schema columns,
+retain their original assertions and finish later schema before today's adapter.
+Their provider row models stored legacy state with no verified mailbox and unknown
+authentication time; it is not evidence of a new signed protocol ceremony. An
+initial fixture check-constraint failure exposed the mailbox default and was fixed
+without relaxing a constraint or inventing freshness. The post-upgrade assertion
+requires the provider authentication time to remain unknown.
+
+Final evidence, with CARGO_INCREMENTAL=0 and documented PostgreSQL17 setup:
+
+- Formatting and strict locked workspace/all-target Clippy pass for default and
+  all features. Advisory gate and all-feature cargo-deny pass without exceptions;
+  inactive SQLx/MySQL RSA0.9.10 RUSTSEC-2023-0071 remains visible.
+- `cargo test --locked --workspace`: **97 passed**.
+- `cargo test --locked --workspace --all-features`: **637 passed**, zero failures or
+  ignored cases:2 Axum unit,116 HTTP,96 core,358 PostgreSQL,53 server unit,12 desktop
+  integration. The filtered logging child repeats an included case and is excluded.
+  Shared socket controls repeat in the two importing binaries; they are not extra
+  distinct authentication scenarios.
+- Final focused native process/PG suite: **18 passed**, including five new stable
+  source cases for reopen/IP-family preservation, actual concurrent-port JIT,
+  exact cross-port callback/cancel rejection, real administrative invalidation and
+  bound-URL composition. Actual signatures, sockets/processes and final session/
+  audit commit are required. No actual system browser is invoked by these cases.
+- PostgreSQL desktop profile group: **4 passed**; historical migration-name suite:
+  **17 passed**; upgrade-name suite: **12 passed**. Cases preserve full metadata/
+  disable, one-use, exact-return/private-proof and original-cap checks. Foreign
+  realm/client controls deliberately admit the same actual return under different
+  unique registration anchors, so URI difference cannot stand in for isolation.
+  Storage failure remains Unavailable and is followed by a healthy positive control.
+- Core OAuth tests: **7 passed**, including explicit profile negatives and all three
+  legacy backend methods refusing alternate returns without invoking old storage.
+- [Owned desktop regression](../../tests/browser/google-desktop/results/2026-10-20/chromium-regression-after-native-returns.json):
+  **1 passed**, all786 source hashes and fixed producer binary matched. Its scope
+  remains captured transport/CSP/query/storage behavior, not database identity or
+  OS-launch acceptance.
+- [Owned Google HTTPS regression](../../tests/browser/google-web/results/2026-10-20/chromium-https-regression-after-native-returns.json):
+  **13 passed**, all792 source hashes and fixed producer binary matched. Final facts:
+  users/identities/sessions/pending0,audit2,tokenPOSTs5,actual signatures5. The fixture
+  exits normally and removes its owned database/TLS files without emergency cleanup
+  or diagnostics. This exercises the unchanged exact HTTPS profile under the new
+  schema, not registered Google or public-root/provider TLS.
+
+The earlier full-run connect-reset probe failure is retained above; its independent
+observer fix0798745 requires actual refusal and has its own negative controls. The
+complete final rerun passes after that correction. Browser reports use source base
+0798745 plus their verified complete source hashes and retained private producers;
+older published reports are unchanged. Existing ff333e8 hosted run39413883420 was
+successful. The new behavior publication requires its own exact-head hosted run;
+local evidence does not substitute for that result. CI adds isolated PostgreSQL
+native-profile checks while retaining all prior acceptance/security gates.
+
+Maintainability review keeps configuration/admission in core OAuth, exact wire
+selection in the existing verifier/Google modules, SQL/locks in PostgreSQL and
+actual listener matching in the server. Scenario modules and legacy schema setup
+remain feature-owned, private and under300lines. Longer ordered negative/race/
+upgrade/positive-control cases retain their sequence as justified function-size
+exceptions; no unrelated structural cleanup is deferred. No meaningful regression
+assertion, security check, timeout policy or original final cap is weakened.
+
+AUTH-23 remains In Progress for actual registered Google/OS-browser evidence,
+usable genuine freshness and broader native lifecycle/ordinary activation review.
+Remote application authority remains a separate issuer gate. Independent review,
+SAML and the unresolved AUTH-20 Safari recovery path are not completed by this
+work. No credential-manager access, device prompts or system security setting
+changes were requested; no production-readiness or interoperability claim is made.

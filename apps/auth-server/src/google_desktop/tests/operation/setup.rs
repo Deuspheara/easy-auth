@@ -48,7 +48,7 @@ impl Fixture {
             .await
             .unwrap();
         let provider = Provider::new();
-        let service = service(&policy, &store, &provider);
+        let service = service(&policy, &store, &provider, listener.redirect());
         Self {
             pool,
             store,
@@ -59,13 +59,57 @@ impl Fixture {
             ip,
         }
     }
+    pub async fn stable(pool: PgPool, ip: IpAddr) -> Self {
+        let mut fixture = Self::new(pool, ip).await;
+        let config = fixture
+            .policy
+            .configuration()
+            .clone()
+            .with_desktop_loopback_returns()
+            .unwrap();
+        fixture.policy = fixture
+            .store
+            .configure_oidc_identity_policy(&policy(config))
+            .await
+            .unwrap();
+        fixture.service = service(
+            &fixture.policy,
+            &fixture.store,
+            &fixture.provider,
+            fixture.listener.as_ref().unwrap().redirect(),
+        );
+        fixture
+    }
+    pub async fn reopen(&mut self, ip: IpAddr) {
+        let listener = GoogleDesktopListener::bind(ip, self.uri().path())
+            .await
+            .unwrap();
+        self.service = service(
+            &self.policy,
+            &self.store,
+            &self.provider,
+            listener.redirect(),
+        );
+        self.listener = Some(listener);
+    }
+    pub async fn begin_on(&self, listener: GoogleDesktopListener) -> GoogleDesktopSignIn {
+        let service = service(
+            &self.policy,
+            &self.store,
+            &self.provider,
+            listener.redirect(),
+        );
+        GoogleDesktopSignIn::begin(listener, service, SOURCE)
+            .await
+            .unwrap()
+    }
     pub async fn begin(&mut self) -> GoogleDesktopSignIn {
         GoogleDesktopSignIn::begin(self.listener.take().unwrap(), self.service.clone(), SOURCE)
             .await
             .unwrap()
     }
     pub fn uri(&self) -> url::Url {
-        url::Url::parse(self.policy.configuration().redirect()).unwrap()
+        url::Url::parse(self.service.redirect()).unwrap()
     }
     pub async fn rebind(&mut self) {
         let listener = GoogleDesktopListener::bind(self.ip, self.uri().path())
@@ -87,7 +131,12 @@ impl Fixture {
             .configure_oidc_identity_policy(&policy(config))
             .await
             .unwrap();
-        self.service = service(&self.policy, &self.store, &self.provider);
+        self.service = service(
+            &self.policy,
+            &self.store,
+            &self.provider,
+            listener.redirect(),
+        );
         self.listener = Some(listener);
     }
     pub async fn issue(&self, attempt: &GoogleDesktopSignIn, attributes: Value) -> Secret {
@@ -102,7 +151,8 @@ impl Fixture {
             values[0].clone()
         };
         assert_eq!(field("client_id"), CLIENT);
-        assert!(field("redirect_uri") == self.policy.configuration().redirect());
+        let redirect = field("redirect_uri");
+        assert!(self.policy.configuration().permits_return(&redirect));
         assert_eq!(field("code_challenge_method"), "S256");
         let challenge: Verifier = URL_SAFE_NO_PAD
             .decode(field("code_challenge"))
@@ -119,8 +169,18 @@ impl Fixture {
             claims[name] = value.clone();
         }
         let code = Secret::generate().unwrap();
-        self.provider
-            .issue(&code, challenge, self.policy.configuration(), claims);
+        if redirect == self.policy.configuration().redirect() {
+            self.provider
+                .issue(&code, challenge, self.policy.configuration(), claims);
+        } else {
+            self.provider.issue_for_return(
+                &code,
+                challenge,
+                self.policy.configuration(),
+                &redirect,
+                claims,
+            );
+        }
         code
     }
     pub async fn cap(&self, attempt: &mut GoogleDesktopSignIn, seconds: i32) {
@@ -197,11 +257,17 @@ fn service(
     policy: &OidcIdentityPolicy,
     store: &Arc<Postgres>,
     provider: &Arc<Provider>,
+    redirect: &OAuthRedirect,
 ) -> Arc<GoogleAuthorization> {
-    let flow = Arc::new(OAuthTransactions::new(
-        policy.configuration().clone(),
-        store.clone(),
-    ));
+    let configuration = policy.configuration().clone();
+    let flow = Arc::new(
+        if configuration.redirect_policy() == OAuthRedirectPolicy::DesktopLoopback {
+            OAuthTransactions::for_desktop_return(configuration, store.clone(), redirect.clone())
+                .unwrap()
+        } else {
+            OAuthTransactions::new(configuration, store.clone())
+        },
+    );
     let exchange = Arc::new(
         GoogleCodeExchange::new(
             policy.configuration().clone(),

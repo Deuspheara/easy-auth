@@ -18,11 +18,15 @@ impl AuthorizationExchange {
             Self::SessionAge(value) | Self::AccountDeletion(value) => value.configuration(),
         }
     }
-    pub async fn authorization_url(&self, start: &OAuthStart) -> Result<OidcAuthorizationUrl> {
+    pub async fn authorization_url(
+        &self,
+        start: &OAuthStart,
+        redirect: &str,
+    ) -> Result<OidcAuthorizationUrl> {
         match self {
-            Self::Ordinary(value) => value.authorization_url(start).await,
+            Self::Ordinary(value) => value.authorization_for_return(start, redirect).await,
             Self::SessionAge(value) | Self::AccountDeletion(value) => {
-                value.authorization_url(start).await
+                value.authorization_for_return(start, redirect).await
             }
         }
     }

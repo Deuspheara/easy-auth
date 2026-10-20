@@ -7,3 +7,5 @@ mod provider;
 mod resources;
 mod setup;
 use crate::google_desktop::test_socket as socket;
+
+mod stable;

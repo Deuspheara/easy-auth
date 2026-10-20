@@ -20,13 +20,26 @@ use auth_core::{OAuthRequest, OAuthTransactionRepository, Result};
 #[async_trait]
 impl OAuthTransactionRepository for Postgres {
     async fn save_oauth(&self, request: &OAuthRequest) -> Result<i64> {
-        transactions::save(&self.pool, request).await
+        transactions::save(&self.pool, request, request.configuration.redirect()).await
     }
     async fn consume_oauth(&self, request: &OAuthRequest) -> Result<i64> {
-        transactions::take(&self.pool, request).await
+        transactions::take(&self.pool, request, request.configuration.redirect()).await
     }
     async fn cancel_oauth(&self, request: &OAuthRequest) -> Result<()> {
-        transactions::take(&self.pool, request).await.map(|_| ())
+        transactions::take(&self.pool, request, request.configuration.redirect())
+            .await
+            .map(|_| ())
+    }
+    async fn save_oauth_return(&self, request: &OAuthRequest, redirect: &str) -> Result<i64> {
+        transactions::save(&self.pool, request, redirect).await
+    }
+    async fn consume_oauth_return(&self, request: &OAuthRequest, redirect: &str) -> Result<i64> {
+        transactions::take(&self.pool, request, redirect).await
+    }
+    async fn cancel_oauth_return(&self, request: &OAuthRequest, redirect: &str) -> Result<()> {
+        transactions::take(&self.pool, request, redirect)
+            .await
+            .map(|_| ())
     }
 }
 

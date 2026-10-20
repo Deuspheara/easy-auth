@@ -15,6 +15,11 @@ pub(super) async fn lock(
     configuration: &OAuthConnection,
     purpose: &OAuthPurpose,
 ) -> Result<Owner> {
+    if configuration.redirect_policy() == auth_core::OAuthRedirectPolicy::DesktopLoopback
+        && !matches!(purpose, OAuthPurpose::SignIn)
+    {
+        return Err(Error::Unauthorized);
+    }
     let realm = configuration.realm();
     match purpose {
         OAuthPurpose::SignIn => Ok(Owner {

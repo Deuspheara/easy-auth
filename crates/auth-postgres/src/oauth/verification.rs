@@ -4,6 +4,9 @@ use auth_core::{Error, OAuthExchange, Result};
 use sqlx::PgPool;
 
 pub(super) async fn check(pool: &PgPool, exchange: &OAuthExchange) -> Result<i64> {
+    if !exchange.configuration().permits_return(exchange.redirect()) {
+        return Err(Error::Unauthorized);
+    }
     let mut tx = pool.begin().await.map_err(unavailable)?;
     configuration::lock(&mut tx, exchange.configuration()).await?;
     let owner = ownership::lock(&mut tx, exchange.configuration(), exchange.purpose()).await?;

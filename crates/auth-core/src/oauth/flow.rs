@@ -20,9 +20,14 @@ pub struct OAuthExchange {
     purpose: OAuthPurpose,
     expires_us: i64,
     proof: OAuthBrowserProof,
+    redirect: String,
 }
 
 impl OAuthExchange {
+    /// Exact admitted operation return; wire exchange must not substitute the anchor.
+    pub fn redirect(&self) -> &str {
+        &self.redirect
+    }
     pub fn configuration(&self) -> &OAuthConnection {
         &self.configuration
     }
@@ -40,6 +45,7 @@ impl OAuthExchange {
 pub struct OAuthTransactions {
     configuration: OAuthConnection,
     repository: Arc<dyn OAuthTransactionRepository>,
+    redirect: String,
 }
 
 impl OAuthTransactions {
@@ -53,15 +59,39 @@ impl OAuthTransactions {
         repository: Arc<dyn OAuthTransactionRepository>,
     ) -> Self {
         Self {
+            redirect: configuration.redirect().to_owned(),
             configuration,
             repository,
         }
+    }
+    /// Trusted native construction only, after binding the actual listener.
+    pub fn for_desktop_return(
+        configuration: OAuthConnection,
+        repository: Arc<dyn OAuthTransactionRepository>,
+        redirect: super::OAuthRedirect,
+    ) -> Result<Self> {
+        if configuration.redirect_policy() != super::OAuthRedirectPolicy::DesktopLoopback
+            || !configuration.permits_return(redirect.as_str())
+        {
+            return Err(Error::InvalidInput);
+        }
+        Ok(Self {
+            configuration,
+            repository,
+            redirect: redirect.as_str().to_owned(),
+        })
+    }
+    pub fn redirect(&self) -> &str {
+        &self.redirect
     }
     pub async fn begin(&self, intent: &OAuthIntent<'_>) -> Result<OAuthStart> {
         let state = Secret::generate()?;
         let proof = OAuthBrowserProof::generate()?;
         let request = self.request(intent, &state, &proof)?;
-        let expires_us = self.repository.save_oauth(&request).await?;
+        let expires_us = self
+            .repository
+            .save_oauth_return(&request, &self.redirect)
+            .await?;
         Ok(OAuthStart {
             state,
             proof,
@@ -75,14 +105,23 @@ impl OAuthTransactions {
         proof: OAuthBrowserProof,
         callback: OAuthCallback<'_>,
     ) -> Result<OAuthExchange> {
-        self.configuration.validate_callback(&callback)?;
+        if self.redirect == self.configuration.redirect() {
+            self.configuration.validate_callback(&callback)?;
+        } else {
+            self.configuration
+                .validate_callback_at(&callback, &self.redirect)?;
+        }
         let request = self.request(intent, state, &proof)?;
-        let expires_us = self.repository.consume_oauth(&request).await?;
+        let expires_us = self
+            .repository
+            .consume_oauth_return(&request, &self.redirect)
+            .await?;
         Ok(OAuthExchange {
             configuration: self.configuration.clone(),
             purpose: intent.purpose.clone(),
             expires_us,
             proof,
+            redirect: self.redirect.clone(),
         })
     }
     pub async fn cancel(
@@ -92,7 +131,9 @@ impl OAuthTransactions {
         proof: &OAuthBrowserProof,
     ) -> Result<()> {
         let request = self.request(intent, state, proof)?;
-        self.repository.cancel_oauth(&request).await
+        self.repository
+            .cancel_oauth_return(&request, &self.redirect)
+            .await
     }
     fn request(
         &self,
@@ -100,7 +141,9 @@ impl OAuthTransactions {
         state: &Secret,
         proof: &OAuthBrowserProof,
     ) -> Result<OAuthRequest> {
-        if intent.source.is_empty()
+        if (self.configuration.redirect_policy() == super::OAuthRedirectPolicy::DesktopLoopback
+            && !matches!(intent.purpose, OAuthPurpose::SignIn))
+            || intent.source.is_empty()
             || intent.source.len() > 256
             || intent.source.chars().any(char::is_control)
             || matches!(intent.purpose,

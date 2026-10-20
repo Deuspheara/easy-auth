@@ -429,12 +429,13 @@ an ambient session. Retained rows expire at their original deadline.
 `OidcSignIn` to obtain an atomic current-policy/session/audit commit. Registration,
 launcher success, callback receipt and signature verification alone issue no session.
 
-Current lifecycle limitation: persisting a different ephemeral redirect rotates the
-source revision. Existing source-bound sessions then fail their current-revision
+For the original exact native profile, persisting a different ephemeral redirect
+rotates the source revision. Existing source-bound sessions then fail their current-revision
 guard even if their stored rows are unrevoked. The regression proves both that
 denial and a subsequent same-subject sign-in retaining its original owner. Do not
-relax exact redirects or revision checks to bypass this limitation. A reviewed
-registration/concurrent-client lifecycle is required before ordinary native use.
+relax exact redirects or revision checks to bypass this limitation. The explicit
+stable profile below separates port changes from registration changes. Actual
+provider/OS and broader lifecycle acceptance remain required before ordinary use.
 
 Owned acceptance uses actual child processes, IPv4/IPv6 sockets, PostgreSQL and
 RS256 signatures. Private Python actors replace the opener only inside tests;
@@ -445,3 +446,52 @@ interoperability. Run with the documented PostgreSQL setup:
 ```sh
 CARGO_INCREMENTAL=0 cargo test --locked -p easy-auth-server --features google-desktop-launch,oidc-identities --lib google_desktop::operation
 ```
+
+
+## Stable native registration and per-attempt return
+
+Select `OAuthRedirectPolicy::DesktopLoopback` only through trusted registration:
+create the original canonical owned-listener anchor using `OAuthConnection::with_redirect`,
+then call `with_desktop_loopback_returns()` before persisting its identity policy.
+Retain the complete returned policy/anchor as stable trusted configuration. On
+restart, load it with `load_or_initialize_oidc_identity_policy`; do not replace
+its anchor with the newly chosen port or administratively reapply configuration.
+The existing exact profile stays the default, including HTTPS-only web admission.
+
+For each actual owned listener, construct its matching transactions:
+
+```rust
+let transactions = Arc::new(OAuthTransactions::for_desktop_return(
+    stable_policy.configuration().clone(),
+    repository.clone(),
+    listener.redirect().clone(),
+)?);
+let operation_service = Arc::new(GoogleAuthorization::new(transactions, google_exchange)?);
+let mut attempt = GoogleDesktopSignIn::begin(listener, operation_service, source).await?;
+let completion = attempt.run(cancellation).await?;
+```
+
+`google_exchange` uses the same stable persisted configuration/repositories.
+`GoogleAuthorization::redirect()` is this operation's exact URI;
+`configuration().redirect()` remains the stable registration anchor. Only canonical
+literal IPv4/IPv6 loopback, a concrete nonzero/nondefault port and the registered
+path are accepted. No web relaxation, arbitrary host/URI override, query/fragment,
+localhost or mobile return is provided. The profile supports sign-in only.
+
+Migration0020 retains old registrations as exact and binds each pending operation's
+actual URI. Drain older OAuth writers and deploy the matching adapter/schema
+together; older writers omit the new required column. Mixed-version rolling
+upgrade/downgrade is not supported by this checkpoint. Authorization, callback, cancellation and token POST use that exact
+URI. A different admitted port cannot consume/cancel its neighbor's operation.
+Mapping and local commit still use the stable source snapshot; reopen/concurrent
+ports preserve existing sessions. Operator disable or actual configuration/policy
+change remains authoritative and invalidates old contexts/sessions. New repository
+methods default to rejection for alternate returns on unextended backends.
+
+Existing low-level authorization-URL helpers reject the new desktop profile because
+a bare start does not carry its exact return. Use this shared Google authorization
+operation to propagate the per-attempt URI; exact-profile helpers remain unchanged.
+No session is issued until mapping and atomic sign-in commit. The original bounded
+launcher and explicit cancellation/drop rules apply. See
+[ADR0020](../architecture/adr/0020-native-oauth-operation-returns.md) for migration,
+compatibility, threat boundaries and the remaining activation gates.

@@ -362,3 +362,10 @@ redirect rotates source revision and deliberately invalidates previous source
 sessions. That existing guard is preserved and regression-tested; stable registration
 and concurrent native lifecycle require further design before ordinary activation.
 See the [native operation guide](../../guides/google.md#owned-native-sign-in-operation).
+
+
+The subsequent [ADR0020](0020-native-oauth-operation-returns.md) adds an explicit
+stable native registration profile and exact per-operation return persistence. It
+resolves port-only reopen/concurrency invalidation without weakening the existing
+exact profile or actual administrative source-revision invalidation. This is a
+component boundary, not ordinary Google/native activation or OS interoperability.

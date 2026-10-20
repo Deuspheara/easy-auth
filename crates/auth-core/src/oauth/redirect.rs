@@ -14,9 +14,10 @@ impl OAuthRedirect {
         Ok(Self(value.to_owned()))
     }
 
-    /// Call only after owning the actual desktop listener. This validates its
-    /// address, not socket ownership or mobile/provider registration support.
-    /// Retain this exact URI through authorization, callback and code exchange.
+    /// Construct operation returns after owning the actual listener. Trusted
+    /// registration loading may restore a previously admitted anchor. This validates
+    /// the address, not ownership or provider/mobile support. Retain the exact
+    /// operation URI through authorization, callback and code exchange.
     pub fn desktop_loopback(listener: SocketAddr, path: &str) -> Result<Self> {
         if !matches!(listener.ip(), IpAddr::V4(ip) if ip == Ipv4Addr::LOCALHOST)
             && !matches!(listener.ip(), IpAddr::V6(ip) if ip == Ipv6Addr::LOCALHOST)
@@ -81,4 +82,24 @@ fn require_canonical_callback(url: &Url, value: &str) -> Result<()> {
         return Err(Error::InvalidInput);
     }
     Ok(())
+}
+
+// Profile admission is intentionally narrower than a URL prefix/wildcard. Both
+// canonical loopback literals are supported; the path is fixed by registration.
+pub(super) fn same_desktop_path(anchor: &str, actual: &str) -> bool {
+    fn canonical(value: &str) -> Option<Url> {
+        let url = bounded_url(value).ok()?;
+        let ip = match url.host()? {
+            url::Host::Ipv4(ip) => IpAddr::V4(ip),
+            url::Host::Ipv6(ip) => IpAddr::V6(ip),
+            _ => return None,
+        };
+        let redirect =
+            OAuthRedirect::desktop_loopback(SocketAddr::new(ip, url.port()?), url.path()).ok()?;
+        (redirect.as_str() == value).then_some(url)
+    }
+    match (canonical(anchor), canonical(actual)) {
+        (Some(anchor), Some(actual)) => anchor.path() == actual.path(),
+        _ => false,
+    }
 }

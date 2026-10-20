@@ -568,3 +568,17 @@ never resurrects consumed state. Signature completion alone grants no local sess
 The OS handler/configuration is trusted, not authenticated by exit status. Actual
 platform/browser and Google registration remain unverified. Rebinding an ephemeral
 redirect invalidates old source-revision sessions; this fail-closed guard stays intact.
+
+
+The explicit native registration profile admits only canonical literal127.0.0.1
+or::1 with fixed path and a concrete port, under RequireIssuer and sign-in purpose.
+It never relaxes HTTPS web defaults or establishes socket ownership. Each operation
+retains/persists its exact actual return; alternate admitted ports cannot consume
+or cancel another operation. Code exchange sends that retained URI. Stable source
+metadata includes the profile under the full registry lock; real disable/revision
+changes still invalidate contexts and sessions. Existing pending hashes, private
+browser/nonce/PKCE, realm/subject/owner separation, one-use and final database caps
+remain mandatory. Legacy backends reject alternate returns instead of substituting
+the anchor. Migration defaults old definitions to exact and preserves original
+proofs/caps. Owned fixtures, process actors and offline signatures do not establish
+Google registration, OS-browser interoperability or native remote-token authority.

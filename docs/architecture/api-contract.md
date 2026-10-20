@@ -461,3 +461,13 @@ verified completion still needs mapping and atomic sign-in. Transport cancellati
 is distinct from committed pending-state cancellation. See the
 [native operation contract](../guides/google.md#owned-native-sign-in-operation)
 for original caps, child cleanup, drop semantics and source-revision limitations.
+
+
+Optional native composition adds `OAuthRedirectPolicy`, the explicit trusted
+`OAuthConnection::with_desktop_loopback_returns` profile builder,
+`OAuthTransactions::for_desktop_return` and readonly operation `redirect()` getters.
+`OAuthStart`/`OAuthRequest` fields and existing repository methods stay unchanged.
+New `save_oauth_return`/`consume_oauth_return`/`cancel_oauth_return` methods bind exact
+operation URIs; their defaults reject alternate returns on unextended backends.
+The default profile remains exact. This adds no HTTP/OpenAPI route or remote token
+contract. See the [stable native contract](../guides/google.md#stable-native-registration-and-per-attempt-return).

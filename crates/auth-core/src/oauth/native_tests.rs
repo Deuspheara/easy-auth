@@ -155,3 +155,62 @@ fn explicit_redirect_preserves_metadata_validation_and_reconfiguration_is_fresh(
     let web = connection(OAuthRedirect::https("https://app.example/callback").unwrap());
     assert_eq!(web.redirect(), "https://app.example/callback");
 }
+
+#[test]
+fn desktop_registration_is_explicit_issuer_bound_and_keeps_a_stable_anchor() {
+    let exact = connection(
+        OAuthRedirect::desktop_loopback("127.0.0.1:49153".parse().unwrap(), "/oauth/owned")
+            .unwrap(),
+    );
+    let profile = exact.clone().with_desktop_loopback_returns().unwrap();
+    assert_eq!(
+        profile.redirect_policy(),
+        OAuthRedirectPolicy::DesktopLoopback
+    );
+    assert_eq!(profile.redirect(), exact.redirect());
+    assert_eq!(profile.revision(), exact.revision());
+    assert_ne!(profile, exact);
+    for actual in [
+        "http://127.0.0.1:49154/oauth/owned",
+        "http://[::1]:49155/oauth/owned",
+    ] {
+        assert!(profile.permits_return(actual));
+        assert!(!exact.permits_return(actual));
+    }
+    for actual in [
+        "http://127.0.0.2:49154/oauth/owned",
+        "http://0.0.0.0:49154/oauth/owned",
+        "http://localhost:49154/oauth/owned",
+        "https://127.0.0.1:49154/oauth/owned",
+        "http://127.0.0.1:0/oauth/owned",
+        "http://127.0.0.1:80/oauth/owned",
+        "http://127.0.0.1:49154/other",
+        "http://127.0.0.1:49154/oauth/owned?x=1",
+        "http://127.0.0.1:49154/oauth/owned#x",
+        "http://127.0.0.1:49154/oauth/%6fwned",
+        "http://user@127.0.0.1:49154/oauth/owned",
+        "http://127.1:49154/oauth/owned",
+    ] {
+        assert!(!profile.permits_return(actual));
+    }
+    let updated = profile.reconfigured();
+    assert_eq!(updated.redirect_policy(), profile.redirect_policy());
+    assert_ne!(updated.revision(), profile.revision());
+    assert!(
+        connection(OAuthRedirect::https("https://app.example/return").unwrap())
+            .with_desktop_loopback_returns()
+            .is_err()
+    );
+    let dedicated = OAuthConnection::with_redirect(
+        exact.realm(),
+        exact.connection(),
+        exact.client(),
+        exact.issuer(),
+        exact.provider_client(),
+        OAuthRedirect::desktop_loopback("127.0.0.1:49153".parse().unwrap(), "/oauth/owned")
+            .unwrap(),
+        OAuthMixupDefense::DedicatedRedirect,
+    )
+    .unwrap();
+    assert!(dedicated.with_desktop_loopback_returns().is_err());
+}

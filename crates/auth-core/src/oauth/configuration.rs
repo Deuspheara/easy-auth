@@ -8,6 +8,13 @@ pub enum OAuthMixupDefense {
     DedicatedRedirect,
 }
 
+/// Trusted registration policy. An actual callback is always exact per operation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum OAuthRedirectPolicy {
+    Exact,
+    DesktopLoopback,
+}
+
 /// Trusted server configuration, never reconstructed from callback parameters.
 /// Persist it before use and retain the returned fresh database configuration.
 #[must_use = "Use the persisted connection revision to construct OAuthTransactions"]
@@ -21,6 +28,7 @@ pub struct OAuthConnection {
     provider_client: String,
     redirect: String,
     defense: OAuthMixupDefense,
+    redirect_policy: OAuthRedirectPolicy,
 }
 
 impl OAuthConnection {
@@ -79,7 +87,32 @@ impl OAuthConnection {
             provider_client: provider_client.to_owned(),
             redirect: redirect.into_string(),
             defense,
+            redirect_policy: OAuthRedirectPolicy::Exact,
         })
+    }
+    /// Explicit trusted desktop registration. The stored URI is a stable anchor;
+    /// each operation must separately retain its exact owned loopback return.
+    pub fn with_desktop_loopback_returns(mut self) -> Result<Self> {
+        if self.defense != OAuthMixupDefense::RequireIssuer
+            || !super::redirect::same_desktop_path(&self.redirect, &self.redirect)
+        {
+            return Err(Error::InvalidInput);
+        }
+        self.redirect_policy = OAuthRedirectPolicy::DesktopLoopback;
+        Ok(self)
+    }
+    pub fn redirect_policy(&self) -> OAuthRedirectPolicy {
+        self.redirect_policy
+    }
+    /// Repository admission only, never proof of listener ownership or delivery.
+    /// Desktop registrations allow only canonical literal loopback and fixed path.
+    pub fn permits_return(&self, actual: &str) -> bool {
+        match self.redirect_policy {
+            OAuthRedirectPolicy::Exact => actual == self.redirect,
+            OAuthRedirectPolicy::DesktopLoopback => {
+                super::redirect::same_desktop_path(&self.redirect, actual)
+            }
+        }
     }
     pub fn realm(&self) -> Uuid {
         self.realm
@@ -123,7 +156,14 @@ impl OAuthConnection {
     }
 
     pub(super) fn validate_callback(&self, callback: &super::OAuthCallback<'_>) -> Result<()> {
-        if callback.redirect != self.redirect
+        self.validate_callback_at(callback, &self.redirect)
+    }
+    pub(super) fn validate_callback_at(
+        &self,
+        callback: &super::OAuthCallback<'_>,
+        expected: &str,
+    ) -> Result<()> {
+        if callback.redirect != expected
             || callback.issuer.is_some_and(|issuer| issuer != self.issuer)
             || (self.defense == OAuthMixupDefense::RequireIssuer && callback.issuer.is_none())
         {

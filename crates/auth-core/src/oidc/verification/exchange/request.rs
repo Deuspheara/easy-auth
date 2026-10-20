@@ -65,7 +65,7 @@ impl OidcTokenRequest {
         let mut form = url::form_urlencoded::Serializer::new(String::new());
         form.append_pair("grant_type", "authorization_code")
             .append_pair("code", &code.0)
-            .append_pair("redirect_uri", exchange.configuration().redirect())
+            .append_pair("redirect_uri", exchange.redirect())
             .append_pair("code_verifier", exchange.proof().pkce_verifier().expose());
         let authorization = match authentication {
             OidcClientAuthentication::Public => {

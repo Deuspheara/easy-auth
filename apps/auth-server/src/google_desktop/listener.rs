@@ -40,8 +40,9 @@ impl GoogleDesktopListener {
         })
     }
 
-    /// Persist this exact redirect/revision before constructing the Google flow.
-    /// Retain this listener until receive completes or it is explicitly dropped.
+    /// Match this concrete URI to the operation return. Exact registrations persist
+    /// it; stable desktop registrations separately admit it after binding. Retain
+    /// this listener until receive completes or it is explicitly dropped.
     pub fn redirect(&self) -> &OAuthRedirect {
         &self.redirect
     }

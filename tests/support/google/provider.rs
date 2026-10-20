@@ -70,7 +70,18 @@ impl Provider {
     // The browser-facing provider sees only the public authorization request's
     // S256 challenge, nonce and exact redirect, never the private browser proof.
     pub fn issue(&self, code: &Secret, pkce: Verifier, c: &OAuthConnection, claims: Value) {
+        self.issue_for_return(code, pkce, c, c.redirect(), claims);
+    }
+    pub fn issue_for_return(
+        &self,
+        code: &Secret,
+        pkce: Verifier,
+        c: &OAuthConnection,
+        redirect: &str,
+        claims: Value,
+    ) {
         assert_eq!(c.provider_client(), CLIENT);
+        assert!(c.permits_return(redirect));
         assert!(
             self.grants
                 .lock()
@@ -79,7 +90,7 @@ impl Provider {
                     code.verifier(),
                     Grant {
                         claims,
-                        redirect: c.redirect().to_owned(),
+                        redirect: redirect.to_owned(),
                         pkce
                     }
                 )
