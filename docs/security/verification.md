@@ -3709,3 +3709,34 @@ Tests separate binding, completion, cancellation, resources, actor and setup;
 all new files stay under300lines. Longer ordered scenarios retain negative, observed
 resource outcomes and positive controls together as justified function-size
 exceptions. No unrelated cleanup or persistence refactor is deferred.
+
+## AUTH-23 connect-reset closure observation — 2026-10-20
+
+A full native-policy regression run reached the server suite and failed the
+missing-opener case at the shared closure observer: macOS returned ConnectionReset
+from connect, before a stream existed. The preceding launcher-error assertion
+passed. This is an observed infrastructure-probe outcome, not evidence of an
+application authorization failure or a proven listener leak. Its exact kernel
+cause is not established.
+
+The shared test-only observer now permits a connect reset/abort to spend another
+observation inside its original three-attempt budget. Only actual ConnectionRefused
+can establish closure. EOF/reset, a closing live listener, data, idle/budget
+exhaustion and unexpected errors cannot become successful closure. No application
+retry, security assertion removal, timeout extension or policy change is introduced.
+The existing distinct-source collision guard and live-listener controls remain.
+
+A new controlled case requires a real socket refusal after an injected first reset,
+rejects reset/abort-only exhaustion and preserves unexpected PermissionDenied as
+an infrastructure error. It is fault-classification evidence, not a deterministic
+reproduction of the macOS kernel event. Actual transport controls pass12 cases;
+the current owned-process/PostgreSQL native operation suite passes18. Strict locked
+all-feature workspace/all-target Clippy and formatting pass. This observer fix is
+published separately from the native registration behavior. Full final native-policy
+acceptance remains subject to its complete rerun and exact-head hosted verification.
+
+The262-line shared fixture keeps the bounded observer and its fault-injection seam
+private to tests. The longer ordered control retains budget/non-success/error and
+actual-network assertions together as a function-size exception. The fixture is
+imported once per binary; repeated controls are not additional authentication
+scenarios. No unrelated cleanup is deferred.

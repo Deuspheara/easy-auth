@@ -56,14 +56,40 @@ pub(super) async fn stopped(uri: &url::Url) {
     );
 }
 
-async fn observe_closed(target: SocketAddr, mut observer: TcpSocket) -> std::io::Result<bool> {
+async fn observe_closed(target: SocketAddr, observer: TcpSocket) -> std::io::Result<bool> {
+    observe_with(target, observer, move |socket| async move {
+        socket.connect(target).await
+    })
+    .await
+}
+
+async fn observe_with<F, Fut>(
+    target: SocketAddr,
+    mut observer: TcpSocket,
+    mut connect: F,
+) -> std::io::Result<bool>
+where
+    F: FnMut(TcpSocket) -> Fut,
+    Fut: std::future::Future<Output = std::io::Result<TcpStream>>,
+{
     use std::io::{Error, ErrorKind};
     for _ in 0..MAX_CLOSURE_OBSERVATIONS {
-        let connected = tokio::time::timeout(CLOSURE_STEP_TIMEOUT, observer.connect(target))
+        let connected = tokio::time::timeout(CLOSURE_STEP_TIMEOUT, connect(observer))
             .await
             .map_err(|_| Error::new(ErrorKind::TimedOut, "closure connection timed out"))?;
         let stream = match connected {
             Err(error) if error.kind() == ErrorKind::ConnectionRefused => return Ok(true),
+            // A reset during connect is no stronger than a reset while reading.
+            // Spend another original-budget observation; only refusal proves closure.
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    ErrorKind::ConnectionReset | ErrorKind::ConnectionAborted
+                ) =>
+            {
+                observer = distinct_observer(target, bound_socket(target));
+                continue;
+            }
             Err(error) => return Err(error),
             Ok(stream) => stream,
         };
@@ -180,5 +206,57 @@ mod tests {
         );
         release.send(()).unwrap();
         task.await.unwrap();
+    }
+    #[tokio::test]
+    async fn connect_resets_require_actual_refusal_and_cannot_exhaust_the_budget_into_success() {
+        use std::{
+            io::{Error, ErrorKind},
+            sync::atomic::{AtomicUsize, Ordering},
+        };
+        let reserved = bound_socket("127.0.0.1:0".parse().unwrap());
+        let target = reserved.local_addr().unwrap();
+        let observer = distinct_observer(target, reserved);
+        let calls = AtomicUsize::new(0);
+        assert!(
+            observe_with(target, observer, |socket| {
+                let first = calls.fetch_add(1, Ordering::SeqCst) == 0;
+                async move {
+                    if first {
+                        drop(socket);
+                        Err(Error::from(ErrorKind::ConnectionReset))
+                    } else {
+                        socket.connect(target).await
+                    }
+                }
+            })
+            .await
+            .expect("test infrastructure: actual refusal after controlled reset")
+        );
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
+        for kind in [ErrorKind::ConnectionReset, ErrorKind::ConnectionAborted] {
+            let calls = AtomicUsize::new(0);
+            let observer = distinct_observer(target, bound_socket(target));
+            assert!(
+                !observe_with(target, observer, |socket| {
+                    calls.fetch_add(1, Ordering::SeqCst);
+                    async move {
+                        drop(socket);
+                        Err(Error::from(kind))
+                    }
+                })
+                .await
+                .unwrap(),
+                "disconnects alone never prove listener closure"
+            );
+            assert_eq!(calls.load(Ordering::SeqCst), MAX_CLOSURE_OBSERVATIONS);
+        }
+        let observer = distinct_observer(target, bound_socket(target));
+        let error = observe_with(target, observer, |socket| async move {
+            drop(socket);
+            Err(Error::from(ErrorKind::PermissionDenied))
+        })
+        .await
+        .unwrap_err();
+        assert_eq!(error.kind(), ErrorKind::PermissionDenied);
     }
 }
