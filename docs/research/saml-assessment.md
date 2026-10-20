@@ -4,6 +4,11 @@ Assessment date: 2026-10-18. **No production verifier is selected. SAML remains 
 
 ## Current selection checkpoint — 2026-10-20
 
+The subsequent [root-cause and alternatives investigation](saml-verifier-options.md)
+compares identical corpus bytes through both unchanged pins, recommends conditional
+qualification of the complete strict message component, and records exact-policy
+and independent-review blockers. No production candidate is selected.
+
 **Do not select the current native candidate for production integration.** The
 generated signed Response/Assertion controls establish bounded trust, algorithm
 and extraction behavior, but the strict XML gate still fails. Additional passing

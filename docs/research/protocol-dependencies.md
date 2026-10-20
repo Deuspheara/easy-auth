@@ -245,3 +245,9 @@ Google metadata/JWKS admission and native request preparation are separate evide
 from signed identity, registered client or OS/browser interoperability; raw public
 keys establish no authentication. See the
 [preflight boundary](../guides/google.md#public-metadata-and-transport-preflight).
+
+The [cross-component root-cause investigation](saml-verifier-options.md) compares
+identical corpus bytes against both exact pins. It recommends qualifying the
+complete strict message component, conditional on exact algorithm/digest policy,
+independent resource evidence and security review. No production selection or
+SAML release-gate change follows from the passing bounded controls.
