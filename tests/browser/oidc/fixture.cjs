@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const {spawn,execFileSync} = require('node:child_process');
 const readline = require('node:readline');
 
-function start(binary, configuration, root) {
+function start(binary, configuration, root, {identityCases=false}={}) {
   const child = spawn(binary,[],{cwd:root,env:process.env,detached:true,stdio:['pipe','pipe','pipe']});
   const state = {removed:false,created:false,diagnostics:false,facts:null};
   let sequence = 0, pending, readyResolve, readyReject;
@@ -15,10 +15,11 @@ function start(binary, configuration, root) {
       const value=JSON.parse(line);
       if (value.database_created) {assert.equal(value.database_created,configuration.database_name);state.created=true;}
       if (['database_migration','connection_configuration','tls_configuration','document_configuration','exchange_configuration'].includes(value.phase)) state.phase=value.phase;
-      if (value.ready) readyResolve();
+      if (value.ready) {state.identity_capability=value.identity_capability===true;readyResolve();}
       if (['active_connections','missing_database','storage_failure'].includes(value.cleanup_failure)) state.cleanup_failure=value.cleanup_failure;
       if (value.database_removed) state.removed=true;
       if (value.facts) state.facts=value.facts;
+      if (value.identity_facts) state.identity_facts=value.identity_facts;
       if (pending && value.id===pending.id) {pending.resolve(value);pending=null;}
     } catch {
       const error=new Error('invalid private fixture IPC');
@@ -63,7 +64,8 @@ function start(binary, configuration, root) {
       assert.equal(code,0,'owned fixture must exit normally');
       assert.equal(state.removed,true,'normal database-removal receipt required');
       assert.equal(state.diagnostics,false,'no unexpected native diagnostics');
-      assert.deepEqual(state.facts,{users:0,sessions:0,audit:0,pending:0});
+      assert.deepEqual(state.facts,identityCases?{users:2,sessions:4,audit:4,pending:0}:{users:0,sessions:0,audit:0,pending:0});
+      if(identityCases)assert.deepEqual(state.identity_facts,{identities:1,provider_users:1,provider_contacts:0,oidc_sessions:3,weak_provider_sessions:0});
     }
   };
 }

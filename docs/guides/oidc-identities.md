@@ -3,7 +3,7 @@
 The core/PostgreSQL `oidc-identities` features add local provider identity resolution
 after the [transaction-bound verifier](oidc-verification.md). They enable no public
 callback route or ordinary server configuration. AUTH-30 remains In Progress pending
-acceptance; provider linking/unlinking is AUTH-25 and stronger-account recovery gates
+hosted publication/completion review; provider linking/unlinking is AUTH-25 and stronger-account recovery gates
 remain open. [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records policy.
 
 ## Trusted setup
@@ -101,3 +101,16 @@ consumed OAuth state. No database lock spans provider I/O or signature verificat
 Use [verification evidence](../security/verification.md) for exact test commands and
 limits. Signed software fixtures are not live-provider interoperability or an independent
 security review. No conformance, MFA/AAL certification or production-readiness claim is made.
+
+
+The [owned Keycloak acceptance](../../tests/browser/oidc/README.md) now runs nineteen
+cases, including actual local JIT/session commits, matching-email separation, signed
+missing-profile login, new-subject denial and live held-proof revision/disable
+rejection. It uses no production-provider credentials or user-device prompts. Its
+mailbox control is repository-bound proof, not SMTP delivery. This does not enable
+ordinary provider routes or complete linking/provider-only lifecycle gates.
+
+Local sessions retain the existing thirty-minute idle and seven-day absolute policy.
+ID-token/original-transaction expiry caps the minting commit; it does not become the
+local session lifetime. Current-source checks use local enabled configuration and
+revision, without per-request remote-user introspection or provider logout support.

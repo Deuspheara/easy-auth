@@ -5,8 +5,11 @@ mod cache_headers;
 mod client;
 mod database;
 mod fixture;
+#[cfg(feature = "oidc-identities")]
+mod identities;
 #[path = "../../src/oidc_http/post.rs"]
 mod post;
+mod protocol;
 #[path = "../../src/oidc_http/response.rs"]
 mod response;
 mod transactions;

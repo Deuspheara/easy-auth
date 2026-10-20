@@ -13,8 +13,8 @@ browser package; no new npm dependency or production provider account is needed:
 npm ci --ignore-scripts --prefix tests/browser/passkeys
 cd tests/browser/passkeys && npx --no-install playwright install chromium
 cd ../../..
-CARGO_INCREMENTAL=0 cargo build --locked -p easy-auth-server --example oidc-keycloak --features oidc-verification
-node tests/browser/oidc/run.cjs
+CARGO_INCREMENTAL=0 cargo build --locked -p easy-auth-server --example oidc-keycloak --features oidc-identities
+EASY_AUTH_OIDC_IDENTITIES=1 node tests/browser/oidc/run.cjs
 ```
 
 The runner owns a random loopback-only Keycloak container, random bootstrap/client/
@@ -58,12 +58,41 @@ corruption and captured-token substitution happen at the owned proxy, never insi
 Keycloak; other invalid claims are actually signed by the provider. These facts
 must remain distinct in any evidence or interoperability claim.
 
-Normal completion requires native zero exit, exact aggregate zero local users/
-sessions/audits/pending transactions, normal owned database removal and provider/
-private-file cleanup. Timeout cleanup can remove only the exact generated database
+The first eleven cases retain exact zero local users/sessions/audits/pending work
+before identity setup. Identity mode then runs eight additional named cases: an
+owned mailbox-proof control; fully verified default-deny; explicit JIT with a
+matching provider-verified email and no merge; bound-subject login without optional
+profile; a live verified/mapped proof rejected after policy revision; existing
+subject login under deny; denial of a different valid subject with usable selected
+display; and a live verified proof/session rejected after local disable.
+
+The owned provider uses the [documented client-scope administration
+API](https://www.keycloak.org/docs-api/26.8.1/rest-api/index.html): email is optional and asserted verified for the disposable primary user, and
+profile becomes optional to produce genuinely signed tokens with no name. A second
+owned user proves JIT denial is not missing-profile rejection. These are real
+provider-signed claims, without proxy claim rewriting. The mailbox control uses
+actual bound repository proof consumption, not SMTP delivery or seeded sessions.
+Only finite outcomes/counts/booleans cross the private result pipe; user IDs, local
+session secrets, provider tokens and credentials are not report fields.
+
+The private fixture explicitly configures and re-enables its latest local connection
+after the original disable case, then applies real administrative policy revisions.
+Held proofs remain opaque original mapped values, not reconstructed input. A live
+original-cap check prevents expiry from masquerading as the intended revision/disable
+denial. The returned optional provider authentication-time value is compared exactly to
+stored session provenance. Missing/old-time policy has separate signed-software
+PostgreSQL coverage; this native run does not assume the provider omits that claim.
+
+Normal identity completion requires native zero exit, exactly two users (mailbox
+and provider), four sessions/audits, zero pending work, one external identity and
+provider user, three genuine oidc sessions, and zero provider contacts/weak-method
+sessions. Original verification proxy totals remain 8 posts/7 successful token
+responses; full totals are 15/14 with the same one controlled signature mutation
+and one captured-token replay. Normal owned database, provider and private-file
+cleanup is mandatory. Timeout cleanup can remove only the exact generated database
 and owner-labeled container; emergency cleanup never converts a failed suite to a
-pass. No external-provider credentials, independent security audit, final local
-identity/session grant or production interoperability is established by this suite.
+pass. No production-provider credentials, independent security audit, public
+callback/ordinary activation or production interoperability is established here.
 
 `EASY_AUTH_OIDC_TEST_BINARY` can select a fixed owned producer copy.
 `EASY_AUTH_TEST_REPORT` creates a new immutable sanitized report with versions,
@@ -77,3 +106,14 @@ records `runner_admission_delays: false`. The original paced
 it established those named provider cases with explicit interoperation pauses.
 Core tests independently reproduce immediate callback/key admission and final
 native-retry lease boundaries; source/binary hashes distinguish the two producers.
+
+
+The [identity/JIT record](results/2026-10-20/keycloak-identity-jit.json) contains all
+**19** cases with `local_identity_cases: true` and no runner admission pacing.
+It retains original eleven-case assertions and records exact application/identity
+aggregates plus normal cleanup. Source/binary hashes identify its producer. CI
+requires identity mode and the compiled capability; it cannot silently run only
+the old cases. A separate verification-only example compile and core tests retain
+that optional-feature boundary. For explicit legacy compatibility, building with
+`oidc-verification` and omitting `EASY_AUTH_OIDC_IDENTITIES` still runs eleven cases
+and requires exact zero local authority. Earlier reports remain immutable.

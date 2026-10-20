@@ -417,3 +417,13 @@ checks stay with verification worker tests. Cache/preflight guards end before
 timers, and final authority/claim validation retains the operation lease. All
 changed implementation/test modules remain below300lines; longer ordered scenarios
 retain their observation, release and valid controls as reviewed size exceptions.
+
+
+AUTH-30's owned provider fixture keeps callback/state capture and replay in its
+private transactions module, protocol construction in a shared factory, identity
+command adaptation under the fixture, and state/evidence in named identity modules.
+The original Node verifier cases remain separate from the new identity scenarios.
+No production verifier constructor, database internals or HTTP hook is exposed.
+New files remain under300lines; longer ordered setup/command/case functions retain
+resource ownership, original proof handling, finite diagnostics and cleanup as
+reviewed size exceptions. No unrelated structural cleanup is deferred.

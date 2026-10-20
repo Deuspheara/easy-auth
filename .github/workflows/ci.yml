@@ -45,8 +45,11 @@ jobs:
         working-directory: tests/browser/passkeys
       - run: npx --no-install playwright install --with-deps chromium
         working-directory: tests/browser/passkeys
-      - run: cargo build --locked -p easy-auth-server --example oidc-keycloak --features oidc-verification
+      - run: cargo check --locked -p easy-auth-server --example oidc-keycloak --features oidc-verification
+      - run: cargo build --locked -p easy-auth-server --example oidc-keycloak --features oidc-identities
       - run: node tests/browser/oidc/run.cjs
+        env:
+          EASY_AUTH_OIDC_IDENTITIES: '1'
       - run: cargo build --locked -p easy-auth-axum --example passkey-browser --features passkey-signup
       - run: node tests/browser/passkeys/run.cjs
       - run: cargo build --locked -p easy-auth-server --example passkey-smtp-browser --features experimental-passkeys

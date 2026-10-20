@@ -13,7 +13,7 @@
 | Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
-| Enterprise OIDC verification/code exchange | Actual asymmetric signature/claim/refresh corpus, real PostgreSQL context/realm/deadline tests and 11 owned Keycloak/browser code+S256/RS256/rotation/replay cases using shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend proof boundary; local mapping/JIT/session issuance and ordinary provider routes unfinished |
+| Enterprise OIDC verification/code exchange and JIT | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 19 owned Keycloak/browser cases through actual local mapping/JIT/session commit; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session boundary; public routes, linking and complete provider lifecycle remain gated |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
 
@@ -133,3 +133,16 @@ while fresh/no-store semantics and fetch/forced-refresh rates remain unchanged.
 Actual immediate-callback/key-cache regressions and rotated-signature final-wait
 capacity controls supplement provider evidence; final authority keeps its operation
 lease on both signature attempts. These checks add no local session/JIT grant.
+
+
+## AUTH-30 owned Keycloak JIT/session acceptance — 2026-10-20
+
+The [new nineteen-case report](../../tests/browser/oidc/results/2026-10-20/keycloak-identity-jit.json)
+retains the eleven verifier cases and adds real provider-signed profile/email through
+local default-deny/explicit-allow JIT, no matching-email merge, profile-free bound
+subject login, new-subject deny and held-proof/current-session invalidation. Exact
+aggregates and normal owned cleanup are required. The mailbox control is actual
+repository proof rather than SMTP delivery; no account IDs/tokens/credentials are
+report fields. Cross-realm/client/issuer isolation and ordered lock races retain
+separate real-PostgreSQL signed-software evidence. No wider provider/native-device,
+conformance, ordinary route/activation or independent security claim is implied.

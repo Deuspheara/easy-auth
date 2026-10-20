@@ -1,3 +1,7 @@
+#[cfg(feature = "oidc-identities")]
+mod identities;
+#[cfg(feature = "oidc-identities")]
+use super::identities::Identities;
 use super::{
     FixtureResult,
     database::Database,
@@ -13,9 +17,12 @@ use std::{
     sync::{Arc, atomic::Ordering},
 };
 use uuid::Uuid;
+#[cfg(feature = "oidc-identities")]
+use zeroize::Zeroizing;
 
 struct Fixture {
     store: Arc<Postgres>,
+    pool: sqlx::PgPool,
     connection: OAuthConnection,
     transactions: OAuthTransactions,
     exchange: OidcCodeExchange,
@@ -23,6 +30,10 @@ struct Fixture {
     expected_subject: String,
     pending: Option<Pending>,
     replay: Option<Replay>,
+    #[cfg(feature = "oidc-identities")]
+    identities: Option<Identities>,
+    #[cfg(feature = "oidc-identities")]
+    credential: Zeroizing<String>,
 }
 impl Fixture {
     async fn new(mut config: Value, database: &Database) -> FixtureResult<Self> {
@@ -53,30 +64,18 @@ impl Fixture {
         let connection = store.configure_oauth_connection(&input).await?;
         send(json!({"phase":"tls_configuration"}))?;
         let http = Http::new(&issuer, address, certificate)?;
-        let origin = url::Url::parse(&issuer)?.origin().ascii_serialization();
-        send(json!({"phase":"document_configuration"}))?;
-        let documents = Arc::new(OidcDocuments::new(
-            connection.clone(),
-            &[&origin],
-            store.clone(),
-            http.clone(),
-        )?);
-        send(json!({"phase":"exchange_configuration"}))?;
         let secret = config["secret"]
             .take()
             .as_str()
             .ok_or("fixture credential")?
             .to_owned();
-        let exchange = OidcCodeExchange::new(
-            documents,
-            store.clone(),
-            OidcVerificationPolicy::new(&[OidcSigningAlgorithm::RS256], &[])?,
-            OidcClientAuthentication::ClientSecretBasic(OidcClientSecret::parse(secret)?),
-            http.clone(),
-        );
+        #[cfg(feature = "oidc-identities")]
+        let credential = Zeroizing::new(secret.clone());
+        let exchange = super::protocol::exchange(&connection, store.clone(), http.clone(), secret)?;
         Ok(Self {
             transactions: OAuthTransactions::new(connection.clone(), store.clone()),
             store,
+            pool: database.pool.clone(),
             connection,
             exchange,
             http,
@@ -86,6 +85,10 @@ impl Fixture {
                 .to_owned(),
             pending: None,
             replay: None,
+            #[cfg(feature = "oidc-identities")]
+            identities: None,
+            #[cfg(feature = "oidc-identities")]
+            credential,
         })
     }
     async fn begin(&mut self) -> auth_core::Result<Value> {
@@ -99,15 +102,19 @@ impl Fixture {
             purpose: OAuthPurpose::SignIn,
         };
         let start = self.transactions.begin(&intent).await?;
-        let authorization = self
-            .exchange
-            .authorization_url(&start, &["profile"])
-            .await?;
+        #[cfg(feature = "oidc-identities")]
+        let scopes = self
+            .identities
+            .as_ref()
+            .map_or(&["profile"][..], Identities::scopes);
+        #[cfg(not(feature = "oidc-identities"))]
+        let scopes = &["profile"];
+        let authorization = self.exchange.authorization_url(&start, scopes).await?;
         let response = json!({"result":"started","authorization":authorization.expose()});
         self.pending = Some(Pending { browser, start });
         Ok(response)
     }
-    async fn finish(&mut self, callback: &str) -> auth_core::Result<Value> {
+    async fn finish(&mut self, callback: &str, hold: bool) -> auth_core::Result<Value> {
         let pending = self.pending.take().ok_or(Error::InvalidInput)?;
         let (context, replay, code) = pending
             .consume(&self.transactions, &self.connection, callback)
@@ -118,6 +125,15 @@ impl Fixture {
             .exchange
             .exchange(context, OidcAuthorizationCode::parse(code?)?)
             .await?;
+        #[cfg(feature = "oidc-identities")]
+        if let Some(cases) = &mut self.identities {
+            return cases
+                .verified(identity, cap, &self.expected_subject, hold)
+                .await;
+        }
+        if hold {
+            return Err(Error::InvalidInput);
+        }
         Ok(
             json!({"result":"verified","subject_matches":identity.subject()==self.expected_subject,
             "email_absent":identity.email().is_none(),"email_verified":identity.email_verified(),
@@ -137,10 +153,16 @@ impl Fixture {
         match command["command"].as_str() {
             Some("begin") => self.begin().await,
             Some("finish") => {
-                self.finish(command["callback"].as_str().ok_or(Error::InvalidInput)?)
-                    .await
+                self.finish(
+                    command["callback"].as_str().ok_or(Error::InvalidInput)?,
+                    false,
+                )
+                .await
             }
             Some("replay_state") => self.replay_state().await,
+            Some("stats") => Ok(json!({"result":"facts","facts":facts(&self.pool).await?})),
+            #[cfg(feature = "oidc-identities")]
+            Some(name) if name.starts_with("identity_") => self.identity_command(command).await,
             Some("disable") => {
                 self.store
                     .disable_oauth_connection(
@@ -155,7 +177,7 @@ impl Fixture {
         }
     }
 }
-fn classified(result: auth_core::Result<Value>) -> Value {
+pub(super) fn classified(result: auth_core::Result<Value>) -> Value {
     match result {
         Ok(value) => value,
         Err(error) => json!({"result":match error {
@@ -170,7 +192,7 @@ pub(super) async fn run(
     input: &mut impl BufRead,
 ) -> FixtureResult<()> {
     let mut fixture = Fixture::new(config, database).await?;
-    send(json!({"ready":true}))?;
+    send(json!({"ready":true,"identity_capability":cfg!(feature="oidc-identities")}))?;
     while let Some(command) = read_command(input)? {
         if command["command"].as_str() == Some("close") {
             break;
@@ -182,7 +204,19 @@ pub(super) async fn run(
         response["id"] = command["id"].clone();
         send(response)?;
     }
-    let facts:(i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)").fetch_one(&database.pool).await?;
-    send(json!({"facts":{"users":facts.0,"sessions":facts.1,"audit":facts.2,"pending":facts.3}}))?;
+    let final_facts = json!({"facts":facts(&fixture.pool).await?});
+    #[cfg(feature = "oidc-identities")]
+    let final_facts = {
+        let mut value = final_facts;
+        if let Some(cases) = &fixture.identities {
+            value["identity_facts"] = cases.facts().await?;
+        }
+        value
+    };
+    send(final_facts)?;
     Ok(())
+}
+async fn facts(pool: &sqlx::PgPool) -> auth_core::Result<Value> {
+    let facts:(i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_audit),(SELECT count(*) FROM auth_oauth_transactions)").fetch_one(pool).await.map_err(|_|Error::Unavailable)?;
+    Ok(json!({"users":facts.0,"sessions":facts.1,"audit":facts.2,"pending":facts.3}))
 }

@@ -77,7 +77,29 @@ async function start(directory, origin, redirect) {
     const clientId = clients[0].id;
     let mapper;
     return {image:IMAGE, base, issuer:origin+'/realms/'+realm, client, secret, username, password,
-      subject:users[0].id, realm, stop,
+      subject:users[0].id, email:username+'@localhost.test', realm, stop,
+      async identityClaims() {
+        const scopes=await admin('/client-scopes');
+        const email=scopes.find(value=>value.name==='email');
+        assert.equal(typeof email?.id,'string','owned email scope exists');
+        await admin('/clients/'+clientId+'/optional-client-scopes/'+email.id,'PUT');
+        await admin('/users/'+users[0].id,'PUT',{username,enabled:true,email:username+'@localhost.test',emailVerified:true,firstName:'Owned',lastName:'Fixture'});
+      },
+      async optionalProfile() {
+        const scopes=await admin('/client-scopes');
+        const profile=scopes.find(value=>value.name==='profile');
+        assert.equal(typeof profile?.id,'string','owned profile scope exists');
+        await admin('/clients/'+clientId+'/default-client-scopes/'+profile.id,'DELETE');
+        await admin('/clients/'+clientId+'/optional-client-scopes/'+profile.id,'PUT');
+      },
+      async anotherUser() {
+        const username='other-'+owner,password=random();
+        await admin('/users','POST',{username,enabled:true,email:username+'@localhost.test',emailVerified:true,
+          firstName:'Other',lastName:'Fixture',credentials:[{type:'password',value:password,temporary:false}]});
+        const users=await admin('/users?username='+encodeURIComponent(username)+'&exact=true');
+        assert.equal(users.length,1);
+        return {username,password,subject:users[0].id};
+      },
       async rotate() {
         const keysBefore = await admin('/keys');
         await admin('/components','POST',{name:'owned-rotation',parentId:realmInfo.id,

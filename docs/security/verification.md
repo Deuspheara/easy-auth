@@ -2105,3 +2105,100 @@ These results do not establish hosted/native acceptance of the newer final resol
 Keycloak/browser reports remain immutable; the next provider run must exercise actual local
 JIT/session behavior with its own current source/binary fingerprint. AUTH-25 linking and
 AUTH-20's unresolved Safari recovery/independent-review gates remain open.
+
+
+## AUTH-30 owned Keycloak JIT/session acceptance — 2026-10-20
+
+AUTH-30 remains **In Progress** until hosted publication and final completion review.
+The [new immutable report](../../tests/browser/oidc/results/2026-10-20/keycloak-identity-jit.json)
+records **19** actual Keycloak/browser/PostgreSQL cases. It matches all **560** code/
+configuration hashes and its frozen producer binary. Source base is the separate
+fixture extraction commit plus the reported working-tree files; final Git-blob hash
+verification accompanies publication. Earlier eleven-case reports remain unchanged.
+
+Callback/state capture was first extracted without behavior change into a private
+transaction module and separately committed as `8974d0d`. All **11** original provider
+cases passed with exact zero user/session/audit/pending state, 8 application posts,
+7 successful provider token responses, one controlled signature mutation and one
+captured-token replay. All 554 source hashes and the fixed binary matched at extraction.
+Strict all-feature lint passed before that structural commit.
+
+The extension keeps those eleven cases intact, including their zero-state and proxy
+assertions before identity setup. It adds eight named scenarios:
+
+- An actual bound mailbox-repository proof as the existing-owner control; no seeded
+  user/session or SMTP/device-delivery claim.
+- A genuinely verified provider proof rejected by persisted JIT deny, without local
+  authority changes. It has a usable selected display claim, so missing profile cannot
+  masquerade as policy denial.
+- Explicit persisted allow with a provider-signed verified email matching the mailbox;
+  the local provider user is different, provider_required and has no local contact.
+- Actual optional-profile scope omission at Keycloak, yielding a signed missing-name
+  token that still resolves the bound subject and preserves local presentation.
+- An opaque proof held after code/signature verification, rejected after real policy
+  reconfiguration while its original cap is still live; earlier provider sessions
+  become unusable under the new revision.
+- Bound-subject login under deny despite missing optional profile.
+- A different enabled provider user with valid signature/nonce/audience and usable
+  selected display, rejected by JIT deny without provisioning.
+- A held verified proof rejected after local disable, plus rejection of the latest
+  provider session while the independent mailbox session remains usable.
+
+Email/profile scopes and the disposable provider users use actual owned administration
+APIs. The new claim cases do not rewrite token payloads at the proxy. Original controlled
+signature/token faults remain separately labeled. The native fixture explicitly applies
+and re-enables its latest configuration after the earlier deliberate disable; this is
+not an application fallback or automatic ordinary activation. Finite private outcome flags
+prove signature verification precedes final policy denial, and an original-cap-live check
+prevents timeout from counting as the intended revision/disable rejection. Infrastructure
+errors cannot satisfy exact Unauthorized assertions.
+
+Normal completion requires **2 users, 4 sessions, 4 audits, 0 pending transactions**; **1 external identity,
+1 provider-required user, 3 OIDC sessions, 0 provider contacts, 0 weak provider sessions**. Proxy
+counts are **15 posts / 14 successful provider token responses**, retaining exactly the original
+one signature mutation and one token replay. All three positive local provider sessions
+validate current source/ownership and preserve the returned optional authentication time.
+Missing/old auth_time semantics additionally retain their distinct signed-software tests;
+no inference is made that Keycloak necessarily omits it. Provider email never becomes local
+contact. Original OAuth/HTTP/verification admission bounds/cache headers remain unchanged,
+and the runner adds no admission delays.
+
+The owned database, owner-labeled Keycloak container and private directory are normally
+removed with native exit 0. Emergency cleanup and unexpected native diagnostics are false.
+No account IDs, local sessions, codes, assertions, passwords or provider credentials are
+report fields. The private fixture retains protected client credentials only for its
+administrative revision/service reconstruction; no production constructor or transport
+bypass is exposed. User devices, system security settings and credential managers are not
+accessed. No production-provider, public callback, wider native/client, conformance,
+independent security or ordinary activation claim follows.
+
+CI now compiles the verification-only example, builds the identity-capable producer and
+requires EASY_AUTH_OIDC_IDENTITIES=1. Capability, nineteen-case count, all original checks,
+new exact aggregates and normal cleanup are mandatory. Explicit legacy compatibility mode
+still requires eleven cases and zero local authority; it cannot satisfy identity-mode CI.
+
+Final local checks pass with CARGO_INCREMENTAL=0 and sequential real-PostgreSQL suites:
+formatting; strict default/all-feature workspace/all-target Clippy; strict verification-only
+example Clippy; **93 default** and **411 distinct all-feature** tests (278 PostgreSQL, 55 HTTP/PostgreSQL, 66 core,
+10 server, 2 Axum; logging child repeats an included core case), zero failures/ignored; compiled
+advisory/license/source/bans and npm audits; JavaScript syntax and documentation/diff checks.
+The inactive optional SQLx/MySQL RSA advisory remains visible. No package version, lockfile,
+production application behavior or migration changes in this fixture extension. Staged
+redacted secret scanning precedes publication.
+
+An initial new fixture compile used a sibling module path after moving private command
+adaptation; it was corrected before the native run. This is not counted as successful
+acceptance or an application authorization failure. The first complete nineteen-case run
+passed; no security assertion was removed to obtain it.
+
+Source review keeps private protocol construction, callback transactions, identity command
+adaptation, state/evidence and Node cases in separate named modules below 300 lines. Longer
+ordered setup/command/case bodies retain resource ownership, actual provider operation,
+finite outcomes and cleanup as documented size exceptions; no unrelated cleanup is deferred.
+The server feature forwards existing optional core/PostgreSQL capabilities and activates no
+ordinary route. Core/PG resolver evidence remains in the preceding checkpoint.
+
+CI run 39350358984 for `38fda0b` completed SUCCESS, verified from GitHub. The newly extended fixture
+requires its own hosted run before AUTH-30 completion. AUTH-25 linking, provider-only public
+lifecycle, AUTH-20's unresolved Safari/recovery evidence and the other first-release gates
+remain open independently.

@@ -2,7 +2,8 @@
 
 Date: 2026-10-20. Status: accepted for AUTH-30's optional core/PostgreSQL mapping,
 policy storage, JIT resolution and provider sessions. AUTH-30 remains In Progress
-pending complete verification/publication and owned-provider acceptance. Explicit
+pending hosted publication and completion review; owned Keycloak now exercises
+actual local JIT/session behavior. Explicit
 linking/unlinking remains AUTH-25; ordinary provider activation is not enabled.
 
 ## Context and identity boundary
@@ -138,3 +139,21 @@ and lock order visible. The longer owning transactions and ordered integration t
 are reviewed size exceptions. Owned-provider acceptance, final full-suite results and
 hosted CI are recorded in verification evidence; no conformance, independent audit,
 ordinary activation or production-readiness claim follows from component tests.
+
+
+## Owned provider acceptance
+
+The [nineteen-case record](../../../tests/browser/oidc/results/2026-10-20/keycloak-identity-jit.json)
+retains all eleven verifier cases and adds eight actual Keycloak code/S256/RS256
+identity cases. Real optional email/profile scopes produce provider-signed verified
+email and missing-name tokens; no proxy claim rewrite stands in for those cases.
+An actual repository-bound mailbox proof is a control, not SMTP/device evidence.
+Local policy revisions and disable reject held opaque proofs while their original
+caps are still live. Actual provider users demonstrate default deny, explicit allow,
+no matching-email merge, known-subject login without profile and new-subject deny.
+Only counts/booleans are reported; raw identities, credentials and sessions are not.
+The fixture owns all resources, requires normal cleanup and adds no production
+transport/configuration hook. CI requires the identity capability and all nineteen
+cases; verification-only builds remain checked. This is owned Keycloak evidence,
+not production-provider, public callback, native-device, independent-review or
+ordinary activation acceptance.

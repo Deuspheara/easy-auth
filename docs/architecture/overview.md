@@ -49,5 +49,6 @@ application rotates connection revision and cancels pending state atomically whi
 retaining disable. Mapping alone grants nothing; `OidcSignIn` consumes the mapped
 proof in an atomic current-policy/JIT/subject/session/audit transaction. Provider-only
 users have explicit policy and current source-bound sessions. Ordinary routes,
-linking and complete provider lifecycle/acceptance remain gated.
+linking and complete provider lifecycle remain gated. Owned Keycloak acceptance now
+extends through final JIT/session commit, with publication tracked separately.
 [ADR 0016](adr/0016-oidc-identity-mapping.md) records that boundary.

@@ -10,6 +10,7 @@ const keycloak = require('./keycloak.cjs');
 const tlsProxy = require('./proxy.cjs');
 const nativeFixture = require('./fixture.cjs');
 const {run} = require('./cases.cjs');
+const identitySuite=require('./identities.cjs');
 const root = path.resolve(__dirname,'../../..');
 
 async function main() {
@@ -17,10 +18,11 @@ async function main() {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(),'easy-auth-oidc-'));
   fs.chmodSync(directory,0o700);
   const binary = process.env.EASY_AUTH_OIDC_TEST_BINARY || path.join(root,'target/debug/examples/oidc-keycloak');
+  const identityCases=process.env.EASY_AUTH_OIDC_IDENTITIES==='1';
   const database_name='easy_auth_oidc_'+crypto.randomUUID().replaceAll('-','');
   const callbackPath='/callback/'+crypto.randomUUID();
   let redirect;
-  let proxy,provider,fixture,browser,failure,results,version;
+  let proxy,provider,fixture,browser,failure,results,version,verificationProxy;
   let providerRemoved=false,privateFilesRemoved=false;
   try {
     proxy=await tlsProxy.start(directory);
@@ -30,12 +32,15 @@ async function main() {
     proxy.connect(provider.base);
     fixture=nativeFixture.start(binary,{database_name,issuer:provider.issuer,client:provider.client,
       secret:provider.secret,redirect,subject:provider.subject,address:proxy.address,
-      certificate_der:proxy.certificate_der},root);
+      certificate_der:proxy.certificate_der},root,{identityCases});
     await fixture.ready;
+    if(identityCases)assert.equal(fixture.state.identity_capability,true,'identity-enabled native producer required');
     browser=await chromium.launch({headless:true,args:[
       '--host-resolver-rules=MAP fixture.invalid 127.0.0.1, MAP app.example 127.0.0.1, MAP * ~NOTFOUND','--no-proxy-server']});
     version=browser.version();
     results=await run(fixture,provider,proxy,browser,redirect);
+    verificationProxy={...proxy.facts};
+    if(identityCases)results.push(...await identitySuite.run(fixture,provider,proxy,browser,redirect));
   } catch(error) {failure=error;}
   finally {
     try {if(browser)await browser.close();} catch(error) {failure ||= error;}
@@ -56,7 +61,7 @@ async function main() {
   for(const field of ['fixture_database_removed','provider_container_removed','private_files_removed'])assert.equal(cleanup[field],true,'owned fixture cleanup');
   assert.equal(cleanup.fixture_exit,0);assert.equal(cleanup.emergency_database_cleanup,false);
   assert.equal(cleanup.unexpected_native_diagnostics,false);
-  assert.equal(results.length,11);
+  assert.equal(results.length,identityCases?19:11);
   const sources=execFileSync('git',['ls-files','--cached','--others','--exclude-standard','-z'],{cwd:root})
     .toString().split('\0').filter(name=>name&&!name.includes('/results/')&&
       (/\.(rs|sql|toml|cjs|js|html|json|yml|yaml)$/.test(name)||name==='Cargo.lock'));
@@ -67,17 +72,19 @@ async function main() {
     fixture_binary_sha256:crypto.createHash('sha256').update(fs.readFileSync(binary)).digest('hex'),
     source_sha256:sources.map(name=>({path:name,sha256:crypto.createHash('sha256')
       .update(fs.readFileSync(path.join(root,name))).digest('hex')})),
-    boundary:'real Keycloak code/S256 and RS256; real PostgreSQL state/context; production TLS builder/GET/POST/readers; private owned certificate/address mapping and TLS proxy; fresh isolated Chromium context with fixture-only certificate tolerance; no public login/session route or production override',
+    boundary:'real Keycloak code/S256 and RS256; real PostgreSQL state/context'+(identityCases?' and current-policy JIT/local source-bound session/audit commit':'')+'; production TLS builder/GET/POST/readers; private owned certificate/address mapping and TLS proxy; fresh isolated Chromium context with fixture-only certificate tolerance; no public login/session route or production override',
     limitations:['controlled signature corruption and captured-token replay occur at the owned proxy, not inside Keycloak',
       'Keycloak no-store discovery and JWKS headers are unchanged; real rotation does not establish the forced-refresh cache branch',
-      'no independent security audit, production-provider acceptance or local identity/session issuance'],
-    runner_admission_delays:false,cases:results,proxy:proxy.facts,database:fixture.state.facts,...cleanup};
+      identityCases?'mailbox control uses actual repository proof, not SMTP/device evidence; no independent audit, production-provider acceptance or ordinary provider route':'no independent security audit, production-provider acceptance or local identity/session issuance'],
+    local_identity_cases:identityCases,runner_admission_delays:false,cases:results,proxy:proxy.facts,verification_proxy:verificationProxy,database:fixture.state.facts,
+    ...(identityCases?{identity_database:fixture.state.identity_facts}:{}),...cleanup};
   if(process.env.EASY_AUTH_TEST_REPORT)fs.writeFileSync(process.env.EASY_AUTH_TEST_REPORT,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
-  console.log(JSON.stringify({passed:results.length,chromium:version,proxy:proxy.facts,database:fixture.state.facts,...cleanup}));
+  console.log(JSON.stringify({passed:results.length,chromium:version,proxy:proxy.facts,database:fixture.state.facts,
+    ...(identityCases?{identity_database:fixture.state.identity_facts}:{}),...cleanup}));
 }
 main().catch(error=>{
   // Never format browser/native messages, response data, assertions or IPC values.
-  const frame=error.stack?.match(/oidc\/(cases|browser|fixture|keycloak|proxy|run)\.cjs:(\d+)/);
+  const frame=error.stack?.match(/oidc\/(cases|identities|browser|fixture|keycloak|proxy|run)\.cjs:(\d+)/);
   console.error('Owned OIDC suite failed:',error.caseName||'startup/cleanup',error.stageName||'case',error.name,frame?frame[1]+':'+frame[2]:'fixture');
   process.exitCode=1;
 });
