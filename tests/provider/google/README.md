@@ -68,3 +68,10 @@ real-client/browser matrix with protected local inputs and explicit operator
 consent. Its input/owned-setup checks are not actual sign-in evidence. The restricted
 owned database fixture is now privately shared from root `tests/support/google/`;
 this extraction does not alter the original published preflight record.
+
+The later [registered Desktop sign-in record](results/2026-10-20/registered-native-signin.json)
+captures a successful base-profile run on macOS with operator-reported Helium,
+including signature verification, local session validation/revocation and independent
+database cleanup. Signed `auth_time` was absent; broader matrix, genuine freshness/
+deletion and ordinary activation remain open. Earlier preflight/preparation records
+retain their original narrower scope.

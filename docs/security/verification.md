@@ -4058,3 +4058,32 @@ that existing source file's SHA256, not a credential. The unpublished record now
 separates reused-source paths and digests into explicit fields; hashes are retained
 and reverified. No scanner rule/ignore or application/test behavior is changed.
 Publication still requires the complete staged scan to pass.
+
+## AUTH-23 registered Google native sign-in — 2026-10-20
+
+The owner supplied a locally downloaded Google Desktop registration and completed
+the real OS-browser sign-in/consent. The owner identified the browser as Helium;
+its version was not recorded. The host reports macOS 27.2, build 26B5086k.
+The [sanitized live record](../../tests/provider/google/results/2026-10-20/registered-native-signin.json)
+identifies source revision `ebac3d63cad8cfba7defab6c748ec4ed26296264` and the fixed
+producer previously built for the preparation record. Before this run, its SHA256,
+all 13 runtime overlay hashes, reused-source hashes and Cargo.lock were reverified.
+No production code, dependency, migration, policy or assertion changed for this run.
+
+Protected input validation and owned public-metadata/PostgreSQL setup both exited
+zero before browser interaction. The explicit `--run-manual-signin
+--disposable-account-consent` run then exited zero: actual Google signature verified,
+local session committed, validated and revoked. Scoped facts were one user, one
+identity, one revoked session, two audits and zero pending operations. The tool
+reported owned database removal; an independent query against the same documented
+loopback PostgreSQL server found zero `easy_auth_google_probe_` databases.
+The owner separately reported sign-in completed. No credential, client/account
+identifier, authorization URL, wire response, code or token is published.
+
+This is one registered Desktop, IPv4, `client_secret_post`, base-profile successful
+sign-in. Signed `auth_time` was absent; genuine freshness and deletion remain
+unaccepted. Other platforms/browsers, registered negative/cancellation cases,
+broader persistence/lifecycle, ordinary activation and independent review retain
+their separate gates. Local session revocation/database cleanup does not establish
+Google authorization-grant revocation. Historical preflight and preparation reports
+are unchanged and retain their narrower claims. AUTH-23 remains In Progress.

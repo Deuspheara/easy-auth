@@ -402,3 +402,10 @@ does not complete that manual mode. No ordinary activation, provider setting,
 remote token endpoint or security-policy fallback is introduced. The
 [manual procedure](../../../tests/provider/google/manual-native.md) retains actual
 platform/client, genuine freshness and usable lifecycle gates.
+
+The subsequent [registered native result](../../../tests/provider/google/results/2026-10-20/registered-native-signin.json)
+records one successful Desktop/base-profile operation on macOS with operator-reported
+Helium. Existing verification and transaction boundaries produced the local session,
+validated and revoked it, and removed the owned database. No signed `auth_time` was
+returned. This evidence narrows the basic native interoperability gap; it does not
+change the freshness/deletion policy or authorize ordinary activation.

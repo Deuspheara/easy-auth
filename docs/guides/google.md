@@ -559,7 +559,12 @@ or credential data. Local cleanup does not revoke a provider authorization grant
 
 See the [manual procedure and limits](../../tests/provider/google/manual-native.md).
 The example has offline signed/socket/database regression evidence and credential-
-free public owned-setup checks; actual registered Google/OS sign-in is unperformed.
+free public owned-setup checks. A later
+[registered Desktop/base-profile result](../../tests/provider/google/results/2026-10-20/registered-native-signin.json)
+passed on macOS with operator-reported Helium: actual signature verification,
+local session commit/validation/revocation and independent disposable DB cleanup.
+Signed `auth_time` was absent. This single result does not establish other browser/
+platform combinations or freshness/deletion acceptance.
 The explicit session-age profile cannot manufacture recent authentication or waive
 Google application eligibility. Ordinary activation, genuine freshness/deletion
 and broader lifecycle review remain gated.
