@@ -482,3 +482,12 @@ The browser runner separates owned lifetime/reporting, browser actions and named
 acceptance scenarios. All new modules remain below 300 lines. Longer setup and
 ordered scenario functions keep prerequisite proof, observed outcome and cleanup
 visible together; no application authorization is duplicated in fixture code.
+
+
+AUTH-56 first extracts existing server configuration without behavior changes:
+`configuration.rs` retains environment/public-origin/bind/realm composition and
+its existing public `configured_auth` signature. Named `configuration/mail.rs`,
+`database.rs` and `passwords.rs` own unchanged SMTP setup, PostgreSQL setup and
+password-corpus attachment. Validation order, defaults, bounds, TLS/development
+rules and secret-safe errors are preserved. This structural checkpoint is verified
+before adding OIDC startup semantics; no generic configuration framework is added.
