@@ -1,5 +1,4 @@
 mod boundary;
 mod lifecycle;
 mod setup;
-#[path = "../../../../../tests/support/google/socket.rs"]
-mod socket;
+use super::test_socket as socket;
