@@ -13,6 +13,8 @@ use auth_core::Auth;
 pub use browser::BrowserConfig;
 pub use contract::openapi;
 pub use handlers::sessions::authenticate;
+#[cfg(feature = "google-web")]
+pub use oidc::{GoogleWebServices, experimental_google_web_router, google_web_openapi};
 #[cfg(feature = "oidc-account-deletion")]
 pub use oidc::{
     OidcAccountDeletionServices, experimental_oidc_account_deletion_router,

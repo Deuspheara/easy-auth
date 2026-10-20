@@ -53,8 +53,12 @@ pub(super) async fn initiated(
     for (name, value) in attributes.as_object().unwrap() {
         claims[name] = value.clone();
     }
-    f.provider
-        .issue(&code, &start.transaction, f.policy.configuration(), claims);
+    f.provider.issue(
+        &code,
+        start.transaction.proof.pkce_verifier().verifier(),
+        f.policy.configuration(),
+        claims,
+    );
     Attempt {
         start: start.transaction,
         browser,

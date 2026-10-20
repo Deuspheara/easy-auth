@@ -686,3 +686,36 @@ and middleware call those focused helpers with their original cookie sets; no
 session selection, proof parsing, cancellation or storage policy moves. This
 behavior-preserving extraction precedes Google HTTP behavior and preserves all44
 existing OIDC HTTP/database regressions and strict all-target/all-feature Axum lint.
+
+
+The experimental Axum `oidc/google/` feature separates concrete service composition,
+routing, sign-in/deletion handlers, bound callback preparation, fixed GET bridge,
+reference pages, DTOs and OpenAPI. Thin handlers call the same core authorization
+and mapped commit use cases; no SQL, claim/freshness policy or provider engine moves
+into HTTP. Core/source snapshots remain explicit. Dedicated Google proof constants
+reuse the existing OIDC cookie/anonymous/revocation boundary. Generic OIDC behavior
+and normal server entry points are unchanged.
+
+HTTP regression modules separate binding, boundary/cookie hygiene, contract/bridge,
+actual lifecycle/concurrency, deletion and infrastructure/rollback. Their configured
+fixture stays below300lines; its longer constructor keeps the exact policy/profile/
+transaction/router snapshots visible together as a security-review exception.
+Ordered end-to-end binding/fault scenarios retain negative assertions and genuine
+signed positive controls together. The browser fixture separates owned process/DB
+lifecycle, public-input provider authorization and server composition; Node splits
+runner/process ownership from page cases. The longer ordered provider response
+builder is one fixture responsibility and a function-size exception. All new
+implementation/scenario modules stay below300lines; no unrelated cleanup is deferred.
+
+The shared signed provider fixture now takes the public S256 hash directly with
+its original trusted source snapshot. Existing PostgreSQL/native callers pass the
+same verifier hash they used before; the new HTTP/browser fixtures derive it from
+the actual public authorization request. Exact registered client, redirect, one-use
+code, private token authenticator and token-POST verifier checks are retained.
+No fixture reads the browser's private proof cookies to fabricate provider success,
+adds a production proof constructor or seeds local authority.
+
+The longer ordered browser case sequence deliberately retains one real account/
+session lifecycle through cancellation, old/missing proof refusal and final deletion
+so ownership retention and final aggregate facts remain directly observable. This
+is a function-size exception, not a generic scenario framework.

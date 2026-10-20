@@ -96,7 +96,7 @@ impl Fixture {
         }
         self.provider.issue(
             &code,
-            &start.transaction,
+            start.transaction.proof.pkce_verifier().verifier(),
             self.policy.configuration(),
             claims,
         );

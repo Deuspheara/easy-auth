@@ -43,6 +43,8 @@ jobs:
         run: cargo test --locked -p easy-auth-server --features google-desktop google_desktop
       - name: Verify owned Google desktop PostgreSQL acceptance
         run: cargo test --locked -p easy-auth-server --features google-desktop,oidc-identities --test google_desktop
+      - name: Verify Google HTTPS boundary without passkeys
+        run: cargo test --locked -p easy-auth-axum --features google-web --test browser google_web
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -59,6 +61,10 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-server --features google-desktop --example google-desktop-browser
           node tests/browser/google-desktop/run.cjs
+      - name: Verify owned Google HTTPS browser flow
+        run: |
+          cargo build --locked -p easy-auth-axum --features google-web --example google-web-browser
+          node tests/browser/google-web/run.cjs
       - run: node tests/browser/oidc/signin-client.cjs
       - name: Build and check supported OIDC startup composition
         run: |

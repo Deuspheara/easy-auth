@@ -508,6 +508,7 @@ version = "0.1.0-alpha.1"
 dependencies = [
  "async-trait",
  "axum",
+ "base64 0.22.1",
  "easy-auth-core",
  "easy-auth-postgres",
  "http-body-util",

@@ -3525,3 +3525,110 @@ Google HTTP/browser delivery, supported OS system-browser launch/return, registe
 provider/manual eligible-client freshness and a genuinely usable reviewed lifecycle
 remain open. AUTH-20's Safari recovery failure is unresolved. AUTH-23 remains
 In Progress; exact final-head hosted CI is tracked separately in Huly.
+
+
+## AUTH-23 experimental Google HTTPS composition checkpoint — 2026-10-20
+
+The opt-in Axum `google-web` composition now supplies actual HTTPS-only Google
+sign-in/deletion HTTP routes, fixed reference pages and a separate generated
+[OpenAPI contract](../architecture/openapi-google-web.json). Typed services require
+the eligible-client session-age profile and exact persisted snapshots. The router
+requires matching realm/origin/callback; private proof uses dedicated Google host
+cookies. GET only selects fixed UI through the existing core Google parser and one
+unique purpose-state match. Explicit POST still owns bound code/error completion,
+current-policy mapping and existing sign-in/deletion transactions. Stale/malformed
+callbacks cannot clear newer proof cookies. Repeated exact deletion confirmation,
+actual initiating owner/session/subject, genuine signed age and original caps remain.
+No production SQL, migration, cryptographic implementation, generic OIDC contract or
+ordinary server startup behavior changes. No unsupported reauthentication parameter
+or weak fallback is added.
+
+Before behavior, c41b711 extracts existing anonymous-session presence and explicit
+revocation proof-cookie hygiene without changing either OIDC composition. All44
+existing OIDC HTTP/PG cases and strict Axum all-target/all-feature lint pass at that
+structural boundary. Previous exact-head hosted CI
+[39403142719](https://github.com/Deuspheara/easy-auth/actions/runs/39403142719)
+at9d98136 is terminal success. It is not acceptance of this later HTTPS change.
+
+Seventeen new real HTTP/PostgreSQL cases cover exact Origin/closed input/bounds,
+protected cookies and logout hygiene, realm/private browser/state/nonce/PKCE binding,
+stale callback preservation, finite provider denial versus infrastructure failure,
+actual signed claims, one-use callback races, current owner/session/subject deletion,
+old/missing/malformed age and genuine positive controls, final audit rollback and
+contract/GET bridge isolation. The shared offline provider sees public authorization
+inputs, not the browser's private proof. Existing PG/native callers retain the same
+original hash, registered client/redirect, one-use code, token authenticator and
+verifier checks. The first15-case HTTP run had13passes and2fixture-setup failures:
+second realms attempted to reuse a globally unique callback. Distinct fixture
+origins correct that assumption; no schema constraint or authorization assertion
+was relaxed. The final17-case focused suite passes.
+
+Final checks use `CARGO_INCREMENTAL=0`, locked dependencies and actual PostgreSQL17.11:
+
+- `cargo fmt --all --check`.
+- `cargo clippy --locked --workspace --all-targets -- -D warnings`, and the same
+  with `--all-features`.
+- `cargo test --locked --workspace`: **97** tests.
+- `cargo test --locked --workspace --all-features`: **611** tests:2Axum unit,
+  116HTTP/database,94core,354PostgreSQL-crate,34server unit and11server integration.
+  The logging child repeats an included core case rather than another scenario.
+- `cargo test --locked -p easy-auth-axum --features google-web --test browser google_web`:
+  **17** tests without passkeys; all earlier99HTTP cases remain in the full suite.
+- Compiled-dependency audit, all-feature cargo-deny and pinned browser npm audit:
+  pass. Inactive SQLx/MySQL RSA0.9.10/RUSTSEC-2023-0071 remains explicitly visible;
+  no advisory exception. The only lockfile change is an Axum development edge to
+  the already selected base640.22.1, with no package/version update.
+
+All final test suites have zero failed/ignored cases. The fresh
+[owned HTTPS Chromium report](../../tests/browser/google-web/results/2026-10-20/chromium-https-code-flow.json)
+passes **13** browser cases and matches all **773** source hashes and its fixed
+rebuilt producer. Actual fixed pages/core/PostgreSQL perform code/signature/claim
+verification and session/deletion commits behind an owned HTTPS proxy. Google
+navigation is intercepted only in the isolated context; all other external traffic
+is blocked. Provider-denial/failure cancellation, bad-query fixed content,
+navigation restoration and fragment proof drop, signed nonce rejection, explicit
+sign-in, ambient switch denial, deletion cancellation/denial and old/missing/fresh
+signed time are exercised. The resulting account stays accessible through failed
+or cancelled deletion and is removed only after repeated confirmation and a valid
+signed proof. Callback URLs are scrubbed, script cookies/storage and foreign-detail
+reflection remain absent, and there are no unhandled page errors.
+
+Cleanup verifies exit0, normal owned database removal, no emergency cleanup or
+diagnostics, and temporary TLS file removal. Aggregate facts are zero users/
+identities/sessions/pending, two audit facts and five actual token POSTs/signatures.
+The private certificate exception is context-local; no real Google endpoint,
+provider setting, system/browser trust setting, vault or manual device prompt is
+involved. The owned provider/database failures have distinct fixed fixture failure
+categories, and are never accepted as credential rejection. No codes, tokens,
+assertions, private keys, screenshots, traces or browser storage state are recorded.
+The first12-case exploratory browser run also passed; the final13-case report adds
+an independent fragment-only client boundary, not another real-provider sample.
+
+File-tree/responsibility/visibility/naming review keeps modules below300lines and
+handlers thin; owning core/PG policy is reused. Longer ordered fixture construction,
+provider-response and browser/binding/fault scenarios retain invariants and actual
+positive controls together as documented function-size exceptions. No unrelated
+cleanup is deferred. Changed-document links and diff whitespace pass. The full
+staged publication receives redacted secret scanning before push. CI now runs the
+isolated HTTP feature and owned HTTPS browser suite alongside all earlier gates.
+
+This is experimental owned-component acceptance. Ordinary standalone Google
+configuration/activation, supported OS system-browser launch/return, actual
+registered/manual eligible-client freshness and a genuinely usable reviewed
+provider lifecycle remain open. AUTH-20's Safari recovery failure, independent
+review, SAML/outbound issuer and broader release gates remain unresolved. AUTH-23
+stays In Progress; exact final-head hosted CI is tracked separately in Huly.
+
+
+Final source review also found and corrected an owned-fixture cleanup edge: the
+initial private IPC write occurred after database creation but before the error
+path that closes it. Preparation/IPC/server Result errors now all pass through
+owned close. An actual closed-stdout smoke with the identical final producer exits1,
+emits only the fixed failure message and leaves zero difference in the owned
+database set; the normal13-case browser run is its successful bootstrap/cleanup
+control. This is infrastructure evidence, never an authentication-denial result.
+Formatting and strict all-feature/all-target lint pass after the fixture-only fix,
+and the rebuilt final13-case browser report again matches all773source hashes and
+producer. No application source, API schema or611-case application regression
+behavior changed at this last cleanup correction. The superseded unpublished
+browser checkpoint was retained privately; published reports were not overwritten.

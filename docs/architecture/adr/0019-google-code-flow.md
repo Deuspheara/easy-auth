@@ -195,6 +195,40 @@ authentication checks or ship a backend secret as an application-authenticity pr
 The native adapter does not create remote application access/refresh tokens: the
 outbound issuer and native token-family contracts remain the separate M07 gate.
 
+## Experimental shared HTTPS transport
+
+Axum `google-web` now implements a separate explicit experimental composition,
+requiring the eligible-client profile for both sign-in and deletion, matching source
+snapshots, HTTPS and the exact `/google/callback`. Named service/routing/sign-in/
+deletion/binding/callback/page/contract modules keep HTTP separate from core policy
+and PostgreSQL transactions. Existing OIDC anonymous-session and revocation-proof
+cookie guards were extracted and verified in a prior behavior-preserving commit.
+Generic OIDC callback members, DTOs, routes and OpenAPI remain unchanged.
+
+Dedicated protected host cookies hold original private browser/state/nonce/PKCE
+proof. GET parses through the bounded Google decoder only to choose fixed UI by one
+purpose-state match; malformed/ambiguous returns receive fixed error bytes. Neither
+GET nor page rendering consumes state or creates authority. POST retains all core
+bindings and deliberately processes code or provider error; stale/malformed state
+cannot clear newer proof cookies. Existing ambient-session sign-in is refused and
+deletion uses the actual current owner/session, never a body-selected account.
+Both deletion stages require the exact confirmation phrase. Only existing committed
+sign-in/deletion produces success or clears current session authority.
+
+Reference scripts scrub query/fragment immediately, keep callback only in memory,
+require explicit POST and drop/abort it on navigation/restoration. CSP, no-store,
+no-referrer and protected cookie rules remain shared. Metadata/error fields are
+never reflected, fetched or used as authority. HTTP64KiB input includes JSON escape
+overhead; the core8192-byte query/2048-byte decoded-value bounds remain in force.
+
+Real HTTP/PostgreSQL tests and owned private-TLS Chromium cases use actual offline
+RS256/JWKS responses from public authorization inputs. They establish component
+behavior only. The runner blocks real external traffic, changes no system trust or
+provider setting, and removes only its owned database/TLS files. Ordinary standalone
+Google configuration/activation, registered/manual profiles and usable genuinely
+fresh lifecycle, supported OS browser launch/return and broader release acceptance
+remain open. This composition does not force a Google authentication event.
+
 ## Account lifecycle and activation
 
 The explicit session-age profile is selected only by trusted composition for an

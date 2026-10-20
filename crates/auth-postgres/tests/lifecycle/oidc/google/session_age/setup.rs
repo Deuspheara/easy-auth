@@ -68,8 +68,12 @@ pub(super) async fn proof(
     for (name, value) in attributes.as_object().unwrap() {
         claims[name] = value.clone();
     }
-    f.provider
-        .issue(&code, &start, f.policy.configuration(), claims);
+    f.provider.issue(
+        &code,
+        start.proof.pkce_verifier().verifier(),
+        f.policy.configuration(),
+        claims,
+    );
     let cap = start.expires_us;
     let context = flow
         .consume(

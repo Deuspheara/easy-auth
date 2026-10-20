@@ -19,6 +19,24 @@ pub(super) const ACCOUNT_DELETION_COOKIES: Cookies = Cookies {
     ],
 };
 const COOKIE_SECONDS: u32 = 300;
+#[cfg(feature = "google-web")]
+pub(super) const GOOGLE_SIGN_IN_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-google-signin-browser",
+        "__Host-auth-google-signin-state",
+        "__Host-auth-google-signin-nonce",
+        "__Host-auth-google-signin-pkce",
+    ],
+};
+#[cfg(feature = "google-web")]
+pub(super) const GOOGLE_DELETION_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-google-delete-browser",
+        "__Host-auth-google-delete-state",
+        "__Host-auth-google-delete-nonce",
+        "__Host-auth-google-delete-pkce",
+    ],
+};
 #[cfg(feature = "oidc-web")]
 pub(super) const SIGN_IN_COOKIES: Cookies = Cookies {
     names: [

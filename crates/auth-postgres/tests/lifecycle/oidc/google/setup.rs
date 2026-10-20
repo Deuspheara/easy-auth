@@ -147,8 +147,12 @@ impl Fixture {
         for (key, value) in attributes.as_object().unwrap() {
             claims[key] = value.clone();
         }
-        self.provider
-            .issue(&code, &start, self.policy.configuration(), claims);
+        self.provider.issue(
+            &code,
+            start.proof.pkce_verifier().verifier(),
+            self.policy.configuration(),
+            claims,
+        );
         Attempt {
             start,
             browser,

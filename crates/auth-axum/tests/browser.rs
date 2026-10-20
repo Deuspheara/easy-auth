@@ -39,3 +39,7 @@ mod oidc_deletion;
 #[cfg(feature = "oidc-web")]
 #[path = "browser/oidc_web/mod.rs"]
 mod oidc_web;
+
+#[cfg(feature = "google-web")]
+#[path = "browser/google_web/mod.rs"]
+mod google_web;

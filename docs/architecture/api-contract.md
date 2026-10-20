@@ -440,3 +440,15 @@ and [ADR 0018](adr/0018-oidc-web-composition.md) for errors, cookie transport an
 request-snapshot concurrency limits. Default OpenAPI/composition is unchanged. Explicit server `oidc-web` settings select
 the same routes through `configured_application`; owned supported-mode public-login
 acceptance is described in the guide with its private-TLS/source-copy limits.
+
+
+The optional Axum `google-web` composition has its own
+[generated contract](openapi-google-web.json) and
+[HTTPS route/cookie/confirmation contract](../guides/google.md#experimental-https-browser-composition).
+`GoogleWebServices` requires the explicit eligible-client session-age profile;
+`experimental_google_web_router` requires HTTPS, the exact `/google/callback` and
+matching realm/source snapshots. It adds fixed `/google/sign-in` and
+`/google/account-delete` pages and separate Google sign-in/deletion start/finish/
+cancel endpoints. Finish accepts the actual raw query under all original private
+bindings, including provider-error cancellation. GET grants nothing. No base or
+generic OIDC path/schema is broadened and no ordinary startup flag is introduced.

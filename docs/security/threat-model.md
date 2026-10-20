@@ -529,3 +529,27 @@ storage faults, capability absence versus invalid claims, old authentication and
 final deletion audit rollback. Transport/storage failures are Unavailable rather
 than successful cancellation or authentication rejection. No real Google freshness,
 web delivery, provider eligibility or ordinary activation is established here.
+
+
+The experimental Google HTTPS boundary selects the eligible session-age profile
+only through trusted construction and requires exact realm/source/HTTPS callback
+composition. Separate Google sign-in/deletion proof cookies reuse the shared host/
+Secure/HttpOnly/SameSite and anonymous-session/revocation guards. Stale/malformed
+returned state cannot clear newer proof cookies. A GET parses only to select fixed
+UI by one unique state-cookie match; codes and provider errors still need explicit
+POST and full core/database binding before any consume/cancel/grant. Ambient-session
+sign-in is refused; deletion uses the actual authenticated owner/session and exact
+confirmation twice. Provider fields cannot select ownership/profile or return URLs.
+
+Scripts scrub query/fragment immediately, retain callback only in memory, reject
+unsupported/duplicate/badly encoded input and drop/abort proof on navigation and
+restoration. Error details/URIs are neither reflected nor fetched. Fixed Google
+navigation, CSP/no-store/no-referrer, closed JSON/query input,64KiB request bound and
+unchanged core8192/2048-byte callback limits apply. Real signed HTTP/PG tests preserve
+one-use/concurrency, realm/private-proof separation, wrong owner/session/subject,
+actual old/missing/invalid claims, rollback and infrastructure error classification.
+Owned private-TLS browser cases prove explicit confirmation and actual commit/deny,
+not registered Google eligibility, actual provider TLS, genuine user freshness or
+ordinary activation. The fixture blocks external traffic, uses public S256/nonce
+inputs, verifies aggregate outcomes and removes its owned DB/TLS material. No
+credential-manager/system security setting or manual device prompt is involved.

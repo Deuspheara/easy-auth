@@ -67,7 +67,9 @@ impl Provider {
             OidcClientSecret::parse(self.secret.expose().to_owned()).unwrap(),
         )
     }
-    pub fn issue(&self, code: &Secret, start: &OAuthStart, c: &OAuthConnection, claims: Value) {
+    // The browser-facing provider sees only the public authorization request's
+    // S256 challenge, nonce and exact redirect, never the private browser proof.
+    pub fn issue(&self, code: &Secret, pkce: Verifier, c: &OAuthConnection, claims: Value) {
         assert_eq!(c.provider_client(), CLIENT);
         assert!(
             self.grants
@@ -78,7 +80,7 @@ impl Provider {
                     Grant {
                         claims,
                         redirect: c.redirect().to_owned(),
-                        pkce: start.proof.pkce_verifier().verifier()
+                        pkce
                     }
                 )
                 .is_none()

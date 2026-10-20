@@ -4,8 +4,10 @@ AUTH-23 adds the opt-in core `google` feature and `GoogleCodeExchange`. This is 
 code/identity-proof component, not supported Google web/native activation. A
 separate optional server `google-desktop` feature supplies owned loopback delivery.
 An explicitly selected eligible-client session-age profile also supplies signed
-authentication-time/deletion proofs. Public Google web routes, startup selection,
-OS browser launch, mobile delivery and ordinary lifecycle activation remain gated.
+authentication-time/deletion proofs. An experimental Axum `google-web` composition
+now adds HTTPS reference pages and bound sign-in/deletion HTTP routes. Ordinary
+startup selection, OS browser launch, mobile delivery and lifecycle activation
+remain gated.
 The [ADR](../architecture/adr/0019-google-code-flow.md) records the remaining work.
 
 Enable `easy-auth-core/google` and use the existing PostgreSQL and server
@@ -289,6 +291,64 @@ These fixtures do not call Google or validate registered clients, provider TLS,
 OS default-browser launch, mobile return, genuine Google freshness or usable
 provider-required deletion. Those remain AUTH-23 activation/acceptance gates.
 
+## Experimental HTTPS browser composition
+
+The opt-in `easy-auth-axum/google-web` feature exposes `GoogleWebServices`,
+`experimental_google_web_router` and `google_web_openapi`. Construct services from
+one persisted `OidcIdentityPolicy`, matching `OAuthTransactions`, an explicit
+`GoogleSessionAgeCodeExchange`, and the existing sign-in/deletion use cases.
+The router requires the same auth realm, HTTPS origin and exact
+`<origin>/google/callback`. It has no ordinary server startup switch. Eligibility
+and a genuinely usable provider lifecycle remain required before ordinary activation.
+
+| Route | Deliberate input / behavior |
+| --- | --- |
+| `GET /google/sign-in` | Fixed sign-in page; no URL proof import |
+| `GET /google/account-delete` | Fixed local-account deletion page |
+| `GET /google/callback` | Fixed page selected by one matching purpose-state cookie; no mutation or provider I/O |
+| `POST /v1/google/sign-in/start` | `{}`; rejects any session-cookie presence and existing sign-in proof |
+| `POST /v1/google/sign-in/finish` | `{query}` containing the actual raw callback query |
+| `POST /v1/google/sign-in/cancel` | `{}`; cancels only the bound pending operation |
+| `POST /v1/account/google-delete/start` | `{confirmation:"delete my account"}` and the actual current provider session |
+| `POST /v1/account/google-delete/finish` | Same confirmation again plus `{query}` and the original current session |
+| `POST /v1/account/google-delete/cancel` | `{}` and the initiating session; no session revocation |
+
+All POSTs require one exact configured Origin, JSON and closed request/query input.
+HTTP bodies are limited to64KiB to accommodate JSON escaping; the core query remains
+limited to8192UTF-8 bytes and each decoded value to2048bytes. A query is not a pasted
+URL and cannot supply realm, owner, source, profile or private proof. The canonical
+actual Google `iss` remains mandatory on both codes and provider errors. The generic
+OIDC route/decoder/schema contract is unchanged. The generated
+[Google schema](../architecture/openapi-google-web.json) is separate from both base
+and generic OIDC contracts.
+
+Dedicated `__Host-auth-google-signin-*` and `__Host-auth-google-delete-*` browser/
+state/nonce/PKCE cookies are Secure, HttpOnly, host-only and SameSite=Lax with the
+original bounded lifetime. Private proof never goes into the authorization URL.
+Malformed or mismatched stale callback state cannot clear a newer attempt's cookies.
+Once a bound core completion/cancellation is attempted, its own proof cookies clear;
+logout/revocation clears both Google proof sets. Existing-session sign-in requires
+explicit logout, even when the supplied cookie is malformed. Deletion binds the
+actual authenticated owner/session; callback input cannot select another account.
+
+The callback bridge includes valid provider-error returns but never reflects their
+details. Script immediately scrubs query/fragment, retains raw callback only in
+memory and requires explicit POST confirmation. Navigation/bfcache restoration drops
+that proof and aborts outstanding client work. There is no local/session storage,
+third-party script, automatic code consumption or arbitrary return navigation.
+The browser follows only the fixed Google HTTPS authorization origin. The exact
+confirmation phrase is required twice for deletion; only a committed204 response
+is presented as success. Unknown/lost completion remains unconfirmed. Core/PG still
+own one-use state, actual signature/claims, current policy, original deadline and
+atomic grant/deletion; missing selected capability is503, invalid proof401, and
+provider or storage failures remain unavailable. No age is inferred from a redirect,
+new token, prompt or local-session creation.
+
+The owned [browser suite](../../tests/browser/google-web/README.md) and feature HTTP
+regressions exercise this composition with actual offline signatures and real
+PostgreSQL. They do not establish real Google TLS/registration/claim availability,
+ordinary standalone configuration, OS launch/return or usable provider freshness.
+
 ## Evidence and remaining gates
 
 Feature-owned offline tests use actual RS256 signatures and public JWKS with
@@ -306,9 +366,9 @@ final-audit deadline waits. Token/JWKS
 responses remain controlled offline actual-signature fixtures, not real Google or
 system-browser interoperability. See the [verification history](../security/verification.md).
 
-Before ordinary activation, AUTH-23 still needs Google web callback transport
-integrated with the tested PostgreSQL flow, actual native
-system-browser/OS-return handling, registered-client/manual provider evidence and a
+Before ordinary activation, AUTH-23 still needs reviewed standalone Google
+configuration/activation, actual native system-browser/OS-return handling,
+registered-client/manual provider evidence and a
 usable genuinely fresh provider-required deletion path. This component does not
 request or infer provider reauthentication: issuance time, local session rotation
 and an authorization prompt cannot substitute for genuinely recent signed

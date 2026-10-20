@@ -168,3 +168,14 @@ algorithm, trust root or license/advisory exception is added. Fixed `claims` req
 support is distinct from actual application verification/settings and from a new
 Google authentication event. Provider reauthentication requests remain unsupported;
 ordinary activation still requires genuine registered-client/lifecycle evidence.
+
+
+The experimental Google HTTPS transport reuses the selected core/PG/Axum verifier,
+transaction and browser boundary, without a new protocol or production dependency.
+Its development-only Axum base64 edge selects the already locked0.22.1 package to
+decode the public S256 challenge in the signed provider fixture; no package/version,
+algorithm, trust root or advisory exception changes. The owned browser runner reuses
+the pinned Playwright/Chromium setup and private TLS proxy. A context-local private
+certificate exception is fixture evidence only, not a production transport fallback
+or system trust change. Real Google registration, eligibility, supported OS return
+and genuinely usable fresh lifecycle remain unverified acceptance gates.

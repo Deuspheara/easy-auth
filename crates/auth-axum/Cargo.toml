@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+google-web = ["oidc-web", "auth-core/google"]
 oidc-web = ["oidc-account-deletion"]
 oidc-account-deletion = ["auth-core/oidc-identities", "auth-postgres/oidc-identities"]
 passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
@@ -32,6 +33,7 @@ uuid.workspace = true
 utoipa = { version = "5", features = ["uuid"] }
 
 [dev-dependencies]
+base64.workspace = true
 josekit.workspace = true
 auth-postgres.workspace = true
 async-trait.workspace = true
@@ -76,3 +78,12 @@ required-features = ["oidc-account-deletion"]
 [[example]]
 name = "export_oidc_web_openapi"
 required-features = ["oidc-web"]
+
+[[example]]
+name = "export_google_web_openapi"
+required-features = ["google-web"]
+
+[[example]]
+name = "google-web-browser"
+path = "examples/google-web-browser/main.rs"
+required-features = ["google-web"]

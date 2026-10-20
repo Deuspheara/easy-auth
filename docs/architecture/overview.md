@@ -109,5 +109,15 @@ token/local-session creation establishes freshness or real provider eligibility.
 callback verification and bound cancellation with that explicit profile. A private
 concrete selection reuses the sign-in operation's binding implementation while
 keeping the public sign-in and deletion purpose restrictions separate. It returns
-proof only; PostgreSQL still owns actual deletion. Browser delivery and registered
-provider/lifecycle acceptance remain separate work.
+proof only; PostgreSQL still owns actual deletion. Registered provider/lifecycle
+acceptance remains a gate for ordinary activation.
+
+
+Axum's opt-in `google-web` feature now composes those services with HTTPS-only
+same-origin sign-in/deletion routes, separate protected proof cookies and fixed
+Google callback/reference pages. Google-specific parsing stays in core; GET only
+selects fixed UI and POST delegates verification/mapping/commit. The original
+anonymous-session guard and explicit revocation-cookie hygiene are shared with OIDC.
+Generic OIDC contracts and ordinary server startup remain unchanged. Owned HTTPS/
+PostgreSQL/offline-signature evidence is distinct from registered Google, supported
+OS browser delivery and usable genuine-freshness/lifecycle acceptance.
