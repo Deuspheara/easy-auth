@@ -208,7 +208,7 @@ component and generic OIDC request behavior remain unchanged.
 
 `GoogleAuthorization::new_session_age` selects that concrete profile for the shared
 sign-in start/completion/cancel use case. Its default constructor remains ordinary
-Google sign-in. A private two-case dispatcher delegates protocol exchange while
+Google sign-in. A private concrete dispatcher delegates protocol exchange while
 retaining one implementation of state/proof/route/cancel policy; it is not a generic
 provider framework. Exact snapshot equality remains mandatory at construction.
 
@@ -222,6 +222,19 @@ subject/current-session/source, genuine age and original deadline checks remain 
 Requesting the claim neither makes it fresh nor establishes provider feature
 eligibility. Registered-client/manual proof of a usable lifecycle remains a gate;
 this component does not activate ordinary Google login or deletion routes.
+
+`GoogleAccountDeletionAuthorization` supplies bound start/completion/cancel for
+the deletion purpose using only the explicit session-age client. Both public
+sign-in constructors continue to reject deletion; the deletion constructor rejects
+sign-in and linking before admission or provider I/O. Its private operation reuses
+the same state/issuer/actual-route/private-proof checks and cancellation as sign-in,
+with a third concrete dispatcher case selecting the deletion exchange method.
+Exact configuration snapshots must match. A callback error can cancel only the
+original deletion operation; cancellation does not revoke its initiating session.
+Neither a successful callback nor a denied provider response deletes an account.
+The verified identity must still pass current-policy mapping and the existing
+atomic deletion transaction. Failed cleanup/storage remains Unavailable, not a
+successful provider denial. This adds no browser route or provider activation.
 
 Primary-source follow-up on 2026-10-20 narrows the remaining lifecycle question.
 Google's [Security Bundle](https://developers.google.com/identity/siwg/security-bundle#authentication_time)

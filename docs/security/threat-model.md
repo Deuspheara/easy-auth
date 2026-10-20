@@ -444,7 +444,7 @@ cannot substitute for required PostgreSQL/native/provider lifecycle evidence. No
 freshness is inferred from issuance or prompts, and no provider-required account
 activation/deletion path is enabled. See [ADR 0019](../architecture/adr/0019-google-code-flow.md).
 
-Twenty-three PostgreSQL-crate Google-profile scenarios traverse the real state,
+Thirty PostgreSQL-crate Google-profile scenarios traverse the real state,
 signature/mapping and local identity/session boundaries with controlled offline
 RS256 responses. Exact provider wire assertions and independent signed-response
 counters distinguish invalid claims/JIT/source policy from infrastructure failures.
@@ -516,3 +516,16 @@ by a new token/session/request. Actual-signature/database controls preserve miss
 stale/wrong-subject/cross-purpose denial, complete rollback, one deletion under a
 race and deleted-subject cooldown. Those controls do not establish provider app
 eligibility, forced reauthentication or usable real-provider lifecycle/activation.
+
+The separate bound Google deletion authorization service requires the explicit
+session-age profile and rejects sign-in/linking intents before I/O. Both public
+sign-in constructors still reject deletion. Shared completion checks original
+state, actual callback route/issuer and private browser/nonce/PKCE/purpose bindings
+before either consuming a code or cancelling a provider error. Wrong owner/session
+cannot cancel another operation. Cancellation leaves the initiating account/session
+intact; verified proof alone also leaves them intact. Actual-signature PostgreSQL
+cases cover binding negatives, one-use callback races, preparation/cancellation
+storage faults, capability absence versus invalid claims, old authentication and
+final deletion audit rollback. Transport/storage failures are Unavailable rather
+than successful cancellation or authentication rejection. No real Google freshness,
+web delivery, provider eligibility or ordinary activation is established here.

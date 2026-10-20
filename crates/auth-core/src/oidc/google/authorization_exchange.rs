@@ -1,7 +1,7 @@
 use super::{GoogleCodeExchange, GoogleSessionAgeCodeExchange};
 use crate::{
-    OAuthConnection, OAuthExchange, OAuthStart, OidcAuthorizationCode, OidcAuthorizationUrl,
-    Result, VerifiedOidcIdentity,
+    Error, OAuthConnection, OAuthExchange, OAuthPurpose, OAuthStart, OidcAuthorizationCode,
+    OidcAuthorizationUrl, Result, VerifiedOidcIdentity,
 };
 use std::sync::Arc;
 
@@ -9,18 +9,28 @@ use std::sync::Arc;
 pub(super) enum AuthorizationExchange {
     Ordinary(Arc<GoogleCodeExchange>),
     SessionAge(Arc<GoogleSessionAgeCodeExchange>),
+    AccountDeletion(Arc<GoogleSessionAgeCodeExchange>),
 }
 impl AuthorizationExchange {
     pub fn configuration(&self) -> &OAuthConnection {
         match self {
             Self::Ordinary(value) => value.configuration(),
-            Self::SessionAge(value) => value.configuration(),
+            Self::SessionAge(value) | Self::AccountDeletion(value) => value.configuration(),
         }
     }
     pub async fn authorization_url(&self, start: &OAuthStart) -> Result<OidcAuthorizationUrl> {
         match self {
             Self::Ordinary(value) => value.authorization_url(start).await,
-            Self::SessionAge(value) => value.authorization_url(start).await,
+            Self::SessionAge(value) | Self::AccountDeletion(value) => {
+                value.authorization_url(start).await
+            }
+        }
+    }
+    pub fn require_purpose(&self, purpose: &OAuthPurpose) -> Result<()> {
+        match (self, purpose) {
+            (Self::AccountDeletion(_), OAuthPurpose::DeleteProviderAccount { .. })
+            | (Self::Ordinary(_) | Self::SessionAge(_), OAuthPurpose::SignIn) => Ok(()),
+            _ => Err(Error::Unauthorized),
         }
     }
     pub async fn exchange(
@@ -31,6 +41,7 @@ impl AuthorizationExchange {
         match self {
             Self::Ordinary(value) => value.exchange(exchange, code).await,
             Self::SessionAge(value) => value.exchange(exchange, code).await,
+            Self::AccountDeletion(value) => value.exchange_account_deletion(exchange, code).await,
         }
     }
 }

@@ -61,9 +61,9 @@ pub use sessions::{SessionInfo, SessionPage};
 
 #[cfg(feature = "google")]
 pub use oidc::{
-    GoogleAuthorization, GoogleAuthorizationCompletion, GoogleAuthorizationOutcome,
-    GoogleAuthorizationResponse, GoogleAuthorizationStart, GoogleCodeExchange,
-    GoogleSessionAgeCodeExchange,
+    GoogleAccountDeletionAuthorization, GoogleAuthorization, GoogleAuthorizationCompletion,
+    GoogleAuthorizationOutcome, GoogleAuthorizationResponse, GoogleAuthorizationStart,
+    GoogleCodeExchange, GoogleSessionAgeCodeExchange,
 };
 
 #[cfg(feature = "oidc-identities")]

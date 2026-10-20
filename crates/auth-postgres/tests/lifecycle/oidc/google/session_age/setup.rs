@@ -100,7 +100,7 @@ pub(super) async fn remove(f: &Fixture, identity: VerifiedOidcIdentity) -> Resul
         .await
 }
 /// Compare privately without formatting rows or verifiers. Admission is not account state.
-pub(super) async fn snapshot(f: &Fixture) -> Value {
+pub(in crate::oidc::google) async fn snapshot(f: &Fixture) -> Value {
     sqlx::query_scalar(r#"SELECT jsonb_build_object(
       'users',(SELECT jsonb_agg(to_jsonb(t) ORDER BY realm_id,id) FROM auth_users t),
       'identities',(SELECT jsonb_agg(to_jsonb(t) ORDER BY realm_id,id) FROM auth_oidc_identities t),

@@ -3459,3 +3459,69 @@ closes every accepted connection. Original HTTP/body/header/cancellation asserti
 remain. The private shared fixture stays under250lines with no dependency or
 production visibility change. This is test-observation evidence, not new Google,
 OS default-browser or real-provider interoperability.
+
+
+## AUTH-23 bound Google deletion authorization checkpoint — 2026-10-20
+
+`GoogleAccountDeletionAuthorization` adds the missing core start/callback/cancel
+boundary for original provider-account deletion intents. It accepts only the
+explicit eligible-client session-age exchange and matching persisted configuration.
+Its private concrete purpose selection reuses the existing sign-in operation's
+state/actual issuer/actual route/private browser/nonce/PKCE checks, bound cancellation
+and cleanup. Both public sign-in constructors remain sign-in only; deletion rejects
+sign-in/linking before admission or provider I/O. No SQL, migration, dependency,
+HTTP/OpenAPI, ordinary startup or provider reauthentication behavior changes.
+
+Seven new real-PostgreSQL scenarios use the actual offline RS256/JWKS/code fixture.
+They cover constructor/purpose rejection, wrong owner/session/browser/state/nonce/
+PKCE/route for codes and provider errors, explicit cancellation without ambient
+session revocation, unavailable document preparation and cleanup, cancellation SQL
+fault versus provider denial, actual signed missing/invalid/old authentication and
+nonce rejection versus token transport failure, one-use callback concurrency and
+final audit rollback with a complete private account-state comparison. Positive
+signed deletion controls follow faults. Verification alone changes no account or
+session; the existing mapped deletion transaction retains genuine freshness,
+original caps, owner/source/subject/session and atomic erasure. A consumed callback
+cannot be revived after failed exchange or final deletion rollback.
+
+Final checks pass with `CARGO_INCREMENTAL=0` and the documented local PostgreSQL17.11:
+
+- `cargo fmt --all --check`.
+- `cargo clippy --locked --workspace --all-targets -- -D warnings` and the same
+  command with `--all-features`.
+- `cargo test --locked --workspace`: **97** tests.
+- `cargo test --locked --workspace --all-features`: **594** tests:2Axum unit,
+  99HTTP/database,94core,354PostgreSQL-crate,34server unit and11server integration.
+  The logging child repeats one included core case; it is not another acceptance
+  case. Two socket-observer controls run in each importing server test binary;
+  the original nine desktop/database scenarios remain unchanged.
+- `cargo test --locked -p easy-auth-core --features google`: **82** tests.
+- `cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google`:
+  **30** Google PostgreSQL cases. All23earlier scenarios are retained.
+- Compiled-dependency `scripts/audit.py` and `cargo-deny deny --all-features check`:
+  pass. Inactive SQLx/MySQL RSA0.9.10/RUSTSEC-2023-0071 remains explicitly visible;
+  there is no advisory exception or dependency/version change.
+
+The final closure observer also passes ten consecutive full concurrent server-unit
+runs,34tests per run; these repeated observations do not increase scenario counts.
+The fresh [owned Chromium report](../../tests/browser/google-desktop/results/2026-10-20/chromium-bound-deletion-closure.json)
+passes its one existing native-return browser case and matches all736source hashes
+and the fixed rebuilt producer binary. It checks actual socket delivery, CSP-allowed
+query scrubbing, no cookies/storage/proof reflection and successful fixture exit.
+Older reports remain immutable. No physical passkey or Google prompt, browser/vault/
+provider setting, real Google credential or claimed interoperability is involved.
+
+Review keeps the new62-line public deletion service in its owning feature module,
+the143-line shared flow and47-line private dispatcher cohesive, with no duplicate
+callback or persistence policy. Managed deletion tests separate binding, lifecycle,
+preparation, failure and setup; files remain below300lines. Longer ordered binding/
+fault matrices retain unchanged-state, actual faults and signed positive controls
+as justified function-size exceptions. The private snapshot visibility is scoped
+only to the Google test feature. No unrelated cleanup is deferred. Changed-document
+file links and diff whitespace pass; the complete staged publication is secret-scanned.
+
+This is core authorization acceptance, not finished Google web transport or release.
+Google HTTP/browser delivery, supported OS system-browser launch/return, registered
+provider/manual eligible-client freshness and a genuinely usable reviewed lifecycle
+remain open. AUTH-20's Safari recovery failure is unresolved. AUTH-23 remains
+In Progress; exact final-head hosted CI is tracked separately in Huly.

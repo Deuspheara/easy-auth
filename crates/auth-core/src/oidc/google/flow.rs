@@ -1,8 +1,8 @@
 use super::{GoogleAuthorizationOutcome, GoogleAuthorizationResponse, GoogleCodeExchange};
 use super::{GoogleSessionAgeCodeExchange, authorization_exchange::AuthorizationExchange};
 use crate::{
-    Error, OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthIntent, OAuthPurpose,
-    OAuthStart, OAuthTransactions, OidcAuthorizationUrl, Result, Secret, VerifiedOidcIdentity,
+    Error, OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthIntent, OAuthStart,
+    OAuthTransactions, OidcAuthorizationUrl, Result, Secret, VerifiedOidcIdentity,
 };
 use std::sync::Arc;
 
@@ -47,7 +47,7 @@ impl GoogleAuthorization {
         Self::configured(transactions, AuthorizationExchange::SessionAge(exchange))
     }
 
-    fn configured(
+    pub(super) fn configured(
         transactions: Arc<OAuthTransactions>,
         exchange: AuthorizationExchange,
     ) -> Result<Self> {
@@ -65,7 +65,7 @@ impl GoogleAuthorization {
     }
 
     pub async fn begin(&self, intent: &OAuthIntent<'_>) -> Result<GoogleAuthorizationStart> {
-        require_sign_in(intent)?;
+        self.exchange.require_purpose(&intent.purpose)?;
         let transaction = self.transactions.begin(intent).await?;
         match self.exchange.authorization_url(&transaction).await {
             Ok(authorization_url) => Ok(GoogleAuthorizationStart {
@@ -94,7 +94,7 @@ impl GoogleAuthorization {
         actual_redirect: &str,
         response: GoogleAuthorizationResponse,
     ) -> Result<GoogleAuthorizationCompletion> {
-        require_sign_in(intent)?;
+        self.exchange.require_purpose(&intent.purpose)?;
         let (state, issuer, outcome) = response.into_parts();
         if state.verifier() != expected_state.verifier()
             || actual_redirect != self.configuration().redirect()
@@ -137,14 +137,7 @@ impl GoogleAuthorization {
         state: &Secret,
         proof: &OAuthBrowserProof,
     ) -> Result<()> {
-        require_sign_in(intent)?;
+        self.exchange.require_purpose(&intent.purpose)?;
         self.transactions.cancel(intent, state, proof).await
     }
-}
-
-fn require_sign_in(intent: &OAuthIntent<'_>) -> Result<()> {
-    if !matches!(intent.purpose, OAuthPurpose::SignIn) {
-        return Err(Error::Unauthorized);
-    }
-    Ok(())
 }

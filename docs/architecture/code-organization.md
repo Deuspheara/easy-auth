@@ -658,11 +658,23 @@ cleanup is deferred.
 
 The owning Google `session_age.rs` module keeps the explicit eligible-client request,
 signed-claim presence and separate proof-purpose boundaries together. A private
-concrete `authorization_exchange.rs` dispatcher selects the two implemented Google
-profiles for the shared flow, without adding a plugin/trait engine or duplicating
+concrete `authorization_exchange.rs` dispatcher selects the implemented Google
+profiles/purposes for the shared flow, without adding a plugin/trait engine or duplicating
 callback policy. The opaque URL owner permits only the fixed internal Google claim
 extension; generic request behavior remains unchanged. Core profile tests and
 PostgreSQL session-age rejection/atomicity/setup scenarios are named feature modules;
 only the private test profile factory is shared with its managed-flow case. All
 files remain below300lines. Ordered request/proof/rollback matrices retain actual
 signed controls as function-size exceptions; no unrelated cleanup is deferred.
+
+The separate `google/deletion.rs` core API delegates bound operation handling to
+the same private flow. Only its constructor selects the concrete deletion-purpose
+exchange; public sign-in constructors retain their existing restriction. No second
+state/issuer/private-proof/cancellation implementation or persistence policy is
+introduced. PostgreSQL managed-deletion scenarios have separate binding, lifecycle,
+preparation and failure modules under `google/authorization/deletion/`, with local
+setup and private reuse of the existing signed provider and account-state snapshot.
+All changed implementation/scenario files remain below300lines. Longer ordered
+binding/fault matrices retain setup, unchanged-state assertions and actual signed
+positive controls together as reviewed function-size exceptions. No unrelated
+structural cleanup is deferred.

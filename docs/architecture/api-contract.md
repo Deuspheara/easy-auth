@@ -140,6 +140,16 @@ mapping and the original deliberate-confirmation/freshness-checked deletion use
 case. No endpoint/OpenAPI or ordinary activation changes. See the
 [eligible-profile contract](../guides/google.md#eligible-session-age-claims-profile).
 
+`GoogleAccountDeletionAuthorization` is the separate deletion-purpose counterpart
+to the shared sign-in service. Construction requires matching transaction and
+explicit session-age exchange snapshots. Bound start/finish/cancel reuse original
+state/private proof/actual route/issuer checks for codes and provider errors.
+Sign-in/linking intents fail before I/O; both sign-in constructors remain sign-in
+only. Completion yields proof, denial or provider failure, never account erasure
+or a session. Current-policy mapping and `OidcAccountDeletion` retain original
+owner/source/subject/session/freshness/cap and atomic erasure checks. No HTTP schema
+or ordinary composition changes follow from this core API.
+
 Only exact configured Origin is accepted on initial browser POST endpoints, including pre-authentication. Missing/null Origin fails closed, so command-line clients must explicitly send it. No wildcard credentialed CORS. SameSite=Lax, Secure in HTTPS production, HttpOnly, Path=/, no Domain; production session uses __Host- prefix. Dev HTTP is loopback-only and explicitly enabled. Duplicate cookie names/invalid token shapes must be rejected. An Origin guard is appropriate for this constrained same-origin contract; it is not a substitute for OAuth state or SAML correlation.
 
 Outbound issuer (M07) has a distinct protocol contract: registered clients, exact redirects, code + S256, client authentication where applicable, signing keys, discovery, JWKS, audience-bound ID/access tokens, revocation and introspection. First-party alpha session introspection does not constitute OIDC support. Native refresh credentials and cross-origin apps are unavailable until that gate passes.

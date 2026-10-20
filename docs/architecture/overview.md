@@ -104,3 +104,10 @@ The shared Google authorization use case can select it without duplicating callb
 bindings. Existing PostgreSQL deletion still owns genuine age/owner/subject/session/
 source/final-cap checks and atomic erasure. Neither requested claims nor recent
 token/local-session creation establishes freshness or real provider eligibility.
+
+`GoogleAccountDeletionAuthorization` now composes deletion-purpose authorization,
+callback verification and bound cancellation with that explicit profile. A private
+concrete selection reuses the sign-in operation's binding implementation while
+keeping the public sign-in and deletion purpose restrictions separate. It returns
+proof only; PostgreSQL still owns actual deletion. Browser delivery and registered
+provider/lifecycle acceptance remain separate work.

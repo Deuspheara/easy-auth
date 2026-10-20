@@ -181,6 +181,32 @@ remain mandatory. These use cases do not own a socket, establish callback delive
 launch a system browser or enable public Google login. Web/native transports and
 usable reviewed provider lifecycle remain required before activation.
 
+## Bound account-deletion authorization
+
+`GoogleAccountDeletionAuthorization::new(transactions, session_age_exchange)`
+requires the same exact persisted configuration snapshot on both services. Only
+the explicit eligible-client profile is accepted; ordinary Google sign-in cannot
+silently become deletion authorization. Both public `GoogleAuthorization`
+constructors remain sign-in only.
+
+For a deliberately confirmed deletion attempt, the trusted transport supplies a
+`DeleteProviderAccount` intent containing the actual current owner/session. `begin`
+commits the bound operation, then returns the fixed claim-request authorization
+URL and private transient proof. The transport must protect that proof and retain
+the original state. `finish` requires the actual trusted callback route and the
+decoded Google response, comparing state/issuer/route and checking the original
+private bindings before code exchange or provider-error cancellation. `cancel`
+cancels only this pending operation and never revokes the current session.
+
+A verified completion grants nothing. Map its identity through the original
+persisted policy and pass it to `OidcAccountDeletion`; the existing transaction
+checks exact owner/source/subject/session, genuinely recent signed authentication,
+original deadlines and atomic erasure. Old signed authentication remains old.
+Missing selected signed capability is Unavailable; invalid claims Unauthorized.
+Storage/transport failures remain observable, including failed cancellation. No
+HTTP route, ordinary activation or supported real-provider lifecycle follows from
+this core API. Actual Google eligibility/freshness and browser delivery remain gates.
+
 ## Owned desktop loopback delivery
 
 The server library's `google-desktop` feature exports `GoogleDesktopListener`,
@@ -270,7 +296,7 @@ Google-shaped discovery/code responses. They cover original code/PKCE/redirect,
 fixed scope/egress/authentication, wrong claims/signature/algorithm, duplicate email
 flags, email-attribute semantics, cancellation, source/purpose isolation and exact
 provider-error versus infrastructure-error results. Their controlled repository is
-a component fixture. Twenty-three PostgreSQL-crate scenarios and nine server-owned
+a component fixture. Thirty PostgreSQL-crate scenarios and nine server-owned
 desktop database scenarios now exercise the actual
 Google code component through real state consumption, signature verification,
 mapping and existing local identity/session commit. They cover provider-only
