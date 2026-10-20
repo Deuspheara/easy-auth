@@ -128,3 +128,29 @@ does not establish signature acceptance, SAML authentication bypass or general X
 safety. Canonicalization, reduced-fragment and other signature/parser paths still
 require their own observers. The default parser's acceptance of these inputs does
 not satisfy our strict rejection policy; no production integration is selected.
+
+### Signed Response engine observations — AUTH-32
+
+The resumed [signature probe](../../tests/provider/saml/native/signature-probe/README.md)
+uses the existing candidate signer with fresh in-memory RSA-2048 certificates.
+The response template's SHA-1 reference digest is replaced with SHA-256 before
+signing. Every verification supplies the explicit RSA-SHA256/SHA-256 allowlist;
+no upstream fixture, assertion, trust configuration or verifier is weakened.
+
+Both nonlegacy reduction modes pass the six healthy signed controls and two
+rollover rows. Both reject unsigned content, altered signatures/subjects, wrong
+keys, empty trust, attacker KeyInfo, SHA-1 reference digests and duplicate IDs.
+Forged sibling markers before/after the signed Response do not reach returned
+verified content. These 34 case/mode observations establish bounded engine
+behavior, not the full SAML profile or local authentication.
+
+The [finite result](../../tests/provider/saml/native/results/2026-10-20/signature-observation.json)
+preserves exit 1 and six XML-policy failures: DOCTYPE, malformed closing tag and
+multiple document roots are accepted in both modes. Returning the trusted signed
+subject after recovery does not meet strict input rejection policy. No bypass or
+general resource-denial claim follows from this result. Actual executable
+unavailability exits 2 as infrastructure failure; a restored run reproduces all
+outcomes. Four reporting tests additionally preserve failed-control and unknown-
+engine distinctions. Signature/canonicalization resource observation, signed
+Assertion-only coverage, broader hostile corpus, native advisory/license inventory
+and independent review remain open. No production SAML dependency or ACS is selected.

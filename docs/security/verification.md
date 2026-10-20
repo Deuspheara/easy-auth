@@ -4161,3 +4161,67 @@ bypass, comprehensive resource denial or XXE safety. Signature/canonicalization/
 reduced-fragment paths, strict profile/algorithm/verified-content policy, native
 advisory/license review, application/PostgreSQL acceptance and focused independent
 security review remain open. No production verifier or SAML ACS is selected.
+
+## AUTH-32 signed Response verification checkpoint — 2026-10-20
+
+The resumed [owned signature probe](../../tests/provider/saml/native/signature-probe/README.md)
+builds offline on the same source-verified native parent, with unchanged upstream
+implementation, lockfile, fixtures and assertions. Generated in-memory RSA-2048
+fixtures explicitly select SHA-256 reference digests before signing, and every
+verification retains the RSA-SHA256/SHA-256 allowlist. No private key or raw XML
+is published. The [finite record](../../tests/provider/saml/native/results/2026-10-20/signature-observation.json)
+includes exact source/executable/observer/image fingerprints and inherited-layer
+verification.
+
+All 34 case/mode rows execute in both nonlegacy reduction modes. Six healthy
+controls and both configured-rollover rows return only the expected trusted
+subject. Both modes reject unsigned content, altered signatures and subjects,
+wrong keys, missing configured trust, attacker KeyInfo, SHA-1 digests and duplicate
+IDs. Forged siblings before/after the signed Response are excluded from returned
+verified content. These observations do not establish SAML profile or application
+authentication acceptance.
+
+The driver exits **1**, retaining six policy failures: DOCTYPE, truncated closing
+tag and multiple document roots are accepted in both modes. The trusted subject
+still verifies after permissive parsing, which fails strict input rejection policy.
+An actual hidden executable instead yields exit **2**, infrastructure failure;
+a restored normal run reproduces all outcomes. Four reporting tests pass and
+ensure invalid/missing IPC, failed positives and unknown engine errors cannot
+become successful security rejections. They supply no cryptographic evidence.
+
+Overlay Rust formatting and owned strict Clippy pass after fixing one redundant
+`Ok(...?)` in fixture serialization. Full upstream strict Clippy still exits 101
+on 20 unchanged library diagnostics, preserved separately without exemptions or
+source patches. The matching component is fetched only in a disposable container;
+Cargo compilation is locked/offline and the host toolchain remains unchanged.
+
+Repository checks for this checkpoint:
+
+- `cargo fmt --all -- --check` and overlay `rustfmt --edition 2021 --check`: pass.
+- `cargo clippy --locked --workspace --all-targets -- -D warnings` and its
+  `--all-features` variant: pass.
+- `cargo test --locked --workspace`: **97 passed**, zero failures/ignored.
+- `CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features`:
+  **639 passed**, zero failures/ignored. Both workspace runs use the real local
+  PostgreSQL service, including migrations, concurrency and realm-isolation cases.
+- Compiled advisory check (`scripts/audit.py`), all-feature `cargo deny` and
+  staged Gitleaks: pass. The inactive SQLx/MySQL RSA advisory remains visible.
+- Four reporting tests, evidence/source fingerprint checks, local documentation
+  links and whitespace checks: pass.
+
+The initial sandboxed workspace run failed on 12 database connection setup errors
+(`Operation not permitted`); the permitted PostgreSQL rerun passed all 97 tests.
+The first all-feature build exited 101 after `No space left on device`; removing
+only generated incremental cache and disabling incremental compilation resolved
+that build failure. A subsequent session interruption stopped the next run before
+completion. Neither partial run is counted as passing; the final fresh run above
+completed with exit 0. No required database suite was skipped.
+
+The changed tree keeps fixture construction, cases, engine invocation and reporting
+in separate focused modules, with an eleven-line example entry point. All new
+implementation modules remain under 300 lines; no production code, migration,
+dependency, public contract or visibility boundary changes. Native resource-access
+observation through signature/canonicalization/fragment paths, signed Assertion-only
+and broader hostile coverage, native advisory/license review, application/PostgreSQL
+SAML acceptance and independent security review remain required. AUTH-32 stays
+In Progress and SAML remains gated.

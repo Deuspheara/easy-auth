@@ -52,6 +52,11 @@ reproduces permissive XML acceptance, not SAML authentication. Other signature/
 canonicalization/resource paths remain open; the historical upstream result above
 is unchanged.
 
+The [signature-engine probe](signature-probe/README.md) adds generated strong
+signed Response controls, trust/unsigned/tamper/digest negatives and verified
+content observations in both nonlegacy reduction modes. It reproduces six
+XML-policy failures; its completed execution does not clear the SAML gate.
+
 Do not copy upstream fixture/private-key files or raw protocol payloads into this
 repository or reports. Keep new reports finite and sanitized; preserve historical
 records. Only the temporary build context contains upstream source. The context

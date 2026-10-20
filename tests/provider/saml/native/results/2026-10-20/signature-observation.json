@@ -1,0 +1,538 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T15:45:54.242820+00:00",
+  "application_base_revision": "a45bd8dbccc4efb5a891ad71c4f8b2a99aee9b36",
+  "scope": "bounded signed Response engine/extraction observations only; no SAML authentication",
+  "candidate": {
+    "repository": "https://github.com/njaremko/samael",
+    "revision": "2d27dfe4930c4632b202f32886a85b2d1f9226c2",
+    "native_baseline_record": "upstream-native.json",
+    "upstream_implementation_assertions_and_fixtures_changed": false,
+    "owned_overlay": "examples/auth32_signature_probe/",
+    "verification_allowlist": [
+      "RSA-SHA256 signature",
+      "SHA-256 reference digest"
+    ],
+    "key_material": "two fresh in-memory RSA-2048 keys and self-signed certificates; never published"
+  },
+  "recipe_sources": [
+    {
+      "path": "tests/provider/saml/native/signature-probe/.dockerignore",
+      "sha256": "522ed1be58af1defe3075d7f94cacf31ee7b97b9fdbc850ae7313170150df5d8"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/Dockerfile",
+      "sha256": "9a7aaed890c46825be62dd2ba532120fdf2a4967013bf6cfc7df38cafac265e4"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/cases.rs",
+      "sha256": "3a5c07ee27ad37082f05f1fc0277c3a02ef4d0afe87ea797bb43c02e21742cb9"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/engine.rs",
+      "sha256": "07178088d9ae2b08d575d5172e3f46db47be5ef0b842932cecd612e90a87328a"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/fixture.rs",
+      "sha256": "d19b3b3c53f3bd29b741cd61ea3f49fe04481add78bf801a1f5e8c1ae54b9578"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/lint.py",
+      "sha256": "bd9005325ed65321cb1ef4f650a24dd6319437c621dd621b2611be3c87e204be"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/main.rs",
+      "sha256": "adb0ae3ead3f64fb729ab6276a402955b903cbe091f3c712fcee76533973bff7"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/observe.py",
+      "sha256": "33a85eea391253a5175d3984ecc3814d3e92a7644ee22be7c29a8b3de81f6300"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/test_observe.py",
+      "sha256": "495afb74765c54997edff4b612a31137626d7c90e7e65345f8b0151df1ec845a"
+    }
+  ],
+  "producer": {
+    "parent_layer_prefix_verified": true,
+    "parent_image_id": "sha256:117a4d42941b594f1a55045203926312f4407216f12ebd19947656f031eecd2f",
+    "probe_image_id": "sha256:b898e25e478e41b1034a024e09c00c9d6c83f7189b0c914f3ae3378b96dbeece",
+    "environment_sha256": {
+      "executable": "5a85c862df7ef104a045e03d62c0bdc4c633a18276897aecd4ed4fc682c1a2cf",
+      "cargo_lock": "f1ff7a214a2cb6d7f98437cd01a02280794a1ab24b564bfe16ff0a4bfd1e05e9",
+      "observer": "33a85eea391253a5175d3984ecc3814d3e92a7644ee22be7c29a8b3de81f6300"
+    },
+    "build_network": "none",
+    "cargo_dependencies": "locked/offline",
+    "reproducible_binary_claim": false
+  },
+  "execution": {
+    "network": "none",
+    "root_filesystem_read_only": true,
+    "capabilities_dropped": "ALL",
+    "no_new_privileges": true,
+    "host_mounts": false,
+    "process_timeout_seconds": 10,
+    "post_kill_reap_timeout_seconds": 2,
+    "memory_gib": 3,
+    "cpu_limit": 2,
+    "pid_limit": 128,
+    "tmpfs_mib": 128
+  },
+  "normal_run": {
+    "exit_code": 1,
+    "result": {
+      "candidate_controls_passed": false,
+      "execution_completed": true,
+      "native_diagnostics_emitted": true,
+      "policy_gap_rows": 6,
+      "positive_control_rows": 6,
+      "rows": [
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "healthy-before",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "healthy-before",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "second-healthy",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "second-healthy",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "unsigned",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "unsigned",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "altered-signature",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "altered-signature",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "wrong-key",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "wrong-key",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "missing-key",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "missing-key",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "untrusted-keyinfo",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "untrusted-keyinfo",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "rollover",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "rollover",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "weak-digest",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "weak-digest",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "tampered-subject",
+          "error_class": "invalid_signature",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "tampered-subject",
+          "error_class": "invalid_signature",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "forged-sibling-before",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "forged-sibling-before",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "forged-sibling-after",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "forged-sibling-after",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "duplicate-id",
+          "error_class": "duplicate_id",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "assessment": "rejected",
+          "attacker_marker": false,
+          "case": "duplicate-id",
+          "error_class": "duplicate_id",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "policy_gap",
+          "attacker_marker": false,
+          "case": "doctype",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "policy_gap",
+          "attacker_marker": false,
+          "case": "doctype",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "policy_gap",
+          "attacker_marker": false,
+          "case": "malformed",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "policy_gap",
+          "attacker_marker": false,
+          "case": "malformed",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "policy_gap",
+          "attacker_marker": false,
+          "case": "multiple-roots",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "policy_gap",
+          "attacker_marker": false,
+          "case": "multiple-roots",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "healthy-after",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "assessment": "verified_content_only",
+          "attacker_marker": false,
+          "case": "healthy-after",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        }
+      ],
+      "scope": "signed Response engine only; no SAML profile or authentication acceptance",
+      "status": "candidate_controls_incomplete",
+      "unresolved_engine_rows": 0
+    }
+  },
+  "actual_missing_executable_control": {
+    "mechanism": "empty tmpfs at /work/target hides actual executable",
+    "exit_code": 2,
+    "result": {
+      "stage": "engine_observer_unavailable",
+      "status": "infrastructure_failed"
+    }
+  },
+  "valid_run_after_fault": {
+    "exit_code": 1,
+    "same_observations_as_normal": true
+  },
+  "reporting_unit_tests": {
+    "passed": 4,
+    "failed": 0,
+    "mocked_reporting_only": true
+  },
+  "limits": [
+    "Six XML syntax policy failures prevent production adoption",
+    "No independent signature/canonicalization/fragment resource-access observer",
+    "No signed Assertion-only or comprehensive wrapping/transform/algorithm corpus",
+    "No application SAML profile or PostgreSQL correlation/replay/isolation acceptance",
+    "Native dependency advisory/license clearance and independent security review remain required",
+    "No production SAML dependency, verifier or ACS selected"
+  ],
+  "lint": {
+    "full_upstream_diagnostic_codes": [
+      "clippy::derivable_impls",
+      "clippy::io_other_error",
+      "clippy::large_enum_variant",
+      "clippy::needless_return_with_question_mark",
+      "clippy::ptr_eq",
+      "clippy::too_many_arguments",
+      "clippy::type_complexity",
+      "clippy::unnecessary_cast",
+      "dead_code",
+      "mismatched_lifetime_syntaxes",
+      "unused_imports"
+    ],
+    "full_upstream_diagnostic_count": 20,
+    "full_upstream_exit_code": 101,
+    "owned_diagnostics_emitted": false,
+    "owned_diagnostics_in_full_run": 0,
+    "owned_strict_clippy_exit_code": 0,
+    "upstream_modified": false,
+    "warning_exemptions_added": false,
+    "method": "matching clippy-driver, --edition=2021 -W clippy::all -D warnings, actual compiled samael/libxml artifacts, metadata output only",
+    "component_fetch": "matching Clippy installed in disposable online container; Cargo compilation locked/offline; no host toolchain or assessment image changes",
+    "initial_owned_failure": "one clippy::needless_question_mark in unsigned fixture; corrected before final build and reruns"
+  },
+  "private_log_sha256": [
+    {
+      "name": "signature-final-build.log",
+      "sha256": "95b1b8d2cebe7f7c5c68e5a6612e2c0f500c78769229ee283bab2a01c4163ec7"
+    },
+    {
+      "name": "signature-final.json",
+      "sha256": "65d1fe395a779a4527e3e3c9f6d33adcbfed7a45939313d1479a65f393008d07"
+    },
+    {
+      "name": "signature-missing-executable.json",
+      "sha256": "30e4ca69d33b5126a9f5e5890a35dc37279c79ddce76bd21bde03d4e1bac3308"
+    },
+    {
+      "name": "signature-after-fault.json",
+      "sha256": "65d1fe395a779a4527e3e3c9f6d33adcbfed7a45939313d1479a65f393008d07"
+    },
+    {
+      "name": "signature-lint-final.json",
+      "sha256": "e1ad660466a034a4a4c686cd8a10a101f1bfc86c9aefc036b98130d01c30f1b9"
+    }
+  ],
+  "repository_validation": {
+    "workspace_default": {
+      "exit_code": 0,
+      "passed": 97,
+      "failed": 0,
+      "ignored": 0,
+      "real_postgresql": true,
+      "log_sha256": "4be91b25f768a20f9af726813e643f763d272587da55329ed5d0bbced82a9991"
+    },
+    "workspace_all_features": {
+      "exit_code": 0,
+      "passed": 639,
+      "failed": 0,
+      "ignored": 0,
+      "real_postgresql": true,
+      "log_sha256": "84b51c51c63b3624725504f55755355297f5033b86609dcd3f0b6825a77cc3f7"
+    },
+    "workspace_fmt": "passed",
+    "workspace_strict_clippy_default_and_all_features": "passed",
+    "compiled_advisory_check": "passed; inactive SQLx/MySQL RSA advisory retained",
+    "all_feature_advisories_licenses_bans_sources": "passed",
+    "staged_gitleaks": "passed",
+    "source_fingerprints_and_local_markdown_links": "passed",
+    "earlier_infrastructure_failures": [
+      "sandboxed default suite: 12 DB connection setup errors, Operation not permitted; permitted rerun passes",
+      "first all-feature build exit 101: No space left on device; generated incremental cache removed",
+      "next all-feature run interrupted before completion; final fresh run passes"
+    ]
+  }
+}

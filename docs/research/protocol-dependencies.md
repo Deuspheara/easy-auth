@@ -40,6 +40,12 @@ reproduce permissive DTD/malformed-input acceptance with working file/network
 observers. No resource access was observed for those bounded inputs; signature/
 canonicalization paths and full SAML acceptance remain unestablished.
 
+The resumed [signed Response observations](saml-assessment.md#signed-response-engine-observations--auth-32)
+establish strong signed positives and bounded trust/unsigned/tamper/digest rejection
+in both reduction modes, while reproducing six XML-policy failures. The explicit
+RSA-SHA256/SHA-256 allowlist remains intact. This research adds no runtime dependency
+or production verifier and does not clear the SAML release blocker.
+
 AUTH-18's [passkey enrollment source review](passkey-enrollment.md) records the
 private-state serialization boundary, RP ownership, discoverability limitations,
 authentication provenance/recovery prerequisites and concrete browser/database
