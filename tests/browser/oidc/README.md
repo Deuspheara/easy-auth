@@ -143,3 +143,13 @@ the old cases. A separate verification-only example compile and core tests retai
 that optional-feature boundary. For explicit legacy compatibility, building with
 `oidc-verification` and omitting `EASY_AUTH_OIDC_IDENTITIES` still runs eleven cases
 and requires exact zero local authority. Earlier reports remain immutable.
+
+## Provider-deletion reference client
+
+After installing the existing pinned Playwright/Chromium dependencies, run
+`node tests/browser/oidc/deletion-client.cjs`. This reads the actual opt-in HTML/JS
+and runs Chromium with controlled intercepted responses, covering malformed callback
+parameters, address scrubbing, explicit final confirmation, no automatic POST,
+reload denial, cancellation and unavailable feedback. It uses no real provider or
+account. CI runs it separately; it must not be counted among the 23 native
+Keycloak/backend cases or as provider-to-HTTP interoperability acceptance.

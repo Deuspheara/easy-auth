@@ -43,6 +43,11 @@ pub struct OAuthTransactions {
 }
 
 impl OAuthTransactions {
+    /// Trusted immutable configuration used to align composed protocol services.
+    pub fn configuration(&self) -> &OAuthConnection {
+        &self.configuration
+    }
+
     pub fn new(
         configuration: OAuthConnection,
         repository: Arc<dyn OAuthTransactionRepository>,

@@ -1,7 +1,8 @@
 # ADR 0017: Purpose-bound provider account deletion
 
 Date: 2026-10-20. Status: accepted for AUTH-55's optional core/PostgreSQL deletion
-transaction; HTTP/browser composition remains proposed and ordinary activation is
+transaction. The optional HTTP/browser boundary is now implemented and component
+tested; actual provider-to-HTTP acceptance remains pending. Ordinary activation is
 not enabled. AUTH-56 owns ordinary OIDC sign-in composition.
 
 The preparation checkpoint implements the distinct OAuth purpose, migration 0019,
@@ -10,7 +11,7 @@ URL API. Preparation can request/consume exchange context only. The subsequent
 `OidcAccountDeletion` use case now consumes the separately verified mapped proof
 in a current-policy, exact-subject, original-session and signed-freshness-authorized
 erasure transaction. The [deletion guide](../../guides/oidc-account-deletion.md)
-documents this explicit Rust API; its HTTP/browser boundary remains proposed.
+documents the explicit Rust and opt-in HTTP APIs.
 
 ## Context
 
@@ -79,10 +80,10 @@ provider or lost/expired browser proof can prevent self-service completion; pres
 the account and fail closed. Do not silently re-enable a connection or restore an
 old revision to recover availability.
 
-## Intended HTTP boundary
+## Experimental HTTP boundary
 
-Provide an explicit opt-in deletion composition with trusted aligned services;
-do not activate ordinary provider sign-in or accept a client-selected issuer,
+The implementation provides an explicit opt-in deletion composition with trusted aligned services;
+it does not activate ordinary provider sign-in or accept a client-selected configured issuer,
 connection, realm or owner. Locally initiated start/finish/cancel actions require
 the exact Origin, current session, closed bounded inputs and independent HttpOnly
 browser/nonce/PKCE transport. Require the explicit destructive confirmation phrase
@@ -92,7 +93,7 @@ The cross-site callback GET serves only a no-store/no-referrer/CSP-controlled
 reference bridge and never deletes or consumes state. Its same-origin script reads
 the bounded callback parameters, immediately scrubs the address and retains them
 only in transient memory. A deliberate same-origin POST then has the original
-Strict session/proof cookies and performs verification/deletion. Review duplicate,
+HttpOnly Lax session/proof cookies and performs verification/deletion. Review duplicate,
 unknown and malformed callback parameters, cancellation and navigation cleanup;
 never echo provider error descriptions. No success cookie/response precedes commit.
 Refresh or lost response does not justify replay, fallback or identity recreation.
@@ -106,11 +107,22 @@ mailbox denial, no-email-merge and last-credential corpus. Upgrade tests must sh
 no deletion authority is invented by migration. Exact infrastructure failures are
 not expected authorization rejections.
 
-Add HTTP contract/Origin/cookie/callback/redaction/confirmation negatives and actual
-owned Keycloak browser reauthentication-to-deletion acceptance with normal cleanup.
+HTTP contract/Origin/cookie/callback/redaction/confirmation negatives now pass.
+Actual owned Keycloak browser reauthentication-to-HTTP-deletion acceptance with
+normal cleanup remains required.
 Keep all existing native/SMTP cases. Record formatting, strict default/all-feature
 lint, full default/all-feature real-DB suites, security/license/secret scans and
-exact-code hosted CI. Until the remaining transport and acceptance evidence exists,
+exact-code hosted CI. Until the remaining native HTTP acceptance evidence exists,
 AUTH-55 stays open; backend/component acceptance is not an independent review or
 ordinary activation approval. Exact results and limits are recorded in
 [verification evidence](../../security/verification.md).
+
+The transport's four independent canonical proof cookies use the existing Lax
+policy, Secure/HttpOnly host prefixes and five-minute transport lifetime. Its
+constructor requires exact trusted service configuration, realm and HTTPS callback
+alignment. Normal routers are unchanged. Closed query failures are converted to a
+fixed error rather than echoing attacker-supplied field names. The reference client
+never auto-submits callback proof, stores it persistently or displays provider errors.
+Component acceptance consists of 18 real PostgreSQL HTTP cases plus a controlled
+Chromium reference-client suite. This does not complete actual provider-to-HTTP
+acceptance, independent review or AUTH-55.

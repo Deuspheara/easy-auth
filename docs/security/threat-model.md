@@ -11,7 +11,10 @@ initiating session's exact subject/source and genuine recent signed `auth_time`,
 retaining the earliest proof/session/freshness cap through destructive writes.
 Final expiry or storage failure restores account/audit/notice/cooldown state;
 consumed OAuth state stays consumed. No verified contact means no invented notice.
-HTTP/browser composition remains unimplemented; ordinary activation stays gated.
+The opt-in HTTP/browser composition uses exact-Origin POSTs, independent HttpOnly
+proof cookies, session-derived owner and two destructive confirmations. Its callback
+GET is static and never consumes proof. Actual provider-to-HTTP acceptance and
+ordinary activation stay gated.
 See [ADR 0017](../architecture/adr/0017-provider-account-deletion.md).
 
 AUTH-30's optional core mapping consumes only a verified signed identity bound to

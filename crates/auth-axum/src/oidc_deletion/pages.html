@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Delete provider account</title><script type="module" src="/oidc/account-delete.js"></script></head>
+<body><main><h1>Delete your provider account</h1>
+<p>This permanently removes this application's account, keys and sessions. It does not delete your provider's account or application business data.</p>
+<p id="status" role="status">Preparing confirmation…</p>
+<form id="confirm-form" hidden><label>Type “delete my account” <input id="confirmation" autocomplete="off" required pattern="delete my account" maxlength="17"></label><button id="confirm" type="submit">Continue</button></form>
+<button id="cancel" type="button">Cancel pending deletion</button>
+<p>Keep this browser through provider reauthentication. A cancelled, expired or interrupted attempt grants no deletion authority. If completion is uncertain, do not assume deletion succeeded or automatically create another account.</p>
+</main></body></html>

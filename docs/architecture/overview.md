@@ -57,6 +57,6 @@ AUTH-55's optional provider deletion use case consumes a separate purpose-bound
 proof and requires the initiating source's exact subject and genuine recent signed
 authentication. The shared account erasure tail supports absent verified contact;
 the caller holds source/owner/session/identity locks and retains every original cap
-through the final clock check. No provider deletion HTTP/browser composition or
-ordinary activation is enabled. [ADR 0017](adr/0017-provider-account-deletion.md)
+through the final clock check. An explicit opt-in provider deletion HTTP/browser composition is implemented;
+actual provider-to-HTTP acceptance and ordinary activation remain gated. [ADR 0017](adr/0017-provider-account-deletion.md)
 and the [deletion guide](../guides/oidc-account-deletion.md) record that boundary.

@@ -1,5 +1,14 @@
 # HTTP contract v1
 
+AUTH-55's optional `oidc-account-deletion` Axum feature now exports an explicit
+aligned-services router with three POST operations for start/finish/cancel and static
+reference/callback pages. It derives owner/session from current authentication,
+requires `delete my account` at start and finish, and uses independent HttpOnly
+proof cookies. Normal OpenAPI/routes and ordinary server activation are unchanged.
+See the [HTTP contract](../guides/oidc-account-deletion.md#explicit-experimental-http-composition)
+and [combined schema](openapi-oidc-account-deletion.json). Actual provider-to-HTTP
+acceptance remains pending; the existing Keycloak report proves the backend only.
+
 AUTH-55 adds the optional Rust enum variant
 `OAuthPurpose::DeleteProviderAccount { user, session }` and the fixed-parameter
 `OidcCodeExchange::reauthentication_url` API. Consumers of this experimental enum
@@ -10,8 +19,8 @@ use case and `OidcAccountDeletionRepository` port now consume the mapped deletio
 proof for atomic erasure with exact subject/source and genuine signed authentication
 within `MAX_OIDC_DELETION_AUTH_AGE_SECONDS` (300 seconds). Success returns only
 after commit. The Rust caller must obtain deliberate destructive confirmation.
-No HTTP path, schema or cookie is activated; that transport remains work under
-[ADR 0017](adr/0017-provider-account-deletion.md).
+The explicit experimental HTTP composition is described above and in
+[ADR 0017](adr/0017-provider-account-deletion.md); ordinary activation is gated.
 
 AUTH-30's explicit core/PostgreSQL `oidc-identities` features add trusted mapping
 policy and an opaque proof. The administrative `configure_oidc_identity_policy`
@@ -32,7 +41,7 @@ the ordinary router/server. Its verified session transaction, mode/selection con
 and remaining stronger-account gates are documented in the
 [sign-in guide](../guides/passkey-authentication.md).
 
-Initial same-origin browser contract. Realm is trusted router configuration. JSON bodies are bounded at 8 KiB. Auth responses use Cache-Control: no-store. Errors expose stable codes; internal database/SMTP details never reach the caller. Authentication secrets never appear in query parameters or response JSON.
+Initial same-origin browser contract. Realm is trusted router configuration. JSON bodies are bounded at 8 KiB. Auth responses use Cache-Control: no-store. Errors expose stable codes; internal database/SMTP details never reach the caller. Application session and raw PKCE secrets never appear in query parameters or response JSON. The experimental OAuth redirect boundary deliberately carries protocol state/nonce and the S256 challenge; callback code/state are immediately scrubbed by its reference client.
 
 | Method/path | Input | Output / behavior |
 |---|---|---|

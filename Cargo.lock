@@ -511,6 +511,7 @@ dependencies = [
  "easy-auth-core",
  "easy-auth-postgres",
  "http-body-util",
+ "josekit",
  "serde",
  "serde_json",
  "sqlx",

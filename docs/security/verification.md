@@ -2389,3 +2389,53 @@ AUTH-25, AUTH-20's Safari/recovery failure and the broader first-release gates r
 The preceding purpose checkpoint's exact-head CI39357516806 at `c887386` completed
 SUCCESS. This extended backend/23-case checkpoint requires its own hosted run;
 the earlier result is not substituted for its acceptance.
+
+## AUTH-55 opt-in HTTP checkpoint — 2026-10-20
+
+The optional `easy-auth-axum/oidc-account-deletion` composition now provides exact
+trusted service/realm/HTTPS-callback alignment, session-derived owner, independent
+host-only Secure/HttpOnly proof cookies, closed bounded exact-Origin POSTs and
+explicit start/finish destructive confirmation. The callback GET serves fixed
+bytes and never consumes proof or deletes. Reference JavaScript immediately scrubs
+callback parameters, rejects malformed/duplicate/unknown fields, never automatically
+submits deletion, and discards transient proof on navigation. The ordinary router,
+server activation and existing authentication policy remain unchanged. The combined
+[OpenAPI snapshot](../architecture/openapi-oidc-account-deletion.json) is exported
+from the same contract. No migration or dependency version changes are introduced;
+the already-pinned workspace JOSE library is reused for signed HTTP test fixtures.
+
+All **18** new real PostgreSQL HTTP regressions pass. They verify actual ES256
+proofs through production core/PG services, exact binding/purpose/session checks,
+confirmation before consumption, wrong subject/time/issuer/state, cookie tampering/
+duplicates, no callback GET mutation, cancellation/logout and failure handling.
+An independently observed final-audit lock wait proves no response/clear-cookie
+headers are returned before deletion commits. A storage exception returns 503,
+restores account authority and leaves consumed OAuth state consumed; removing that
+fault permits the positive control. Token transport unavailability also returns
+503 rather than counting as expected Unauthorized. Initial fixture failures were
+an incomplete provider success envelope and a wrong expected logout cookie count;
+production token validation and meaningful assertions remain intact.
+
+Frozen source passes `cargo fmt --all -- --check`, strict workspace/all-targets
+Clippy both default and all-features, and sequential `cargo test --locked
+--workspace` (**93**) and `cargo test --locked --workspace --all-features`
+(**459** distinct tests: 306 PostgreSQL, 73 HTTP, 68 core, 10 server and 2 Axum
+unit tests). The logging child repeats one core case and is not counted twice.
+Verification-only core tests pass **57** cases, and the verification-only native
+example still compiles. Runs use documented PostgreSQL and `CARGO_INCREMENTAL=0`.
+Compiled advisory, cargo-deny, npm audit and the complete staged diff secret scan
+pass; npm reports zero vulnerabilities. The inactive SQLx/MySQL RSA advisory stays
+visible without an ignore. All new source/test modules remain below 300 lines;
+fixture and ordered transaction-wait scenarios retain visible setup and invariants.
+
+The separate `node tests/browser/oidc/deletion-client.cjs` Chromium check passes
+seven malformed-callback cases plus explicit final confirmation, URL scrub,
+reload denial, cancellation, 503 feedback and no browser storage. It uses actual
+reference-page bytes with controlled intercepted responses. This is **not** actual
+provider-to-HTTP interoperability evidence. The existing immutable 23-case Keycloak
+report proves the backend at its earlier source checkpoint. Backend commit
+`121d68eafdc343cf16e3e127bfae1d62ced9a4e3` has successful hosted CI run
+[39361408467](https://github.com/Deuspheara/easy-auth/actions/runs/39361408467).
+The new HTTP source still needs its own exact-commit CI and owned
+Keycloak-to-HTTP acceptance. AUTH-55 remains In Progress, ordinary activation stays
+gated, and no independent audit or production-readiness claim follows.

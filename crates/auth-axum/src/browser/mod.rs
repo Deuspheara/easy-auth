@@ -4,7 +4,7 @@ mod cookies;
 
 pub(crate) use boundary::boundary;
 pub use config::BrowserConfig;
-#[cfg(feature = "passkey-enrollment")]
+#[cfg(any(feature = "passkey-enrollment", feature = "oidc-account-deletion"))]
 pub(crate) use cookies::read_optional_cookie;
 pub(crate) use cookies::{clear_auth_cookies, read_cookie};
 

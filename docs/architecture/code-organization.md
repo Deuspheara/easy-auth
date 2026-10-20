@@ -456,3 +456,17 @@ No production verifier constructor, database internals or HTTP hook is exposed.
 New files remain under300lines; longer ordered setup/command/case functions retain
 resource ownership, original proof handling, finite diagnostics and cleanup as
 reviewed size exceptions. No unrelated structural cleanup is deferred.
+
+## AUTH-55 experimental HTTP boundary
+
+`auth-axum/oidc_deletion/` keeps trusted service alignment/routing, protected cookie
+transport, closed DTOs, thin use-case handlers, OpenAPI and fixed reference pages
+in named modules. No SQL, alternate authorization policy or network crypto is
+implemented in the adapter. Two read-only core configuration getters enable exact
+composition checks without exposing secrets or constructing verified proofs.
+Feature-owned `tests/browser/oidc_deletion/` separates boundary, binding, completion,
+commit ordering, failure cases and actual signed-provider setup. All new modules
+remain below 300 lines. Longer fixture construction and ordered commit-wait tests
+keep prerequisite verification and the observed invariant together; production
+handlers remain under the function-size review trigger. No unrelated cleanup is
+deferred. The browser client checks are separate from native Keycloak acceptance.

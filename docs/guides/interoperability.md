@@ -13,7 +13,7 @@
 | Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
 | Google/Apple web/native | None yet | None | M04 required; unavailable |
-| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 owned Keycloak/browser cases through local mapping/JIT/session commit and purpose-bound reauthentication/deletion; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session/deletion boundary; public routes, linking and complete provider lifecycle remain gated |
+| Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 owned Keycloak/browser cases through local mapping/JIT/session commit and purpose-bound reauthentication/deletion; shared production HTTPS sources with private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional backend identity/session/deletion boundary and component-tested opt-in deletion HTTP; native provider-to-HTTP acceptance, ordinary routes, linking and complete lifecycle remain gated |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
 
@@ -161,6 +161,6 @@ final mutation uses core/PostgreSQL directly through private fixture IPC.
 Final counts require the surviving mailbox user/session, six audits with four
 provider facts deidentified, one deletion/cooldown and no provider identity/session
 authority. This is backend acceptance, not a supported public HTTP deletion flow,
-production-provider acceptance or SMTP provider-contact evidence. The HTTP/browser
-confirmation and transport boundary remains AUTH-55 work; ordinary composition is
+production-provider acceptance or SMTP provider-contact evidence. The opt-in HTTP/browser boundary now has separate component/client checks; actual
+provider-to-HTTP confirmation acceptance remains AUTH-55 work. Ordinary composition is
 AUTH-56. No independent review or ordinary activation claim follows.

@@ -122,3 +122,10 @@ mapped proof, checks current exact policy and original caps under locks, and com
 provider-only ownership/session/audit atomically. Display metadata is required only
 for a new owner and never changes stored presentation on repeat login. See
 [ADR 0016](adr/0016-oidc-identity-mapping.md).
+
+The experimental provider-deletion HTTP adapter derives owner/session from Auth,
+retains independent browser/state/nonce/PKCE proof in host-only HttpOnly cookies,
+and requires explicit confirmation at initiation and completion. Its callback GET
+serves static content only. These transport values confer no identity, freshness
+or erasure authority outside the existing verified core/PostgreSQL transaction.
+Actual provider-to-HTTP acceptance and ordinary activation remain gated.

@@ -31,3 +31,7 @@ mod passkeys;
 #[cfg(feature = "passkey-management")]
 #[path = "browser/passkey_management/mod.rs"]
 mod passkey_management;
+
+#[cfg(feature = "oidc-account-deletion")]
+#[path = "browser/oidc_deletion/mod.rs"]
+mod oidc_deletion;

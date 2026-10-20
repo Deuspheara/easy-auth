@@ -31,6 +31,11 @@ pub struct OidcCodeExchange {
     verifier: OidcTokenVerifier,
 }
 impl OidcCodeExchange {
+    /// Trusted immutable configuration, never reconstructed from callback input.
+    pub fn configuration(&self) -> &crate::OAuthConnection {
+        self.documents.connection()
+    }
+
     pub fn new(
         documents: Arc<OidcDocuments>,
         repository: Arc<dyn OidcExchangeRepository>,

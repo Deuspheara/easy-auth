@@ -2,10 +2,10 @@
 
 The optional core/PostgreSQL `oidc-identities` boundary supports deliberate deletion
 of a `provider_required` account using a separate verified provider proof. It adds
-no public HTTP route, browser proof transport or ordinary server activation.
-AUTH-55 remains In Progress until its HTTP/browser boundary and final acceptance
-are complete. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
-records the implemented transaction and proposed transport.
+an explicit opt-in Axum HTTP/browser boundary, without ordinary server activation.
+AUTH-55 remains In Progress until actual provider-to-HTTP acceptance and final
+verification are complete. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
+records the transaction and experimental transport.
 
 ## Prepare a separate provider proof
 
@@ -38,8 +38,7 @@ OidcAccountDeletion::new(repository.clone()).finish(mapped).await?;
 
 `finish` is destructive. The caller must obtain intentional confirmation; do not
 call it from a callback GET, automatically after a normal login, or with unverified
-callback JSON. The reference HTTP confirmation/transport contract remains under
-implementation. Proofs have no public constructor, Clone or Serialize and must
+callback JSON. The experimental HTTP contract requires confirmation at both start and finish. Proofs have no public constructor, Clone or Serialize and must
 not enter URLs, logs, script storage or a generic session-issuance path.
 
 Both core and PostgreSQL reject a sign-in/linking-purpose or missing-time proof.
@@ -92,3 +91,69 @@ recipient under the existing queue policy. AUTH-26 owns Apple grant revocation;
 AUTH-25 owns link/unlink and last-credential mutation. Ordinary OIDC web composition
 is AUTH-56. None of these boundaries establishes production readiness, independent
 review, certified assurance or complete provider lifecycle activation.
+
+## Explicit experimental HTTP composition
+
+Enable `easy-auth-axum/oidc-account-deletion` and construct
+`OidcAccountDeletionServices::new(policy, transactions, exchange, deletion)` from
+trusted persisted configuration. It rejects mismatched full connection revisions.
+Pass those services to `experimental_oidc_account_deletion_router(auth, browser,
+services)`. The Auth realm must match and the configured redirect must be exactly
+`<HTTPS browser origin>/oidc/account-delete/callback`. HTTP loopback development
+origins are deliberately insufficient for this OAuth callback. There is one trusted
+connection per router; no request selects an owner, realm, connection or redirect.
+Normal routers, server environment configuration and ordinary OIDC sign-in are
+unchanged. AUTH-56 owns ordinary provider composition.
+
+| POST path | Closed JSON input | Committed success |
+| --- | --- | --- |
+| `/v1/account/provider-delete/start` | `{confirmation}` | 200 `{authorization_url}` plus four proof cookies |
+| `/v1/account/provider-delete/finish` | `{confirmation,state,code,issuer?}` | 204 and cleared authentication/proof cookies |
+| `/v1/account/provider-delete/cancel` | `{}` | 204, pending attempt denied, proof cookies cleared |
+
+Both confirmations require exactly `delete my account`. All POSTs require the
+single exact Origin, bounded JSON and no query parameters. The current session
+resolves the owner; another valid session, including one for that same owner,
+cannot finish the original intent. Callback `issuer` is the actual decoded `iss`,
+never a value supplied by trusted configuration in place of missing provider data.
+The generic [OpenAPI snapshot](../architecture/openapi-oidc-account-deletion.json)
+contains the combined opt-in contract; normal OpenAPI omits these operations.
+
+Independent browser/state/nonce/PKCE values use four `__Host-auth-oidc-delete-*`
+cookies: Secure, HttpOnly, Path=/, no Domain, SameSite=Lax and Max-Age=300.
+Lax matches the existing session-cookie policy; exact-Origin POST checks and the
+one-use state/nonce/PKCE binding remain mandatory. Cookies neither grant freshness
+nor extend database deadlines. Raw PKCE and session secrets never enter JSON or
+redirect URLs. The start response intentionally carries the protocol authorization
+URL, including state/nonce and the S256 challenge, for navigation to the provider.
+A pending cookie set must be explicitly cancelled before another start.
+
+The fixed `/oidc/account-delete` reference page requests provider reauthentication
+after deliberate confirmation. Its callback GET serves fixed bytes and does not
+read account authority, consume state or invoke deletion. The same-origin module
+bounds and rejects malformed/duplicate/unknown callback parameters, immediately
+scrubs the query/fragment, retains usable code/state/issuer only in transient memory,
+and requires the second deliberate confirmation before POSTing finish. No provider
+error description is displayed. Refresh after scrubbing cannot replay proof.
+Navigation aborts page-scoped requests and discards transient state; an interrupted
+request or lost finish response is never reported as success. No browser storage,
+third-party script or analytics is used. These are experimental reference pages,
+not approval of general usability or provider interoperability.
+
+Invalid confirmation/JSON/query input precedes proof consumption. A finish attempt
+with invalid authority returns a fixed error and clears its four local proof
+cookies. Storage/provider unavailability remains 503 rather than 401; a boundary
+timeout is 504. Already-consumed state stays consumed on failure. A failed start
+attempts denial-only cancellation before returning without proof cookies; unavailable
+storage may leave its bounded pending row until expiry. Cancellation clears local
+proof even when its old session cannot authorize remote cleanup. Logout/current
+session revocation clears this composition's proof cookies, and database session
+binding independently prevents reuse. A cancelled/expired provider flow has no
+weaker fallback and cannot create a new account.
+
+The 18 HTTP/PostgreSQL component regressions use real signed ES256 proofs, including
+rollback and an observed final-audit lock wait proving no response before commit.
+The Chromium reference-client suite uses controlled responses to check seven bad
+callback forms, explicit confirmation, URL scrubbing, reload, cancellation and 503
+feedback. Those are component/client checks; the existing 23-case Keycloak report
+exercises the Rust backend and does not yet prove this HTTP composition end to end.

@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-account-deletion = ["auth-core/oidc-identities", "auth-postgres/oidc-identities"]
 passkey-enrollment = ["auth-core/passkeys", "auth-postgres/passkeys"]
 passkey-authentication = ["passkey-enrollment"]
 passkey-signup = ["passkey-authentication"]
@@ -30,6 +31,7 @@ uuid.workspace = true
 utoipa = { version = "5", features = ["uuid"] }
 
 [dev-dependencies]
+josekit.workspace = true
 auth-postgres.workspace = true
 async-trait.workspace = true
 http-body-util = "0.1"
@@ -65,3 +67,7 @@ required-features = ["passkey-recovery-setup"]
 [[example]]
 name = "export_passkey_recovery_openapi"
 required-features = ["passkey-recovery"]
+
+[[example]]
+name = "export_oidc_account_deletion_openapi"
+required-features = ["oidc-account-deletion"]
