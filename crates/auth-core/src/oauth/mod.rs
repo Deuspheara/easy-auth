@@ -1,6 +1,7 @@
 mod configuration;
 mod flow;
 mod proofs;
+mod redirect;
 mod repository;
 #[cfg(test)]
 mod tests;

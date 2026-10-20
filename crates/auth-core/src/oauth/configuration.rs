@@ -1,5 +1,4 @@
 use crate::{Error, Result};
-use url::Url;
 use uuid::Uuid;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -25,7 +24,7 @@ pub struct OAuthConnection {
 
 impl OAuthConnection {
     pub(crate) fn validate_issuer(issuer: &str) -> Result<()> {
-        secure_url(issuer, false)
+        super::redirect::validate(issuer, false)
     }
 
     pub fn new(
@@ -41,7 +40,7 @@ impl OAuthConnection {
             return Err(Error::InvalidInput);
         }
         Self::validate_issuer(issuer)?;
-        secure_url(redirect, true)?;
+        super::redirect::validate(redirect, true)?;
         if provider_client.is_empty()
             || provider_client.len() > 256
             || provider_client.trim() != provider_client
@@ -102,27 +101,4 @@ impl OAuthConnection {
         }
         Ok(())
     }
-}
-
-fn secure_url(value: &str, redirect: bool) -> Result<()> {
-    if value.len() > 2048
-        || value.trim() != value
-        || value.chars().any(|c| c.is_control() || c.is_whitespace())
-        || value.contains('\\')
-    {
-        return Err(Error::InvalidInput);
-    }
-    let url = Url::parse(value).map_err(|_| Error::InvalidInput)?;
-    if url.scheme() != "https"
-        || url.host_str().is_none()
-        || !url.username().is_empty()
-        || url.password().is_some()
-        || url.fragment().is_some()
-        || url.query().is_some()
-        || (redirect && (url.path() == "/" || url.path().contains('%') || url.as_str() != value))
-    {
-        return Err(Error::InvalidInput);
-    }
-    // Preserve exact configured strings: issuer comparison must not normalize URLs.
-    Ok(())
 }
