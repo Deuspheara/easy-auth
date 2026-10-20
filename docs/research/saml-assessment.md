@@ -2,6 +2,39 @@
 
 Assessment date: 2026-10-18. **No production verifier is selected. SAML remains a hard release blocker.** This is source and dependency research, not an independent security audit. No SAML runtime dependency or ACS is introduced by this assessment.
 
+## Current selection checkpoint — 2026-10-20
+
+**Do not select the current native candidate for production integration.** The
+generated signed Response/Assertion controls establish bounded trust, algorithm
+and extraction behavior, but the strict XML gate still fails. Additional passing
+signature tests cannot clear a reproduced mandatory parser-policy failure.
+
+| Requirement | Current evidence | Selection consequence |
+| --- | --- | --- |
+| Exact source and explicit trusted-key/algorithm policy | Pinned native build; [56 signature outcomes](../../tests/provider/saml/native/results/2026-10-20/assertion-signature-observation.json), with healthy controls and unsigned/tamper/trust/SHA-1 negatives | Preliminary engine evidence only |
+| Reject forbidden XML | DOCTYPE, malformed closing tag and multiple roots accepted in both reduction modes | Failed; cannot activate SAML |
+| Signature-path resource behavior | [20 observed outcomes](../../tests/provider/saml/native/results/2026-10-20/signature-resource-observation.json), working independent I/O controls and zero observed resource calls; six XML-policy failures and six opaque errors | Bounded observations; strict rejection and error review remain unresolved |
+| Native dependency review and independent security review | No clearance recorded | Required external review remains open |
+| Application and PostgreSQL SAML acceptance | No SAML adapter, ACS or persistence authority enabled | Cannot infer acceptance from the existing application regression suite |
+
+Source reinspection confirms a configuration limitation at this exact pin. The
+[public reduction contract](https://github.com/njaremko/samael/blob/2d27dfe4930c4632b202f32886a85b2d1f9226c2/src/crypto/mod.rs#L179-L184)
+accepts XML, certificates, reduction mode and an algorithm allowlist, with no parser
+policy parameter. Both the
+[input parser](https://github.com/njaremko/samael/blob/2d27dfe4930c4632b202f32886a85b2d1f9226c2/src/crypto/xmlsec/mod.rs#L241-L247)
+and [reduced-fragment parser](https://github.com/njaremko/samael/blob/2d27dfe4930c4632b202f32886a85b2d1f9226c2/src/crypto/xmlsec/mod.rs#L586-L591)
+construct the default parser internally. Directly constructing different libxml
+options in application code does not configure those calls. This is a limitation
+of the assessed API, not a claim that upstream hardening is impossible.
+
+Unblocking selection requires a reviewed dependency hardening change or another
+reviewed pinned verifier, followed by the required hostile corpus, native review
+and independent security review. Preserve the failing controls and strong positive
+controls when evaluating that change. An unreviewed fork, custom XML-signature
+implementation, global parser-policy workaround or relaxed verification is not
+selection evidence. Until those prerequisites change, AUTH-32 remains incomplete
+and the SAML release gate stays closed.
+
 ## Exact candidates
 
 | Candidate | Inspected source | Dependencies and license | Assessment |
