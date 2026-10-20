@@ -134,6 +134,29 @@ client into a public client. Treat credential rotation separately from identity
 policy changes and preserve the exact registered-client contract. Do not log file
 contents or configuration values containing credentials.
 
+## Intended HTTP contract
+
+| Method/path | Closed input | Successful effect |
+| --- | --- | --- |
+| GET `/oidc/sign-in` | No imported proof | Fixed sign-in reference page |
+| POST `/v1/oidc/sign-in/start` | `{}` | 200 authorization URL and protected transaction cookies |
+| GET `/oidc/callback` | Bounded protocol query | Fixed selected bridge; no consumption/session/deletion |
+| POST `/v1/oidc/sign-in/finish` | `{state,code,issuer?}` | 204 and committed session cookie |
+| POST `/v1/oidc/sign-in/cancel` | `{}` | 204 denial-only cancellation and proof cleanup |
+
+The final sign-in POST is a deliberate client action, not an automatic callback
+submission. It uses the actual returned `iss` and no browser-selected connection,
+redirect, owner or JIT setting. Existing provider-deletion paths and their exact
+destructive confirmation remain unchanged. Scope selection is trusted composition,
+never browser input; request no additional profile/contact authority by inference.
+
+An existing consumer opting into the new common callback must explicitly update
+its provider registration and administrative configuration. Preserve connection/
+local-client identity keys; a different local client is not a callback workaround.
+The normal administrative revision change invalidates old contexts/sessions without
+reassigning account ownership. Startup must not perform that transition implicitly.
+The legacy experimental constructor remains available under its original contract.
+
 ## Server delivery and maintainability
 
 Preserve the existing `configured_auth` API. Extract cohesive configuration concerns
