@@ -3973,3 +3973,88 @@ pass after extraction. Previously published source/producer records remain
 unchanged. Full workspace results recorded above belong to87b8b63; they are not
 claimed as a new run for this structural-only extraction. Subsequent behavior
 needs its own final verification.
+
+
+## AUTH-23 registered native acceptance tool preparation — 2026-10-20
+
+Both prior published heads now have hosted success: cleanup dd7c9f9
+[run39427439051](https://github.com/Deuspheara/easy-auth/actions/runs/39427439051)
+and public preflight87b8b63
+[run39429805345](https://github.com/Deuspheara/easy-auth/actions/runs/39429805345).
+Rust/secrets jobs completed successfully; decoded Rust logs confirm the638-case
+workspace, native19 and final security gates. These runs establish their exact
+published heads, not the following new tool.
+
+The explicit `google-native-acceptance` example prepares registered-client/OS
+acceptance with protected local client inputs, stable owned native operation and
+the existing core/PG final mapping/commit. Input checks and public owned-setup
+checks cannot visit the authorization URL or invoke the opener; only a separate
+real sign-in command with explicit disposable-account consent does so. No actual
+manual sign-in has been run. Normal server startup/API, core policy, migrations,
+dependencies and verified-proof constructors are unchanged.
+
+The existing protected secret-file body is imported privately rather than exposed
+or copied. The restricted DB fixture is shared from root tests/support after the
+separate byte-identical6822ea1 extraction. Each real run would use an exclusive new
+local database/source, validate and revoke only its local session, require scoped
+facts (1user/1identity/1revoked session/2audits/0pending), then remove its database.
+Real provider grants are separate owner cleanup; local DB removal does not revoke
+them. Only signed authentication-time presence is reported, never manufactured
+freshness/deletion success. No raw user/account/credential/protocol material is
+emitted. Error classification preserves typed rejection versus infrastructure
+failure, including cancellation-signal failure and unconfirmed opener cleanup.
+
+Final local checks, CARGO_INCREMENTAL=0/documented PostgreSQL17 setup:
+
+- Formatting; strict locked workspace/all-target Clippy default and all features:
+  pass. The example also builds with its minimal launch+identity feature set.
+- Explicit example suite:13 passed, zero failures/ignored. Ten feature cases plus
+  three reused independent socket-observer controls; these are not13 distinct new
+  authentication scenarios. No OS opener is invoked. Actual RS256/JWKS, IPv4/IPv6
+  delivery, PostgreSQL and final validation/revocation are required by positives.
+- The suite retains explicit profile requests and actual native-operation cancel,
+  signed wrong-nonce versus transport-failure counters, required signed claim
+  absence, no authority from provider denial/failure, actual source disable after
+  verification and final-audit SQL failure/rollback followed by healthy signed
+  completion. Old signed auth_time is present without invented freshness.
+- `cargo test --locked --workspace --all-features`:638 passed, zero failures/ignored
+  (2 Axum unit,116 HTTP,96 core,358 PG,54 server unit,12 desktop integration). The
+  filtered logging child is not counted twice. The explicit example suite is
+  separate from these unchanged workspace target counts; CI adds its own command.
+- `cargo test --locked --workspace`:97 passed, zero failures/ignored.
+- Compiled advisory gate and all-feature cargo-deny pass without new exceptions;
+  inactive SQLx/MySQL RSA0.9.10 RUSTSEC-2023-0071 remains visible.
+
+The [fixed-tool record](../../tests/provider/google/results/2026-10-20/native-tool-validation.json)
+verifies9 CLI observations: input-only and production-public-metadata owned setup
+for base/IPv4 and session-age/IPv6, plus missing mode, missing consent, nonlocal DB,
+non-Unicode argument and permissive-secret-file failures. Only owned placeholders
+were used. Owned setups prepare/cancel through actual production TLS and PostgreSQL,
+but do not submit credentials or open a browser. Independent same-server catalog
+checks find0 owned databases. All13 runtime source overlays and the retained fixed
+producer executable hash match the record; unchanged reused sources and Cargo.lock
+match base6822ea1. Source/run provenance is not a reproducible-binary claim.
+Historical reports remain immutable and are not new actual-browser evidence.
+
+Maintainability review keeps entry composition, typed inputs, setup, operation,
+opaque completion and read-only observations separate. All files stay below300lines
+and implementation functions below50lines. Longer ordered provider/socket and
+negative-plus-healthy-control test cases retain their visible security sequence
+as justified size exceptions. Shared signer/socket/DB fixtures and secret reading
+are reused privately. No generic fixture framework, public injection API or
+unrelated cleanup is deferred.
+
+Actual registered Google sign-in, OS/browser handoff, genuine eligible-client
+freshness/deletion, broader native persistence/lifecycle, ordinary activation and
+independent review remain open. Owner client availability is not established; no
+Cloud app, provider settings, account, credential manager or system security setting
+was changed. AUTH-23 remains In Progress. New publication needs its own exact-head
+hosted result; the two earlier successes cannot substitute for it.
+
+
+The first staged secret scan flagged the provenance map entry for `secret_file.rs`
+as generic-api-key. Independent recomputation proved the matched value is exactly
+that existing source file's SHA256, not a credential. The unpublished record now
+separates reused-source paths and digests into explicit fields; hashes are retained
+and reverified. No scanner rule/ignore or application/test behavior is changed.
+Publication still requires the complete staged scan to pass.

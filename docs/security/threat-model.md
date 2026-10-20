@@ -582,3 +582,17 @@ remain mandatory. Legacy backends reject alternate returns instead of substituti
 the anchor. Migration defaults old definitions to exact and preserves original
 proofs/caps. Owned fixtures, process actors and offline signatures do not establish
 Google registration, OS-browser interoperability or native remote-token authority.
+
+
+The separate registered-native acceptance tool requires an explicit developer
+sign-in mode and disposable-account consent before OS handoff. That flag prevents
+operator accidents; authentication authority still needs the existing owned
+callback/private proof, genuine signature and final current-source transaction.
+Input/owned-setup success grants nothing and submits no wire credential. Real-mode
+credentials come only from the existing bounded protected reader, never arguments,
+callback input or logs. The tool accepts no arbitrary issuer/egress/algorithm and
+keeps base/session-age selection in trusted setup. Only finite outcome/counts are
+emitted; session validation/revocation and database destruction affect exclusively
+its fresh local realm. Provider grant cleanup remains separate owner action.
+Offline proof fixtures and public setup do not establish real Google/OS acceptance,
+genuine freshness, ordinary activation or an installed-client DB credential model.

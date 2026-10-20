@@ -388,3 +388,17 @@ metadata/TLS boundary only; signed/registered-client and actual browser/OS evide
 remain mandatory. Its disposable database lifecycle closes after success or probe
 failure, with independent failure and catalog controls. See the
 [preflight guide](../../guides/google.md#public-metadata-and-transport-preflight).
+
+
+## Registered native acceptance preparation
+
+A separate opt-in example now prepares the registered Google/OS matrix, using
+protected registered-client inputs, actual owned native operation and existing
+opaque proof/mapping/PG commit. It validates/revokes only its transient local session
+and removes the exclusive disposable database. Input-only and owned-setup checks
+cannot invoke the opener or claim registered acceptance; a separate explicit
+operator-consent mode is required for real sign-in. Offline/public-setup evidence
+does not complete that manual mode. No ordinary activation, provider setting,
+remote token endpoint or security-policy fallback is introduced. The
+[manual procedure](../../../tests/provider/google/manual-native.md) retains actual
+platform/client, genuine freshness and usable lifecycle gates.

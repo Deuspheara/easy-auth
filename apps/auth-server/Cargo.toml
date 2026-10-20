@@ -86,6 +86,11 @@ path = "examples/google-provider-preflight/main.rs"
 required-features = ["google-desktop"]
 
 [[example]]
+name = "google-native-acceptance"
+path = "examples/google-native-acceptance/main.rs"
+required-features = ["google-desktop-launch", "oidc-identities"]
+
+[[example]]
 name = "oidc-web-native"
 path = "examples/oidc-web-native/main.rs"
 required-features = ["oidc-web"]

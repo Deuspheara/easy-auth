@@ -61,3 +61,10 @@ behavior, token POST/signature/claim validity, actual browser/OS return, genuine
 Google freshness, provider-required deletion or ordinary activation. Those remain
 AUTH-23 gates. The offline actual-signature/database/browser suites retain their
 separate scope and immutable historical reports.
+
+
+The [registered native acceptance tool](manual-native.md) separately prepares the
+real-client/browser matrix with protected local inputs and explicit operator
+consent. Its input/owned-setup checks are not actual sign-in evidence. The restricted
+owned database fixture is now privately shared from root `tests/support/google/`;
+this extraction does not alter the original published preflight record.

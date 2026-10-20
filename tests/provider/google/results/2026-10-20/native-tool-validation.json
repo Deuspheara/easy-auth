@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T13:52:41.648674+00:00",
+  "scope": "manual-tool preparation validation only",
+  "source": {
+    "base_revision": "6822ea12c94397704646cbc6596e4087c49e9d70",
+    "overlay_sha256": {
+      "apps/auth-server/Cargo.toml": "d9f114ab23ab747b81986277e0bdbb0a353038648380ca32b1258ea5c71472bf",
+      "apps/auth-server/examples/google-native-acceptance/attempt.rs": "3efe94278b4cb6592f69b3962300d3ca220bf54e0cdc7c13d2bf2f66a379e9b5",
+      "apps/auth-server/examples/google-native-acceptance/completion.rs": "dc84ba64479fc33c9b4dac7d43935fecf2eaa66b5c39f0db37c213ca04c37196",
+      "apps/auth-server/examples/google-native-acceptance/errors.rs": "edd18a3ea53cf711ade395325f21b4d899568d73c3c39fca82748bf21c4b86cb",
+      "apps/auth-server/examples/google-native-acceptance/main.rs": "d32bd9527d2292a3ec55b1201f2d241163739e813402dcb911f75db43fd402a2",
+      "apps/auth-server/examples/google-native-acceptance/observations.rs": "41ade1c27ecca4946753c7947c116954e7b42171d1b0ec0a179e26992636c2ce",
+      "apps/auth-server/examples/google-native-acceptance/settings.rs": "dabbfbdbdf4314ceed18ed2b507df84aae33cfd2839fd92f00f04b4a35259810",
+      "apps/auth-server/examples/google-native-acceptance/setup.rs": "d2e614c68213a532059ab924adcd3f61efbdb882816845e1244d7f0ce6162097",
+      "apps/auth-server/examples/google-native-acceptance/tests/composition.rs": "7ffe8a026400523b2d55537c99fa9ce43ee162e55d822d6d6cbd0520b2fc21dc",
+      "apps/auth-server/examples/google-native-acceptance/tests/failures.rs": "178198d15a162239149161f5a50a21925ecb74cf08561a19c7f03b9b0f08de75",
+      "apps/auth-server/examples/google-native-acceptance/tests/fixture.rs": "ee63b3865a4545af4f80e72f77ce93523f386610b99d9fc44ea78847f8f5a7a4",
+      "apps/auth-server/examples/google-native-acceptance/tests/mod.rs": "5ef31213e1c726448abeddf05767bdc1d8e86f427ed40944c7af0ad374ba0b48",
+      "apps/auth-server/examples/google-native-acceptance/tests/settings.rs": "745c79eaf33cb75027965d687b54ddb5d0112408bdb94b2fab6dbfc830078e84"
+    },
+    "other_runtime_sources_unchanged": true,
+    "cargo_lock_sha256": "763700ff74ce32f1bbffe08066809309459530701e2a3597de3c81ddc15a805c",
+    "ci_configuration_sha256": "9f9302924fc561246799ef00438d3a485773317b3530634297c2aa3150bb65ff",
+    "reused_sources": [
+      {
+        "path": "apps/auth-server/src/configuration/oidc/secret_file.rs",
+        "sha256": "1625d5c1972cf2475f2a51dbd3d1fa49d857dbbbeb3bb2bc0146be6f06b8a42c"
+      },
+      {
+        "path": "tests/support/google/database.rs",
+        "sha256": "be4347ee3291a03a0656d89bb30d14403c2bd9bbb36faf060f422684644de2d3"
+      },
+      {
+        "path": "tests/support/google/provider.rs",
+        "sha256": "7cc33c64c0de8191d51d696af85782562786454eb5fa9474b96b97bcad67ab67"
+      },
+      {
+        "path": "tests/support/google/socket.rs",
+        "sha256": "fbece2d9faa890a77c5f3b3c544481c4f4afefbdbc038a069a3b4278353379c7"
+      }
+    ]
+  },
+  "producer": {
+    "example": "google-native-acceptance",
+    "features": [
+      "google-desktop-launch",
+      "oidc-identities"
+    ],
+    "profile": "dev",
+    "cargo_incremental": "0",
+    "executable_sha256": "ec5e772184e56eaf7b0b69a20515d81daaef4c25c6db815e60d125fb2c7b4247",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14) (Homebrew)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.3",
+    "reproducible_binary_claim": false
+  },
+  "offline_tests": {
+    "passed": 13,
+    "feature_cases": 10,
+    "reused_observer_controls": 3,
+    "failed": 0,
+    "ignored": 0,
+    "actual_os_opener_invoked": false
+  },
+  "workspace_tests": {
+    "all_features": 638,
+    "default": 97,
+    "real_postgresql_cases": 358,
+    "logging_child_not_double_counted": true
+  },
+  "tool_checks": [
+    {
+      "case": "base-check-configuration",
+      "exit": 0,
+      "result": {
+        "status": "inputs_checked",
+        "registered_client_confirmed": false,
+        "claims_profile": "base",
+        "loopback": "127.0.0.1",
+        "browser_launched": false,
+        "credentials_submitted": false
+      },
+      "owned_databases_after": 0
+    },
+    {
+      "case": "base-check-owned-setup",
+      "exit": 0,
+      "result": {
+        "status": "owned_setup_checked",
+        "claims_profile": "base",
+        "loopback": "127.0.0.1",
+        "registered_client_confirmed": false,
+        "browser_launched": false,
+        "credentials_submitted": false,
+        "pending_cancelled": true,
+        "users": 0,
+        "identities": 0,
+        "sessions": 0,
+        "audits": 0,
+        "pending": 0,
+        "owned_database_removed": true
+      },
+      "owned_databases_after": 0
+    },
+    {
+      "case": "session_age-check-configuration",
+      "exit": 0,
+      "result": {
+        "status": "inputs_checked",
+        "registered_client_confirmed": false,
+        "claims_profile": "session_age",
+        "loopback": "::1",
+        "browser_launched": false,
+        "credentials_submitted": false
+      },
+      "owned_databases_after": 0
+    },
+    {
+      "case": "session_age-check-owned-setup",
+      "exit": 0,
+      "result": {
+        "status": "owned_setup_checked",
+        "claims_profile": "session_age",
+        "loopback": "::1",
+        "registered_client_confirmed": false,
+        "browser_launched": false,
+        "credentials_submitted": false,
+        "pending_cancelled": true,
+        "users": 0,
+        "identities": 0,
+        "sessions": 0,
+        "audits": 0,
+        "pending": 0,
+        "owned_database_removed": true
+      },
+      "owned_databases_after": 0
+    },
+    {
+      "case": "missing_mode",
+      "exit": 1,
+      "stage": "explicit_manual_mode_and_consent_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "missing_consent",
+      "exit": 1,
+      "stage": "explicit_manual_mode_and_consent_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "nonlocal_database",
+      "exit": 1,
+      "stage": "local_database_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "non_unicode_argument",
+      "exit": 1,
+      "stage": "manual_cli_unicode_required",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    },
+    {
+      "case": "permissive_secret_file",
+      "exit": 1,
+      "stage": "protected_client_secret_file",
+      "stdout_empty": true,
+      "owned_databases_after": 0
+    }
+  ],
+  "independent_catalog": {
+    "same_loopback_server_verified": true,
+    "owned_databases_before": 0,
+    "owned_databases_after": 0
+  },
+  "actual_manual_signin": {
+    "performed": false,
+    "registered_client_availability": "not_established",
+    "real_credentials_used": false,
+    "browser_launched": false,
+    "provider_settings_changed": false,
+    "freshness_or_deletion_accepted": false
+  },
+  "limits": [
+    "Public owned setup prepares/cancels but does not visit authorization URL",
+    "Offline signed fixtures are not registered Google tokens",
+    "Actual Google account/browser/OS handoff remains unverified",
+    "Google genuine freshness, lifecycle and ordinary activation remain gated"
+  ]
+}

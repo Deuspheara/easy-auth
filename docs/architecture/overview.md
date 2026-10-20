@@ -138,3 +138,10 @@ original final caps, and Google/native composition uses the retained actual URI.
 Reopened/concurrent ports preserve source sessions; real administrative revision
 changes and disable remain authoritative. Exact HTTPS/native defaults and ordinary
 startup stay unchanged. Actual provider/OS and broader native lifecycle remain gates.
+
+
+The registered Google native acceptance example is developer-only composition of
+the same stable operation, protected input reader and core/PG final commit. It
+separates local input/public owned-setup checks from actual browser sign-in, and
+revokes/removes only disposable local authority. No application startup/API or
+proof-construction boundary changes. Real provider/OS and lifecycle gates remain.

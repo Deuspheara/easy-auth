@@ -763,3 +763,16 @@ Its extraction preserves the implementation byte-for-byte; the public preflight
 imports the same body at an explicit static path. This avoids a second lifecycle
 implementation or production API exposure. The published preflight record retains
 its original producer/source paths as historical evidence.
+
+
+Registered Google native acceptance stays in a separate explicit example: entry
+composition/consent, typed input parsing, trusted source/service setup, owned
+operation, opaque-proof completion and read-only scoped observations are distinct
+modules. It reuses the byte-identical root owned-DB fixture and existing private
+server secret-file implementation via deliberate static source imports, without
+exposing production internals or duplicating their policies. Offline input,
+composition, failure and signed-delivery fixtures remain named test modules.
+All files are below300lines; implementation functions stay below50lines. Longer
+ordered test/provider-delivery cases retain public request fields, actual signature/
+socket delivery, negative facts and healthy controls together as justified
+function-size exceptions. No generic fixture/plugin framework or cleanup is deferred.

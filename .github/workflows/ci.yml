@@ -47,6 +47,8 @@ jobs:
         run: cargo test --locked -p easy-auth-server --features google-desktop-launch --lib google_desktop
       - name: Verify owned Google native process and PostgreSQL acceptance
         run: cargo test --locked -p easy-auth-server --features google-desktop-launch,oidc-identities --lib google_desktop::operation
+      - name: Verify Google manual acceptance composition without opening a browser
+        run: cargo test --locked -p easy-auth-server --example google-native-acceptance --features google-desktop-launch,oidc-identities
       - name: Verify owned Google desktop PostgreSQL acceptance
         run: cargo test --locked -p easy-auth-server --features google-desktop,oidc-identities --test google_desktop
       - name: Verify Google HTTPS boundary without passkeys

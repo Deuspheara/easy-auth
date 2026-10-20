@@ -543,3 +543,23 @@ suite: external service availability can fail it. Never relabel a public transpo
 metadata failure as a successful authentication rejection or relax TLS/egress to
 make it pass. The [run record and reproduction notes](../../tests/provider/google/README.md)
 state the source/producer provenance and remaining matrix.
+
+
+## Registered native acceptance preparation
+
+The optional `google-native-acceptance` example composes the existing protected
+secret-file reader, production HTTPS, stable owned native operation and original
+core/PostgreSQL mapping/session transaction in a disposable local database. It adds
+no ordinary startup flag, production API, callback upload or proof constructor.
+Input-only and public owned-setup checks are separate from the real sign-in mode,
+which requires explicit disposable-account consent. A genuine verified completion
+must commit/validate/revoke its local session and satisfy scoped audit/pending
+facts before database removal. Output contains only finite results, not account
+or credential data. Local cleanup does not revoke a provider authorization grant.
+
+See the [manual procedure and limits](../../tests/provider/google/manual-native.md).
+The example has offline signed/socket/database regression evidence and credential-
+free public owned-setup checks; actual registered Google/OS sign-in is unperformed.
+The explicit session-age profile cannot manufacture recent authentication or waive
+Google application eligibility. Ordinary activation, genuine freshness/deletion
+and broader lifecycle review remain gated.
