@@ -3422,3 +3422,40 @@ genuinely usable repeatable provider-required freshness/deletion path. The optio
 claim/component success is not ordinary activation, independent review or production
 readiness. No user/device prompts or provider/browser/security settings changed;
 AUTH-20's Safari recovery failure and broader release gates remain unresolved.
+
+
+## AUTH-23 desktop closure observation correction — 2026-10-20
+
+Exact-head CI [39398973050](https://github.com/Deuspheara/easy-auth/actions/runs/39398973050)
+at49b9de6 failed two server desktop tests at the final socket-closure observation;
+callback rejection/positive-return assertions had already passed. The secret job
+passed. This run is a failure, not acceptance of that head or a provider denial.
+The first local all-feature suite also reproduced the old closure assertion failure
+after all PostgreSQL cases passed; it remains recorded as a failed run.
+
+An isolated diagnostic in the existing owned Linux development container bound
+netcat's source and destination to the same unused loopback port and received its
+own fixed non-secret marker without a listener. Source-port self-connection is a
+concrete false-positive mechanism. However, a distinct-source probe still reproduced
+a local failure. Its connected stream then had no peer address, and a temporary
+same-process socket-listener diagnostic found no listening socket at that endpoint.
+Explicit earlier listener drop and an independent blocking connect did not remove
+the failure; those experiments and temporary process inspection are not retained.
+The exact cause of the hosted failures cannot be established from their old logs.
+No production listener or provider behavior change is retained.
+
+The shared test probe binds a distinct source before connect. A connect result
+alone does not prove a usable listener: if a returned stream proves EOF/reset/
+disconnection, the probe may make another bounded observation. It still requires
+an actual ConnectionRefused result to establish closure, never accepts EOF alone,
+and fails if a stream responds, remains open or the three-observation budget is
+exhausted. Each connect/read step is bounded to one second. Unexpected socket
+errors and connection-observation timeout are explicit infrastructure failures.
+There is no unconditional sleep, application retry or relaxed credential check.
+
+Actual socket controls force source-port collision and check closed IPv4/IPv6
+endpoints, reject an idle live listener, and reject a live listener that immediately
+closes every accepted connection. Original HTTP/body/header/cancellation assertions
+remain. The private shared fixture stays under250lines with no dependency or
+production visibility change. This is test-observation evidence, not new Google,
+OS default-browser or real-provider interoperability.
