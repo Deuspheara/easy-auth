@@ -129,6 +129,15 @@ async fn session_arriving_after_start_prevents_consumption_and_switching(pool: P
 #[sqlx::test]
 async fn overlapping_starts_remain_distinct_and_cancel_independently(pool: PgPool) {
     let f = Fixture::new(pool).await;
+    // This case isolates concurrent proof namespaces from cold-discovery
+    // admission, which deliberately fails prompt contenders with 429. Exercise
+    // that boundary separately rather than depending on fixture/runner timing.
+    let warm = f.start().await;
+    assert_eq!(
+        f.post("cancel", json!({}), &warm.cookie).await.status(),
+        204
+    );
+    assert_eq!(f.facts().await, (0, 0, 0, 0));
     let (a, b) = tokio::join!(
         f.post("start", json!({}), ""),
         f.post("start", json!({}), "")

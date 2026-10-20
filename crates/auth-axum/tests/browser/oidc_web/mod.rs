@@ -1,3 +1,4 @@
+mod admission;
 mod boundary;
 mod callback;
 mod commit;

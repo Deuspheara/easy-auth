@@ -12,6 +12,7 @@ use std::{
         atomic::{AtomicBool, AtomicUsize, Ordering},
     },
 };
+use tokio::sync::Notify;
 
 // Trusted fake network boundary only. Identity proof is an actual ES256 signature
 // verified by core against the served JWK; no public proof constructor is added.
@@ -24,6 +25,9 @@ pub(crate) struct Provider {
     pub posts: AtomicUsize,
     pub unavailable: AtomicBool,
     pub documents_unavailable: AtomicBool,
+    pub hold_discovery: AtomicBool,
+    pub discovery_entered: Notify,
+    pub discovery_release: Notify,
 }
 impl Provider {
     pub fn new(redirect: &'static str) -> Self {
@@ -41,6 +45,9 @@ impl Provider {
             posts: AtomicUsize::new(0),
             unavailable: AtomicBool::new(false),
             documents_unavailable: AtomicBool::new(false),
+            hold_discovery: AtomicBool::new(false),
+            discovery_entered: Notify::new(),
+            discovery_release: Notify::new(),
         }
     }
     pub fn token(&self, claims: Value) -> String {
@@ -70,6 +77,10 @@ impl OidcHttp for Provider {
             return Err(Error::Unavailable);
         }
         let value = if target.url().path().ends_with("openid-configuration") {
+            if self.hold_discovery.load(Ordering::SeqCst) {
+                self.discovery_entered.notify_one();
+                self.discovery_release.notified().await;
+            }
             json!({"issuer":"https://issuer.example", "authorization_endpoint":"https://issuer.example/authorize", "token_endpoint":"https://issuer.example/token", "jwks_uri":"https://issuer.example/keys", "authorization_response_iss_parameter_supported":true,"code_challenge_methods_supported":["S256"],"token_endpoint_auth_methods_supported":["none"]})
         } else {
             json!({"keys":[self.public]})
