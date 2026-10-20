@@ -1,8 +1,12 @@
 mod documents;
+#[cfg(feature = "oidc-identities")]
+mod identities;
 mod metadata;
 mod policy;
 mod ports;
 mod public_address;
+#[cfg(feature = "oidc-identities")]
+pub use identities::{OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, OidcMappedIdentity};
 #[cfg(test)]
 mod tests;
 

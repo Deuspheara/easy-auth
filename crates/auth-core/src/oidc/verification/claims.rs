@@ -31,6 +31,12 @@ pub(super) struct Claims {
     pub(super) email: Option<String>,
     #[serde(default, deserialize_with = "optional")]
     pub(super) email_verified: Option<bool>,
+    #[cfg(feature = "oidc-identities")]
+    #[serde(default, deserialize_with = "super::profile::attribute")]
+    pub(super) name: Option<String>,
+    #[cfg(feature = "oidc-identities")]
+    #[serde(default, deserialize_with = "super::profile::attribute")]
+    pub(super) preferred_username: Option<String>,
 }
 impl Drop for Claims {
     fn drop(&mut self) {

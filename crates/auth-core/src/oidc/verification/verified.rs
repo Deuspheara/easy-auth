@@ -15,6 +15,10 @@ pub struct VerifiedOidcIdentity {
     authenticated_at: Option<u64>,
     email: Option<String>,
     email_verified: bool,
+    #[cfg(feature = "oidc-identities")]
+    name: Option<String>,
+    #[cfg(feature = "oidc-identities")]
+    preferred_username: Option<String>,
 }
 impl VerifiedOidcIdentity {
     pub(super) fn new(exchange: OAuthExchange, claims: &Claims) -> Self {
@@ -33,6 +37,10 @@ impl VerifiedOidcIdentity {
             authenticated_at: claims.auth_time,
             email: claims.email.clone(),
             email_verified: claims.email.is_some() && claims.email_verified == Some(true),
+            #[cfg(feature = "oidc-identities")]
+            name: claims.name.clone(),
+            #[cfg(feature = "oidc-identities")]
+            preferred_username: claims.preferred_username.clone(),
         }
     }
     pub fn configuration(&self) -> &OAuthConnection {
@@ -60,6 +68,15 @@ impl VerifiedOidcIdentity {
     }
     pub fn email_verified(&self) -> bool {
         self.email_verified
+    }
+    /// Optional signed presentation metadata; never a stable identity key.
+    #[cfg(feature = "oidc-identities")]
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+    #[cfg(feature = "oidc-identities")]
+    pub fn preferred_username(&self) -> Option<&str> {
+        self.preferred_username.as_deref()
     }
 }
 impl fmt::Debug for VerifiedOidcIdentity {

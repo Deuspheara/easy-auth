@@ -1898,3 +1898,58 @@ Prior exact-head CI39340016588 at eb3281b completed SUCCESS. That checkpoint's g
 result is distinct from these corrections' new hosted run, tracked separately.
 AUTH-29/project completion and independent review/ordinary activation are not
 claimed from local evidence alone.
+
+
+## AUTH-30 scoped mapping checkpoint — 2026-10-20
+
+AUTH-30 remains **In Progress**. The optional core `oidc-identities` feature now
+consumes a verified external identity through immutable exact-connection policy,
+an explicit bounded issuer allowlist and typed display-claim selection. JIT
+configuration defaults to deny; no local provisioning/session transaction is
+implemented yet. Provider email never selects a local owner or becomes verified
+contact. No HTTP/OpenAPI, account-policy enum, dependency or migration changes.
+[ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records implemented
+behavior and the remaining persistence/lifecycle requirements separately.
+
+Six signed mapping cases cover display selection, exact allowlists including eight
+valid distinct issuers versus a ninth, other registrations/stale revisions,
+unavailable selected profile data without fallback, UTF-8 byte bounds, duplicate
+signed profile fields, redacted diagnostics and preserved subject/purpose/deadline/
+authentication-time/email provenance. Every other-registration configuration has a
+fresh revision; this matrix is not independent evidence of each database key
+constraint. A separate verification-only case proves unrecognized profile data
+remains ignored without the new feature, and CI now runs that feature combination.
+
+Local checks pass using PostgreSQL 17.11 and the documented loopback development
+services, `CARGO_INCREMENTAL=0`, sequential database suites and four test workers:
+
+- `cargo fmt --all -- --check` and default/all-feature strict locked workspace/
+  all-target Clippy pass. Final all-feature lint reruns after test-bound expansion.
+- `cargo test --locked --workspace`: **93 distinct tests** pass.
+- `cargo test --locked --workspace --all-features`: **374 distinct tests** pass
+  (2 Axum unit, 55 HTTP/PostgreSQL, 66 core, 241 PostgreSQL, 10 server).
+  The logging subprocess repeats one already-counted core case. No failures or
+  ignored tests. After strengthening the issuer bound case, the core all-feature
+  suite reruns: all **66** pass; application implementation is unchanged.
+- Core `--features oidc-identities`: **60** tests pass; separate core
+  `--features oidc-verification`: **55** pass, including compatibility coverage.
+- Compiled-dependency advisory and all-feature cargo-deny advisory/license/source/
+  bans gates pass. Inactive SQLx/MySQL RSA advisory remains visible. Local doc
+  links and diff whitespace pass. The complete staged changes receive redacted
+  Gitleaks scanning before publication.
+
+An initial test compilation failed because a new assertion requested Debug for
+OAuthPurpose. The assertion now matches the existing closed variant without adding
+secret-bearing diagnostics or changing production types. No failed compilation is
+counted as regression evidence.
+
+Source review keeps policy, opaque mapped proof and profile decoding in separate
+cohesive modules; all new source files remain under 300 lines. Longer issuer-bound,
+cross-registration and invalid-profile tables retain cases/controls together as
+reviewed test-size exceptions. No unrelated cleanup is deferred.
+
+Real PostgreSQL policy persistence, provisioning/linking atomicity, disabled-callback
+and deletion races, actual JIT denial and provider session provenance remain
+required before completing AUTH-30. No new native/provider acceptance run is claimed
+for this core-only mapping checkpoint. Existing browser reports stay immutable;
+AUTH-20's Safari/Dashlane failure and independent recovery review remain open.

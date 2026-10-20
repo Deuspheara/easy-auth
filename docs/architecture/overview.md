@@ -42,3 +42,9 @@ local Keycloak/browser/PostgreSQL suite verifies that boundary using a private
 fixture certificate/address mapping and shared production request code. Final
 identity mapping/JIT/session issuance and ordinary provider activation remain open.
 [ADR 0015](adr/0015-oidc-token-verification.md) records the boundary.
+
+The explicit core `oidc-identities` feature adds exact-connection mapping policy,
+an issuer allowlist and default-deny JIT configuration. Mapping consumes a verified
+identity into another opaque proof; it grants no local user/session. PostgreSQL
+policy persistence, resolution/provisioning and method policy remain AUTH-30 work.
+[ADR 0016](adr/0016-oidc-identity-mapping.md) records that boundary.

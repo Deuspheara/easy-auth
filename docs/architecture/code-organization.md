@@ -1,5 +1,12 @@
 # Code organization
 
+AUTH-30's optional core `oidc/identities/` separates trusted mapping policy and
+opaque mapped proof. Signed presentation decoding stays in a focused verification
+profile module. No SQL, HTTP, new crate or generic mapping framework is added.
+The longer issuer-bound, cross-registration and invalid-attribute tables keep their
+negative cases and controls together as reviewed test-size exceptions. No new file
+exceeds 300 lines. Database identity resolution remains required subsequent work.
+
 AUTH-22's optional `oauth/` modules keep core configuration validation, transient
 proofs, repository contract and use cases separate. PostgreSQL `oauth/` owns
 administrative configuration, committed admission, shared fresh-owner/session

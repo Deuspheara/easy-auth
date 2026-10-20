@@ -24,6 +24,10 @@ pub struct OAuthConnection {
 }
 
 impl OAuthConnection {
+    pub(crate) fn validate_issuer(issuer: &str) -> Result<()> {
+        secure_url(issuer, false)
+    }
+
     pub fn new(
         realm: Uuid,
         connection: Uuid,
@@ -36,7 +40,7 @@ impl OAuthConnection {
         if realm.is_nil() || connection.is_nil() || client.is_nil() {
             return Err(Error::InvalidInput);
         }
-        secure_url(issuer, false)?;
+        Self::validate_issuer(issuer)?;
         secure_url(redirect, true)?;
         if provider_client.is_empty()
             || provider_client.len() > 256

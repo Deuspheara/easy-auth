@@ -1,5 +1,13 @@
 # Threat model — alpha design, before credential flows
 
+AUTH-30's optional core mapping consumes only a verified signed identity bound to
+the exact trusted realm/connection/client/revision and explicit issuer allowlist.
+Display selection has no email/alternate-field fallback. JIT configuration defaults
+to deny; mapping grants no local identity/session. Current database policy checks,
+JIT enforcement, subject uniqueness, deletion races and provider session provenance
+remain required work. [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md)
+distinguishes implemented mapping from those unimplemented safeguards.
+
 AUTH-22's optional core/PostgreSQL OAuth transaction boundary binds realm,
 connection/client revision, purpose, original linking owner/session and independent
 state/browser/nonce/PKCE verifiers. Required-issuer versus unique dedicated callback

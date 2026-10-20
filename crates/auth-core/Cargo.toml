@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-identities = ["oidc-verification"]
 oidc-verification = ["oidc-egress", "dep:josekit"]
 oidc-egress = ["oauth-transactions", "dep:ipnet", "dep:serde_json"]
 oauth-transactions = ["dep:url"]

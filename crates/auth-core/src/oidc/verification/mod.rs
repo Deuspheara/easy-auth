@@ -4,6 +4,8 @@ mod flow;
 mod input;
 mod keys;
 mod policy;
+#[cfg(feature = "oidc-identities")]
+mod profile;
 mod repository;
 #[cfg(test)]
 mod tests;

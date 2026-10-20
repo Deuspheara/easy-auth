@@ -1,5 +1,11 @@
 # HTTP contract v1
 
+AUTH-30's explicit core-only `oidc-identities` feature adds trusted mapping policy
+and an opaque mapped proof, not an HTTP callback or session endpoint. HTTP DTOs and
+OpenAPI are unchanged. Provider email never becomes local verified contact; JIT
+configuration defaults to deny. Persistence/issuance remain unimplemented. See
+[ADR 0016](adr/0016-oidc-identity-mapping.md).
+
 AUTH-19 adds explicit experimental passkey HTTP sign-in, separately enabled from
 the ordinary router/server. Its verified session transaction, mode/selection contract
 and remaining stronger-account gates are documented in the

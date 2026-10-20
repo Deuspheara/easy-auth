@@ -32,6 +32,8 @@ jobs:
       - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - run: cargo test --locked --workspace
       - run: cargo test --locked --workspace --all-features
+      - name: Verify OIDC without optional local identity mapping
+        run: cargo test --locked -p easy-auth-core --features oidc-verification
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
