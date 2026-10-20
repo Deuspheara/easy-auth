@@ -5,10 +5,15 @@ from pathlib import Path
 import signal
 import subprocess
 
-POSITIVES = {"healthy-before", "second-healthy", "healthy-after"}
+POSITIVES = {"healthy-before", "second-healthy", "healthy-after",
+             "assertion-healthy-before", "assertion-healthy-after"}
 DENIALS = {"wrong-key", "missing-key", "untrusted-keyinfo", "weak-digest",
-           "tampered-subject", "duplicate-id", "unsigned", "altered-signature"}
-WRAPPERS = {"forged-sibling-before", "forged-sibling-after"}
+           "weak-signature",
+           "tampered-subject", "duplicate-id", "unsigned", "altered-signature",
+           "assertion-wrong-key", "assertion-missing-key", "assertion-unsigned",
+           "assertion-altered-signature", "assertion-tampered-subject", "assertion-duplicate-id"}
+WRAPPERS = {"forged-sibling-before", "forged-sibling-after",
+            "assertion-forged-before", "assertion-forged-after"}
 SYNTAX = {"doctype", "malformed", "multiple-roots"}
 CASES = POSITIVES | DENIALS | WRAPPERS | SYNTAX | {"rollover"}
 MODES = {"rooted", "predigest"}
@@ -94,7 +99,7 @@ def run():
     return {
         "status": "candidate_controls_incomplete" if gaps or unresolved else "engine_controls_passed",
         "execution_completed": True, "candidate_controls_passed": not (gaps or unresolved),
-        "scope": "signed Response engine only; no SAML profile or authentication acceptance",
+        "scope": "signed Response and Assertion engine only; no SAML profile or authentication acceptance",
         "positive_control_rows": sum(row["case"] in POSITIVES for row in rows),
         "policy_gap_rows": len(gaps), "unresolved_engine_rows": len(unresolved),
         "native_diagnostics_emitted": diagnostics, "rows": rows,

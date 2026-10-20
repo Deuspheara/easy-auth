@@ -4225,3 +4225,35 @@ observation through signature/canonicalization/fragment paths, signed Assertion-
 and broader hostile coverage, native advisory/license review, application/PostgreSQL
 SAML acceptance and independent security review remain required. AUTH-32 stays
 In Progress and SAML remains gated.
+
+## AUTH-32 signed Assertion and algorithm follow-up — 2026-10-20
+
+The same [signature overlay](../../tests/provider/saml/native/signature-probe/README.md)
+now generates signed Assertions inside unsigned Responses as well as signed
+Responses. Fixture construction reuses the candidate's template/signer; extraction
+uses its typed Response/Assertion parsers. A feature-named `assertion_cases.rs`
+keeps the additional scenarios out of the entry point and existing Response cases.
+Every verification still specifies RSA-SHA256/SHA-256 only. No upstream source,
+application dependency, runtime behavior, schema or public contract changes.
+
+The [new immutable record](../../tests/provider/saml/native/results/2026-10-20/assertion-signature-observation.json)
+retains 56 case/mode rows and verifies that the previous 34 outcomes are unchanged.
+All ten healthy rows and two rollover rows pass. Both modes reject unsigned or
+tampered Assertions, wrong/missing trust and duplicate signed Assertion IDs;
+unsigned Response metadata and forged Assertion siblings are omitted. The existing
+signer also generates an RSA-SHA1 signature with a SHA-256 digest as a separate
+negative, rejected in both modes without allowing SHA-1 for verification.
+
+The assessment still exits 1 on the six earlier XML-policy failures. Actual hidden
+executable failure exits 2; a restored run reproduces all 56 outcomes. Four
+reporting tests pass, now independently faulting each of the five positive case
+labels. Owned strict Clippy passes with no diagnostics; full upstream strict
+Clippy separately retains exit 101 and 20 unchanged diagnostics. Overlay and
+workspace formatting, source fingerprints, documentation links and secret scanning
+are checked for this change. Full application regression is the prior 97/639-test
+PostgreSQL checkpoint at `4e912ba`; those suites are not rerun for this isolated
+research-overlay change. No ticket acceptance or security gate is marked complete.
+
+Broader wrapping/transform/algorithm/resource and profile coverage, native
+dependency advisory/license review, application/PostgreSQL SAML acceptance and
+focused independent security review remain required. SAML stays gated.

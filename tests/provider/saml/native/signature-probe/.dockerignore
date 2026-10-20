@@ -4,4 +4,5 @@
 !fixture.rs
 !engine.rs
 !cases.rs
+!assertion_cases.rs
 !observe.py

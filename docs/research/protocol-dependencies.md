@@ -46,6 +46,12 @@ in both reduction modes, while reproducing six XML-policy failures. The explicit
 RSA-SHA256/SHA-256 allowlist remains intact. This research adds no runtime dependency
 or production verifier and does not clear the SAML release blocker.
 
+The subsequent [Assertion and signature-algorithm follow-up](saml-assessment.md#signed-assertion-and-signature-algorithm-follow-up--auth-32)
+adds signed Assertion extraction and a separately generated RSA-SHA1-signature
+negative without changing that verification allowlist. All 34 prior outcomes
+remain unchanged in the expanded 56-row assessment; the same XML-policy failures
+and broader release prerequisites remain open.
+
 AUTH-18's [passkey enrollment source review](passkey-enrollment.md) records the
 private-state serialization boundary, RP ownership, discoverability limitations,
 authentication provenance/recovery prerequisites and concrete browser/database

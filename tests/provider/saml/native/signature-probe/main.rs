@@ -1,4 +1,5 @@
 //! Research-only composition of the candidate's existing signing and verification APIs.
+mod assertion_cases;
 mod cases;
 mod engine;
 mod fixture;

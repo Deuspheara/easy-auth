@@ -154,3 +154,28 @@ outcomes. Four reporting tests additionally preserve failed-control and unknown-
 engine distinctions. Signature/canonicalization resource observation, signed
 Assertion-only coverage, broader hostile corpus, native advisory/license inventory
 and independent review remain open. No production SAML dependency or ACS is selected.
+
+### Signed Assertion and signature-algorithm follow-up — AUTH-32
+
+The [expanded signature record](../../tests/provider/saml/native/results/2026-10-20/assertion-signature-observation.json)
+extends the unchanged upstream candidate to 56 case/mode rows. All earlier 34
+outcomes are reproduced unchanged. Four new healthy rows establish signed
+Assertion extraction in both modes: only the Assertion is signed inside an
+unsigned Response containing an outside-signature marker. The marker and forged
+unsigned Assertions inserted before/after the signed Assertion are absent from
+returned content. Unsigned/altered Assertions, wrong/missing trust and duplicate
+signed Assertion IDs are rejected. This closes only the bounded Assertion engine
+coverage gap; it is not profile or application authentication acceptance.
+
+A separate negative uses the existing upstream signer to generate RSA-SHA1 with
+a SHA-256 reference digest. Both modes reject it under the unchanged explicit
+RSA-SHA256/SHA-256 allowlist. Combined with the prior RSA-SHA256/SHA-1-digest
+negative, the controls vary signature and digest independently. No permissive
+verification, custom cryptography or policy exception is introduced.
+
+Ten healthy rows and both rollover rows pass; six XML-policy failures remain.
+The actual missing-executable control and restored run again distinguish
+infrastructure failure from candidate rejection. Owned strict Clippy and four
+reporting tests pass; full upstream Clippy retains its 20 diagnostics. Broader
+hostile/resource/profile coverage, native dependency review, application/PostgreSQL
+SAML acceptance and independent security review remain release gates.

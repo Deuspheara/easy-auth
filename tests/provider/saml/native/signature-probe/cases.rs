@@ -22,6 +22,12 @@ pub(super) fn run() -> Result<()> {
     );
     trust_cases(&first, &second, &signed, &alternate)?;
     boundary_cases(&signed, std::slice::from_ref(&first.cert))?;
+    super::assertion_cases::run(&first, &second)?;
+    emit(
+        "weak-signature",
+        &first.sign_legacy_signature()?.xml,
+        std::slice::from_ref(&first.cert),
+    );
     emit(
         "healthy-after",
         &signed.xml,
@@ -85,7 +91,7 @@ fn boundary_cases(signed: &Signed, certs: &[CertificateDer]) -> Result<()> {
         &envelope(&format!("{body}{forged}")),
         certs,
     );
-    let duplicate = format!("<probe ID='{}'>{ATTACKER}</probe>", signed.response_id);
+    let duplicate = format!("<probe ID='{}'>{ATTACKER}</probe>", signed.signed_id);
     emit(
         "duplicate-id",
         &envelope(&format!("{body}{duplicate}")),
@@ -112,7 +118,7 @@ fn envelope(content: &str) -> String {
     format!("<owned:Envelope xmlns:owned='urn:auth32:wrapper' data-marker='{WRAPPER}'>{content}</owned:Envelope>")
 }
 
-fn emit(case: &str, xml: &str, certs: &[CertificateDer]) {
+pub(super) fn emit(case: &str, xml: &str, certs: &[CertificateDer]) {
     for mode in [
         ReduceMode::ValidateAndMarkNoAncestors,
         ReduceMode::PreDigest,

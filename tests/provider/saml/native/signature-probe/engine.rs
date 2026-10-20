@@ -4,7 +4,7 @@ use samael::crypto::{
     AllowedSignatureAlgorithm, CertificateDer, Crypto, CryptoError, CryptoProvider, ReduceMode,
     XmlSecProviderError,
 };
-use samael::schema::Response;
+use samael::schema::{Assertion, Response};
 
 pub(super) fn emit(case: &str, mode: ReduceMode, xml: &str, certs: &[CertificateDer]) {
     let name = match mode {
@@ -24,6 +24,7 @@ pub(super) fn emit(case: &str, mode: ReduceMode, xml: &str, certs: &[Certificate
                 .parse::<Response>()
                 .ok()
                 .and_then(|response| response.assertion)
+                .or_else(|| output.parse::<Assertion>().ok())
                 .and_then(|assertion| assertion.subject)
                 .and_then(|subject| subject.name_id)
                 .is_some_and(|name| name.value == TRUSTED);

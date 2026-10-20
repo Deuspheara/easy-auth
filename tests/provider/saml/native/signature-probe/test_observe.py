@@ -27,15 +27,17 @@ class ReportingTests(unittest.TestCase):
                     observe.validate(invalid)
 
     def test_failed_positive_is_never_reported_as_secure_rejection(self):
-        rows = complete_rows()
-        for row in rows:
-            if row["case"] == "healthy-before":
-                row.update(accepted=False, trusted_subject=False,
-                           error_class="invalid_signature")
-        with patch.object(observe, "capture", return_value=(rows, False)):
-            with self.assertRaisesRegex(observe.InfrastructureFailure,
-                                        "signed_positive_control_failed"):
-                observe.run()
+        for failed in sorted(observe.POSITIVES):
+            with self.subTest(failed=failed):
+                rows = complete_rows()
+                for row in rows:
+                    if row["case"] == failed:
+                        row.update(accepted=False, trusted_subject=False,
+                                   error_class="invalid_signature")
+                with patch.object(observe, "capture", return_value=(rows, False)):
+                    with self.assertRaisesRegex(observe.InfrastructureFailure,
+                                                "signed_positive_control_failed"):
+                        observe.run()
 
     def test_engine_failure_is_unresolved_and_does_not_pass_candidate(self):
         rows = complete_rows()
