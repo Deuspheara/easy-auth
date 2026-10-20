@@ -55,6 +55,10 @@ an authentication bypass. Resource access during signature/canonicalization or
 fragment parsing is not independently observed by this probe; network isolation
 alone supplies no such proof.
 
+The separate [signature-resource observer](RESOURCES.md) now adds bounded signed
+DTD/entity observations with the existing parser I/O controls. It preserves policy
+failures and opaque errors separately; zero observed access is not general XXE safety.
+
 Infrastructure controls:
 
 ```sh

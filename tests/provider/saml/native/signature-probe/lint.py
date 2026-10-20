@@ -9,17 +9,18 @@ import subprocess
 import sys
 
 
-def run():
+def run(resources=False):
+    example = "auth32_signature_resources" if resources else "auth32_signature_probe"
     full = subprocess.run(
         ["cargo", "clippy", "--locked", "--offline", "--features", "xmlsec",
-         "--example", "auth32_signature_probe", "--message-format=json", "--", "-D", "warnings"],
+         "--example", example, "--message-format=json", "--", "-D", "warnings"],
         capture_output=True, text=True, timeout=180,
     )
     diagnostics = [item for line in full.stdout.splitlines()
                    if (item := json.loads(line)).get("reason") == "compiler-message"
                    and item["message"]["level"] in {"error", "warning"}]
     deps = Path("/work/target/debug/deps")
-    command = ["clippy-driver", "/work/source/examples/auth32_signature_probe/main.rs",
+    command = ["clippy-driver", f"/work/source/examples/{example}/main.rs",
                "--edition=2021", "--crate-type=bin", "--emit=metadata",
                "-L", f"dependency={deps}", "-o", "/tmp/auth32-signature-lint.rmeta",
                "-W", "clippy::all", "-D", "warnings"]
@@ -31,13 +32,13 @@ def run():
     owned = subprocess.run(command, capture_output=True, timeout=60)
     if owned.returncode:
         sys.stderr.buffer.write(owned.stderr)
-    return {"full_upstream_exit_code": full.returncode,
+    return {"example": example, "full_upstream_exit_code": full.returncode,
             "full_upstream_diagnostic_count": len(diagnostics),
             "full_upstream_diagnostic_codes": sorted({
                 item["message"]["code"]["code"] for item in diagnostics
                 if item["message"].get("code")}),
             "owned_diagnostics_in_full_run": sum(any(
-                span["file_name"].startswith("examples/auth32_signature_probe/")
+                span["file_name"].startswith(f"examples/{example}/")
                 for span in item["message"]["spans"]) for item in diagnostics),
             "owned_strict_clippy_exit_code": owned.returncode,
             "owned_diagnostics_emitted": bool(owned.stderr),
@@ -45,6 +46,8 @@ def run():
 
 
 if __name__ == "__main__":
-    result = run()
+    if sys.argv[1:] not in ([], ["--resources"]):
+        raise SystemExit("only --resources is supported")
+    result = run(resources=sys.argv[1:] == ["--resources"])
     print(json.dumps(result, sort_keys=True))
     raise SystemExit(0 if result["owned_strict_clippy_exit_code"] == 0 else 1)

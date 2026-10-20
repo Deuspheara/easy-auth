@@ -179,3 +179,32 @@ infrastructure failure from candidate rejection. Owned strict Clippy and four
 reporting tests pass; full upstream Clippy retains its 20 diagnostics. Broader
 hostile/resource/profile coverage, native dependency review, application/PostgreSQL
 SAML acceptance and independent security review remain release gates.
+
+### Signature-child resource observations — AUTH-32
+
+The [signature resource recipe](../../tests/provider/saml/native/signature-probe/RESOURCES.md)
+reuses the exact earlier parser observer and independent I/O-control executable,
+with fingerprints verified against their original record. A separate signature
+child runs 20 case/mode rows: healthy signed Responses/Assertions before/after six
+DTD/entity variants, always under the unchanged RSA-SHA256/SHA-256 allowlist.
+The observer traces only that child and descendants; the independent HTTP trap
+and direct-parser/file/HTTP controls work before and after it.
+
+The [finite result](../../tests/provider/saml/native/results/2026-10-20/signature-resource-observation.json)
+records zero sentinel-file calls, connection calls and HTTP requests across the
+child, including its fixture generation and verification/reduction calls. These
+are aggregate observations without per-case or internal-stage attribution. They
+do not establish general XXE safety or resource denial for untested transforms.
+
+The assessment exits 1: DOCTYPE, external DTD and parameter entities are accepted
+in both modes (six policy failures); internal/file/HTTP entity references produce
+six opaque engine errors. The latter remain unresolved rather than secure
+rejections. Actual missing `strace` exits 2 without rejection observations; a
+restored run reproduces the counts and outcomes. The new binary also reproduces
+all prior 56 signature outcomes. Eight reporting tests and owned strict Clippy
+pass; the same 20 upstream Clippy diagnostics remain separate failures.
+
+This adds bounded signature-path resource evidence, not a production integration
+or complete canonicalization/fragment/transform coverage. Strict rejection policy,
+opaque error review, broader hostile/profile and SAML PostgreSQL acceptance,
+native dependency review and independent security review still gate selection.

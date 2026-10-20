@@ -6,3 +6,7 @@
 !cases.rs
 !assertion_cases.rs
 !observe.py
+!resource.Dockerfile
+!resource_main.rs
+!resource_cases.rs
+!resource_observe.py

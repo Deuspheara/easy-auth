@@ -52,6 +52,12 @@ negative without changing that verification allowlist. All 34 prior outcomes
 remain unchanged in the expanded 56-row assessment; the same XML-policy failures
 and broader release prerequisites remain open.
 
+The [signature-child resource observation](saml-assessment.md#signature-child-resource-observations--auth-32)
+adds working independent file/network controls around 20 signed-input outcomes.
+No resource calls were observed for those bounded cases, but six forbidden XML
+acceptances and six opaque engine errors remain. This does not clear the strict
+XML/resource, native dependency or independent-review gates.
+
 AUTH-18's [passkey enrollment source review](passkey-enrollment.md) records the
 private-state serialization boundary, RP ownership, discoverability limitations,
 authentication provenance/recovery prerequisites and concrete browser/database

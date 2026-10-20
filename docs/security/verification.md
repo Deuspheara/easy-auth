@@ -4257,3 +4257,45 @@ research-overlay change. No ticket acceptance or security gate is marked complet
 Broader wrapping/transform/algorithm/resource and profile coverage, native
 dependency advisory/license review, application/PostgreSQL SAML acceptance and
 focused independent security review remain required. SAML stays gated.
+
+## AUTH-32 bounded signature-child resource observation — 2026-10-20
+
+The [separate resource observer](../../tests/provider/saml/native/signature-probe/RESOURCES.md)
+reuses the earlier parser observer's bounded child execution, HTTP trap and actual
+file/HTTP control executable. Both copied artifacts match the prior fingerprints;
+the new image inherits the verified signature-image layers. Candidate source,
+lockfile, native stack and explicit RSA-SHA256/SHA-256 verification policy are
+unchanged. Build and observation run offline, read-only at execution, without host
+mounts or capabilities. Clippy component download occurs separately in a disposable
+online container, with offline Cargo compilation.
+
+Twenty case/mode rows exercise healthy signed Response/Assertion controls around
+six DTD/entity variants. Both sets of independent direct-parser/file/HTTP controls
+work. Aggregate tracing over the signature child and descendants observes zero
+sentinel-file calls, connection calls and HTTP requests. The counts include fixture
+generation, verification and reduction; they do not identify individual internal
+parser/transform stages or establish general resource safety.
+
+The [record](../../tests/provider/saml/native/results/2026-10-20/signature-resource-observation.json)
+preserves exit 1: six DOCTYPE/external-DTD/parameter-entity acceptances fail strict
+XML rejection policy, and six internal/file/HTTP-entity engine errors remain
+unresolved. Neither opaque errors nor absence of observed access become successful
+security rejections. Actual unavailable `strace` instead returns exit 2,
+`infrastructure_failed`, with no rejection observations. A restored run reproduces
+all counts/outcomes. The resource binary's default path reproduces all 56 earlier
+signature outcomes unchanged.
+
+Eight reporting tests pass, including failed signed controls, missing IPC rows,
+opaque error handling and resource-call counts that prevent a passing assessment.
+Owned strict Clippy passes without diagnostics; full upstream Clippy separately
+retains exit 101 and 20 diagnostics in unchanged source. Overlay/workspace
+formatting, evidence fingerprints, local links and secret scanning are checked.
+Application regression remains the earlier real-PostgreSQL 97/639-test checkpoint
+at `4e912ba`; those suites are not rerun for this isolated research overlay.
+
+The new resource fixtures, entry point and observer have separate responsibilities
+and remain below the implementation size thresholds. Existing observer/control
+code is reused rather than copied into another framework. No production runtime,
+schema, dependency or public API is changed. Strict XML/resource policy, opaque
+error review, broader hostile/profile and SAML PostgreSQL acceptance, native
+advisory/license review and focused independent security review remain gates.

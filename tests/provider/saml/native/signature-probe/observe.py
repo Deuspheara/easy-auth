@@ -51,7 +51,7 @@ def capture():
     return [json.loads(line) for line in stdout.splitlines()], bool(stderr)
 
 
-def validate(rows):
+def validate(rows, expected_cases=CASES):
     seen = set()
     fields = {"case", "mode", "accepted", "trusted_subject", "attacker_marker",
               "wrapper_marker", "error_class"}
@@ -59,7 +59,7 @@ def validate(rows):
         if not isinstance(row, dict) or set(row) != fields:
             raise InfrastructureFailure("invalid_engine_ipc")
         pair = row["case"], row["mode"]
-        if (pair in seen or pair[0] not in CASES or pair[1] not in MODES
+        if (pair in seen or pair[0] not in expected_cases or pair[1] not in MODES
                 or row["error_class"] not in ERRORS
                 or any(type(row[key]) is not bool for key in
                        ("accepted", "trusted_subject", "attacker_marker", "wrapper_marker"))
@@ -68,7 +68,7 @@ def validate(rows):
                     ("trusted_subject", "attacker_marker", "wrapper_marker")))):
             raise InfrastructureFailure("invalid_engine_ipc")
         seen.add(pair)
-    if seen != {(case, mode) for case in CASES for mode in MODES}:
+    if seen != {(case, mode) for case in expected_cases for mode in MODES}:
         raise InfrastructureFailure("engine_cases_incomplete")
 
 

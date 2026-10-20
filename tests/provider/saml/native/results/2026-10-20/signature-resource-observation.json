@@ -1,0 +1,453 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-20T16:07:16.239451+00:00",
+  "application_base_revision": "32f7de4d06acd90f83b5d9130c93390a22dba83c",
+  "scope": "aggregate resource observations across bounded signature child inputs; not SAML authentication or general resource safety",
+  "candidate": {
+    "repository": "https://github.com/njaremko/samael",
+    "revision": "2d27dfe4930c4632b202f32886a85b2d1f9226c2",
+    "native_baseline_record": "upstream-native.json",
+    "upstream_implementation_assertions_and_fixtures_changed": false,
+    "owned_overlay": "examples/auth32_signature_probe/",
+    "verification_allowlist": [
+      "RSA-SHA256 signature",
+      "SHA-256 reference digest"
+    ],
+    "key_material": "two fresh in-memory RSA-2048 keys and self-signed certificates; never published"
+  },
+  "recipe_sources": [
+    {
+      "path": "tests/provider/saml/native/signature-probe/.dockerignore",
+      "sha256": "7b3157d4a347e794994aa2722d054e52c881a0f26bb0578b616567b9b39e6434"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/Dockerfile",
+      "sha256": "e9863540993c3dd70a9cea35ba6694ba8ce21954a79cc1b5c062d152a851cd41"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/assertion_cases.rs",
+      "sha256": "0650a9ec046d676fba28cc857b32aa0b42b3cc4778fca6bdbb055d41eeb20c3b"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/cases.rs",
+      "sha256": "3595044647377574f18876c47c92d8618d2dfde22e05db8816d5e71727ad95c0"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/engine.rs",
+      "sha256": "235c045370adb4785072e67fcb100a83126880fd6c8208d933f07335412c5a57"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/fixture.rs",
+      "sha256": "ddb957a73957794e79aeb4b941fd5d66eacac954b5b342fbf1ab27f20c664f15"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/lint.py",
+      "sha256": "382ed5d15a285de361e94864e3f3546b9c6dcd5763f842e8cf90c46fc29b8df7"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/main.rs",
+      "sha256": "ffdc3a3e75aebbdcffe01d0ef9c8871f9780da86a415c52edea94b1cfb53e810"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/observe.py",
+      "sha256": "bc316aad7c29940b65b1df99348cf2f70b98f6fd19d37ec862e544923955561d"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/resource.Dockerfile",
+      "sha256": "10a710de811d34b76483f014f3d0126e61e2b99af7fd075152986bbec74968c8"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/resource_cases.rs",
+      "sha256": "982a6a65e572311d0032adfd893b7909ef537fe8d5f2e114cdf3ad45d4a3c571"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/resource_main.rs",
+      "sha256": "4eded1325143a72f29c74c39c323964d49dacb479a0cd9d4cac19047ff317bfe"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/resource_observe.py",
+      "sha256": "97a7df5e8186795b24c05dc1b1ff2e32c4e4f25374fc46b53eedd2f565206593"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/test_observe.py",
+      "sha256": "1b8ba54614d7ff2ab5aa8afbc6290f0423a9834445ee507cef33de0e598ace16"
+    },
+    {
+      "path": "tests/provider/saml/native/signature-probe/test_resource_observe.py",
+      "sha256": "77e04c2e772d150eb253e1db575fecf044f5ab29a5b7ad378b9dd4f87ebfc05f"
+    }
+  ],
+  "producer": {
+    "signature_parent_layer_prefix_verified": true,
+    "signature_parent_image_id": "sha256:55904c4776b52f73ac0f876fb875e5b50c805dabca1c493641b676935fefac8f",
+    "parser_donor_image_id": "sha256:aff417dbfbbbfddd74dd81db637ebb2440a5ad28956042bec32cce92e7fbe82a",
+    "probe_image_id": "sha256:341c25e08bb524505db5bf2fb376d42d6d130c94078980a96f5002de33643799",
+    "parser_observer_and_control_fingerprints_match_prior_record": true,
+    "environment_sha256": {
+      "executable": "56b9357158eb44a33b1afbf55f92575befe9a6385e07123f1d30f28e539da7c2",
+      "parser_control_executable": "50fcf55170bcd448edf5f4a52b9a2ca99e6c33ece19d4fdc166d0aa79b586164",
+      "parser_observer": "5c8033919c5545ca8b60e2d02cf943fe7696d4686ec0abb6c850ceaec85c7e5e",
+      "signature_validator": "bc316aad7c29940b65b1df99348cf2f70b98f6fd19d37ec862e544923955561d",
+      "resource_observer": "97a7df5e8186795b24c05dc1b1ff2e32c4e4f25374fc46b53eedd2f565206593",
+      "cargo_lock": "f1ff7a214a2cb6d7f98437cd01a02280794a1ab24b564bfe16ff0a4bfd1e05e9"
+    },
+    "build_network": "none",
+    "cargo_dependencies": "locked/offline",
+    "reproducible_binary_claim": false
+  },
+  "execution": {
+    "network": "none; owned loopback trap only",
+    "root_filesystem_read_only": true,
+    "capabilities_dropped": "ALL",
+    "no_new_privileges": true,
+    "host_mounts": false,
+    "child_timeout_seconds": 5,
+    "post_kill_reap_timeout_seconds": 2,
+    "trap_connection_timeout_seconds": 2,
+    "memory_gib": 3,
+    "cpu_limit": 2,
+    "pid_limit": 128,
+    "tmpfs_mib": 128,
+    "trace_scope": "signature child and descendants; includes fixture generation, verification and reduction; no per-case or per-stage attribution"
+  },
+  "normal_run": {
+    "exit_code": 1,
+    "result": {
+      "aggregate_signature_child": {
+        "connect_calls": 0,
+        "http_requests": 0,
+        "native_diagnostics_emitted": true,
+        "sentinel_file_calls": 0
+      },
+      "candidate_controls_passed": false,
+      "controls_after": {
+        "file_observer": {
+          "case": "file-control",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 1
+        },
+        "healthy_parser": {
+          "case": "healthy",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        "http_observer": {
+          "case": "http-control",
+          "connect_calls": 1,
+          "diagnostics_emitted": false,
+          "http_requests": 1,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 0
+        }
+      },
+      "controls_before": {
+        "file_observer": {
+          "case": "file-control",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 1
+        },
+        "healthy_parser": {
+          "case": "healthy",
+          "connect_calls": 0,
+          "diagnostics_emitted": false,
+          "http_requests": 0,
+          "marker_matches": true,
+          "parse_accepted": true,
+          "sentinel_file_calls": 0
+        },
+        "http_observer": {
+          "case": "http-control",
+          "connect_calls": 1,
+          "diagnostics_emitted": false,
+          "http_requests": 1,
+          "marker_matches": true,
+          "parse_accepted": null,
+          "sentinel_file_calls": 0
+        }
+      },
+      "execution_completed": true,
+      "policy_gap_rows": 6,
+      "rows": [
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-response-before",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-response-before",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-assertion-before",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-assertion-before",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-doctype",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-doctype",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "attacker_marker": false,
+          "case": "resource-internal-entity",
+          "error_class": "engine_error",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "attacker_marker": false,
+          "case": "resource-internal-entity",
+          "error_class": "engine_error",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "attacker_marker": false,
+          "case": "resource-file-entity",
+          "error_class": "engine_error",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "attacker_marker": false,
+          "case": "resource-file-entity",
+          "error_class": "engine_error",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "attacker_marker": false,
+          "case": "resource-http-entity",
+          "error_class": "engine_error",
+          "mode": "rooted",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": false,
+          "attacker_marker": false,
+          "case": "resource-http-entity",
+          "error_class": "engine_error",
+          "mode": "predigest",
+          "trusted_subject": false,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-external-dtd",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-external-dtd",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-parameter-entity",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-parameter-entity",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-response-after",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-response-after",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-assertion-after",
+          "error_class": "none",
+          "mode": "rooted",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        },
+        {
+          "accepted": true,
+          "attacker_marker": false,
+          "case": "resource-healthy-assertion-after",
+          "error_class": "none",
+          "mode": "predigest",
+          "trusted_subject": true,
+          "wrapper_marker": false
+        }
+      ],
+      "scope": "aggregate child observations across bounded signed XML inputs; no SAML authority",
+      "status": "candidate_controls_incomplete",
+      "unresolved_engine_rows": 6
+    }
+  },
+  "actual_missing_observer_control": {
+    "mechanism": "PATH=/nonexistent with absolute Python entry point prevents strace lookup",
+    "exit_code": 2,
+    "result": {
+      "stage": "observer_unavailable",
+      "status": "infrastructure_failed"
+    }
+  },
+  "valid_run_after_fault": {
+    "exit_code": 1,
+    "same_observations_as_normal": true
+  },
+  "prior_signature_regression": {
+    "record": "assertion-signature-observation.json",
+    "all_56_outcomes_reproduced_unchanged_by_new_resource_binary": true
+  },
+  "reporting_unit_tests": {
+    "passed": 8,
+    "failed": 0,
+    "mocked_reporting_only": true
+  },
+  "lint": {
+    "example": "auth32_signature_resources",
+    "full_upstream_diagnostic_codes": [
+      "clippy::derivable_impls",
+      "clippy::io_other_error",
+      "clippy::large_enum_variant",
+      "clippy::needless_return_with_question_mark",
+      "clippy::ptr_eq",
+      "clippy::too_many_arguments",
+      "clippy::type_complexity",
+      "clippy::unnecessary_cast",
+      "dead_code",
+      "mismatched_lifetime_syntaxes",
+      "unused_imports"
+    ],
+    "full_upstream_diagnostic_count": 20,
+    "full_upstream_exit_code": 101,
+    "owned_diagnostics_emitted": false,
+    "owned_diagnostics_in_full_run": 0,
+    "owned_strict_clippy_exit_code": 0,
+    "upstream_modified": false,
+    "warning_exemptions_added": false,
+    "component_fetch": "matching Clippy in disposable online container only; Cargo compilation offline",
+    "method": "matching clippy-driver, edition 2021, -W clippy::all -D warnings, actual compiled samael/libxml artifacts, metadata only"
+  },
+  "repository_validation": {
+    "runtime_sources_manifests_migrations_unchanged": true,
+    "full_workspace_tests_rerun_for_research_overlay_change": false,
+    "prior_full_regression_revision": "4e912ba7febaf4a017dcdb7749374351bb54501c",
+    "prior_default_passed": 97,
+    "prior_all_features_passed": 639
+  },
+  "private_log_sha256": [
+    {
+      "name": "resource-build.log",
+      "sha256": "8cc039e5385137c8933c064d3b04a0940a192b0772729289aba8d4e8ea075fbd"
+    },
+    {
+      "name": "resource-observation.json",
+      "sha256": "2ec62c0a11f0ebe26a8a6f163c7c8df701d51cd6a66dc38b2123e25ac3b9f79c"
+    },
+    {
+      "name": "resource-observer-unavailable.json",
+      "sha256": "18999a93f809c20975c7c86ca1bd60b9bb9b0823c2d9ab52e6f7dd8d3ce7292d"
+    },
+    {
+      "name": "resource-after-fault.json",
+      "sha256": "2ec62c0a11f0ebe26a8a6f163c7c8df701d51cd6a66dc38b2123e25ac3b9f79c"
+    },
+    {
+      "name": "resource-lint.json",
+      "sha256": "672fad3cdfb9790912b2a3a28c6ac3940ef3cffe61f9cd755c30e0a9f4a9654b"
+    }
+  ],
+  "limits": [
+    "Six forbidden XML policy failures and six opaque engine errors remain",
+    "Zero observed access applies only to this bounded child and native stack",
+    "No per-case or internal parser/transform-stage resource attribution",
+    "No comprehensive hostile/transform/profile corpus or application/PostgreSQL SAML acceptance",
+    "Native advisory/license and independent security review remain gates",
+    "No production SAML verifier, dependency or ACS selected"
+  ]
+}
