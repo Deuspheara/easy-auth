@@ -1,5 +1,7 @@
 mod configuration;
 mod flow;
+#[cfg(test)]
+mod native_tests;
 mod proofs;
 mod redirect;
 mod repository;
@@ -9,6 +11,7 @@ mod tests;
 pub use configuration::{OAuthConnection, OAuthMixupDefense};
 pub use flow::{OAuthExchange, OAuthStart, OAuthTransactions};
 pub use proofs::OAuthBrowserProof;
+pub use redirect::OAuthRedirect;
 pub use repository::{
     OAuthCallback, OAuthIntent, OAuthPurpose, OAuthRequest, OAuthTransactionRepository,
 };

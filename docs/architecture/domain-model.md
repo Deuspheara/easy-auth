@@ -149,3 +149,11 @@ compose the existing services in both modes. Actual public-flow evidence preserv
 pending proof and a committed owner/session across factory restarts without revision
 rotation. Provider-contact attachment, linking, native refresh families and application
 business authorization remain separate domains and release work.
+
+AUTH-23's `OAuthRedirect` is validated configuration metadata, not a credential,
+proof or new table. Its explicit desktop-loopback constructor keeps the concrete
+literal address/port/path in the existing connection's exact redirect string.
+Configuration values have no deserialization or arbitrary field mutation API;
+`reconfigured` copies their validated definition with a fresh revision. PostgreSQL
+retains global redirect uniqueness, realm/client scope and current-policy locking.
+The existing HTTPS constructor and web configuration retain their restrictions.

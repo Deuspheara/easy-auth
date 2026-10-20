@@ -124,3 +124,10 @@ production crypto dependency or advisory/license exception is added. The SQL
 scoped-subject digest uses PostgreSQL's existing SHA-256 over a JSON tuple for
 serialization/cooldown metadata, not custom signature or credential verification.
 No raw provider token/key/nonce is persisted by the new identity transaction.
+
+AUTH-23's initial explicit desktop return metadata uses existing standard socket
+types and the already selected URL parser. It introduces no dependency/version,
+cryptography, license or advisory exception. The HTTPS web constructor and provider
+network restrictions remain unchanged. Typed exact loopback metadata is not a
+Google exchange adapter, native transport or real-provider acceptance result;
+[ADR 0019](../architecture/adr/0019-google-code-flow.md) retains those gates.

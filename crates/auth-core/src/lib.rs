@@ -25,8 +25,8 @@ pub use notifications::{SecurityNotice, SecurityNoticeKind};
 #[cfg(feature = "oauth-transactions")]
 pub use oauth::{
     OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthExchange, OAuthIntent,
-    OAuthMixupDefense, OAuthPurpose, OAuthRequest, OAuthStart, OAuthTransactionRepository,
-    OAuthTransactions,
+    OAuthMixupDefense, OAuthPurpose, OAuthRedirect, OAuthRequest, OAuthStart,
+    OAuthTransactionRepository, OAuthTransactions,
 };
 #[cfg(feature = "oidc-egress")]
 pub use oidc::{

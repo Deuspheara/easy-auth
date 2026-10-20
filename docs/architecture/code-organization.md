@@ -563,3 +563,14 @@ case orchestration and immutable report generation. All new modules remain under
 300lines. Longer ordered scenario/factory/shutdown functions retain exact waits,
 positive controls and cleanup together as reviewed size exceptions; no generic test
 engine or unrelated cleanup is deferred.
+
+AUTH-23 first extracts exact URL admission into private `oauth/redirect.rs` and
+verifies existing core/PostgreSQL cases before adding native behavior. That module
+owns the typed exact web/desktop redirect contract; configuration retains immutable
+connection metadata and explicit fresh-revision copying. PostgreSQL keeps its original
+administrative transactions, lock order, disable retention and pending cancellation.
+Native core cases and OAuth/identity-startup database cases have separate feature
+modules. All affected modules remain below300lines. Longer ordered callback-race and
+signed-session lifecycle cases keep valid controls, invalid attempts, reconfiguration
+and final assertions together as reviewed function-size exceptions. No listener,
+generic provider engine, widened proof constructor or unrelated cleanup is added.

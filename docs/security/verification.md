@@ -2799,3 +2799,89 @@ modules. Production policy/SQL remain in their existing crates. Modules stay bel
 300lines; longer ordered test/supervision functions keep exact waits, positive
 controls and cleanup visible as reviewed size exceptions. No unrelated cleanup is
 deferred and no generic test engine or widened production proof API is added.
+
+## AUTH-23 explicit desktop return metadata — 2026-10-20
+
+AUTH-23 remains In Progress. This checkpoint implements only trusted exact desktop
+return metadata, not a Google verifier/profile, system-browser transport, mobile
+return mechanism or supported Google activation. The
+[proposed ADR](../architecture/adr/0019-google-code-flow.md) retains those acceptance
+requirements, including usable genuinely fresh provider deletion and the manual
+provider matrix. No device/provider prompt or security-setting change was requested.
+
+Structural commit `d433086` extracts the unchanged exact URL validator before
+behavior changes. Its two existing core cases,25 real-PostgreSQL OAuth cases and
+strict selected-feature lint pass. New feature-owned tests initially fail compilation
+because the explicit redirect/reconfiguration API does not exist (E0425/E0599);
+this is a missing-feature result, not evidence of an exploited application failure.
+After implementation, three new core and three new PostgreSQL cases pass.
+
+`OAuthRedirect::https` and `OAuthConnection::new` remain HTTPS-only. The explicit
+desktop constructor accepts only literal `127.0.0.1`/`::1`, an exact nonzero port
+other than80 and a canonical non-root path, with existing URL bounds and no query,
+fragment, credentials, encoded alias or network-path spelling. It validates metadata,
+not listener ownership or provider registration. Exact callback port/address/path
+and issuer checks remain mandatory. Administrative persistence copies immutable
+validated metadata at a fresh revision rather than rejecting it through the web-only
+constructor. Existing transactions still retain disable, cancel old pending work
+and enforce current source/realm/client policy. No migration, HTTP contract, server
+setting, provider network exception, dependency or cryptographic change is added.
+
+Core controls cover explicit IPv4/IPv6 selection, unchanged web rejection, wrong
+port/path/issuer, malformed native addresses/paths, bounds, metadata validation and
+fresh revision copying. Real PostgreSQL covers exact port/protocol/address mismatch
+without consuming the valid pending operation, single-winner callbacks, cancellation,
+disable retention and revision invalidation. Actual signed generic ES256 identity
+controls prove startup preserves the original local session, reconfiguration rejects
+old signed proof/session authority, current proof resolves the original owner, and
+callback uniqueness still prevents another realm/client from claiming the same URI.
+Infrastructure failures cannot substitute for the exact expected authorization
+results. These are not Google RS256 or real native callback/provider tests.
+
+Final local commands pass with `CARGO_INCREMENTAL=0` and the documented real
+PostgreSQL setup; default/all-feature workspace runs execute sequentially:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace
+cargo test --locked --workspace --all-features
+cargo test --locked -p easy-auth-core --features oidc-verification
+cargo build --locked -p easy-auth-server --example oidc-web-native --features oidc-web
+node tests/browser/oidc/web/run.cjs
+python3 scripts/audit.py
+cargo deny --all-features check
+npm audit --audit-level=low --prefix tests/browser/passkeys
+```
+
+Results: **97 default**, **519 all-feature** workspace cases (2 Axum,98 HTTP,
+72 core,324 PostgreSQL,23 server; the logging subprocess repeats an included case),
+and **60 verification-only** cases. No failures or ignored cases. Compiled advisory,
+license/source/bans and npm checks pass; the inactive SQLx/MySQL RSA advisory stays
+visible without an exception. The complete staged diff receives redacted Gitleaks
+scanning before publication.
+
+The rebuilt [Keycloak regression report](../../tests/browser/oidc/results/2026-10-20/keycloak-native-metadata-regression.json)
+passes all **18 existing public-flow cases**, with **683 source hashes** and its
+fixed producer binary matched before publication. Both standalone and embedded
+factory restarts, exact confidential authentication, actual final commit/subject
+waits, session/logout/deletion/cooldown and normal owned cleanup remain intact.
+All six application instances stop normally and both owned databases, provider
+container and private files are removed. Original assertions and immutable reports
+are unchanged. This is generic web regression evidence through the existing private
+TLS/source-copy boundary, not a native loopback or Google interoperability result.
+The original provider/passkey/SMTP suites remain required in hosted CI.
+
+Prerequisite composition ticket AUTH-56 separately completed after exact final-head
+hosted run [39379861505](https://github.com/Deuspheara/easy-auth/actions/runs/39379861505)
+passed at `0e8dcb28a917f38247cb8992e39769d92994f8bf`; implementation run39378959095
+also passed. Its branch is unchanged. AUTH-23's new checkpoint requires its own
+hosted evidence and does not close Google/manual/native/lifecycle acceptance.
+Broader release, independent review, SAML/outbound and AUTH-20 recovery gates remain.
+
+Maintainability review keeps URL admission/typed redirects, immutable connection
+metadata and original PostgreSQL transaction ownership separate. All affected
+modules remain below300lines. Longer ordered race and signed-session cases retain
+their valid controls, precise rejection and lifecycle assertions as reviewed
+function-size exceptions; no unrelated cleanup or generic provider engine is added.

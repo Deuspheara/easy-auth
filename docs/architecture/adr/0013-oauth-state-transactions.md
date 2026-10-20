@@ -165,3 +165,15 @@ Provider-specific code exchange, signature/nonce/claims validation, bounded egre
 protected provider credentials, HTTP/cookie transport, real Google/Apple web/native
 checks and linking/last-credential policy remain subsequent gates. AUTH-20's device
 and independent recovery review remain open. This feature activates none of them.
+
+## AUTH-23 explicit desktop metadata extension
+
+The additive typed `OAuthRedirect::desktop_loopback` contract admits only literal
+IPv4/IPv6 localhost, a concrete nonzero/nondefault port and a canonical non-root
+path. `OAuthConnection::new` remains HTTPS-only; a caller must explicitly select
+the typed redirect constructor in trusted composition. No native listener, mobile
+scheme, provider profile or public HTTP route is activated. Exact URI comparison,
+issuer defense, global callback uniqueness and every original state/deadline check
+remain unchanged. Administrative revision rotation preserves the validated definition
+rather than reconstructing it through the web-only constructor. See
+[ADR 0019](0019-google-code-flow.md) for the unfinished Google/native acceptance scope.

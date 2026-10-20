@@ -17,15 +17,7 @@ impl Postgres {
         &self,
         input: &OAuthConnection,
     ) -> Result<OAuthConnection> {
-        let connection = OAuthConnection::new(
-            input.realm(),
-            input.connection(),
-            input.client(),
-            input.issuer(),
-            input.provider_client(),
-            input.redirect(),
-            input.defense(),
-        )?;
+        let connection = input.reconfigured();
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         replace(&mut tx, &connection).await?;
         tx.commit().await.map_err(unavailable)?;

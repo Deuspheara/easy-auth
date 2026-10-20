@@ -34,8 +34,44 @@ explicit alternative for a globally unique configured callback; a present wrong
 `iss` is still rejected. Never copy the configured issuer into a response's missing
 `iss`, derive a trusted callback URI from request body input, normalize issuer
 strings or silently fall back between modes. Dedicated callback URLs use canonical
-HTTPS spelling and unencoded paths; native/loopback transport is not available in
-this boundary.
+HTTPS spelling and unencoded paths by default. The explicit desktop metadata
+boundary below does not activate a native callback transport.
+
+## Explicit desktop return metadata
+
+AUTH-23 adds `OAuthRedirect` and `OAuthConnection::with_redirect` under the existing
+`oauth-transactions` feature. `OAuthConnection::new` and `OAuthRedirect::https`
+retain the HTTPS-only contract. A desktop embedding may deliberately create a
+typed return URI after binding its own listener:
+
+```rust
+let listener = std::net::TcpListener::bind(("127.0.0.1", 0))?;
+let redirect = OAuthRedirect::desktop_loopback(listener.local_addr()?, "/oauth/callback")?;
+```
+
+Pass that value to `OAuthConnection::with_redirect` in trusted composition, then
+persist the connection and use the returned revision. Keep the listener owned until
+completion/cancellation. The type validates metadata; it cannot prove socket
+ownership, provider registration, OS return handling or application identity.
+
+Only literal `127.0.0.1` and `::1` with a concrete nonzero port other than 80 are
+admitted. Port 80 is excluded because URL serialization removes its explicit port.
+The path must be canonical and non-root, without encoded aliases, query, fragment,
+credentials or network-path spelling. Names such as localhost, alternate loopback
+addresses and mapped IPv6 are not accepted by this constructor. Callback consumption
+still requires the exact scheme/address/port/path and the configured issuer defense.
+No wildcard port matching or implicit HTTPS-to-HTTP conversion exists.
+
+Administrative reconfiguration uses `OAuthConnection::reconfigured` to allocate
+fresh metadata while preserving the already validated redirect. Persistence still
+retains disable and atomically invalidates old pending work. Stable identity-policy
+loading keeps its current-revision checks; metadata never grants authentication.
+No migration, new HTTP route or server setting is added. Ordinary OIDC web startup
+and routing remain HTTPS-only. Google exchange, an actual native listener/client,
+mobile return mechanisms and the manual provider matrix remain AUTH-23 work; this
+primitive is not Google or native-system-browser interoperability evidence.
+
+## Purpose and completion authority
 
 Link intent binds the original owner/session. The shared database policy requires
 fresh authentication and the correct method for a passkey-required account at both

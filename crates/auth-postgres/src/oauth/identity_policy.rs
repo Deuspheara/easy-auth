@@ -1,8 +1,6 @@
 use super::configuration;
 use crate::{Postgres, unavailable};
-use auth_core::{
-    Error, OAuthConnection, OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, Result,
-};
+use auth_core::{Error, OidcDisplayNameClaim, OidcIdentityPolicy, OidcJitPolicy, Result};
 use sqlx::Row;
 
 impl Postgres {
@@ -14,15 +12,7 @@ impl Postgres {
         input: &OidcIdentityPolicy,
     ) -> Result<OidcIdentityPolicy> {
         let current = input.configuration();
-        let connection = OAuthConnection::new(
-            current.realm(),
-            current.connection(),
-            current.client(),
-            current.issuer(),
-            current.provider_client(),
-            current.redirect(),
-            current.defense(),
-        )?;
+        let connection = current.reconfigured();
         let issuers: Vec<&str> = input.allowed_issuers().iter().map(String::as_str).collect();
         let policy = OidcIdentityPolicy::new(connection, &issuers, input.display_name_claim())?
             .with_jit(input.jit());

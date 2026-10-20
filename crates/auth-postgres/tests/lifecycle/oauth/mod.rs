@@ -7,5 +7,6 @@ mod deletion_disabled;
 mod limits;
 mod linking;
 mod migration;
+mod native;
 mod ordering;
 mod setup;

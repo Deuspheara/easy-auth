@@ -420,3 +420,15 @@ current-authority proof. Stable loading preserves revisions and operator disable
 No root/address/insecure override, additional audience, dynamic issuer, secret
 logging or policy-row credential storage is added. Auth-only legacy composition
 refuses enabled browser settings rather than silently dropping requested routes.
+
+AUTH-23's explicit desktop return metadata cannot relax ordinary web origin or
+provider egress policy. Only typed literal `127.0.0.1`/`::1` return addresses with
+an exact nonzero/nondefault port and canonical non-root path are admitted; the
+existing HTTPS-only constructor and server settings are unchanged. Exact callback,
+browser/purpose, original cap, source revision and scoped ownership checks still
+apply. Trusted embedding must actually own the listener; validating a socket address
+does not establish ownership or app authenticity. No native callback endpoint,
+Google verifier/profile, weaker client authentication or mobile fallback is added.
+Tests use explicit metadata and real signed generic OIDC controls, not real Google
+or OS-return evidence. Native transport and provider-required fresh deletion remain
+activation gates.

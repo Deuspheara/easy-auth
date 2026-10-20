@@ -1,8 +1,14 @@
 # ADR 0019: Google authorization-code profiles
 
-Date: 2026-10-20. Status: proposed for AUTH-23; not implemented or activated.
+Date: 2026-10-20. Status: proposed for Google web/native activation in AUTH-23.
 This records the implementation and acceptance boundaries before behavior changes.
 Existing generic OIDC/Keycloak evidence does not establish Google interoperability.
+
+The first implementation checkpoint adds only explicit desktop return metadata:
+`OAuthRedirect`, exact loopback binding, preserved administrative revision rotation
+and native-configuration PostgreSQL regressions. No Google profile, native callback
+listener or web/native activation is implemented by that checkpoint. The remaining
+proposal below must still be resolved and verified.
 
 ## Context
 

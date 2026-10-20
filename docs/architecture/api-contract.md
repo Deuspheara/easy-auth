@@ -88,6 +88,12 @@ nonce and S256 challenge; raw PKCE/session/browser secrets must not enter URLs.
 The private proof transport and actual callback route/issuer parsing are mandatory
 adapter work before exposing provider flows.
 
+AUTH-23 adds explicit `OAuthRedirect` metadata and
+`OAuthConnection::with_redirect` for trusted desktop embedding. The existing
+constructor remains HTTPS-only. Literal desktop loopback has exact nonzero,
+nondefault port and canonical path binding; it does not create a public native or
+Google endpoint. See the [desktop contract](../guides/oauth-transactions.md#explicit-desktop-return-metadata).
+
 Only exact configured Origin is accepted on initial browser POST endpoints, including pre-authentication. Missing/null Origin fails closed, so command-line clients must explicitly send it. No wildcard credentialed CORS. SameSite=Lax, Secure in HTTPS production, HttpOnly, Path=/, no Domain; production session uses __Host- prefix. Dev HTTP is loopback-only and explicitly enabled. Duplicate cookie names/invalid token shapes must be rejected. An Origin guard is appropriate for this constrained same-origin contract; it is not a substitute for OAuth state or SAML correlation.
 
 Outbound issuer (M07) has a distinct protocol contract: registered clients, exact redirects, code + S256, client authentication where applicable, signing keys, discovery, JWKS, audience-bound ID/access tokens, revocation and introspection. First-party alpha session introspection does not constitute OIDC support. Native refresh credentials and cross-origin apps are unavailable until that gate passes.
