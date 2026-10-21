@@ -1,9 +1,8 @@
-use super::{replay::Reservations, timing, verified::VerifiedSamlAssertion};
+use super::{replay::Reservations, subject, timing, verified::VerifiedSamlAssertion};
 use crate::{Error, Result, SamlPinnedCertificate, SamlPreparedResponse};
-use saml_rs::{NameIdFormat, SsoSession, VerifiedXmlSignatureCoverage as Coverage};
+use saml_rs::{SsoSession, VerifiedXmlSignatureCoverage as Coverage};
 use zeroize::Zeroizing;
 
-const MAX_SUBJECT_BYTES: usize = 1024;
 const RSA_SHA256: &str = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
 
 pub(super) fn project(
@@ -14,7 +13,7 @@ pub(super) fn project(
     now: i64,
 ) -> Result<VerifiedSamlAssertion> {
     validate_shape(&prepared, &session)?;
-    let subject = subject(&prepared, &session)?;
+    let subject = subject::persistent(prepared.registration(), session.name_id())?;
     let response_until = timing::recent_instant(
         session.response_issue_instant(),
         now,
@@ -99,21 +98,4 @@ fn validate_shape(prepared: &SamlPreparedResponse, session: &SsoSession) -> Resu
         return Err(Error::Unauthorized);
     }
     Ok(())
-}
-
-fn subject(prepared: &SamlPreparedResponse, session: &SsoSession) -> Result<String> {
-    let id = session.name_id();
-    let reg = prepared.registration();
-    if id.format() != Some(&NameIdFormat::Persistent)
-        || id.value().is_empty()
-        || id.value().len() > MAX_SUBJECT_BYTES
-        || id.value().trim() != id.value()
-        || id.value().chars().any(char::is_control)
-        || id.sp_provided_id().is_some()
-        || id.name_qualifier().is_some_and(|q| q != reg.idp_entity())
-        || id.sp_name_qualifier().is_some_and(|q| q != reg.sp_entity())
-    {
-        return Err(Error::Unauthorized);
-    }
-    Ok(id.value().to_owned())
 }

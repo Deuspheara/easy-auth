@@ -4,6 +4,7 @@ mod input;
 mod projection;
 mod replay;
 mod repository;
+mod subject;
 mod timing;
 mod verified;
 

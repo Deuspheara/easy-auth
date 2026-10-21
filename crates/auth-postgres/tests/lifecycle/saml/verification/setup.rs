@@ -50,8 +50,24 @@ pub(super) fn response(
     subject: &str,
     lifetime: Duration,
 ) -> SamlPostResponse {
+    response_from(
+        f,
+        start,
+        NameId::new(subject, Some(NameIdFormat::Persistent)),
+        f.registration.idp_entity(),
+        lifetime,
+    )
+}
+
+pub(super) fn response_from(
+    f: &Fixture,
+    start: &SamlStart,
+    name_id: NameId,
+    issuer: &str,
+    lifetime: Duration,
+) -> SamlPostResponse {
     let reg = &f.registration;
-    let config = IdpConfig::builder(EntityId::try_new(reg.idp_entity()).unwrap())
+    let config = IdpConfig::builder(EntityId::try_new(issuer).unwrap())
         .sso_endpoint(SsoEndpoint::redirect(reg.sso()).unwrap())
         .credentials(Credentials {
             signing_key: Some(PrivateKeyPem::new(fixture_signing_key())),
@@ -88,7 +104,7 @@ pub(super) fn response(
         .respond_sso(
             &sp,
             &received,
-            Subject::new(NameId::new(subject, Some(NameIdFormat::Persistent)), vec![]),
+            Subject::new(name_id, vec![]),
             RespondSso::post()
                 .sign_response()
                 .apply_web_browser_sso_generation_rules(),
