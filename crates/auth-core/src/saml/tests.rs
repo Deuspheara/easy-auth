@@ -44,8 +44,8 @@ fn metadata_roundtrip_advertises_only_the_selected_outgoing_profile() {
 fn outgoing_request_uses_exact_endpoint_and_independent_opaque_relay_state() {
     let registration = registration();
     let relay = crate::Secret::generate().unwrap();
-    let first = registration.login_request(relay.expose()).unwrap();
-    let second = registration.login_request(relay.expose()).unwrap();
+    let first = registration.login_request(relay.expose(), None).unwrap();
+    let second = registration.login_request(relay.expose(), None).unwrap();
     assert_ne!(first.id, second.id);
     assert!(first.id.starts_with('_'));
     assert_eq!(first.entity_endpoint, registration.sso());

@@ -7,6 +7,7 @@ mod metadata;
 mod prepared;
 mod proofs;
 mod repository;
+mod request_generation;
 mod requests;
 #[cfg(feature = "saml-verification")]
 mod verification;

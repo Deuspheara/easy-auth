@@ -31,11 +31,7 @@ impl SamlRegistration {
         generate_sp_metadata(&sp_config(self))
     }
 
-    pub(super) fn login_request(&self, relay_state: &str) -> Result<BindingContext> {
-        self.login_request_options(relay_state, None)
-    }
-
-    fn login_request_options(
+    pub(super) fn login_request(
         &self,
         relay_state: &str,
         force_authn: Option<bool>,
