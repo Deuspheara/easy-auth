@@ -7,6 +7,12 @@ and `cancel` removes only that operation under both proofs/current registration.
 Neither operation accepts an Assertion or grants a user/session. The normal SAML
 ACS remains absent. See the [component contract and limits](../guides/saml.md).
 
+The separate opt-in `saml-certificates` component adds operator-pinned public
+certificate configuration and atomic revision/rotation invalidation in PostgreSQL.
+It adds no HTTP endpoint, response verifier or user/session grant. Exact leaf pins,
+X.509/approval windows, namespace checks and remaining integration requirements are
+specified in the same [SAML guide](../guides/saml.md#operator-pinned-idp-certificates).
+
 AUTH-56 adds the trusted PostgreSQL
 `load_or_initialize_oidc_identity_policy(&definition)` operation and narrow core
 `OidcIdentityPolicy::with_persisted_revision` metadata API. Matching startup loads

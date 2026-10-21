@@ -34,6 +34,12 @@ RelayState persistence and one-use cancellation. It uses the crypto-disabled
 producer only and grants no identity/session. [Component limits](../guides/saml.md)
 remain explicit; the verifier, ACS and lifecycle approval gates are still open.
 
+The separate opt-in `saml-certificates` feature adds typed operator-approved leaf
+pins/windows in core and atomic revision-bound pin persistence/invalidation in
+PostgreSQL. OpenSSL parses X.509/key/validity configuration; it does not verify XML.
+No core policy is copied into HTTP, no new workspace crate or provider activation
+is introduced, and no storage lock spans certificate parsing.
+
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
 current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`
 adapter in the server library. Embedded consumers share that adapter. Short registry

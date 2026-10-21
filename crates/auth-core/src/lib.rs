@@ -63,6 +63,8 @@ pub use saml::{
     MAX_SAML_PENDING_PER_CONNECTION, SAML_REQUEST_LIFETIME_SECONDS, SamlBrowserProof,
     SamlRegistration, SamlRequestAdmission, SamlRequestRepository, SamlStart, SamlTransactions,
 };
+#[cfg(feature = "saml-certificates")]
+pub use saml::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 

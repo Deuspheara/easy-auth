@@ -103,6 +103,14 @@ overlap windows. KeyInfo cannot introduce trust. Validate certificate/key materi
 through the selected library, retain applicable validity/algorithm policy and
 record whether the deployment uses pinned leaf certificates or a reviewed PKI
 model. Never equate loading an X.509 public key with chain/validity validation.
+The opt-in `saml-certificates` configuration slice uses existing OpenSSL 0.10.81
+bindings for X.509 parsing/validity comparisons, canonical DER and RSA key policy
+(at least 2048 bits). It pins one/two exact leaves and explicit approval windows;
+it does not perform PKI chain/revocation/EKU validation, XML signature operations
+or backend selection. This is a separate optional configuration dependency edge,
+not approval of the proposed AWS-LC signature graph. Native OpenSSL updates and
+licenses remain part of deployment inventory. See the [SAML guide](../../guides/saml.md).
+
 Rotation or disable must invalidate pending operations and source-bound sessions
 according to the same current-source rules used elsewhere in the library.
 

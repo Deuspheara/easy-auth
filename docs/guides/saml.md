@@ -63,10 +63,51 @@ current enabled registration. Wrong proofs leave pending state untouched. It is
 one-use, has no user/session effect and never verifies or consumes an Assertion.
 Cancellation/storage errors remain distinguishable from successful cancellation.
 
+## Operator-pinned IdP certificates
+
+The separate opt-in core/PostgreSQL `saml-certificates` feature adds trusted
+certificate configuration; it implies `saml-requests`. Metadata/request-only
+builds still have no certificate/cryptographic provider dependency. Certificate
+parsing uses established OpenSSL 0.10.81 bindings, already present in the workspace
+OIDC graph. This adds an explicit optional edge, no new package versions, XML
+cryptography or trust fallback. Native OpenSSL deployment/patching still applies.
+
+`SamlPinnedCertificate::from_der` accepts a single canonical DER RSA certificate
+(up to 16 KiB, at least 2048-bit public key) and an explicit half-open approval
+window in Unix seconds. OpenSSL parses the X.509 structure and compares the
+window with NotBefore/NotAfter. Approval must fit within certificate validity.
+`SamlCertificateTrust::pinned_leaf` requires one or two distinct certificates,
+allowing one explicitly approved rotation overlap. SHA-256 fingerprints cover
+exact certificate DER. No private key is loaded or created.
+
+This trust model is exact operator-approved leaf pinning, including self-signed
+IdP signing certificates. It is not PKI chain, hostname, revocation, OCSP or EKU
+validation. System roots, fetched metadata, certificate issuer names and callback
+KeyInfo cannot add trust. `active_at` must use trusted operation/database time,
+with no implicit clock skew; an empty active set fails closed. It is configuration,
+not evidence that an Assertion was signed or a provider is approved.
+
+`Postgres::configure_saml_pinned_registration` atomically replaces registration
+and certificate pins, allocates a fresh revision and cancels pending requests.
+It retains an existing disable. `saml_certificate_trust` reads only under exact
+current enabled realm/connection/client/revision and revalidates stored DER,
+windows and fingerprints. Missing configuration is unauthorized; malformed stored
+material is unavailable. It releases database locks before X.509 parsing. A
+returned snapshot is not continuing authority: future sign-in completion must
+recheck the current revision and original deadline in its final transaction.
+
+Every revision change, including requests-only replacement and disable, deletes
+old pins in the same database transaction through migration 0022. Failed pin
+replacement rolls back registration, pins and request cancellation together.
+The real PostgreSQL tests cover rotation, rollback, corrupt storage, identical
+connection/client IDs across realms and disable. Core tests reuse unchanged public
+upstream certificates with explicit historical windows and reject their expiry at
+current time; no key/signature fixture is generated.
+
 ## Remaining implementation and approval
 
-The requests feature does **not** implement signing-certificate trust/rollover,
-signature verification, verified Assertion extraction, issuer/audience/recipient/
+The requests feature alone has no certificate trust. Neither optional component
+implements signature verification, verified Assertion extraction, issuer/audience/recipient/
 destination/time/NameID validation, response correlation consumption, Assertion
 replay protection, JIT/identity mapping or source-bound session/lifecycle commit.
 Pending AuthnRequest uniqueness is not a substitute for the Assertion replay ledger.
@@ -84,6 +125,8 @@ Ordinary local checks for this component:
 ```sh
 cargo test --locked -p easy-auth-core --features saml-requests saml::
 cargo test --locked -p easy-auth-postgres --features saml-requests --test lifecycle saml::
+cargo test --locked -p easy-auth-core --features saml-certificates saml::
+cargo test --locked -p easy-auth-postgres --features saml-certificates --test lifecycle saml::
 ```
 
 The second command requires the documented real development PostgreSQL database.

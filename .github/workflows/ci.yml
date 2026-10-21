@@ -41,6 +41,10 @@ jobs:
         run: |
           cargo test --locked -p easy-auth-core --features saml-requests saml::
           cargo test --locked -p easy-auth-postgres --features saml-requests --test lifecycle saml::
+      - name: Verify gated SAML certificate configuration without XML signature activation
+        run: |
+          cargo test --locked -p easy-auth-core --features saml-certificates saml::
+          cargo test --locked -p easy-auth-postgres --features saml-certificates --test lifecycle saml::
       - name: Verify Google PostgreSQL integration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
       - name: Verify stable native OAuth registration without passkeys

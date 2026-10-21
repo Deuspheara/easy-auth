@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+saml-certificates = ["saml-requests", "auth-core/saml-certificates"]
 saml-requests = ["auth-core/saml-requests"]
 google = ["oidc-identities", "auth-core/google"]
 oidc-identities = ["oidc-verification", "auth-core/oidc-identities"]
@@ -25,6 +26,7 @@ sqlx.workspace = true
 uuid.workspace = true
 
 [dev-dependencies]
+openssl.workspace = true
 josekit.workspace = true
 tokio.workspace = true
 webauthn-authenticator-rs = { version = "=0.5.5", default-features = false, features = ["softtoken"] }
