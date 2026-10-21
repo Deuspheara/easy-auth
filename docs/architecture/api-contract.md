@@ -486,3 +486,13 @@ New `save_oauth_return`/`consume_oauth_return`/`cancel_oauth_return` methods bin
 operation URIs; their defaults reject alternate returns on unextended backends.
 The default profile remains exact. This adds no HTTP/OpenAPI route or remote token
 contract. See the [stable native contract](../guides/google.md#stable-native-registration-and-per-attempt-return).
+
+
+The opt-in Rust-only `saml-verification` component consumes prepared browser-bound
+request state and a bounded POST field through concrete `SamlResponseVerifier`.
+`VerifiedSamlAssertion` contains authenticated persistent-subject/time/source/pin
+facts and hashed replay reservations, without raw XML or local session authority.
+It has no public constructor or clone/serialization contract. The PostgreSQL
+configuration/clock port requires exact current enabled registration. Durable
+replay and final identity/session commit remain unimplemented; normal HTTP APIs
+expose no SAML ACS. See the [SAML component guide](../guides/saml.md).

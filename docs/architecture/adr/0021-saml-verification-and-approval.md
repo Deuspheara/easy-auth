@@ -167,7 +167,8 @@ cannot reuse a sign-in proof or silently fall back to a weaker credential.
 | Dependency source/features/patch maintenance and distribution | Experimental candidate/patches exist | Historical pin-scoped suites/inventory exist | Internal assessment only | Pending |
 | XML/C14N/signature/reference/verified-payload binding | Library candidate plus recorded patches | Existing bounded vectors/corpus; additional assurance outstanding | Internal source assessment only | Pending |
 | Outgoing metadata, browser-bound request state/preparation and leaf-pin configuration | Opt-in AUTH-33 components implemented; no authentication grant | Core and real PostgreSQL scenarios; commands/limits in the SAML guide | Internal source/maintainability review only | Pending |
-| Signed protocol conditions, Assertion replay and identity/session lifecycle | AUTH-34/35 integration remains unfinished | Not established by request/certificate tests | Pending | Pending |
+| Signed message/condition projection | Opt-in concrete AUTH-34 adapter; opaque proof only | Ordinary signed local POST, correlation/pin/configuration/storage controls; full condition matrix and actual IdP remain open | Internal implementation review only | Pending |
+| Durable Assertion replay and identity/session lifecycle | AUTH-34/35 integration remains unfinished | Not established by staged replay or message tests | Pending | Pending |
 | End-to-end IdP interoperability, identity/session and lifecycle | Not established by dependency tests | Owned IdP/browser/database evidence required; Entra/Okta coverage explicitly recorded | Pending | Pending |
 | Independent security review and activation decision | Reviewer/scope/decision record required | Not replaced by a green build or internal agent review | Pending | Pending |
 
@@ -181,3 +182,28 @@ Activation requires every mandatory gate, resolved findings and explicit approva
 for the actual shipped source/features/configuration. AUTH-32 remains open;
 AUTH-33/34/35 can progress as gated engineering slices without pretending the
 production dependency or SAML service is independently approved.
+
+## Concrete opt-in adapter boundary
+
+The `saml-verification` component now selects that exact source with only AWS-LC.
+The root lock resolves Bergshamra 0.9.2, uppsala 0.10.1, kryptering 0.6.0/AWS-LC,
+aws-lc-rs 1.18.2 and aws-lc-sys 0.46.0. The latter two differ from the candidate's
+original standalone lock (1.18.1/0.45.0); historical qualification is not claimed
+for the newer native versions. The adopting root lock and fresh ordinary tests,
+compiled-graph audit, license/source/feature inventory are separate evidence.
+No RustCrypto, legacy, PKCS#11, post-quantum or FIPS feature is selected. AWS-LC
+needs its native C/CMake toolchain; existing OpenSSL X.509 configuration still
+needs OpenSSL development/runtime support. CI installs those prerequisites.
+No advisory ignore or license exception is added. Native backend release/advisory
+mapping and ongoing distribution/patch ownership approval remain required.
+
+The adapter requires both authenticated signature coverages, narrow algorithms,
+current active leaf pins and strict zero-skew typed protocol checks. It calls the
+library's complete typed message boundary, not a signature boolean plus separately
+parsed XML. Local generated metadata contains only trusted configuration and one
+pin. A required replay callback stages authenticated hash/deadline reservations;
+that is not durable replay protection or identity authority. Full fixed profile,
+opaque-proof limits, worker cancellation semantics and remaining atomic commit
+requirements are documented in the [component guide](../../guides/saml.md).
+Independent XML/backend review, maintained dependency acceptance and actual
+IdP/browser/lifecycle interoperability remain mandatory before activation.

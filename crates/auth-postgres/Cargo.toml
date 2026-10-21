@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+saml-verification = ["saml-certificates", "auth-core/saml-verification"]
 saml-certificates = ["saml-requests", "auth-core/saml-certificates"]
 saml-requests = ["auth-core/saml-requests"]
 google = ["oidc-identities", "auth-core/google"]
@@ -26,6 +27,7 @@ sqlx.workspace = true
 uuid.workspace = true
 
 [dev-dependencies]
+saml-rs.workspace = true
 openssl.workspace = true
 josekit.workspace = true
 tokio.workspace = true

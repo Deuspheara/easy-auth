@@ -776,3 +776,16 @@ All files are below300lines; implementation functions stay below50lines. Longer
 ordered test/provider-delivery cases retain public request fields, actual signature/
 socket delivery, negative facts and healthy controls together as justified
 function-size exceptions. No generic fixture/plugin framework or cleanup is deferred.
+
+
+AUTH-34's gated core `saml/verification/` separates bounded input, trusted library
+configuration, concrete asynchronous flow, typed authenticated projection, clock
+conversion, replay reservation staging, storage port and opaque proof. PostgreSQL
+implements the configuration/clock port in its owning SAML feature; no XML/crypto
+runs under database locks. Entry modules declare and deliberately reexport only.
+The ordered projection function retains every original/signed/certificate cap and
+proof construction together as a size exception. The ordinary IdP fixture and
+ordered rollover scenario retain their actual request/signature/negative/positive
+sequence as function-size exceptions; all new modules stay below 300 lines.
+No custom XML verifier, crypto test framework, alternate provider engine or
+production proof constructor is introduced. No unrelated cleanup is deferred.

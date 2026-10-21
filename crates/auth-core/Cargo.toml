@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+saml-verification = ["saml-certificates", "saml-rs/crypto-aws-lc", "dep:time"]
 saml-certificates = ["saml-requests", "dep:openssl"]
 saml-requests = ["dep:saml-rs", "dep:url"]
 google = ["oidc-verification"]
@@ -20,6 +21,7 @@ oauth-transactions = ["dep:url"]
 passkeys = ["dep:webauthn-rs", "dep:serde_json", "dep:url", "dep:tracing"]
 
 [dependencies]
+time = { workspace = true, optional = true }
 openssl = { workspace = true, optional = true }
 saml-rs = { workspace = true, optional = true }
 josekit = { workspace = true, optional = true }

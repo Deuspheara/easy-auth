@@ -25,10 +25,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.95.0
         with:
           components: rustfmt, clippy
-      - name: Install native WebAuthn build dependencies
+      - name: Install native WebAuthn and gated SAML build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libssl-dev pkg-config
+          sudo apt-get install -y libssl-dev pkg-config cmake
       - run: python3 scripts/check_saml_source.py
       - run: python3 -m unittest scripts.test_saml_source
       - run: cargo fmt --all -- --check
@@ -47,6 +47,10 @@ jobs:
         run: |
           cargo test --locked -p easy-auth-core --features saml-certificates saml::
           cargo test --locked -p easy-auth-postgres --features saml-certificates --test lifecycle saml::
+      - name: Verify concrete gated SAML verification without other providers
+        run: |
+          cargo test --locked -p easy-auth-core --features saml-verification saml::
+          cargo test --locked -p easy-auth-postgres --features saml-verification --test lifecycle saml::
       - name: Verify Google PostgreSQL integration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
       - name: Verify stable native OAuth registration without passkeys

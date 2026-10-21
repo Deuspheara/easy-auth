@@ -133,14 +133,65 @@ connection/client IDs across realms and disable. Core tests reuse unchanged publ
 upstream certificates with explicit historical windows and reject their expiry at
 current time; no key/signature fixture is generated.
 
+## Gated concrete verification component
+
+The explicit core/PostgreSQL `saml-verification` feature builds the qualified
+source with **only `crypto-aws-lc`**. Defaults, server routes and provider activation
+remain unchanged. `SamlResponseVerifier` consumes a `SamlPreparedResponse` and a
+bounded, redacted `SamlPostResponse` (one base64 POST field, at most 256 KiB). It
+loads current enabled registration pins and fresh database time, releases storage
+locks, then calls the established typed `finish_sso` message API. There is no
+boolean-verifier trait, alternate engine, XML reparse/serialization bridge or
+public constructor for `VerifiedSamlAssertion`.
+
+The fixed profile requires both the Response and direct consumed Assertion
+signatures, exact RSA-SHA256/SHA-256 and exclusive C14N under the existing qualified
+profile. Only active operator-approved pins establish trust. At most two pins are
+tried sequentially; both signatures must use the same approved certificate for a
+single message. Mixed-certificate messages, encryption, unsolicited SSO, artifact,
+SimpleSign and logout are unsupported. Locally generated IdP metadata imports only
+our trusted registration and one approved certificate; its unsigned metadata import
+policy does not permit inbound unsigned responses or remote metadata trust.
+
+The library validates signed issuer, audience, destination, recipient, conditions,
+bearer data and signed `InResponseTo` against the consumed trusted request/ACS.
+The adapter checks its returned authenticated coverage and typed facts and admits
+one Assertion, one bearer confirmation and one authentication statement. Persistent
+NameID is mandatory, exact/nonempty/control-free and at most 1024 UTF-8 bytes; optional
+NameQualifier/SPNameQualifier must equal the configured IdP/SP respectively, and
+SPProvidedID is unsupported. Missing qualifiers use those trusted namespaces;
+no email matching, normalization, attributes or account linking selects an owner.
+
+Clock skew is explicitly zero. Response and Assertion IssueInstant must be at
+most 300 seconds old and not in the future; assertion/bearer/replay deadlines must be
+future and no later than Assertion IssueInstant plus 300 seconds. Actual signed
+AuthnInstant is required, not future and less than 24 hours old. These are this
+initial application's bounded profile policies, not a claim that SAML mandates
+these durations. Original DB request cap, signed deadlines, authentication age and
+selected pin's approval end all bound the returned proof. There is no fresh-login
+or authentication-strength claim from IssueInstant or an unspecified authn context.
+
+Two workers per verifier bound blocking verification. Admission fails when full;
+storage and worker waits each time out after 15 seconds. A timed-out/cancelled worker
+retains its permit until native work exits; timeout does not claim to abort crypto.
+No database lock spans XML/crypto. Library/internal errors are not logged or exposed
+and map to finite application errors.
+
+**Verified does not mean admitted or signed in.** The library's required replay
+callback collects exactly two authenticated hashed ID reservations with retention
+caps and rejects duplicates within that batch. This staging is not a durable replay
+cache. `VerifiedSamlAssertion` is opaque, noncloneable and redacted, and contains no
+raw XML. It creates no user/session and cannot clear the release gate. Final sign-in
+must consume it in the same atomic transaction as durable response/Assertion replay
+uniqueness, exact current source/policy, identity ownership/JIT, session and audit
+writes, with a final DB-clock check. Replay namespaces must survive revision changes.
+
 ## Remaining implementation and approval
 
-The requests feature alone has no certificate trust. Neither optional component
-implements signature verification, verified Assertion extraction, issuer/audience/recipient/
-destination/time/NameID or signed InResponseTo validation, response/Assertion
-replay protection, JIT/identity mapping or source-bound session/lifecycle commit.
-Pending AuthnRequest uniqueness is not a substitute for the Assertion replay ledger.
-Those integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
+Durable replay rejection, identity/JIT mapping, source-bound session/lifecycle commit
+and the HTTP/browser boundary are not implemented by these components. Pending
+AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
+These integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
 one-use original caps and all existing account-policy invariants.
 
 Dependency adoption and XML/signature/backend review must identify the actual
@@ -156,8 +207,20 @@ cargo test --locked -p easy-auth-core --features saml-requests saml::
 cargo test --locked -p easy-auth-postgres --features saml-requests --test lifecycle saml::
 cargo test --locked -p easy-auth-core --features saml-certificates saml::
 cargo test --locked -p easy-auth-postgres --features saml-certificates --test lifecycle saml::
+cargo test --locked -p easy-auth-core --features saml-verification saml::
+cargo test --locked -p easy-auth-postgres --features saml-verification --test lifecycle saml::
 ```
 
 The second command requires the documented real development PostgreSQL database.
 These component scenarios establish request-state behavior, not SAML production
 approval or interoperability with a real IdP.
+
+The concrete adapter's ordinary PostgreSQL round trip uses saml-rs's IdP API and
+an unchanged public upstream Shibboleth fixture key/certificate. The same key is
+encoded as PKCS#8 by OpenSSL for the AWS-LC signer; no key is generated. This proves
+local component integration, not interoperability with a running Shibboleth IdP.
+Ordinary controls include invalid subject/validity, signed request correlation,
+wrong trusted certificate/explicit overlap, stale configuration and storage failure.
+No new adversarial XML, bypass experiment or custom signature-concurrency probe is
+part of this work. Broader documented condition and actual IdP/browser scenarios
+remain acceptance work alongside independent security review.

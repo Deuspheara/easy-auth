@@ -6,6 +6,8 @@ mod prepared;
 mod proofs;
 mod repository;
 mod requests;
+#[cfg(feature = "saml-verification")]
+mod verification;
 
 #[cfg(feature = "saml-certificates")]
 pub use certificates::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
@@ -15,6 +17,12 @@ pub use proofs::{SamlBrowserProof, SamlStart};
 pub use repository::{SamlRequestAdmission, SamlRequestRepository};
 pub use requests::{
     MAX_SAML_PENDING_PER_CONNECTION, SAML_REQUEST_LIFETIME_SECONDS, SamlTransactions,
+};
+
+#[cfg(feature = "saml-verification")]
+pub use verification::{
+    SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
+    SamlVerificationMaterial, SamlVerificationRepository, VerifiedSamlAssertion,
 };
 
 #[cfg(test)]

@@ -4299,3 +4299,52 @@ code is reused rather than copied into another framework. No production runtime,
 schema, dependency or public API is changed. Strict XML/resource policy, opaque
 error review, broader hostile/profile and SAML PostgreSQL acceptance, native
 advisory/license review and focused independent security review remain gates.
+
+
+## AUTH-34 concrete gated SAML adapter checkpoint — 2026-10-21
+
+The opt-in core/PostgreSQL `saml-verification` component uses the immutable
+qualified saml-rs snapshot and its three existing patches, with AWS-LC only.
+No verifier/C14N code, qualification patch or adversarial fixture changes here.
+Core owns bounded POST input, concrete message verification, authenticated typed
+projection, strict clock/profile policy and an opaque noncloneable proof.
+PostgreSQL supplies exact current enabled registration/pins and fresh DB time;
+XML/crypto runs after storage locks are released. The proof contains staged replay
+hashes and no local user/session authority. Normal composition still has no SAML ACS.
+
+Ordinary scenarios use the established typed IdP API with an unchanged public
+upstream test key/certificate. OpenSSL reencodes that same PKCS#1 key as PKCS#8 for
+the selected AWS-LC signer; the initial fixture-encoding failure is corrected,
+without generating a key or changing the verifier. Cases cover actual signed POST
+facts, invalid subject/excessive lifetime, signed InResponseTo, wrong trusted
+certificate/explicit rollover overlap, stale source, storage failure and realm
+isolation with identical connection/client IDs. These are local component tests,
+not actual Shibboleth/Keycloak interoperability or independent security review.
+
+The adopting root lock adds 56 dependency packages and removes/upgrades none of
+its existing versions. It selects Bergshamra 0.9.2, uppsala 0.10.1,
+kryptering 0.6.0/AWS-LC, aws-lc-rs 1.18.2 and aws-lc-sys 0.46.0. The last two differ
+from the qualification checkout's standalone lock; old native qualification does
+not establish this build's approval. No RustCrypto/legacy/PKCS#11/PQ/FIPS feature
+is selected. Unsuppressed compiled-graph audit and cargo-deny advisory/license/
+source/bans checks pass. Inactive SQLx/MySQL rsa 0.9.10/RUSTSEC-2023-0071 remains
+reported, without a global ignore. Native distribution/advisory mapping and patch
+maintenance ownership still require production acceptance.
+
+Verification commands for this checkpoint are the required default/all-feature
+workspace tests with real development PostgreSQL, strict default/all-feature
+Clippy, formatting/diff checks, warning-free all-feature docs, the compiled audit,
+all-feature cargo-deny, source/patch integrity plus its four Python regressions,
+and project-source Gitleaks (11.83 MB; no findings). The default workspace passes
+110 tests and the final all-feature workspace passes 685, with zero failures/ignored
+tests. Isolated core SAML passes 9 tests. Publication/CI status is recorded with the
+delivery commit. No research overlay, new adversarial XML,
+bypass/fuzz/stress probe or custom signature-concurrency experiment is run.
+
+Mandatory remaining work: full ordinary condition matrix and actual IdP/browser
+interoperability, durable atomic response/Assertion replay rejection and final
+current-source/cap recheck, identity/JIT and source-bound session/lifecycle, reviewed
+HTTP/browser binding, maintained dependency approval, XML/signature/backend review
+and separate named independent security review. Staged hashes do not establish
+replay protection. Implemented/tested/internal-reviewed/independently-approved are
+separate states; none authorizes SAML activation by implication.

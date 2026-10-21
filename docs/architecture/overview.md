@@ -33,13 +33,19 @@ registration, library-generated SP metadata/Redirect requests, hash-only browser
 RelayState persistence, one-use cancellation and response-preparation consumption
 with original database timing. Preparation is not a verified identity. It uses the crypto-disabled
 producer only and grants no identity/session. [Component limits](../guides/saml.md)
-remain explicit; the verifier, ACS and lifecycle approval gates are still open.
+remain explicit; the ACS and lifecycle implementation/approval gates are still open.
 
 The separate opt-in `saml-certificates` feature adds typed operator-approved leaf
 pins/windows in core and atomic revision-bound pin persistence/invalidation in
 PostgreSQL. OpenSSL parses X.509/key/validity configuration; it does not verify XML.
 No core policy is copied into HTTP, no new workspace crate or provider activation
 is introduced, and no storage lock spans certificate parsing.
+
+The explicit `saml-verification` core/PostgreSQL feature adds the concrete qualified
+AWS-LC message adapter and fresh database configuration/clock port. Authenticated
+typed facts and staged replay hashes return an opaque proof without local authority.
+Durable replay, identity/session/lifecycle and HTTP remain implementation gates.
+Normal composition exposes no SAML ACS; no independent approval is established.
 
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
 current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`

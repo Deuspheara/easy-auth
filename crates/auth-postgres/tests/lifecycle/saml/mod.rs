@@ -5,3 +5,6 @@ mod configuration;
 mod consumption;
 mod requests;
 mod setup;
+
+#[cfg(feature = "saml-verification")]
+mod verification;

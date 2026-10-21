@@ -66,6 +66,11 @@ pub use saml::{
 };
 #[cfg(feature = "saml-certificates")]
 pub use saml::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
+#[cfg(feature = "saml-verification")]
+pub use saml::{
+    SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
+    SamlVerificationMaterial, SamlVerificationRepository, VerifiedSamlAssertion,
+};
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 

@@ -10,7 +10,7 @@ pub struct SamlRequestTiming {
 
 /// A consumed, browser-bound AuthnRequest awaiting protocol verification.
 ///
-/// Pass this by value to the eventual verifier. It carries no verified Assertion,
+/// Pass this by value to the gated concrete verifier. It carries no verified Assertion,
 /// local owner or session authority. Consumption does not establish successful
 /// authentication or replace the separate response/Assertion replay ledger.
 pub struct SamlPreparedResponse {
@@ -30,8 +30,8 @@ impl SamlPreparedResponse {
     pub fn expires_at_us(&self) -> i64 {
         self.timing.expires_at_us
     }
-    /// Database observation for initial protocol time checks. Final completion
-    /// must recheck current DB time against all original and signed deadlines.
+    /// Database observation that bounds the verifier's fresh clock observation.
+    /// Final completion must recheck DB time against all original/signed caps.
     pub fn observed_at_us(&self) -> i64 {
         self.timing.observed_at_us
     }

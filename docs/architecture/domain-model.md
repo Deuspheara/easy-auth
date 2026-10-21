@@ -163,3 +163,13 @@ sign-in context into the existing `VerifiedOidcIdentity`; it defines no alternat
 identity, contact, session, token or persistence entity. Fixed provider policy grants
 no authority by itself. Email attributes remain distinct from verified local contact,
 and linking/provider-deletion purposes cannot use this sign-in-only component.
+
+
+The opt-in SAML verifier returns an opaque `VerifiedSamlAssertion`, distinct from
+consumed request state, local user/provider identity and local session authority.
+It retains exact registration revision, persistent subject, actual signed authn
+time, original/signed/certificate caps, selected approved pin and authenticated
+response/Assertion replay hashes. Replay records are staged, not committed; the
+future durable ledger and identity/session transaction must remain realm-scoped,
+recheck current source and retain replay uniqueness across configuration rotation.
+Raw XML, public email claims and mere signature success cannot select a local owner.
