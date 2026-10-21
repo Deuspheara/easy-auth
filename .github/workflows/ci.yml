@@ -71,6 +71,8 @@ jobs:
         run: cargo test --locked -p easy-auth-server --features google-desktop,oidc-identities --test google_desktop
       - name: Verify Google HTTPS boundary without passkeys
         run: cargo test --locked -p easy-auth-axum --features google-web --test browser google_web
+      - name: Verify gated SAML HTTP without unrelated providers
+        run: cargo test --locked -p easy-auth-axum --features saml-web --test browser saml::
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -91,6 +93,10 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features google-web --example google-web-browser
           node tests/browser/google-web/run.cjs
+      - name: Verify owned SAML HTTPS POST browser flow
+        run: |
+          cargo build --locked -p easy-auth-axum --features saml-web --example saml-web-browser
+          node tests/browser/saml-web/run.cjs
       - run: node tests/browser/oidc/signin-client.cjs
       - name: Build and check supported OIDC startup composition
         run: |

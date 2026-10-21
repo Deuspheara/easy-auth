@@ -190,7 +190,7 @@ writes, with a final DB-clock check. Replay namespaces must survive revision cha
 
 The separate identity component supplies durable replay rejection, identity
 resolution/JIT provisioning and source-bound session commit. Complete lifecycle
-and the HTTP/browser boundary are not implemented by these components. Pending
+remains open; a separate gated Axum component supplies HTTP/browser delivery below. Pending
 AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
 These integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
 one-use original caps and all existing account-policy invariants.
@@ -293,3 +293,40 @@ distinct caps and retains any shorter database-default session lifetime.
 Typed timing tests cover the optional statement cap and real signed/mapped controls
 retain the resulting bound. The pinned ordinary IdP producer does not emit the
 optional statement expiry, so that wire case remains actual-IdP acceptance work.
+
+## Gated browser engineering composition
+
+The explicit Axum `saml-web` feature exposes `SamlWebServices`,
+`experimental_saml_web_router` and `saml_web_openapi`. It does not add a normal
+server flag or activate the default router. HTTPS, the configured realm and exact
+`{origin}/saml/acs` are mandatory. Construct services from the trusted persisted
+policy and existing request/verification/identity repositories; source snapshots
+are composed consistently and rechecked by core/PostgreSQL.
+
+POST `/v1/saml/sign-in/start` accepts closed empty JSON and sets host-only protected
+pending cookies before returning the library authorization URL. The reference page
+is `/saml/sign-in`; metadata is `/saml/metadata`. Cross-site POST `/saml/acs` accepts
+only `SAMLResponse`/`RelayState` form fields and renders a non-authoritative handoff.
+It grants nothing and does not consume the pending request. Its fixed script sends
+a same-origin form POST to `/v1/saml/sign-in/finish`, where existing-session rejection,
+private browser proofs, actual verification and atomic replay/identity/session
+commit run. POST `/v1/saml/sign-in/cancel` is same-origin and proof-bound.
+
+This preserves existing Secure/HttpOnly/SameSite=Lax policy. An absent session
+cookie on the IdP's cross-site POST cannot establish that the browser is anonymous;
+only same-origin finish makes that check. Returned assertions never enter URLs,
+browser storage, tracing or audit. Completion/cancellation clear pending cookies;
+logout/revocation clears them with the session. Original database caps still apply.
+See [ADR 0024](../architecture/adr/0024-saml-web-delivery.md) and the
+[owned browser suite](../../tests/browser/saml-web/README.md) for exact limits.
+
+These are explicitly gated engineering routes. Normal SAML remains disabled until
+mandatory source/patch/dependency, XML/backend, actual IdP/lifecycle and independent
+approval requirements are met. Attribute selection and purpose-bound SAML account
+deletion remain unsupported. Offline producer/browser evidence is not deployed-IdP
+interoperability or an independent audit.
+
+The [gated OpenAPI contract](../architecture/openapi-saml-web.json) is generated
+with `cargo run --locked -p easy-auth-axum --features saml-web --example export_saml_web_openapi`.
+Its live publication and normal-contract separation are checked by the isolated
+HTTP contract suite. It does not change the ordinary API document.

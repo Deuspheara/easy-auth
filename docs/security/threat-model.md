@@ -616,3 +616,13 @@ local authority and preserves a bounded hash-only cooldown against resurrection
 from still-valid preverified input. This is not purpose-bound SAML deletion or
 complete browser acceptance. Mandatory dependency/XML/backend/independent review
 and actual IdP interoperability remain open; normal SAML stays disabled.
+
+
+The gated Axum SAML ACS is explicitly non-authoritative. Existing Lax cookies may
+be absent on the cross-site POST; its fixed protected page forwards bounded form
+fields to same-origin completion, where existing-session rejection and private
+request/browser/RelayState binding precede core consumption and verification. This
+keeps the ordinary session cookie and origin policy intact. Only the delivery page
+uses a cross-site exception, with shared timeout/security headers and no SQL or
+grant. See [ADR 0024](../architecture/adr/0024-saml-web-delivery.md). Normal startup
+remains unchanged; actual IdP, full lifecycle and independent approval stay open.

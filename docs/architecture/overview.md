@@ -45,14 +45,14 @@ The explicit `saml-verification` core/PostgreSQL feature adds the concrete quali
 AWS-LC message adapter and fresh database configuration/clock port. Authenticated
 typed facts and staged replay hashes return an opaque proof without local authority.
 Final authority is supplied only by the separate opt-in identity component;
-HTTP and complete lifecycle acceptance remain gates.
+HTTP/browser and complete lifecycle acceptance remain gates.
 Normal composition exposes no SAML ACS; no independent approval is established.
 
 The gated `saml-identities` feature adds exact-registration default-deny policy,
 opaque mapping and atomic registration/pin/policy configuration. `SamlSignIn` now
 commits durable replay, exact-subject ownership, source-bound session and audit
 atomically. Current-source authentication/inventory/revocation fail closed, including
-backend-disabled builds. Attribute-selected mapping, HTTP and complete purpose-bound
+backend-disabled builds. Attribute-selected mapping and complete purpose-bound
 lifecycle remain unsupported; [ADR 0023](adr/0023-saml-identity-session-commit.md)
 records this boundary. Normal SAML remains disabled.
 
@@ -177,3 +177,11 @@ the same stable operation, protected input reader and core/PG final commit. It
 separates local input/public owned-setup checks from actual browser sign-in, and
 revokes/removes only disposable local authority. No application startup/API or
 proof-construction boundary changes. Real provider/OS and lifecycle gates remain.
+
+
+The explicit Axum `saml-web` feature now supplies gated reference sign-in/metadata,
+non-authoritative cross-site POST delivery and same-origin final completion over
+those existing core/PG services. It preserves Lax cookies and detects existing
+sessions at same-origin finish. Normal router/server startup stays unchanged.
+[ADR 0024](adr/0024-saml-web-delivery.md) separates ordinary HTTP/browser evidence
+from deployed IdP interoperability and mandatory independent approval.

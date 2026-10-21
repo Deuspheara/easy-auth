@@ -4461,3 +4461,74 @@ contains 713 parent-suite cases plus its independently executed child control;
 the final 52-case SAML run separately covers the four later additions.
 Narrow PostgreSQL SAML feature checks also passed: request-only **15 cases** and
 certificate-only **18 cases**, with zero failures/ignored and no verifier activation.
+
+## AUTH-34 gated HTTP POST delivery — 2026-10-22
+
+The separate `saml-web` Axum feature adds the explicit experimental composition in
+[ADR 0024](../architecture/adr/0024-saml-web-delivery.md). Default router/server
+startup remains unchanged. The cross-site ACS renders only a bounded protected
+handoff; same-origin finish sees existing Lax session/proof cookies before consuming
+a request, calling the unchanged concrete verifier and committing through the
+existing atomic grant. HTTPS, exact realm/ACS, closed form fields, private proofs,
+current source and all existing signature/trust/algorithm restrictions remain.
+
+Preparatory cookie parsing/anonymous guard extraction is separate commit `5e524ba`:
+existing Axum 2 unit/116 browser tests passed against real PostgreSQL, then cookie
+formatting delegation passed the two existing unit cases. The shared unchanged
+ordinary IdP producer extraction is commit `1fbc737`; all 52 PostgreSQL SAML cases
+passed afterwards. Axum adds only references to already locked test-only OpenSSL
+and saml-rs; no dependency version, vendor/patch, production crypto feature or
+license/advisory exception changes.
+
+`cargo test --locked --workspace --all-features` passed: **723 parent-suite cases**
+and the independently executed child redaction control, zero failures/ignored,
+including 122 Axum browser and 410 PostgreSQL lifecycle cases. Six new HTTP cases
+cover non-authoritative delivery, actual signed final session/logout, cancellation,
+disable, other-browser binding, exact realm/TLS/ACS configuration and closed public
+contracts. Existing-session/origin/duplicate/unknown-field rejection does not
+consume the pending request. Normal router/OpenAPI exposes no SAML provider.
+
+The [owned Chromium record](../../tests/browser/saml-web/results/2026-10-22/chromium-https-post.json)
+passes **eight observations** with Chromium156.0.8078.4/Playwright1.64.1/macOS arm64.
+Actual complete request headers prove pending Lax cookies are absent on cross-site
+POST and present on same-origin finish. A usable signed provider-only session is
+created; cookies remain HttpOnly and proofs clear. A new start cannot replace an
+existing session. Restoring a genuine previously issued session during a pending
+operation causes same-origin finish to reject and preserve that bearer; it is a
+browser-state control, not simultaneous tab-login evidence. Logout revokes it.
+The final rejected request is intentionally unconsumed until its original cap;
+the record includes aggregate pending=1 before disposal. Owned server, database
+and private TLS files were cleaned up. No raw payload/header/key enters reports.
+
+The first browser harness attempt failed because Node did not inherit Chromium's
+private DNS mapping. Its diagnostic was redacted; the exact leftover owned database
+was identified by its callback and removed with the existing emergency cleanup
+command. The retry calls the owned loopback producer, contains provider-delivery
+errors and verifies cleanup. This was test infrastructure; no verifier, cookie or
+production TLS check was relaxed.
+
+Strict default/all-feature all-target Clippy, formatting/diff checks, warning-free
+all-feature docs, exact source inventory (234 files/three unchanged patches plus
+four checker tests), compiled advisory and all-feature cargo-deny checks passed.
+Inactive SQLx/MySQL RSA remains reported. The final default workspace passed all
+111 cases with real PostgreSQL and zero failures/ignored. Current source/report
+Gitleaks passed (about 12.22 MB), using only existing exact upstream allowlists.
+
+This is implemented/tested engineering and internal boundary review only. The
+browser IdP navigation is fulfilled in the owned context using the established
+library producer and unchanged public signing fixture; it is not deployed IdP
+interoperability, an independent audit or production approval. Purpose-bound SAML
+deletion, authenticated attribute/qualifier limitations, actual provider rollover/
+lifecycle and maintained dependency/XML/backend/independent approval remain open.
+No custom adversarial XML, bypass, fuzz, stress or signature-concurrency experiment
+was added. Normal SAML remains disabled.
+
+The existing CI workflow now runs isolated `saml-web` HTTP acceptance and the
+owned HTTPS POST browser suite using its existing Playwright/Chromium installation.
+CI outcomes must be recorded separately; local passes do not imply hosted success.
+
+The final isolated SAML HTTP suite passed all six cases after exact ACS rejection,
+test-module organization and checked-in/live/generated OpenAPI equality checks.
+The final rebuilt browser binary passed all eight observations with refreshed
+source hashes and verified cleanup. The final source/OpenAPI/report secret scan
+and warning-free Rustdoc checks also passed.

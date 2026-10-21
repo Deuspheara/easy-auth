@@ -15,8 +15,24 @@ pub(crate) async fn boundary(
     request: Request,
     next: Next,
 ) -> Response {
+    serve(state, request, next, true).await
+}
+
+/// Cross-site POST delivery may render only a non-authoritative handoff page.
+/// All authority-changing routes must use the ordinary same-origin boundary.
+#[cfg(feature = "saml-web")]
+pub(crate) async fn post_delivery_boundary(
+    State(state): State<AppState>,
+    request: Request,
+    next: Next,
+) -> Response {
+    serve(state, request, next, false).await
+}
+
+async fn serve(state: AppState, request: Request, next: Next, same_origin: bool) -> Response {
     let request_id = Uuid::new_v4().to_string();
-    let mut response = if request.method() == Method::POST
+    let mut response = if same_origin
+        && request.method() == Method::POST
         && (request.headers().get_all(header::ORIGIN).iter().count() != 1
             || request
                 .headers()

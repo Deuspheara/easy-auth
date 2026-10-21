@@ -507,5 +507,17 @@ consumes the mapped proof through `SamlIdentityRepository::finish_saml_identity`
 and returns `(User, Secret)` only after atomic replay/identity/session/audit commit.
 `AuditEvent::SamlAuthenticated` records the committed user/session fact. Existing
 authentication, inventory, revocation and logout APIs enforce SAML source policy.
-Attribute selection, purpose-bound SAML deletion and HTTP routes remain unsupported.
+Attribute selection and purpose-bound SAML deletion remain unsupported. The
+separate gated Axum composition below supplies engineering-only HTTP routes.
 See [ADR 0023](adr/0023-saml-identity-session-commit.md).
+
+
+The explicit Axum `saml-web` API adds `SamlWebServices`,
+`experimental_saml_web_router` and `saml_web_openapi` only. Its opt-in contract
+contains closed start/cancel JSON, POST delivery/finish forms with exactly
+`SAMLResponse` and `RelayState`, trusted metadata and a reference page. ACS delivery
+is non-authoritative; only same-origin finish can issue the shared session cookie
+after concrete verification and final commit. HTTPS, exact realm/ACS and private
+pending cookies are mandatory; no browser-selected source or return URL exists.
+Normal OpenAPI/router/server configuration has no SAML provider activation.
+[ADR 0024](adr/0024-saml-web-delivery.md) records the cross-site exception and limits.

@@ -82,7 +82,8 @@ transaction boundary. These are engineering tests, not independent XML/signature
 review, a deployed IdP exchange or an audit. Exact results belong in the verification
 record; failed setup and corrected controls must not be hidden.
 
-Normal SAML stays disabled. HTTP/browser ACS delivery, real IdP rollover/identity
+Normal SAML stays disabled. Gated HTTP/browser delivery is extended separately
+by [ADR 0024](0024-saml-web-delivery.md). Real IdP rollover/identity
 acceptance, complete purpose-bound lifecycle and the authenticated attribute and
 qualifier limitations in ADR 0022 remain open. ADR 0021 still requires an owned
 maintained distribution/patch decision, dependency/backend/XML signature review

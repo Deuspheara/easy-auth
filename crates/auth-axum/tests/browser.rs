@@ -43,3 +43,7 @@ mod oidc_web;
 #[cfg(feature = "google-web")]
 #[path = "browser/google_web/mod.rs"]
 mod google_web;
+
+#[cfg(feature = "saml-web")]
+#[path = "browser/saml/mod.rs"]
+mod saml;

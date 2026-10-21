@@ -8,6 +8,8 @@ mod oidc;
 #[cfg(feature = "passkey-enrollment")]
 mod passkeys;
 mod router;
+#[cfg(feature = "saml-web")]
+mod saml;
 
 use auth_core::Auth;
 pub use browser::BrowserConfig;
@@ -29,6 +31,8 @@ pub use passkeys::{experimental_passkey_router, passkey_authentication_openapi};
 #[cfg(feature = "passkey-signup")]
 pub use passkeys::{experimental_passkey_signup_router, passkey_signup_openapi};
 pub use router::router;
+#[cfg(feature = "saml-web")]
+pub use saml::{SamlWebServices, experimental_saml_web_router, saml_web_openapi};
 
 #[cfg(feature = "passkey-management")]
 pub use passkeys::{experimental_passkey_management_router, passkey_management_openapi};

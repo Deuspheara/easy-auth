@@ -818,3 +818,14 @@ acquires persistence policy. The shared existing provider-owner lock remains in
 `identity.rs`; test lock/clock observation lives in `tests/support/postgres/`.
 Ordered transaction/wait tests keep observation and rollback assertions together
 for review; new modules remain below 300 lines. No unrelated cleanup is deferred.
+
+
+Gated SAML HTTP composition lives in `auth-axum/src/saml/`: routing/services,
+private cookies, non-authoritative delivery rendering, thin handlers, schemas and
+fixed pages/scripts have separate responsibilities. Shared cookie parsing and the
+anonymous-session guard were extracted before extending them; the existing
+boundary owns timeout/security headers for both same-origin and delivery-only
+routes. The cross-site exception never owns persistence or grants authority.
+New source/test modules stay below 300 lines. The visible route composition and
+ordered browser lifecycle cases retain setup/bindings/result together. The shared
+ordinary IdP producer under `tests/support/saml/` has no local authority bypass.

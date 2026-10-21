@@ -869,6 +869,8 @@ dependencies = [
  "easy-auth-postgres",
  "http-body-util",
  "josekit",
+ "openssl",
+ "saml-rs",
  "serde",
  "serde_json",
  "sqlx",
