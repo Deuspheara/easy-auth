@@ -57,6 +57,32 @@ support this direction. Their bounded results are historical, version-scoped
 evidence. A package with no matching advisory entry is not thereby audited;
 rerun compiled-graph, license and native-backend checks on the adopted lockfile.
 
+## Ordinary upstream canonicalization checks
+
+On 2026-10-21, the unchanged upstream `bergshamra-c14n` library/tests passed:
+
+| Release and immutable source | Result |
+| --- | --- |
+| 0.9.2, `747a5a877a2415fc0d58286533ae51b22cc966c3` | 32 passed, 0 failed/ignored |
+| 0.11.0, `5548cc7c9095c3932f0c791fe63e417dffe88af3` | 41 passed, 0 failed/ignored |
+
+Both used Rust/Cargo 1.95.0 on aarch64-apple-darwin, their own unchanged lockfiles,
+and `CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=2 cargo test --locked --manifest-path
+/path/to/release/Cargo.toml -p bergshamra-c14n --lib --tests`. An initial attempt
+stopped during compilation with insufficient disk space; the sequential reruns
+completed. No custom XML, cryptographic fixture, fuzzing or load scenario was added.
+These are library regression results, not a complete C14N conformance assessment,
+reference-binding review, AWS-LC verification test or application interoperability
+approval. The newer release's passing suite does not qualify the older graph.
+
+The [0.11.0 changelog](https://github.com/kushaldas/bergshamra/blob/5548cc7c9095c3932f0c791fe63e417dffe88af3/CHANGELOG.md)
+records substantial C14N/DOM changes in 0.10.0 and later crypto dependency changes.
+Its [advisory configuration](https://github.com/kushaldas/bergshamra/blob/5548cc7c9095c3932f0c791fe63e417dffe88af3/.cargo/audit.toml)
+contains advisory ignores. We do not copy those ignores or infer applicability
+from upstream commentary; any upgrade needs a fresh inventory and unsuppressed
+assessment of our actual compiled feature graph. This evidence does not select
+0.11.0 for the assessed saml-rs candidate.
+
 ## Application responsibilities
 
 Keep the four workspace crates and inward dependency direction. Core owns typed
