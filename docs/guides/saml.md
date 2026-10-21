@@ -224,3 +224,13 @@ wrong trusted certificate/explicit overlap, stale configuration and storage fail
 No new adversarial XML, bypass experiment or custom signature-concurrency probe is
 part of this work. Broader documented condition and actual IdP/browser scenarios
 remain acceptance work alongside independent security review.
+
+
+Additional ordinary checks cover library-generated nonpersistent NameID formats
+and a different IdP entity using the same configured signing key; both must fail,
+and persistent/correct-issuer controls must succeed. Typed Rust policy tests cover
+exact qualifiers, aliases, unchanged subject values and UTF-8 byte limits. They do
+not establish qualifier extraction over the wire: the pinned upstream typed IdP
+producer forwards NameID value/format but does not render supplied qualifier
+attributes. Qualifier interoperability therefore remains open for actual IdP or
+established-vector acceptance. No custom XML/signer is introduced to fill that gap.

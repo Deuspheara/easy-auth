@@ -4348,3 +4348,16 @@ HTTP/browser binding, maintained dependency approval, XML/signature/backend revi
 and separate named independent security review. Staged hashes do not establish
 replay protection. Implemented/tested/internal-reviewed/independently-approved are
 separate states; none authorizes SAML activation by implication.
+
+
+The separate behavior-preserving AUTH-34 extraction `094ae43` isolates persistent
+NameID policy and parameterizes the existing ordinary IdP fixture. Its existing
+9 core and 6 actual-signature PostgreSQL regressions plus strict all-feature Clippy
+pass. Follow-up ordinary coverage now passes 11 isolated core SAML tests and 26
+PostgreSQL SAML cases: real library-generated nonpersistent-format/wrong-issuer
+rejections and corresponding signed positives, plus pure typed-policy qualifiers,
+aliases, value preservation and UTF-8 limits. These counts are targeted follow-up
+checks; the complete 110/685 workspace checkpoint above belongs to `ac4edb1`.
+The upstream IdP builder does not emit supplied qualifier attributes, so typed
+policy unit tests do not claim actual XML qualifier extraction/interoperability.
+That evidence remains open; no bespoke XML/signature fixture is generated.

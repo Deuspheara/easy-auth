@@ -16,3 +16,6 @@ pub use verified::VerifiedSamlAssertion;
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod subject_tests;
