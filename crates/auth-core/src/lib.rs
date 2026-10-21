@@ -1,6 +1,8 @@
 //! Shared authentication use cases. HTTP and SQL implementations live outside this crate.
 mod audit;
 mod auth;
+#[cfg(feature = "oidc-identities")]
+mod display_name;
 mod email;
 mod error;
 mod identity;

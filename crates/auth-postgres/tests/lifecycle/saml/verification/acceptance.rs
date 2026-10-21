@@ -1,5 +1,5 @@
-use super::setup;
-use super::setup::{fixture, response};
+use super::super::signed_idp as setup;
+use super::super::signed_idp::{fixture, response};
 use auth_core::{
     Error, SamlPostResponse, SamlReplayKind, SamlResponseVerifier, SamlTransactions,
     SamlVerificationRepository,

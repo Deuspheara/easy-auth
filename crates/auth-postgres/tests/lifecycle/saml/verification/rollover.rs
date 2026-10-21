@@ -1,4 +1,4 @@
-use super::setup::{alternate_pin, fixture, response, trust};
+use super::super::signed_idp::{alternate_pin, fixture, response, trust};
 use auth_core::{Error, SamlCertificateTrust, SamlResponseVerifier, SamlTransactions};
 use sqlx::PgPool;
 use std::time::Duration;

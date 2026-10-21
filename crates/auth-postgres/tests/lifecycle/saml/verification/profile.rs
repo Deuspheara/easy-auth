@@ -1,4 +1,4 @@
-use super::setup::{fixture, response_from};
+use super::super::signed_idp::{fixture, response_from};
 use auth_core::{Error, SamlResponseVerifier};
 use saml_rs::{NameId, NameIdFormat};
 use sqlx::PgPool;

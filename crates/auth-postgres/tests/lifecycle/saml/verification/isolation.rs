@@ -1,5 +1,5 @@
 use super::super::setup::registration;
-use super::setup::{fixture, response, trust};
+use super::super::signed_idp::{fixture, response, trust};
 use auth_core::{Error, SamlResponseVerifier, SamlTransactions, SamlVerificationRepository};
 use sqlx::PgPool;
 use std::{sync::Arc, time::Duration};

@@ -8,3 +8,6 @@ mod setup;
 
 #[cfg(feature = "saml-verification")]
 mod verification;
+
+#[cfg(feature = "saml-verification")]
+mod signed_idp;

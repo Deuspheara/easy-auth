@@ -1,7 +1,7 @@
 use super::configuration;
 use crate::{Postgres, unavailable};
 use auth_core::{Error, Result, SamlCertificateTrust, SamlPinnedCertificate, SamlRegistration};
-use sqlx::FromRow;
+use sqlx::{FromRow, Postgres as Pg, Transaction};
 
 impl Postgres {
     /// Trusted administration only. Replace exact registration and pins in one
@@ -13,29 +13,7 @@ impl Postgres {
         trust: &SamlCertificateTrust,
     ) -> Result<SamlRegistration> {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        let registration = configuration::replace_registration(&mut tx, input).await?;
-        for (slot, pin) in trust.certificates().iter().enumerate() {
-            let slot = i16::try_from(slot).map_err(|_| Error::InvalidInput)?;
-            sqlx::query(
-                r#"
-                INSERT INTO auth_saml_certificates(realm_id,connection_id,client_id,revision,slot,
-                  certificate_der,fingerprint,approved_from,approved_until)
-                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-            "#,
-            )
-            .bind(registration.realm())
-            .bind(registration.connection())
-            .bind(registration.client())
-            .bind(registration.revision())
-            .bind(slot)
-            .bind(pin.der())
-            .bind(pin.fingerprint().as_slice())
-            .bind(pin.approved_from())
-            .bind(pin.approved_until())
-            .execute(&mut *tx)
-            .await
-            .map_err(unavailable)?;
-        }
+        let registration = replace_registration(&mut tx, input, trust).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(registration)
     }
@@ -68,6 +46,40 @@ impl Postgres {
         let pins: Result<Vec<_>> = rows.into_iter().map(CertificateRow::parse).collect();
         SamlCertificateTrust::pinned_leaf(pins?).map_err(|_| Error::Unavailable)
     }
+}
+
+/// Allocate registration revision, invalidate old state and replace explicit pins
+/// under the caller's transaction. Commit and any additional policy stay visible
+/// in that caller; no transaction or trust inference is hidden here.
+pub(super) async fn replace_registration(
+    tx: &mut Transaction<'_, Pg>,
+    input: &SamlRegistration,
+    trust: &SamlCertificateTrust,
+) -> Result<SamlRegistration> {
+    let registration = configuration::replace_registration(tx, input).await?;
+    for (slot, pin) in trust.certificates().iter().enumerate() {
+        let slot = i16::try_from(slot).map_err(|_| Error::InvalidInput)?;
+        sqlx::query(
+            r#"
+            INSERT INTO auth_saml_certificates(realm_id,connection_id,client_id,revision,slot,
+              certificate_der,fingerprint,approved_from,approved_until)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+        "#,
+        )
+        .bind(registration.realm())
+        .bind(registration.connection())
+        .bind(registration.client())
+        .bind(registration.revision())
+        .bind(slot)
+        .bind(pin.der())
+        .bind(pin.fingerprint().as_slice())
+        .bind(pin.approved_from())
+        .bind(pin.approved_until())
+        .execute(&mut **tx)
+        .await
+        .map_err(unavailable)?;
+    }
+    Ok(registration)
 }
 
 #[derive(FromRow)]

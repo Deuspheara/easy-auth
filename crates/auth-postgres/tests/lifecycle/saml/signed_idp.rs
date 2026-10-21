@@ -1,4 +1,4 @@
-use super::super::setup::Fixture;
+use super::setup::Fixture;
 use auth_core::{
     SamlCertificateTrust, SamlPinnedCertificate, SamlPostResponse, SamlStart, SamlTransactions,
 };
@@ -13,10 +13,10 @@ use std::{time::Duration, time::SystemTime};
 
 // Unchanged public upstream interoperability fixture, NOT a deployed IdP key.
 const CERT: &[u8] = include_bytes!(
-    "../../../../../../third-party/saml-rs/tests/fixtures/interop/shibboleth-idp-5.2.3/idp-signing-cert.pem"
+    "../../../../../third-party/saml-rs/tests/fixtures/interop/shibboleth-idp-5.2.3/idp-signing-cert.pem"
 );
 const KEY: &str = include_str!(
-    "../../../../../../third-party/saml-rs/tests/fixtures/interop/shibboleth-idp-5.2.3/idp-signing-key.pem"
+    "../../../../../third-party/saml-rs/tests/fixtures/interop/shibboleth-idp-5.2.3/idp-signing-key.pem"
 );
 
 pub(super) fn trust() -> SamlCertificateTrust {
@@ -130,8 +130,7 @@ fn fixture_signing_key() -> String {
 }
 
 pub(super) fn alternate_pin() -> SamlPinnedCertificate {
-    let pem =
-        include_bytes!("../../../../../../third-party/saml-rs/tests/fixtures/key/idp/cert2.cer");
+    let pem = include_bytes!("../../../../../third-party/saml-rs/tests/fixtures/key/idp/cert2.cer");
     let der = openssl::x509::X509::from_pem(pem)
         .unwrap()
         .to_der()
