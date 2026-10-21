@@ -29,9 +29,9 @@ async fn only_actual_proof_of_exact_registration_maps_without_granting_authority
         format!("{mapped:?}"),
         "SamlMappedIdentity([REDACTED; not committed])"
     );
-    let long = policy.map(verify(&f, &"s".repeat(300)).await).unwrap();
+    let long = policy.map(verify(&f, &"é".repeat(200)).await).unwrap();
     assert!(long.display_name().is_none());
-    assert_eq!(long.assertion().subject().len(), 300);
+    assert_eq!(long.assertion().subject().len(), 400);
     let proof = verify(&f, "Opaque-Subject").await;
     let next = f
         .store

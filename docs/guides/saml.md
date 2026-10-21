@@ -157,7 +157,7 @@ The library validates signed issuer, audience, destination, recipient, condition
 bearer data and signed `InResponseTo` against the consumed trusted request/ACS.
 The adapter checks its returned authenticated coverage and typed facts and admits
 one Assertion, one bearer confirmation and one authentication statement. Persistent
-NameID is mandatory, exact/nonempty/control-free and at most 1024 UTF-8 bytes; optional
+NameID is mandatory, exact/nonempty/control-free and at most 256 Unicode characters (and 1024 UTF-8 bytes); optional
 NameQualifier/SPNameQualifier must equal the configured IdP/SP respectively, and
 SPProvidedID is unsupported. Missing qualifiers use those trusted namespaces;
 no email matching, normalization, attributes or account linking selects an owner.
@@ -268,3 +268,13 @@ open. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the b
 cargo test --locked -p easy-auth-core --features saml-identities saml::
 cargo test --locked -p easy-auth-postgres --features saml-identities --test lifecycle saml::
 ```
+
+
+Persistent NameID also obeys the 256-character protocol bound in
+[OASIS Approved Errata 05 E78](https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.html).
+The earlier byte-only admission allowed 257 ASCII characters; a focused Rust
+regression reproduced that ordinary validation bug before correction. The byte cap
+remains, with a separate character count. Ordinary signed IdP-API cases cover 256
+ASCII characters, 257 rejection and 256 four-byte Unicode characters. Optional
+display metadata still has its separate 256-byte bound; a valid multibyte persistent
+subject can exceed that presentation limit without losing its exact identity value.

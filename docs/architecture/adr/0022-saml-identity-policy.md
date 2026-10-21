@@ -21,7 +21,8 @@ inside the original proof. Final storage must recheck full current policy/source
 and caps and atomically reject replay, resolve ownership, write session and audit.
 This component implements none of that final authority by itself.
 
-The initial verification profile requires persistent NameID. Present IdP/SP
+The initial verification profile requires persistent NameID of at most 256 Unicode
+characters/1024 UTF-8 bytes (Approved Errata 05 E78). Present IdP/SP
 qualifiers must equal configured entities; absent qualifiers use those same
 trusted namespaces and SPProvidedID is unsupported. Final identity uniqueness must
 include **realm, connection, client, configured IdP entity, configured SP entity and

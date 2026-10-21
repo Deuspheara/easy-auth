@@ -35,7 +35,7 @@ fn persistent_subject_policy_preserves_exact_values_and_trusted_qualifiers() {
         );
         assert_eq!(subject::persistent(&reg, &name).unwrap(), "Opaque-Subject");
     }
-    let exact_limit = NameId::new("é".repeat(512), Some(NameIdFormat::Persistent));
+    let exact_limit = NameId::new("💡".repeat(256), Some(NameIdFormat::Persistent));
     assert_eq!(subject::persistent(&reg, &exact_limit).unwrap().len(), 1024);
 }
 
@@ -73,6 +73,20 @@ fn subject_policy_rejects_other_formats_namespaces_aliases_and_invalid_values() 
     ] {
         let name =
             NameId::with_qualifiers("normal", Some(NameIdFormat::Persistent), idp, sp, alias);
+        assert!(matches!(
+            subject::persistent(&reg, &name),
+            Err(Error::Unauthorized)
+        ));
+    }
+}
+
+#[test]
+fn persistent_nameid_rejects_more_than_256_characters_even_below_byte_limit() {
+    let reg = registration();
+    let valid = NameId::new("n".repeat(256), Some(NameIdFormat::Persistent));
+    assert!(subject::persistent(&reg, &valid).is_ok());
+    for value in ["n".repeat(257), "é".repeat(257)] {
+        let name = NameId::new(value, Some(NameIdFormat::Persistent));
         assert!(matches!(
             subject::persistent(&reg, &name),
             Err(Error::Unauthorized)
