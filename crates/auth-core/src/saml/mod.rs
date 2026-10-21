@@ -1,6 +1,8 @@
 #[cfg(feature = "saml-certificates")]
 mod certificates;
 mod configuration;
+#[cfg(feature = "saml-identities")]
+mod identities;
 mod metadata;
 mod prepared;
 mod proofs;
@@ -30,3 +32,6 @@ mod tests;
 
 #[cfg(test)]
 mod preparation_tests;
+
+#[cfg(feature = "saml-identities")]
+pub use identities::{SamlIdentityPolicy, SamlJitPolicy, SamlMappedIdentity};

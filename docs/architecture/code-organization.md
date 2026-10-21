@@ -789,3 +789,21 @@ ordered rollover scenario retain their actual request/signature/negative/positiv
 sequence as function-size exceptions; all new modules stay below 300 lines.
 No custom XML verifier, crypto test framework, alternate provider engine or
 production proof constructor is introduced. No unrelated cleanup is deferred.
+
+
+AUTH-35 separates SAML identity policy and opaque mapped proof under core
+`saml/identities/`; PostgreSQL `saml/identity_policy.rs` owns the exact scoped
+configuration transaction/current snapshot. The shared `display_name.rs` contains
+only existing presentation validation; OIDC callers retain their deliberate private
+reexport, and no authentication policy is generalized. Pin replacement is a
+cohesive caller-transaction helper extracted before policy behavior; it hides no
+commit. The private `saml/signed_idp.rs` test fixture supplies the same genuine
+library-generated signature path to verification and mapping tests, with no public
+production proof constructor or duplicated signer.
+
+Identity tests separate configuration, real-proof mapping, rollback, database-only
+concurrency, realm isolation, migration and reusable setup. All new modules stay
+below 300 lines. Ordered configuration and upgrade scenarios preserve exact state,
+negative results and positive controls as function-size exceptions. Core mapping
+adds no SQL, raw XML or provider engine; normal composition/HTTP remain unchanged.
+No unrelated cleanup is deferred.

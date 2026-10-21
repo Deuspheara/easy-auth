@@ -188,7 +188,7 @@ writes, with a final DB-clock check. Replay namespaces must survive revision cha
 
 ## Remaining implementation and approval
 
-Durable replay rejection, identity/JIT mapping, source-bound session/lifecycle commit
+Durable replay rejection, identity resolution/JIT provisioning, source-bound session/lifecycle commit
 and the HTTP/browser boundary are not implemented by these components. Pending
 AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
 These integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
@@ -234,3 +234,37 @@ not establish qualifier extraction over the wire: the pinned upstream typed IdP
 producer forwards NameID value/format but does not render supplied qualifier
 attributes. Qualifier interoperability therefore remains open for actual IdP or
 established-vector acceptance. No custom XML/signer is introduced to fill that gap.
+
+
+## Gated identity policy and mapping
+
+The optional core/PostgreSQL `saml-identities` component depends on concrete
+verification. `SamlIdentityPolicy::new(registration)` fixes the current persistent
+NameID profile and defaults to `SamlJitPolicy::Deny`; explicit `with_jit(Allow)` is
+trusted administrative input only. `map` consumes an actual verified assertion
+with exact full registration equality and returns an opaque `SamlMappedIdentity`.
+It grants no local authority and does not commit replay reservations.
+
+The verified subject supplies optional initial presentation only, using the same
+nonblank/control-free/256-byte rule as existing OIDC mapping. Oversized presentation
+is absent, without changing the exact subject or proof. Final ownership keys must
+include realm/connection/client, both configured IdP/SP entities and persistent
+subject. No email/attribute/presentation matching may select an owner or contact.
+
+`Postgres::configure_saml_identity_policy` requires explicit pins, rotates revision
+and replaces registration/pins/policy/cancelled pending state in one transaction.
+It retains operator disable. `saml_identity_policy` reads only the exact current
+enabled definition. Any revision change, including disable or pin-only replacement,
+invalidates the previous policy atomically. Migration 0023 preserves all original
+registration, pin and pending-request values and grants no default mapping authority.
+
+Mapping policy, its storage and tests do not implement JIT/session creation, durable
+replay rejection or source-bound lifecycle. Attribute-selected mapping remains
+unsupported because the pinned typed extraction does not preserve NameFormat.
+Actual qualifier/attribute/IdP/browser acceptance and independent approval remain
+open. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the boundary.
+
+```sh
+cargo test --locked -p easy-auth-core --features saml-identities saml::
+cargo test --locked -p easy-auth-postgres --features saml-identities --test lifecycle saml::
+```

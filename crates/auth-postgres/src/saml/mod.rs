@@ -6,3 +6,6 @@ mod requests;
 
 #[cfg(feature = "saml-verification")]
 mod verification;
+
+#[cfg(feature = "saml-identities")]
+mod identity_policy;

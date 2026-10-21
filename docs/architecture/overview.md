@@ -47,6 +47,12 @@ typed facts and staged replay hashes return an opaque proof without local author
 Durable replay, identity/session/lifecycle and HTTP remain implementation gates.
 Normal composition exposes no SAML ACS; no independent approval is established.
 
+The gated `saml-identities` feature adds exact-registration default-deny policy,
+opaque mapping and atomic registration/pin/policy configuration. It creates no local
+identity/session or durable replay grant. Attribute-selected mapping and final
+source-bound lifecycle remain unsupported; [ADR 0022](adr/0022-saml-identity-policy.md)
+records the current subject namespace and limits. Normal SAML remains disabled.
+
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
 current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`
 adapter in the server library. Embedded consumers share that adapter. Short registry

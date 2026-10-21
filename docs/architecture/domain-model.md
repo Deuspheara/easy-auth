@@ -173,3 +173,11 @@ response/Assertion replay hashes. Replay records are staged, not committed; the
 future durable ledger and identity/session transaction must remain realm-scoped,
 recheck current source and retain replay uniqueness across configuration rotation.
 Raw XML, public email claims and mere signature success cannot select a local owner.
+
+
+`SamlIdentityPolicy` and `SamlMappedIdentity` separate trusted default-deny JIT
+configuration, real signature evidence and future local identity authority. The
+persistent subject's owning namespace includes both configured IdP and SP entities
+in addition to realm/connection/client. Presentation is optional metadata; it cannot
+select ownership, local contact, roles or fallback credentials. Mapping and stored
+policy create no local identities, replay admission, sessions or audit facts.

@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+saml-identities = ["saml-verification"]
 saml-verification = ["saml-certificates", "saml-rs/crypto-aws-lc", "dep:time"]
 saml-certificates = ["saml-requests", "dep:openssl"]
 saml-requests = ["dep:saml-rs", "dep:url"]

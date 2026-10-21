@@ -11,3 +11,6 @@ mod verification;
 
 #[cfg(feature = "saml-verification")]
 mod signed_idp;
+
+#[cfg(feature = "saml-identities")]
+mod identities;

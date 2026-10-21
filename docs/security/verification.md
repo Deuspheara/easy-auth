@@ -4361,3 +4361,46 @@ checks; the complete 110/685 workspace checkpoint above belongs to `ac4edb1`.
 The upstream IdP builder does not emit supplied qualifier attributes, so typed
 policy unit tests do not claim actual XML qualifier extraction/interoperability.
 That evidence remains open; no bespoke XML/signature fixture is generated.
+
+
+## AUTH-35 gated SAML identity-policy checkpoint — 2026-10-21
+
+The preceding behavior-preserving extraction `5d7accf` shares existing presentation
+validation, atomic caller-owned pin replacement and the private signed IdP fixture.
+Its core all-feature 107 tests (plus existing child-process control), real PostgreSQL
+SAML 26 cases and strict workspace/all-target/all-feature Clippy pass. It is pushed;
+publication/CI is tracked separately from security approval.
+
+The optional `saml-identities` component adds exact-registration immutable policy,
+explicit default-deny JIT configuration, opaque real-proof mapping and revision-bound
+PostgreSQL persistence (migration 0023). Atomic replacement retains disable and rolls
+back registration/pins/cancellation if policy insertion fails. Any revision change
+invalidates old policy in the same transaction. This creates no user/session/replay
+or audit authority. Mapping retains original/signed/pin caps and authenticated replay
+reservations; display metadata is optional and never ownership/contact/role input.
+
+Final default workspace 110 tests and all-feature workspace 696 tests pass against
+real PostgreSQL, with zero failures/ignored. Isolated core SAML 12 and PostgreSQL
+SAML 32 pass. New ordinary cases cover original-schema upgrade, exact real-proof
+mapping/no local authority, stale policy, absent optional presentation, explicit
+JIT values, atomic rollback, disable/pin-only invalidation, database-only competing
+configuration writers and identical identifiers across realms. No custom signature
+concurrency experiment, adversarial XML, newly generated key material or verifier change is introduced.
+
+Formatting/diff checks, strict default/all-feature Clippy, warning-free all-feature
+docs, source integrity: 234 files/three unchanged patches and its four Python
+regressions, unsuppressed compiled-graph audit, all-feature cargo-deny advisory/
+license/source/bans checks and source Gitleaks pass. Inactive SQLx/MySQL
+rsa 0.9.10/RUSTSEC-2023-0071 remains reported without a global ignore. No new dependency,
+license exception or native backend feature is added by mapping.
+
+[ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records exact ownership
+namespace (including both configured IdP and SP entities), the dependency's missing
+typed attribute NameFormat evidence, and deliberate lack of attribute-selected
+mapping. No custom XML extraction bridge is introduced. AUTH-34 durable replay and
+final identity/session/current-policy transaction, source-bound lifecycle and HTTP,
+actual IdP/attribute/qualifier/browser acceptance, maintained dependency approval,
+XML/signature/backend review and separate named independent approval remain open.
+Normal SAML stays disabled. Internal code/maintainability review checks cohesive
+modules, exact visibility, no policy duplication, scope, transaction ownership,
+closed modes and original caps; it is not independent security review.

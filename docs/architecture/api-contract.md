@@ -496,3 +496,12 @@ It has no public constructor or clone/serialization contract. The PostgreSQL
 configuration/clock port requires exact current enabled registration. Durable
 replay and final identity/session commit remain unimplemented; normal HTTP APIs
 expose no SAML ACS. See the [SAML component guide](../guides/saml.md).
+
+
+The opt-in `saml-identities` Rust API binds `SamlIdentityPolicy` to exact full
+registration and defaults JIT to Deny. It consumes actual verified assertions into
+opaque `SamlMappedIdentity`, without local authority or durable replay commit.
+PostgreSQL configures registration, explicit pins and mapping policy atomically;
+current-policy reads require enabled exact registration. Attribute selection,
+identity/session creation and HTTP routes remain unsupported. See
+[ADR 0022](adr/0022-saml-identity-policy.md).

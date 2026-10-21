@@ -1,7 +1,7 @@
 //! Shared authentication use cases. HTTP and SQL implementations live outside this crate.
 mod audit;
 mod auth;
-#[cfg(feature = "oidc-identities")]
+#[cfg(any(feature = "oidc-identities", feature = "saml-identities"))]
 mod display_name;
 mod email;
 mod error;
@@ -68,6 +68,8 @@ pub use saml::{
 };
 #[cfg(feature = "saml-certificates")]
 pub use saml::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
+#[cfg(feature = "saml-identities")]
+pub use saml::{SamlIdentityPolicy, SamlJitPolicy, SamlMappedIdentity};
 #[cfg(feature = "saml-verification")]
 pub use saml::{
     SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
