@@ -1,5 +1,6 @@
 [workspace]
 members = ["crates/auth-core", "crates/auth-postgres", "crates/auth-axum", "apps/auth-server"]
+exclude = ["third-party/saml-rs"]
 resolver = "2"
 
 [workspace.package]
@@ -35,7 +36,7 @@ reqwest = { version = "=0.13.5", default-features = false, features = ["rustls-n
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 webpki-roots = "1.0.10"
 openssl = { version = "=0.10.81", default-features = false }
-saml-rs = { version = "=0.6.1", default-features = false }
+saml-rs = { version = "=0.6.1", path = "third-party/saml-rs", default-features = false }
 webauthn-rs = { version = "=0.5.5", default-features = false, features = ["danger-allow-state-serialisation", "conditional-ui"] }
 
 [workspace.lints.rust]

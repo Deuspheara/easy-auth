@@ -12,3 +12,199 @@ condition = "AND"
 paths = ['''(^|/)benchmarks/adoption/results/2026-10-19(-under-load)?/environment\.json$''']
 regexTarget = "line"
 regexes = ['''^\s*"src/rustauth\.rs": "0a8bd5cf18a1b5757cd3759654e08220325bd5eb246f4851ed06de3ffb884aa3"\s*,?\s*$''']
+
+# Only exact, public upstream vector contents are exempted; other values in
+# these same files remain scanned. Source hashes are checked separately in CI.
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/idpmeta\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/misc/idpmeta\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/misc/idpmeta_nosign\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/misc/idpmeta_onelogoutservice\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/misc/idpmeta_rollingcert\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+    '''\AKeyInfo ID="SM4cee9750ee17cc2f60ddbe777a2798218f7a5bbef"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/misc/idpmeta_share_cert\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/misc/multiple_entitydescriptor\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/multiple_entitydescriptor\.xml$''']
+regexTarget = "match"
+regexes = [
+    '''\AKeyInfo ID="SM4cee9750ee17bb2f60ddbe556a2798218f7a5bbed"\z''',
+]
+
+[[rules]]
+id = "private-key"
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/interop/shibboleth-idp-5\.2\.3/idp-signing-key\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nMIIG5AIBAAKCAYEAretsAWIbc/HDXUdNxibhoiRllKaA7MaTD7f/v/xwFR9ezZVM\nhifA6Ec7tSqi6ohGSsQbtUE7zGVl2s0v3bf7qqQJGrbSTgvTmZFZEq86cpcWyMrY\nhInFK8kGoRZYIi/PlJ4ZyT350iHFnGDmsOlO2boEzP\+HrwOKbsb7WFZr0pzBJF5l\nAx8YCDA2a6XkNJQIjPYteT7Dn0pDNJ\+5uOefHKRuvIQ\+CcRGJGwNS3ZFei40D7Q8\n288uRh6IHAFR\+D/4\+Ru5EzM6pAa3pGx/MRTz/5n5bOkxp1ldb2DDroeFi\+qgC\+\+s\nU15JJRuZDvNMroVvajKhKdoFXGlVM\+aJo13LfD/b\+OqG4o8gGTaZvw7lqNOC4Ssq\n6axbUyHZoWJ0AWwvkd4cOcAw3lGgB\+ErAU5jvrh9S71T6AZVt829o6bviTc7T1jc\nC3fmMe7Z76m5ldTrkAFLrl78JJb/hqO8TsFGfUa3RPvqqomZL55ak/vl46n7IJnU\nupgPJggTXmT0GuWdAgMBAAECggGACFMpg1Nv3vfmkxNzrJV13W4Ckr/5kdvbdDgp\nfMYXk1tCDXMlC5Lhj/zA5eYZkEJfovqKHP33X8xGuNdzgBhranqZmPbBUE0Ont4v\nNk6\+7HdA9vGGtalmj7b6o0FPjKtfM0zyDQjzaVSGgfq9cCBqzs8xpaJhm0X/HVhW\n9Z6FYLpyIEyIZ0LYwqOUJ0j0iHPBiQXLnW8crAZA\+0bd\+/TST\+urBUkLMyp69Qlb\nBY6uuq91fH7zHs5m96JEf5qsksZ1Dyku5/FWVGLuJyWQ1dto\+VikV8cSBGkIDUEm\nec4Laf9uL0s8TI2W0HUDQMsGjtM1Q24FyKUMpy\+EzCtoLHVZnoMZK8HklMV4c8bb\nSzA0J43mbRe/dvo3NC6\+pw43D6DPwsX3fUzIJKUQ8eSBaevOip37gnCDZm7e2HEB\nap64\+uwuzZaDB/OE5jdgdxIa6EySk2754TM7ST0bRu4V8rwbcRcuSkIZguTXuQFU\nGjnP2FssSmTHwDHwLG5gygzqxzrhAoHBAOXlFAzuEmOrTqvjVknyQSj17lAXrJ6g\n56ll1l70ZFaw/nxBbJ9nzYysgtv/FPs5Gnd7VDO320nxv3Yeum1sF0BbvTp8zkvO\nPlTZItoxbiFExU\+0DS7mVlCzWZICnTMSOSlodzAI4aeaVo28Y/zw3sMoBZxKPBah\nWmm29\+QuPDiTc9C1bKodCDGoBv1g/KOIxNKjoHFUEhYYl78YZdRBWu7ZoUrgBOEu\now956t8uT77h1gDsTXQsqOt2m3ItO1uWBQKBwQDBqyxmTSHom9XT6tgozxDJnXVp\nadB7IQrDg/dvCEyJnntkUDCKmO5\+amCO\+8dCNeH\+caw5OkusxXBkFACDGe4Fzxdp\nOd\+K6pCMW5Tr7J4mMkgjCY32C8dISoZxEXy5ojv4hHnDwczvSwdMKZE0FlIbbgTp\neFQ2EzBnzqTPNdDNz5/aQch0\+izvsB9gFIL5CBoCMmRO0uR4D4qfXT1wnuqPmXLk\nH/8qruJjoHg6zuLr\+2w9DOovL\+DFlLb4POB6TLkCgcEAtxfJ7z5QcQbHQkhtubjx\nwlCTu0APn8qglh5gLAHSQ\+T02Ts16oK\+hxIBqnquWCKzfINBnWsJgAvEI6v3aBxV\nLFGkFIe/uUoKBINmqYYCowZlasQIV9jk16LvbEUes8UIt3zWp\+/64AQgeQOYUqP3\nllAyn7XTw2ZAXr91EErudVSiQY\+sepNiqkGbR4NN0mSj9OqSZo/BU83EVVJ2DyT5\n6g5z0fE2ka0V\+sZrk9ILewfb66JHUYYcBmPRC48QnjGNAoHBAJVLeGGwijg/kXnY\n6yOiZEWX/X/yk0Wn9h08aQ0N77qTEnoFGzZsqEWJicAPtc6DrSCxzlsbZmTcm0R6\n6t4lqgiOWXTDqWD0a9PXcZjhghTd5CAmaGpJMCm5UaRuH6EWwHZW4WsXxfyd8RU0\nYfwuTMNab6zvFrPM3R7Y/NHDoaBWstrUpUwP434uXjF5/nEtXqdc41ikWH15NZqe\njRN5XkauuxPC2rizsk\+sz6I\+BE54Njtl7k3L8dE\+UEJS45VD\+QKBwB\+aqG46BMqF\nFizHuYbfmMhbu5a5LE32fkTuzKGufLwuZmw4wL1OMupJwSQJ81RuWxfW2HHfKpBr\nYxhqDIaBuLsNkXcIIfH1B8UPHOmgmJ/GItokSTr1z0pcCgTzD\+3EmlDVDWgS\+FLC\nQZqRGUBPa7qFO4fhzDMc/Avox0B\+s8s\+taKKSXu4eiqnl5Rg8hjB9Hje8ptE\+oN\+\nLXtR1ZUzX2NcvPS2Ck\+MCkX66hRWlcBYNt6jpSoE9lfiso15\+h5B9A==\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/interop/simplesamlphp-2\.5\.2/sp-signing-key\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDJXlxlobJhwOdL\nv41M93xBQ3Kx5e2LcYyq2fRFTF79HtxBtQuaS0Vb1rnw/5Vx/G21q9RviaZgh9ay\n1\+GrfYZI909D75LuPFvP2aY\+iCtLqCr30Eq7oF00TVZjsL08LemIAwyuv9Tm4Rit\nwXCP0VZ2Nb2JhovsOdDVL9UCiDuba9dRhgmVNapprW91Nf30AOLVtPK1DvEkNp8V\nXoxAh5Xw4PtU04TAaHwridsRxRx5Xe9xia8IOeRIyqHtNp95aECZQseXcgbCB5Is\ngF484OLvTxeAU/iEOiIzo1DhtEVH1LmVOKudCqeTVHLQs6\+7PCIZlOqeR02xr0MS\nYGdoMp\+hAgMBAAECggEABpWmUdByw82KAqkV1sF097Fb68NH/DpPTjroSOfRZ1d9\n/kwMQBRcBT/FPsMswNhvQfSHcso\+fYOTmq\+CepgVLwefOOp5lH62xdopHHxZZhTu\nqsHN38rDoXUx8PqThYc\+zqrC3Gf7bz1HEE91/c3rlNv3Aas7ohLV6FKzFW0c/dz/\nBk5aaTSxbURZcNyuvaW/Gfu\+NU2UfEscoImO1ibdw4dsNHKoJt\+zyRmX5tnXZv3V\n1oqGQBz2Q8uBgBJAhVr82Si7pOBrqu3iJsF6O7kcmyZvbKQ\+quQgWn/okWJVV1Id\nmfyaBHmxb4u1twytxn950xBJpByjcEkIjp0bC\+ovPQKBgQDsEOmKL2M0Xp8Kx0zV\nSRjZVHjgyBmXFN1MUd0GRvr9PEU/91noW6ZMQpUPdDk7Jn3MY6DaZMjne2f\+9GQQ\nsVKHPyOnRbPZNKuXpzPoxZWW2DwQYOciKayoFfTB3TlttYUy4WaJehAwQgjQzeD\+\ndbmlXrsi9dXhrlkoLbj0WF7lzwKBgQDaX2LzzZ6KWx7LRORO\+XO23yXT68oDd685\nPc8/DQ51TGsGR/0uyVw1yX5KyS30k5gBFUXLXSycqsUJCksFVN2sbtaE1KlyUZBp\nTVEeeeGJdetrGbsLvEtjGucsjG\+GvULfcrEK89OnEo/unOCwpzJpUCkiwdq3/3UQ\nTbLWsBzvjwKBgQCPvhSWwhgkMWGijIzqaqIo49je9rkuV9QQvuBZDCuUu3hnZNRo\nOjZexURCrsCSlfOP2zJ9CVWULn66rlGoIHFiTT4Ggtjqb7n0lCl1mapmubCJQJg9\nIycxCn2I9o4bkaZTvxBSsfLdj7gSfOp9x22NlstYlFzyGNnNL1op3w2Z3QKBgFz6\nQCeOZPKD2ZiyvILjs2EpofGZc2oGi5TTvGocJQvMfcUu4Z4KHjjIkf1Fq0t3jEDp\nzc3I3jXWgA5ZU5fxinDgwHXOFleWYuZzBRb0zhK5IoN3cSyN/4sy6TsOkG3OJ6r8\nKmV/a563SJFQOlr81XoBp4IlB/tPyYgnjP3b/nYBAoGAKQbE2wOzY4CcmoJhxerF\nWxhMrJ3ibLXbO4jB8On1EJg1h3LmtZWRB2w2ynhoe08SrpGVln1XqdSjAYcnlz9d\nCiA1XPUknmAbw8uz5aXL1AGHan04zrQ/Rco6xJq\+xKQJH2reMqyvR9dKctBIbCNz\nU3/FIebmxQtbKcaGf2GYglE=\n-----END PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/idp/encryptKey\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: DES-EDE3-CBC,FACBF89A697AB50A\n\ni0RiFM9TTHzN/atuOBWhAfoty7rMEgNVVsyeoAPqQZoGwBTmOSbMZ\+3vLR3jc7Xi\nGJ4NtXOux2IcNy5rcYnL3SgZIANVakfEUwF6qwBLCGYbOaqWqEv4eHvz9JHIH9iC\n0w4PPMzA2Q4daWiRw1UGr4Kik2iqfkDGv4JPdUDY7/KNlD4hpthRk6axUg\+XbJat\nswCijv0NGrU//MRGCpqnt4q5ApoZ5Yg4jIbc9JG95ZoZ9\+eVZJa1l9ZyYyw6bJ6\+\n0iinwWC59qX4soWzvBPvXMzJpgSPAtDrhNKMU4mLPD6\+1fLVsc5POzjAuGqDRNcV\nbJb/nftu3/MNasXI0PI37RM5krOitBfona8YD4T3B5fIa80XBUrPfSpFXqOqCHZQ\nH4rHbnletX8mnAAlzBIEzELO5Dspwnd9OvEkHsKdN5BSZ8cKJh6/qIHwejn4DP21\nhvFAkUYrZWpNZsCi7CKZTJBYkwogW7u0u7ki3XiyPxeDJaYSyTxcdiZD2eVmsWdh\nwOWU7mfprfcYIJJnslyJ104z5C0Ioj2xp7VHcX4It8DrwzizfPHkvasv9JarILIX\nyeST80i7mcxFyAwmuKIVdD\+vvNhZeu0OYs15uhcoKH/oIz2dBLk5U\+d/hVwV6TlX\nv41nDLuXfvqjAh83rz\+a\+QkjEdtaMDXKkM3ob6u13F\+7JZPQ/32VMeiu0hMWwFff\nnijXoWZ\+gv3hxbI2oy3Gc2Kjj4H8sYBx/Jd\+LTtEZzH01wq0oR/2BR2r74ErB2lF\nByD9d9/SJ/\+WrIuseJTcLIWARP5t0QDe8NAWEY5KPk6YjvB84jHIAHf\+K\+fQMKJL\nn6ehvRlVZo4a4cP9PPGMEupfSHCNjioRzT92/AAc3\+vplZghMd8lNOpCKSs2NlYX\nrf1gKanBPwjcH034SbiP3gN8r4j0Pep6RIWBra2FGZtZcNUhLSXZG87Lmf4RGnsJ\nTRwbCUPAx21vhkoQPg5/sLh9IQ\+7nzCZfs82ke/yXVNNW7KIxchQ8mz54Ji/k2ix\nl0q3jRgH3u8LGPOyLwl1h2fusfZjKYZQnjTZw69Xv8kz1dt5iigNlSspwoMm9NI1\nHj2TEXQJuBi2/Z\+J\+aDnY8HLPTM1VtXpuJiPmbxcS0kAJIveg9HQDAei26i\+l5OM\nb4tXGjGCH/HYJxNIFWtAkrRJZjwrKmVF/GWESGvOtpEsm5YiuC5pUt7\+fs6eZ\+F\+\nnzUV2d/2EkA3FKEjAvoQb6QICCFE0SRUGutYYuUZm4AYG3JEeI4JGYpE1h9pGXMz\nm1hlV8N9EIJiFdEtGifjAcfHSVHm7m4us5qOG0TiVfSDC3RZCJSxm8pAUJXLaemp\nBvoHL8MuJX8bNMMB3JpWW3e3HxrmR8nLk\+xZiviggfWBVRxM9YAyb6NPezVFAV0H\nYTULqiXGZbpe\+Bm6MmJ6LryicIf8E3pyGbQEYtO9iLYfXnJDHud4dKZnXqjo68oc\n80EeEm149eVGtYFRiWhjnRGyb6Hdql4u5iLZdaBRIm3Jm0qsHioYBi6SH5ucPM\+q\n8hSEfoIZiRlSsrjzvko\+19lM4/JnHpk/7cihRNpgXBQysGLwSSA626cvgjwEJSJB\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/idp/nocrypt\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEA4NmxaEJ77IbQ9qVA9NSgPvKSjkxNYwJHEnyFKbaTuYbcSD9j\na/QQF0KZPDuIMJ69GpSZuYWersxE7JXh6uInOHQppsB1l/v\+TqSiCGy3dlS1Y7DO\nyHLGQG1YPAaYGlAZMawrEnwzWOzdpKo1FcFPg4FYz3DYaW3X7y3LfRGFi/elIX78\nccsfsBz68tIgCWiRoVbfhFZNwn/ysAO5FaVeKHgZ\+ci7Rb\+dybmdNJomJEC\+vd0Y\nNE7\+SGJegl1ts6Pt0c9QvFUZsf0hs8rvpMLAtsXuKQgyw\+i9VtOunIvq\+xtVQp4S\nX/kYqmlPCn0MsA56hJikJiSQORgq71NFCMXTYwIDAQABAoIBADOGbzr/ETrQYg5D\nLDFukBIcsCzfm1Q272ZzFmjKp\+t51fzQWc4hLZbG8ip1Ue4iUh9HMjrrPcO8l4bH\nie\+zR12OcQT/UXM0kcAfxem8UAZTvwVLPPd\+JaQZ6oBG2pAdDsjtNSmVQIb\+MIRN\nZMDJfZkbCOjwaQcv3q22hszwOPQrq5nW82ScuZ8k9oAyz5igomGX0jQBkQM8KMzm\ncXTJXBVCc/wEjHEjV8Gx1hBaDuIqY0rt6/5R4zLtwgSvT5LvUOIlzFMKACs7RFA2\npkhfUx786IRbDXnGRPIqlJgYglcQjEh/815jTdsjJ6VDBBtYcEiF4vn0eWl9tp4S\nNxzwWoECgYEA/BG\+bAMnMuvjtlOnrZF7l7mCMmKvQzhPr8\+8zPtuiQKgn0vHtw4z\n7u0TcaP35sa7WwZjcwUtSX4Vs1VrlBfNaHUAEgJ6PAxVPMIB537ttxbPER1l4vE8\nZvGRGYsps\+VNfu7XJnaFtq81mbpGsr1qRmaN\+OjDs51UbkKd5esPDCECgYEA5FtK\nps3kfe8rkaacFKfbD3tyj9CeZf8A1ovgiWJFi7PCY46Yg\+66Vx/aKkzj2rh993Nn\n74BgPWszDJHwG15sHyDlxaZHxUAAeWRJClirsS8MuaLOooReA9D3U82w/s5MDviT\naP3CIc/RtpoLk31arCyqF/aT6K2B79EjmzOKzwMCgYEAjpY68T6XXeax2OFZaIVz\nNFBrpbTND2k7KmiIlCtmS3qBAZsMTjBqkCzrYs0t3g1szgC/IME87OW1wMwBHrSY\nLQ6CC637Fxyi2suj6B\+UuIzedP/8MnPjhxf\+zEQ8QtbjD3prmgZRfRV/bIZCl7kt\n9MTuam7AxUmqCPUF/JkK2gECgYEA4Y8DF\+w7i\+EYag/mD8kVah\+Hs2Jfc2QEkecs\nbMdy5mEy21/Yakj\+Kly\+BBZa4oplcmy99yYY6dHfZMUqI/6KUd0O2MI8Fiv3y/Aw\n7VVUkfllWl/kN0cEDkT0aAS\+lZF0Mz15bbVpcjhybymN0at6SqL7iBv5UVVBCX7M\n6tpoe70CgYEA5TAEHT77eF8falYD7nYKnPUinfx2p6a3J0UAWI33W3CE6K4MTMSN\nQ2AxLj1ImFrmDMiPIFa9GeP9DrE/6eeKVI4q0u7kF58XkCammgIJ9GzyCBWfNpVR\nrR2ZD\+OyCGiqsrL4PqtHxTwRiYymLOuVKvXxZYlDDPN/RlkBINUX0qk=\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/idp/privkey\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: DES-EDE3-CBC,116B0EBB2F2F0A9D\n\nHMmUsJPVPTsq1e06yrrskfinY21OOHosfRzibLueBg9ByFFZ7\+/oW/DKy1GcDeBc\nycL\+3gylIoGUYuZ\+DPC11ArjdxFqLFnHJb96rwy5h4sTP0lE\+qHy\+06AwsowUgp3\npdD2unPFeydpu5h/dqgoDzkGSucz0Ty/spHXNBvns0vJO18B7XlzXUtfH5aHco22\nDyVY6FrJwMts9E4Rzs9JsxJJ7mi/6\+Qsc0rOr8/6KKsRo1sKD6cvQIQ05dEvGrE9\n/2fubHkRTl\+zBqOVyQvC6iUtocwxlMP4KfmyYrD1wlQAnP/\+smq2G\+xf7uGc4X4P\n8q0jEy2P9n5ASlwZ3XCS9hZgp8VRAcXWOYjzzNouQp3NEP9d5D3wN4aFKa/JW6pk\na6VwraEweuyJqvZ7nnam1emW0ge0z7hJabR0\+j0PnUxFIwkI5jO3HI5UiuUzuQFe\n2bTLA3XnJ7QD08ZKom0rmApbFrmm9BWBRTmt46NlQDy49VODPY4gFuQ/mpaFjaBy\nfSNJaOSS/MDuAdPabNEh3l\+yCGKtHIbPVIms76PxYf6o0VVxW96/Q25hrvyOJCxn\ndVQyyJbQ1jGenu4ViDNrW9ZQfw4aJCPpY7lUQd09BGz2NMKgkrSl8bKSan4lvlF3\nok8BjfIw\+pIrTyesPU5tF0YudDxwi8fbIG70iwrpsSt2wVIMa\+Nz2lwFT1dV8be7\nNARkkkhLWJYAsxsyVfdl\+ucNSqhvo8xLITuG8CZnzKf0T2HMKnMNegFx/ipfM7ff\nMx5CjayN5Oy99MWsagYEutUGzCGPAuVpqYpJuuYa3lWbFk2XWihWkAiUwgRqIluE\nM6LpO8l3LVXVjN1\+6bK1GZpbfLay\+E6vy4W38XMuXZSNpyhy6e\+XggTPH2xbbwoi\nOcAzcojhMaxVGpxm/aXyRxg9zBdrQjtqM/aCN91ri55bvOKxELVi\+D/VcZKpd2CR\nX/vWcqoGaK/6\+vlPWMZSHCJkPa4KBT0aUcnEdeFWx2nmrwdrHvETzCYLAzVBSECV\nZoYH0xTkFr/RI2AOAzx701LSuYbnPoCq\+w7TXtjPaooZdYVVgrYuI\+j4JOlseFS7\n1c9iRiJVPBfnpUNIZdHLw19\+k81IJ/FmumiuDhfLS5pwQmtuXkO3DWZDa3UPlV8e\n6dmZeP1XGwRLL9VpOKx7NCqZM\+CdEt87CXpFFWXdw8tL\+3K/2r8w4lHIzBKaVPSS\n5uFqXc1vzfP6Qeov31IjeLPE1pWTHNqRPdmvt9Scq9tKS3o18wmLBxOVinOE0cxQ\noddzPd0z5NxNYVayqZORwDdVv6CVXKnrvBSnOFFslZqv1G8/diE5BXxeaAPEMcZE\n3lD7MzdoEHK5oL2MXofLWZbNtMkOZLaLqY80zKT1UG3Gs8U44d44aLXO1dBL0HGX\ndNfNUaH\+IGZf2ccS6OR1RhwIazDZ8qk0XeUwQV588adwC3FUvscVA3eHZa95z4kX\nxvHg\+ylzRtKRfpSPzB2IVwgV9/rsOg0OmvwhV8\+5IQpdcFr\+hf2Bn6AVn6H9aX8A\nJjycN6KMcHaFa0EUqagGm9tsQLmf/MGCj8sy9am1IbRmFCz5lB5A7P/YLPM2Csjg\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/idp/privkey2\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nMIIJKQIBAAKCAgEA0BvmmwHnlo8LDmbeUpHDXMP10iXI0sicpBGxFNooLhK0bjiM\ngX4I9KdVFQb997i9ooHmCU9zkl5ko7zDvCr6rWDdrSQI6BY4IRq/DWyBGY2EuLpD\nGVG8MXdm0cnA/TjCPYOOAFAdbH0NFMhcMxDrHlt5XFtRZ4XIswPE4CNBjeDaXVa7\njZaYKFnT98PksobatK1nm2PIPxxha7hCp/FcG1G5TmXT\+4zVV7HdWlDEnKbjGtJI\nc81zwzfkNK8Je/XzuMnIUnigABEXT1wNVHw324fVu6XGAT9AAV3fdQX/WpKZZm21\nTiLDW7kSHFUu1ry8Aq\+tdybifhLRg3FJK0qW7kbw1vOQ0ERwRrqCpXEhvoph0LR6\nkcDMDHPD\+eISBAb2hVtEX8D383RTXvMAEbZryHl/OIsKuWHsteS8ta3aKYu7doO6\nshewvwfYGd7Sf4Dyqdja3QhhQXGoZfdy4\+ellpiNIzR5\+/u2N8eorCdyk0VyJYkq\nwMIiu/\+1HszpVs7NZPJhkFmUw9wBhirtXAVcLgvq4eMJC7A3h388Wr218VRKJPaf\n9T9vDOBoh30tDzhNx5eEU90OgImFp5hWMmfrJmPe0oD8AeLUzWBYwuvvXfwZZTaE\nG/MLD46qemQ59TnmOuvIafmQHBNdwBXYkwTFa3HRBAgjy8YNZBZOcGXR6xsCAwEA\nAQKCAgBLkOYCgQWLuPMlzpqJ1t3ecFVxckDisO\+X78iiLrkKScZ0g1oZpx8vXxdY\n5EoRymYpfQt/c/cePeJDRka4q86MaDD2LrCBPZgyBRk8kZqrIaUAwrmclv5D4/xU\nzvKhwBtf5MYKPQ0CGMJIOpyn\+ku1oTeHHq2Hbp\+6yPKTBJpIH06LN/QwbG9hr4R1\nYg9H\+AmwM4r8dJYAvJhvWd/yRYTRcrJb0kPQAopxJmee5NcPntW2JocibYbMax4V\nNz21YlCWV8bCk4RdodcZ/O3mMJjDwSYN1hr41vOxy1lZj8zyIWtMMyfzcFIJm0EF\nQrUYSj3mp83QBzGU39Zt6RPNgW8d/CMrBRoGK4PnBqOaL8vxlc3zFh9imveXEhk\+\nbYhvC15w3\+i94IX/7zEv8Bkx7iPUTvKh1RjEEDqYikuLmW9KEmF01u26BSg1Y2uM\n6ZLlzhw9cKf8xok63jdE0o8XT\+VRd8UzcdCnQ7k5NUkm4dLYhpNxMTCsSptBwpTV\nc7XwHOdMFopkQi8XMkZlJqNsXQy57BcDgEEfLPRsfd93jGOn5zIKwj5zC1DXDrDX\nuker1yDxkLxeQdFPQwvE3m1Xpb2lvR1a29474qE6bxsrp0ADajLaebnB\+QprWRX3\niBLMJau1YcI0HHpncGtTTzmmkuTNbwd7CgLODMQ35V2kkIbPGQKCAQEA/B\+1oPhb\nbh0jZGTL3MoHQTjJNwmd2frv4ijxB683VJbhw0kbHbitnYsv/cCdgCTsHcxOGYQu\nD6feVTPtNoJxYZziXwFI0xvrgAMQHWPHDfESs3vCZtJfyWSVqNf7FGfbasxxe0D1\n3qbKLVJSctdMezc1\+o7grJmfd\+mBNU3p9iGUmWNc/qBClsB4tlrsNfoyRiJwcOsY\nHZKXNeudawIBlq\+Lysf1r7waLtjMg9flshzrkvOlls6xfV0z9MT6XvSnqKqUNiMI\nsgJGnc2SWbuYa/pVWNMyFdt40aq7i\+ybkm\+ddFJFEYD7X37yI9gZZQLsltik8D1/\nfICX37mGrbk5vwKCAQEA007192RB31QA6rSTzQ48rvcKIreBH9dRf/LrQtrkUp1M\noAAGeiH5iypCdWREL6yXVCXMmAgTUdpgP6hj5J7B7N7TkQP5HBvL\+NIN/iaY2pob\nSI4hwf4OuiHD6oRMWuuzOlT8enNk4mo\+ue29uv/g3gvR2S6zkOCDc2G3gycSfpfF\nvgjU0lF9dVhhn3emcXInDXkDU9aXXjy\+8tXDo6xvbMV9Vo9nCrFMT1hYbrdIETxl\nGyrvVbDvel6xV765FT60v37Q0e4zbyPoS8iN0yDXg\+XS8GrqrEnCDc6hUJG5OFwb\nkBnbCX0Eo0YXd85YuKYfwmwRwFK8Ct98FXl\+EL8NpQKCAQA4o9sG7aSEqVEhJa/S\nyyQ0F9DEZ4mpxcEMWsxDQK66dycC2zKXS7zdLr66UAJSHnlY/GPzQYmjhL/i/kZl\nP4q/NiJ4224D1zrhyE5fe\+HlFOpxnfT/anWQZeNlShgi7m4RoRpBaUeTHH9BDURu\nfkW1TKL4xg5dWCnGI5QeaIGOBN9AUl066r/q5BR6SxTTz4Bp1yTRiU8inaMQvvzf\nZFT9CDTsel2MfEKZkaToXaFBkVOu8MObjJW9Jyob7ACfQnFD6AZh3x799prsqpkd\nRZKpd1SjHtcap/KNj8CQX7hXfnGuBylzFDnkqz00pkCWO8Dw5nyvZ/FzA\+SaozBJ\naNo7AoIBAQCGlyGlzK8EX44h8Ji/oFTYoLNM/5L4Q/4\+P\+zHbYLGeDiJJNr7Sc6X\nbHheK1oe/5B34YeaQnKDzVNG2Kufv9sHU7pwAJbX54CY4LpW6iCsBEJiiV1JIdgh\niEYwhsnXk49aFS2nlP5qFIAVjy8s/7Qr2l10NwHawpYXlOL9X5KxHVyvORLNT2hY\nqM2tc9mJIstrEmwjJ2jMdmatZ6iwBLIIFxZJXxejwOA5Ha1d/9GgYNaJYmSFMSin\nyc6tc\+aReJpJ6q15OX57SOS5\+GkVVDLRaT5dMcx9ppE6mCU5m0fddRV9SGqydXXR\nxWBHSCBMpEtQW\+NGm6v4RPbU\+shoRDidAoIBAQCfNnCjLvLNTfeJ4blQOdGMOiDr\nTEyxtF9tAgkzbQefBr6HBVwzfPdywUtf3ZxVxKIsnpYmbGJIKp525/Wtvme7qjp4\nCsdyFO6ZFLEeI8KGKiewGEv5YzvQIpVqoMZ6ucY/WiSvwHSvZuyLZVLHOLGcZRLJ\n49jbfhsvrJqWVDC2CmX2oAuH3GF\+LUFhkM36zD1d0FrpaZwL2acWErk/N0CNhnNp\nH/08579O5MmSjlWh8Eco2wVD1z/A\+LSC0YN\+04ZrurB7wAebGCsOoEO7M53aan77\ngP2nLQ/cnYHiPrmUlL5s7EDhKnvpNY1W2ViEydwywvg9m4mxOA1sjrYpoNRg\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/idp/provider_matrix_privkey\.pkcs8\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDg2bFoQnvshtD2\npUD01KA\+8pKOTE1jAkcSfIUptpO5htxIP2Nr9BAXQpk8O4gwnr0alJm5hZ6uzETs\nleHq4ic4dCmmwHWX\+/5OpKIIbLd2VLVjsM7IcsZAbVg8BpgaUBkxrCsSfDNY7N2k\nqjUVwU\+DgVjPcNhpbdfvLct9EYWL96Uhfvxxyx\+wHPry0iAJaJGhVt\+EVk3Cf/Kw\nA7kVpV4oeBn5yLtFv53JuZ00miYkQL693Rg0Tv5IYl6CXW2zo\+3Rz1C8VRmx/SGz\nyu\+kwsC2xe4pCDLD6L1W066ci\+r7G1VCnhJf\+RiqaU8KfQywDnqEmKQmJJA5GCrv\nU0UIxdNjAgMBAAECggEAM4ZvOv8ROtBiDkMsMW6QEhywLN\+bVDbvZnMWaMqn63nV\n/NBZziEtlsbyKnVR7iJSH0cyOus9w7yXhseJ77NHXY5xBP9RczSRwB/F6bxQBlO/\nBUs8934lpBnqgEbakB0OyO01KZVAhv4whE1kwMl9mRsI6PBpBy/erbaGzPA49Cur\nmdbzZJy5nyT2gDLPmKCiYZfSNAGRAzwozOZxdMlcFUJz/ASMcSNXwbHWEFoO4ipj\nSu3r/lHjMu3CBK9Pku9Q4iXMUwoAKztEUDamSF9THvzohFsNecZE8iqUmBiCVxCM\nSH/zXmNN2yMnpUMEG1hwSIXi\+fR5aX22nhI3HPBagQKBgQD8Eb5sAycy6\+O2U6et\nkXuXuYIyYq9DOE\+vz7zM\+26JAqCfS8e3DjPu7RNxo/fmxrtbBmNzBS1JfhWzVWuU\nF81odQASAno8DFU8wgHnfu23Fs8RHWXi8Txm8ZEZiymz5U1\+7tcmdoW2rzWZukay\nvWpGZo346MOznVRuQp3l6w8MIQKBgQDkW0qmzeR97yuRppwUp9sPe3KP0J5l/wDW\ni\+CJYkWLs8JjjpiD7rpXH9oqTOPauH33c2fvgGA9azMMkfAbXmwfIOXFpkfFQAB5\nZEkKWKuxLwy5os6ihF4D0PdTzbD\+zkwO\+JNo/cIhz9G2mguTfVqsLKoX9pPorYHv\n0SObM4rPAwKBgQCOljrxPpdd5rHY4VlohXM0UGultM0PaTsqaIiUK2ZLeoEBmwxO\nMGqQLOtizS3eDWzOAL8gwTzs5bXAzAEetJgtDoILrfsXHKLay6PoH5S4jN50//wy\nc\+OHF/7MRDxC1uMPemuaBlF9FX9shkKXuS30xO5qbsDFSaoI9QX8mQraAQKBgQDh\njwMX7DuL4RhqD\+YPyRVqH4ezYl9zZASR5yxsx3LmYTLbX9hqSP4qXL4EFlriimVy\nbL33Jhjp0d9kxSoj/opR3Q7YwjwWK/fL8DDtVVSR\+WVaX\+Q3RwQORPRoBL6VkXQz\nPXlttWlyOHJvKY3Rq3pKovuIG/lRVUEJfszq2mh7vQKBgQDlMAQdPvt4Xx9qVgPu\ndgqc9SKd/HanprcnRQBYjfdbcITorgxMxI1DYDEuPUiYWuYMyI8gVr0Z4/0OsT/p\n54pUjirS7uQXnxeQJqaaAgn0bPIIFZ82lVGtHZkP47IIaKqysvg\+q0fFPBGJjKYs\n65Uq9fFliUMM839GWQEg1RfSqQ==\n-----END PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/sp/encryptKey\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: DES-EDE3-CBC,860FDB9F3BE14699\n\nbMpTdWaAEqNciUFQhHYNv1F9N12aqOQd6cFbMozfRnNR19HW6QIPDmEOPSSCaaRy\nQCnJhbpcSnaz9pvI7EzeJzdykDmR8Boos\+0NSK9qIX0buBO55mfPr7hjx7bLFEVl\nkkHk\+k9F1rLyjyAGJrVoTNoWjyuMOFUCWR7ZxoYticwM/sL\+Rbhn1FsfdkdfhFW0\n08OHTouRK33Aifx0A3MWxR0ILvw49E6urtbbIrskEzKzfWQug8gY1TJhI3sbsMsI\n1bS5Vg88TvilFFBGn0Yv6GEJjgOrsrKDGKtYGhuBfK4fd4rwnQKKvC6gTKeNXIfV\n7Qm1R20LUJXC8zv35pdKoVk\+NdS/MGNXJRFgO3Kkp01aVf3n1oo2\+AllS02AYyWt\n1svHecsRwbibXip8gSQsOtDdpqQrEDyqZlFHXEw/IcJE9vQWEJmpHD5GFhbKtttp\nE0B3ZtNl6YcyUz0rSf9zjuMx/wReWdRb6H2WoIqoRS7vAUONDRPt7wvfjtLlDRVi\nbc2RTN8yce/57lGnA1n8bxPV5\+9VxCJOEipV3io/nrj\+uNO8i/0rUpkKdZy8wy2C\nRksoxq4TxwegONz1HQcJVpJu0iBdu7B\+BXVjxQQScvMQlOTbua8k\+YdaCeZAb83j\nJVX89/PFy\+Xj7eGyzzBTqz7dV0Xkxq9mpiMYUCoyNL5Iq1jD9Xb5TzVW1Gbh8zCZ\nYXjcZEQKeartaBC4/fRWyxqK3gJRX4SJkl4gYMQrPS2pbTzVCO\+WLxSwIh3dOZpo\neErXLSrylIv9cE2Xrs0McXAR\+hfGrqgtILBWwgbh2NhmUiFfLwUTUxU51eu7QZ2T\nV1VFBX0QTmn2kM0JLSSC96mDUzbs6qfURUaXbuffF5cqdUjXgtzZj5SFEbIv4UFS\n0DAS\+6i/jTGSz7aAp/uofOxhYkCqK/s2Cex2jQbDpcKXKiWzPdULOCjAh3fdCAp0\n3ua3fdAI7H8PslSDiPFrcY78OxZaWXzazEiun77WKbzrMloLMP5dpCPlUCOqxbZ0\nykSuo0M7p/UPY34yi3AMHS9grvQQ1DykMPoqKKEheI6nUGcQ1AFcdr307ILWRsPO\nT6gHOLXZaR4\+UEeYfkTKsjrMUhozx7JIyuLgTXA9TWC\+tZ9WZpbJ7i3bpQ\+RNwX2\nAxQSwc9ZOcNxg8YCbGlJgJHnRVhA202kNT5ORplcRKqaOaO9LK7491gaaShjaspg\n4THDnH\+HHFORmbgwyO9P74wuw\+n6tI40Ia3qzRLVz6sJBQMtLEN\+cvNoNi3KYkNj\nGJM1iWfSz6PjrEGxbzQZKoFPPiZrVRnVfPhBNyT2OZj\+TJii9CaukhmkkA2/AJmS\n5XoO3GNIaqOGYV9HLyh1\+\+cn3NhjgFYe/Q3ORCTIg2Ltd8Qr6mYe0LcONQFgiv4c\nAUOZtOq05fJDXE74R1JjYHPaQF6uZEbTF98jN9QZIfCEvDdv1nC83MvSwATi0j5S\nLvdU/MSPaZ0VKzPc4JPwv72dveEPME6QyswKx9izioJVrQJr36YtmrhDlKR1WBny\nISbutnQPUN5fsaIsgKDIV3T7n6519t6brobcW5bdigmf5ebFeZJ16/lYy6V77UM5\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/sp/privkey\.encrypted\.pkcs8\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIuQ2unbu0tjICAggA\nMBQGCCqGSIb3DQMHBAjKZQizh2v/CgSCBMjMV4AX1EmUgV2PjSYYehbnIEOZdiOU\nxiH2hEWZBvj6Lc\+OtG01w/DubW7drMdbeQPY8ZWd0mFuhPKWbrU7C\+u98vy9\+dly\nhm22DfEda5BWD4YINKj7qdK\+RtM0Im3gHtmppfNP6ZTIGB6TC6gy0pSbOsT2BaAO\nLy/4wp/KSxgaCyTIyFlmUP34AGZoLz21FjQn6nD9TNGO6V\+/0CUin5aezuoEbz6r\naWhw\+eaw/KtzIDfuj6mShbqBHWP74DfB16M5pU3MCOsfalzouoh\+y4FbImRD\+ILU\nCYibmXQXxbXFHtp30eYsJHVMg56HvkO1EZI6nHdOLUxJ6N/0Gs1FdsijMuqdjX9P\nOWPVMrXvCoWSSWcSQDIGKqxA7QJOubH3Q0F2cEWkgSht00EO3tm7LZqCVWv0lPh/\nS61WvUSu6YeGXgeZ7FMWBM3MEJIGAP6Uk0jJ//NGkdPEHe4K488UM8KswLMfUPdv\nPCI9vtqgDuWlMytQKbtUPgY9LHKa2aGF3FJq6XIDgyGAbPkSjdtMJS3cIzbB9vPD\nPxpj6PLe2HRuE9fQsxQia3SFHhXlHo2MjUJZsyZbts70BeI1J8dJJSCfRtvxjCeL\nfet8LN/5wv7aIteJOiM6ffvexzwUUiBMSo\+HtgZ49992MRf/bx5i87uAgxlshc2k\ntLJEW/UQXwpA2QaP3CJS8I2P3PwvmCKT77\+s21vFeheNUOsfdwN2dQeEJU/9DDCN\nfGrCW2p9HAvh9TEAqJGToMU11OZjMhWEh/d1Xzo9VxuO5LDSNnv3w/MHXKUuZyNI\nmIBSTvwz/qs7bdDxZfTzhy6IxIYIT2jILg\+sOR5jyej/bq3F3MxvKonX58X3U5NE\nHqKcFuqtsZfFINUrke2GjyQaHKvnUpwTx8H5SkCzpH6MuSrm78afX1Pkg8LvDO6c\n4YWSs6hX7xUZxuiACvF6oDAesk5KqlbH7DoEbgX003i\+0RoRPGbm8a1ksrbxw\+Vl\nNsab4Wq6pXM0z5ZcDLrgI2PRc7yJLnoLiMDFIbKWWC3TTmLsNuQqyICRSsJtE9SH\nCQNq\+hD82GElrnERllxCyGeues6Wx6ST2ruxil1oKTXygU8dg3Hw6tae3t5Gfnwv\nFZaTsU1rQF8fnRaWHID65e4XuXdvqx9ml7KHfDool6Kgjjz\+AgSM0ns6R5WIDsZR\n2sBdorICollrE6zvCrpZiPxbr96M835lW0Zblj2a7rKWqDUd2t1\+W4TbFgwGS7jM\nT8n5Fbje4f1BSpJCWZlo28aDzlfum003tdKrHizzWEjIoEsO\+fad55qPMc94/4oW\nTXg7kn5jo2RMYniKV18cDIJhziGp5sA/fJX5w2z2mL1cyKLZpV6YcIrErxdJ/gQD\nTx1Q9ayCenIAgnwn/PtRf0AI1n/yPYxHfln3Y9kvajgYe7lA4lFFMKpUMZ8xmZ8T\nKTWIK\+tVSm\+uYCrMPb\+EwKxkoD\+unvPjHFUfRjquCahx07HVd7\+TMBA3LHwSWdtX\nDIdLBDUrvmhrdcUf8EyHBD4TGr/ZYiKPVCcT1E1op4mqBucfQGBfja02sDXL6Vu\+\nvqKMK662XrRNUXUIRPF901f070QVmou7UW1tG9Dzi6Y7bcUfDjZwR7Y3LPrMEYfi\nmOk=\n-----END ENCRYPTED PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/sp/privkey\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: DES-EDE3-CBC,9C86371F0420A091\n\n77TqgiK/IYRgO5w3ZMyV81/gk0zN5wPTGWxoztNFjQKXCySFnrL30kUqlGituBxX\nVgxwXbkoYMrd5MoDZKL5EJuf0H59hq92O0\+3uwJA8QyZjOm4brQcjXKmIrkvihgs\nFvpaJiGzp6kS/O7vFBDNTQWr9yY9Y3FBPcmOUWufpRp4Q5nhpSlqnMmIqZyWQUL/\nYJSJETtzJVsk38lCqIxxDT3LtbGySahj0jRuRqspAZQeLTpnJqzNMC4vnJew9luC\nR\+UffrX7gVsnwOhNtyRzYaMsLnbRfXT8Jqx2gRHg36GxkOVgyU7e62nk9CzeC0WA\nkHHCNVqqivRx9/EC0mQkkRgRzo3BZWp0o671sUsGTy57JhktiGfTnWMrl7ZfhAza\nSZnjyTwuI1bTQipIkNI3aJBTP/o/gNUE1sj5D5FZlFdpq5ks2Vxww3GNx1FRrvWd\n98z5CNt78ZR0ihLmdz/EakEBKBUteQu/5zPLUlwmGuou4wPuEHG2BsjGzb/d5Zfc\nElIjUV\+yrMmGHvBfPyPnDUrCUyLn18S1NZiCMCdN5PqCybjhk8oMPYZhWBqp8Ymr\nyHIC7BCnTJhIvgQZR6M68NwVv0aBBgH/I/DB0jADo6/B5Eajwus9i6zSv8QIbqhw\nfusKtI04vxc91aP0GWRr0J/O4mkxXYNPfa3a/I7sGTXGl0k0CygckE3fLXRy/WEk\nikZt4UHqg5ZQ8vc5NSAM5f5Yx/72CU1I6ehFtxHsyE5yndpZXWp2X2S4l31e8fLs\nddOoybroJgbyLrh7JT3Yac3XOEsKATWIvqU\+hNYq6KwqLWev9jInHVgjzfyOKbmF\nhkrzDDHaKULYZuTsUq5mLc1SzSu98lXYfXp1WE4XsH0X0VicPzf8ZH4Kutuig0VG\n5Kg9HB/Cin65VMm0ffEiTraO6johIlwFGRrtAs38ONKgsPCQUv7ee9SEGOHViNZq\nNpWPr1KOzbI4wEB1ueKoZuEQ0a\+tzfJgszJrM48bM82J6iEjN/PSOTsdTKJq9e47\ndlUp\+tqQsvGkbBOIOt5OOpkr8Z\+8qbEd21ojF9Q0p0T4WMThRP6YBRKvt8mmFwRs\nDjEhMiPa4L70Eqldfu2lWdI6ietfHrK97WXwQO1gF73LOnA\+EdMXNxr1iLd0Tdke\nz6fUSw3hKZL\+I7nX6O40\+KgkhXVSZOsRz5CEvo2iChIUrYGEGDl94K/ofqGu71Y\+\nG8KBvbha6EC7xcUrTYP5Gek5wsrw7cGgDZJjMsyXYFBZjQO1N6g9fncLmc5pB5Ix\nW3gLfQS/My4daWNTvrYOgfA08J4M4ZWd0v5TglxOSV78psG4J4slppDySNFB2d/3\n7JiwWVm5SMk0StLWwb2azmTvBoinnrZJzPnPlOytxvE5uGJ/i0WAik7C99YgVJkS\n9hO3FJGasrOnHeiOvMZEdRuIVspKz9iMFx7hWHpVHTTyjwceEpaiEkhmqLM9QkKh\nkCZqeWyVsKBIc0sse\+CKNK8ik9eTeUlCklGMV1Q4kKjR6uuHUOLyjk/xhqslV4TS\njnnjCjsK5YzTa4hmbHhPZIW262KoFV9TqxYKkhP5ab7AXRSakrdrY2cwACWN4AMT\n-----END RSA PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/sp/privkey\.unencrypted\.pkcs8\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN PRIVATE KEY-----\nMIIEwgIBADANBgkqhkiG9w0BAQEFAASCBKwwggSoAgEAAoIBAgC6Jl6iPARyB13z\nJEJ12SEuGgpJwhMmXVVxStswVrvrKD/0oWM6CJjbtjhzMvvVcrLcvnYZBdyvJeE5\neu3613wCuwNX4BNWYu38TDVVOYbmMpuwlB7e1iC6W92XqswTvK0LW\+TjQsYC0HTx\n8/gdtVQs5LocSwVa3C0rEjbChWB8JTfuck4LP1JVawzFHCOY2fWXI6ct3MdnzvJT\nojIgZELPAuE3T2NWhgrfpco\+X5cXaZN44MBcnlsYfMF9LU8uGL3Mbtzy3TAsxVtL\nvoLPpOkr\+hMmdMEybPBnqwuWtsrdfLuB5FXuuFZ8SZj3tZeQYtRreMp\+rktMB/re\nvPlmPOB5nwIDAQABAoIBAgCwsQD8n1lc3y9HPjCzafE7sE35qvTAYrFag0JAxONE\nmAT08Eeea1CkpHc6qbcu6Ntr\+oFgyRarTZpWFCBWDDnS4a6Pt8rDIc5hv/iTt7Ib\nSQhM\+JvAyqFwIwjYEK/7QAlFEenV6ajIPRP0Ia5ujJKktksN1gv0La/WBUjjJPTr\ngdKDgP4SgEHwhDF3rgzk/284Dbmr4pOxvi290AnHrVER\+oPlxy/WS4mOEBYVU2Rq\nTbP07ej\+ifYO/w9ZjJAc5l9UK2NDsv3JCUgui0PBgZ27z3dZ2TD2VbZXqSS4jahG\nUUhwCT0sOzIWVsZypv4PvTHJl/uvgS1Be01n/FAtcJGAKQKBgQ49glSkdtfJtjQm\nblqbacabkox\+EM8EGkc9iveveD81E0gUYTL7AjVawowVYKQnYSZfsCdU7feLPQH2\nbwjzAgbiY\+QbbFcTT9FJu5D31qM4jqk24Bu2vjecHpEy8sJKkvoqv0CdWTUKhk98\n7enh63LWo4Hjs6FVMAh8QKwsHjeMfQKBgQ0Sc4eO4ZSFuwCx8L4gG7MlvIeqVbHC\n8kwDzJY3qECxDaDD1ogbGuDVa9p8bnZNmhHE6\+nyep7AGvXKzWUzWqYYz2nqxwuC\n/MAQHN6ruKFDaWzrDCfBMfwLsif4SgpcKkJj\+1Y\+LjPe1tgBw45cco9cWxZLPvVL\nyxEAVTbFWXFlSwKBgQu7F/ZqVYyGGpbzYc06YfS\+jAc4gthG5O7y/9vyrPhE3NFw\nGHJK3RLe5Y1Ivwf7eMiH4zFDgZV/Go7XV7jjlzPco7Vx8dn5irM6Lk3KHQLwwHUd\nQ5kQ/boJ3hR3CAyOKm3zcQHlnWtYdDRfEg6tkaxUrPV/gqbQ6nTTBuPOpEXWcQKB\ngQnqSvMxr21mmleGoOK1nA0gvIXy75ksE3kREKeIg/i902Zz5U/Lr3GGsI5C/86A\nQjLkOUV0hQnRESIKuAzhDQsbmofuaxgSPQC5uAw2GI9JgLf6\+XdWFUHm5TVoIVEG\nY4\+EIuphs83oYvHpNJnRCZwwI28fmBubZ\+X3aKtoudVHTQKBgQCKN34ZGQUgs3OY\n0VNlrlM5BMqO4uJD/kv5BgepqfbVEud2Mwmu\+W1nPKv0rdWyIZunL2xVGD/9yRk0\nruC2q4dCQvFV2TsxN7Pkf\+bvm9Ep9XokQE79g7EVty3mf8vYVv5KXDXEH808YxqU\ngFQYnB76DUsI08o13SQtjDCm/oLxSA==\n-----END PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/sp_privkey\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN PRIVATE KEY-----\nMIIEwgIBADANBgkqhkiG9w0BAQEFAASCBKwwggSoAgEAAoIBAgC6Jl6iPARyB13z\nJEJ12SEuGgpJwhMmXVVxStswVrvrKD/0oWM6CJjbtjhzMvvVcrLcvnYZBdyvJeE5\neu3613wCuwNX4BNWYu38TDVVOYbmMpuwlB7e1iC6W92XqswTvK0LW\+TjQsYC0HTx\n8/gdtVQs5LocSwVa3C0rEjbChWB8JTfuck4LP1JVawzFHCOY2fWXI6ct3MdnzvJT\nojIgZELPAuE3T2NWhgrfpco\+X5cXaZN44MBcnlsYfMF9LU8uGL3Mbtzy3TAsxVtL\nvoLPpOkr\+hMmdMEybPBnqwuWtsrdfLuB5FXuuFZ8SZj3tZeQYtRreMp\+rktMB/re\nvPlmPOB5nwIDAQABAoIBAgCwsQD8n1lc3y9HPjCzafE7sE35qvTAYrFag0JAxONE\nmAT08Eeea1CkpHc6qbcu6Ntr\+oFgyRarTZpWFCBWDDnS4a6Pt8rDIc5hv/iTt7Ib\nSQhM\+JvAyqFwIwjYEK/7QAlFEenV6ajIPRP0Ia5ujJKktksN1gv0La/WBUjjJPTr\ngdKDgP4SgEHwhDF3rgzk/284Dbmr4pOxvi290AnHrVER\+oPlxy/WS4mOEBYVU2Rq\nTbP07ej\+ifYO/w9ZjJAc5l9UK2NDsv3JCUgui0PBgZ27z3dZ2TD2VbZXqSS4jahG\nUUhwCT0sOzIWVsZypv4PvTHJl/uvgS1Be01n/FAtcJGAKQKBgQ49glSkdtfJtjQm\nblqbacabkox\+EM8EGkc9iveveD81E0gUYTL7AjVawowVYKQnYSZfsCdU7feLPQH2\nbwjzAgbiY\+QbbFcTT9FJu5D31qM4jqk24Bu2vjecHpEy8sJKkvoqv0CdWTUKhk98\n7enh63LWo4Hjs6FVMAh8QKwsHjeMfQKBgQ0Sc4eO4ZSFuwCx8L4gG7MlvIeqVbHC\n8kwDzJY3qECxDaDD1ogbGuDVa9p8bnZNmhHE6\+nyep7AGvXKzWUzWqYYz2nqxwuC\n/MAQHN6ruKFDaWzrDCfBMfwLsif4SgpcKkJj\+1Y\+LjPe1tgBw45cco9cWxZLPvVL\nyxEAVTbFWXFlSwKBgQu7F/ZqVYyGGpbzYc06YfS\+jAc4gthG5O7y/9vyrPhE3NFw\nGHJK3RLe5Y1Ivwf7eMiH4zFDgZV/Go7XV7jjlzPco7Vx8dn5irM6Lk3KHQLwwHUd\nQ5kQ/boJ3hR3CAyOKm3zcQHlnWtYdDRfEg6tkaxUrPV/gqbQ6nTTBuPOpEXWcQKB\ngQnqSvMxr21mmleGoOK1nA0gvIXy75ksE3kREKeIg/i902Zz5U/Lr3GGsI5C/86A\nQjLkOUV0hQnRESIKuAzhDQsbmofuaxgSPQC5uAw2GI9JgLf6\+XdWFUHm5TVoIVEG\nY4\+EIuphs83oYvHpNJnRCZwwI28fmBubZ\+X3aKtoudVHTQKBgQCKN34ZGQUgs3OY\n0VNlrlM5BMqO4uJD/kv5BgepqfbVEud2Mwmu\+W1nPKv0rdWyIZunL2xVGD/9yRk0\nruC2q4dCQvFV2TsxN7Pkf\+bvm9Ep9XokQE79g7EVty3mf8vYVv5KXDXEH808YxqU\ngFQYnB76DUsI08o13SQtjDCm/oLxSA==\n-----END PRIVATE KEY-----\s*\z''',
+]
+
+[[rules.allowlists]]
+description = "Exact public saml-rs package vector; upstream provenance and source hashes retained"
+condition = "AND"
+paths = ['''(^|/)third-party/saml-rs/tests/fixtures/key/sp_privkey_enc\.pem$''']
+regexTarget = "match"
+regexes = [
+    '''(?s)\A\s*-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIuQ2unbu0tjICAggA\nMBQGCCqGSIb3DQMHBAjKZQizh2v/CgSCBMjMV4AX1EmUgV2PjSYYehbnIEOZdiOU\nxiH2hEWZBvj6Lc\+OtG01w/DubW7drMdbeQPY8ZWd0mFuhPKWbrU7C\+u98vy9\+dly\nhm22DfEda5BWD4YINKj7qdK\+RtM0Im3gHtmppfNP6ZTIGB6TC6gy0pSbOsT2BaAO\nLy/4wp/KSxgaCyTIyFlmUP34AGZoLz21FjQn6nD9TNGO6V\+/0CUin5aezuoEbz6r\naWhw\+eaw/KtzIDfuj6mShbqBHWP74DfB16M5pU3MCOsfalzouoh\+y4FbImRD\+ILU\nCYibmXQXxbXFHtp30eYsJHVMg56HvkO1EZI6nHdOLUxJ6N/0Gs1FdsijMuqdjX9P\nOWPVMrXvCoWSSWcSQDIGKqxA7QJOubH3Q0F2cEWkgSht00EO3tm7LZqCVWv0lPh/\nS61WvUSu6YeGXgeZ7FMWBM3MEJIGAP6Uk0jJ//NGkdPEHe4K488UM8KswLMfUPdv\nPCI9vtqgDuWlMytQKbtUPgY9LHKa2aGF3FJq6XIDgyGAbPkSjdtMJS3cIzbB9vPD\nPxpj6PLe2HRuE9fQsxQia3SFHhXlHo2MjUJZsyZbts70BeI1J8dJJSCfRtvxjCeL\nfet8LN/5wv7aIteJOiM6ffvexzwUUiBMSo\+HtgZ49992MRf/bx5i87uAgxlshc2k\ntLJEW/UQXwpA2QaP3CJS8I2P3PwvmCKT77\+s21vFeheNUOsfdwN2dQeEJU/9DDCN\nfGrCW2p9HAvh9TEAqJGToMU11OZjMhWEh/d1Xzo9VxuO5LDSNnv3w/MHXKUuZyNI\nmIBSTvwz/qs7bdDxZfTzhy6IxIYIT2jILg\+sOR5jyej/bq3F3MxvKonX58X3U5NE\nHqKcFuqtsZfFINUrke2GjyQaHKvnUpwTx8H5SkCzpH6MuSrm78afX1Pkg8LvDO6c\n4YWSs6hX7xUZxuiACvF6oDAesk5KqlbH7DoEbgX003i\+0RoRPGbm8a1ksrbxw\+Vl\nNsab4Wq6pXM0z5ZcDLrgI2PRc7yJLnoLiMDFIbKWWC3TTmLsNuQqyICRSsJtE9SH\nCQNq\+hD82GElrnERllxCyGeues6Wx6ST2ruxil1oKTXygU8dg3Hw6tae3t5Gfnwv\nFZaTsU1rQF8fnRaWHID65e4XuXdvqx9ml7KHfDool6Kgjjz\+AgSM0ns6R5WIDsZR\n2sBdorICollrE6zvCrpZiPxbr96M835lW0Zblj2a7rKWqDUd2t1\+W4TbFgwGS7jM\nT8n5Fbje4f1BSpJCWZlo28aDzlfum003tdKrHizzWEjIoEsO\+fad55qPMc94/4oW\nTXg7kn5jo2RMYniKV18cDIJhziGp5sA/fJX5w2z2mL1cyKLZpV6YcIrErxdJ/gQD\nTx1Q9ayCenIAgnwn/PtRf0AI1n/yPYxHfln3Y9kvajgYe7lA4lFFMKpUMZ8xmZ8T\nKTWIK\+tVSm\+uYCrMPb\+EwKxkoD\+unvPjHFUfRjquCahx07HVd7\+TMBA3LHwSWdtX\nDIdLBDUrvmhrdcUf8EyHBD4TGr/ZYiKPVCcT1E1op4mqBucfQGBfja02sDXL6Vu\+\nvqKMK662XrRNUXUIRPF901f070QVmou7UW1tG9Dzi6Y7bcUfDjZwR7Y3LPrMEYfi\nmOk=\n-----END ENCRYPTED PRIVATE KEY-----\s*\z''',
+]

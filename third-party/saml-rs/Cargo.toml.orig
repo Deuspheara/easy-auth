@@ -1,0 +1,82 @@
+[package]
+name = "saml-rs"
+version = "0.6.1"
+edition = "2021"
+rust-version = "1.88"
+license = "MIT"
+repository = "https://github.com/salasebas/saml-rs"
+homepage = "https://github.com/salasebas/saml-rs"
+readme = "README.md"
+description = "Pure-Rust SAML 2.0 Service Provider and Identity Provider support."
+keywords = ["saml", "sso", "xml", "authentication"]
+categories = ["authentication", "web-programming"]
+include = [
+    "/Cargo.toml",
+    "/Cargo.lock",
+    "/src/**",
+    "/tests/**",
+    "/examples/**",
+    "/docs/migrations/**",
+    "/README.md",
+    "/LICENSE",
+    "/CHANGELOG.md",
+]
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/opensaml",
+    "crates/samlify",
+    "crates/samlet",
+]
+
+[package.metadata.docs.rs]
+no-default-features = true
+features = ["crypto-bergshamra"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lib]
+name = "saml_rs"
+path = "src/lib.rs"
+
+[features]
+default = ["crypto-bergshamra"]
+crypto-bergshamra = [
+    "crypto-rustcrypto",
+    "crypto-legacy-algorithms",
+    "crypto-post-quantum",
+    "crypto-pkcs11",
+]
+crypto-rustcrypto = ["dep:bergshamra", "bergshamra/rustcrypto"]
+crypto-aws-lc = ["dep:bergshamra", "bergshamra/aws-lc"]
+crypto-fips = ["dep:bergshamra", "bergshamra/fips"]
+crypto-legacy-algorithms = ["bergshamra?/legacy-algorithms"]
+crypto-post-quantum = ["bergshamra?/post-quantum"]
+crypto-pkcs11 = ["bergshamra?/pkcs11"]
+
+[dependencies]
+base64 = "0.23"
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
+quick-xml = "0.42"
+thiserror = "2"
+time = { version = "0.3", default-features = false, features = ["std", "parsing"] }
+url = "2"
+uuid = { version = "1", default-features = false, features = ["v4"] }
+bergshamra = { version = "0.9.0", optional = true, default-features = false }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.rustdoc]
+broken_intra_doc_links = "deny"
+bare_urls = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_rust_codeblocks = "deny"
+
+[lints.clippy]
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+empty_docs = "warn"
+panic = "warn"
+unwrap_used = "warn"
+expect_used = "warn"

@@ -1,0 +1,3 @@
+# Keep the qualified upstream source/vectors byte-exact, including original CRLF.
+# Hash inventory checks replace application whitespace/style edits in this snapshot.
+third-party/saml-rs/** -text -whitespace

@@ -29,6 +29,32 @@ of converting unverified XML into user/session authority. Default application
 composition must expose no SAML ACS. Missing approval cannot select unsigned,
 compatibility, inline-key or alternative-algorithm fallback.
 
+## Reproducible gated source integration
+
+For ordinary integration engineering, retain the exact qualified source as a
+Cargo package-layout dependency under `third-party/saml-rs`, excluded from the
+four-package workspace. This is an explicitly identified local qualification
+snapshot, not a claimed maintained upstream release or approved production fork.
+Only the three already recorded patches are applied. The package retains source,
+MIT licensing and all packaged upstream tests/vectors; it generates no new XML or
+key fixtures. Do not refactor its large upstream modules or introduce another XML
+verification engine. The source pin/patch diff is the third-party review boundary.
+
+The file/patch inventory is checked by `scripts/check_saml_source.py` before builds
+and scanning. Four ordinary integrity scenarios cover exact source, changed docs,
+extra files and changed patches. Secret-scan exceptions are bound to exact public
+upstream vector values and exact paths, not entire files. Other values at those
+paths remain scanned. No upstream advisory ignores are inherited. The original
+full package lock's inactive/yanked entries remain visible; the adopting compiled
+feature graph needs its own unsuppressed advisory/license/native review.
+
+Requests/certificate components still disable all saml-rs crypto features. Merely
+importing the qualified source does not activate a verifier, provider or ACS. Later
+runtime integration must deliberately select only AWS-LC and retain verified-object
+coverage, exact algorithms, pinned trust, request/replay ownership and lifecycle
+policy. Explicit maintained distribution/patch ownership acceptance and independent
+review remain mandatory production gates, even after engineering builds pass.
+
 ## Evidence and alternatives
 
 Current release/activity metadata was checked against the upstream repositories

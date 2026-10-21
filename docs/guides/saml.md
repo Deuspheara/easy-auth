@@ -8,12 +8,16 @@ internal assessment and green tests do not constitute independent approval.
 ## Outgoing requests and metadata
 
 The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registration,
-metadata, request persistence and cancellation. It selects published saml-rs
-**0.6.1**, defaults disabled, with **no cryptographic provider enabled**. The
-published package source revision is `6b414db010235f6c2d1121944b42919a82325b06`,
-checksum `4997d94a9df26e1e2768acc8fedc70afeb456d503f7af4cd85d8d8bd363ab984`.
-This producer is distinct from the later source/patch pin assessed for signature
-qualification. It is not an inbound verifier dependency approval.
+metadata, request persistence, cancellation and response preparation. It selects
+the [packaged qualification source](../../third-party/README.md) of saml-rs
+**0.6.1** at `3b289001a7a84d5a7ff7af2671991ab7098090bd`, with the three existing
+qualification patches, defaults disabled and **no cryptographic provider enabled**.
+Source/patch hashes and existing upstream vectors are retained. This is a gated
+engineering dependency, not an upstream release or production verifier approval.
+The earlier registry producer at `6b414db010235f6c2d1121944b42919a82325b06`
+(checksum `4997d94a9df26e1e2768acc8fedc70afeb456d503f7af4cd85d8d8bd363ab984`)
+was a different source despite the same version; its tests do not qualify this
+snapshot. Source integrity and ordinary component regressions are checked again.
 
 Trusted embedding constructs `SamlRegistration::unsigned_redirect` with realm,
 connection/client UUIDs, exact SP/IdP entity IDs, HTTPS SSO URL and HTTPS ACS URL.
