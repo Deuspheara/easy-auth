@@ -32,6 +32,14 @@ impl SamlRegistration {
     }
 
     pub(super) fn login_request(&self, relay_state: &str) -> Result<BindingContext> {
+        self.login_request_options(relay_state, None)
+    }
+
+    fn login_request_options(
+        &self,
+        relay_state: &str,
+        force_authn: Option<bool>,
+    ) -> Result<BindingContext> {
         // Only our own generated metadata is parsed. No inbound SAML/metadata or
         // cryptographic verification API is exposed by the requests-only feature.
         let sp = ServiceProvider::from_config(&sp_config(self), EntitySetting::default())
@@ -50,6 +58,7 @@ impl SamlRegistration {
             Binding::Redirect,
             &LoginRequestOptions {
                 relay_state: Some(relay_state),
+                force_authn,
                 response_binding: Some(Binding::Post),
                 ..Default::default()
             },

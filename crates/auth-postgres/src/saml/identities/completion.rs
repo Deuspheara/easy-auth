@@ -1,5 +1,5 @@
-use super::super::identity_policy;
-use super::{ownership, replay, session};
+use super::super::{identity_policy, replay};
+use super::{ownership, session};
 use crate::{Postgres, audit, deadlines::Deadline, unavailable};
 use async_trait::async_trait;
 use auth_core::{AuditEvent, Result, SamlIdentityRepository, SamlMappedIdentity, User, Verifier};

@@ -4,7 +4,7 @@ use sqlx::{PgPool, Postgres, Transaction};
 
 const REPLAY_CLEANUP_BATCH: i64 = 32;
 
-pub(super) async fn prune(pool: &PgPool, reg: &SamlRegistration) -> Result<()> {
+pub(crate) async fn prune(pool: &PgPool, reg: &SamlRegistration) -> Result<()> {
     // Separate autocommit statement; no owner/source/replay reservation lock is
     // retained into sign-in. Outer expiry is rechecked after any row wait.
     sqlx::query("DELETE FROM auth_saml_replays WHERE realm_id=$1 AND connection_id=$2 AND retain_until<=clock_timestamp() AND ctid IN (SELECT ctid FROM auth_saml_replays WHERE realm_id=$1 AND connection_id=$2 AND retain_until<=clock_timestamp() ORDER BY identifier_hash LIMIT $3 FOR UPDATE SKIP LOCKED)")
@@ -13,7 +13,7 @@ pub(super) async fn prune(pool: &PgPool, reg: &SamlRegistration) -> Result<()> {
     Ok(())
 }
 
-pub(super) async fn reserve(
+pub(crate) async fn reserve(
     tx: &mut Transaction<'_, Postgres>,
     proof: &VerifiedSamlAssertion,
 ) -> Result<()> {

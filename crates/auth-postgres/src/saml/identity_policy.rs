@@ -56,7 +56,7 @@ pub(super) async fn load(
     Ok(SamlIdentityPolicy::new(reg.clone()).with_jit(jit))
 }
 
-pub(super) async fn lock(tx: &mut Transaction<'_, Pg>, policy: &SamlIdentityPolicy) -> Result<()> {
+pub(crate) async fn lock(tx: &mut Transaction<'_, Pg>, policy: &SamlIdentityPolicy) -> Result<()> {
     if load(tx, policy.registration()).await? != *policy {
         return Err(Error::Unauthorized);
     }

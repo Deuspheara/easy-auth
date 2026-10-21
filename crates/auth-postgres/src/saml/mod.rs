@@ -8,7 +8,10 @@ mod requests;
 mod verification;
 
 #[cfg(feature = "saml-identities")]
-mod identity_policy;
+pub(crate) mod identity_policy;
 
 #[cfg(feature = "saml-identities")]
 mod identities;
+
+#[cfg(feature = "saml-identities")]
+pub(crate) mod replay;
