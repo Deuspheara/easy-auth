@@ -10,33 +10,8 @@ impl Postgres {
         &self,
         input: &SamlRegistration,
     ) -> Result<SamlRegistration> {
-        let registration = input.reconfigured();
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
-        sqlx::query(r#"
-            INSERT INTO auth_saml_registrations(realm_id,id,client_id,revision,sp_entity,idp_entity,sso_url,acs_url)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-            ON CONFLICT (realm_id,id,client_id) DO UPDATE SET
-              revision=EXCLUDED.revision,sp_entity=EXCLUDED.sp_entity,idp_entity=EXCLUDED.idp_entity,
-              sso_url=EXCLUDED.sso_url,acs_url=EXCLUDED.acs_url
-        "#)
-        .bind(registration.realm())
-        .bind(registration.connection())
-        .bind(registration.client())
-        .bind(registration.revision())
-        .bind(registration.sp_entity())
-        .bind(registration.idp_entity())
-        .bind(registration.sso())
-        .bind(registration.acs())
-        .execute(&mut *tx)
-        .await
-        .map_err(unavailable)?;
-        clear_requests(
-            &mut tx,
-            registration.realm(),
-            registration.connection(),
-            registration.client(),
-        )
-        .await?;
+        let registration = replace_registration(&mut tx, input).await?;
         tx.commit().await.map_err(unavailable)?;
         Ok(registration)
     }
@@ -124,4 +99,37 @@ pub(super) async fn lock(
         return Err(Error::Unauthorized);
     }
     Ok(())
+}
+
+pub(super) async fn replace_registration(
+    tx: &mut Transaction<'_, Pg>,
+    input: &SamlRegistration,
+) -> Result<SamlRegistration> {
+    let registration = input.reconfigured();
+    sqlx::query(r#"
+        INSERT INTO auth_saml_registrations(realm_id,id,client_id,revision,sp_entity,idp_entity,sso_url,acs_url)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        ON CONFLICT (realm_id,id,client_id) DO UPDATE SET
+          revision=EXCLUDED.revision,sp_entity=EXCLUDED.sp_entity,idp_entity=EXCLUDED.idp_entity,
+          sso_url=EXCLUDED.sso_url,acs_url=EXCLUDED.acs_url
+    "#)
+    .bind(registration.realm())
+    .bind(registration.connection())
+    .bind(registration.client())
+    .bind(registration.revision())
+    .bind(registration.sp_entity())
+    .bind(registration.idp_entity())
+    .bind(registration.sso())
+    .bind(registration.acs())
+    .execute(&mut **tx)
+    .await
+    .map_err(unavailable)?;
+    clear_requests(
+        tx,
+        registration.realm(),
+        registration.connection(),
+        registration.client(),
+    )
+    .await?;
+    Ok(registration)
 }
