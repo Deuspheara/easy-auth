@@ -14,6 +14,15 @@ pub(crate) fn read_optional_cookie(
     headers: &HeaderMap,
     name: &str,
 ) -> auth_core::Result<Option<Secret>> {
+    read_optional_cookie_value(headers, name)?
+        .map(Secret::parse)
+        .transpose()
+}
+
+pub(crate) fn read_optional_cookie_value(
+    headers: &HeaderMap,
+    name: &str,
+) -> auth_core::Result<Option<String>> {
     let mut value = None;
     for header in headers.get_all(header::COOKIE) {
         let header = header.to_str().map_err(|_| Error::Unauthorized)?;
@@ -28,7 +37,7 @@ pub(crate) fn read_optional_cookie(
             }
         }
     }
-    value.map(Secret::parse).transpose()
+    Ok(value)
 }
 
 pub(crate) fn clear_auth_cookies(browser: &BrowserConfig) -> Response {
@@ -49,4 +58,21 @@ pub(crate) fn clear_auth_cookies(browser: &BrowserConfig) -> Response {
             .append(header::SET_COOKIE, browser.cookie(name, None, 0));
     }
     response
+}
+
+#[cfg(feature = "oidc-web")]
+pub(crate) fn require_anonymous(
+    config: &BrowserConfig,
+    headers: &HeaderMap,
+) -> auth_core::Result<()> {
+    for value in headers.get_all(header::COOKIE) {
+        let value = value.to_str().map_err(|_| Error::Unauthorized)?;
+        for pair in value.split(';').map(str::trim) {
+            let name = pair.split_once('=').map_or(pair, |(name, _)| name);
+            if name == config.session_name() {
+                return Err(Error::Unauthorized);
+            }
+        }
+    }
+    Ok(())
 }

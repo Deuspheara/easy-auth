@@ -90,12 +90,20 @@ impl BrowserConfig {
         }
     }
     pub(crate) fn cookie(&self, name: &str, secret: Option<&Secret>, max_age: u32) -> HeaderValue {
+        self.cookie_value(name, secret.map(Secret::expose), max_age)
+    }
+    pub(crate) fn cookie_value(
+        &self,
+        name: &str,
+        value: Option<&str>,
+        max_age: u32,
+    ) -> HeaderValue {
         let value = format!(
             "{name}={}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{}",
-            secret.map(Secret::expose).unwrap_or(""),
+            value.unwrap_or(""),
             if self.secure { "; Secure" } else { "" }
         );
-        // Names and canonical base64url secrets are controlled by this module.
+        // Callers supply fixed names and validated cookie-safe values.
         HeaderValue::from_str(&value).expect("controlled cookie is a valid header")
     }
 }
