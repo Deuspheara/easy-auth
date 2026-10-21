@@ -18,9 +18,18 @@ impl Postgres {
             ON CONFLICT (realm_id,id,client_id) DO UPDATE SET
               revision=EXCLUDED.revision,sp_entity=EXCLUDED.sp_entity,idp_entity=EXCLUDED.idp_entity,
               sso_url=EXCLUDED.sso_url,acs_url=EXCLUDED.acs_url
-        "#).bind(registration.realm()).bind(registration.connection()).bind(registration.client())
-            .bind(registration.revision()).bind(registration.sp_entity()).bind(registration.idp_entity())
-            .bind(registration.sso()).bind(registration.acs()).execute(&mut *tx).await.map_err(unavailable)?;
+        "#)
+        .bind(registration.realm())
+        .bind(registration.connection())
+        .bind(registration.client())
+        .bind(registration.revision())
+        .bind(registration.sp_entity())
+        .bind(registration.idp_entity())
+        .bind(registration.sso())
+        .bind(registration.acs())
+        .execute(&mut *tx)
+        .await
+        .map_err(unavailable)?;
         clear_requests(
             &mut tx,
             registration.realm(),
@@ -40,8 +49,13 @@ impl Postgres {
     ) -> Result<()> {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         let updated = sqlx::query("UPDATE auth_saml_registrations SET enabled=false,revision=$4 WHERE realm_id=$1 AND id=$2 AND client_id=$3")
-            .bind(realm).bind(connection).bind(client).bind(Uuid::new_v4())
-            .execute(&mut *tx).await.map_err(unavailable)?.rows_affected();
+        .bind(realm)
+        .bind(connection)
+        .bind(client)
+        .bind(Uuid::new_v4())
+        .execute(&mut *tx)
+        .await
+        .map_err(unavailable)?.rows_affected();
         if updated != 1 {
             return Err(Error::Unauthorized);
         }
@@ -53,8 +67,13 @@ impl Postgres {
     /// never re-enables an existing disabled registration.
     pub async fn enable_saml_registration(&self, registration: &SamlRegistration) -> Result<()> {
         let updated = sqlx::query("UPDATE auth_saml_registrations SET enabled=true WHERE realm_id=$1 AND id=$2 AND client_id=$3 AND revision=$4")
-            .bind(registration.realm()).bind(registration.connection()).bind(registration.client())
-            .bind(registration.revision()).execute(&self.pool).await.map_err(unavailable)?.rows_affected();
+        .bind(registration.realm())
+        .bind(registration.connection())
+        .bind(registration.client())
+        .bind(registration.revision())
+        .execute(&self.pool)
+        .await
+        .map_err(unavailable)?.rows_affected();
         if updated != 1 {
             return Err(Error::Unauthorized);
         }
@@ -89,9 +108,18 @@ pub(super) async fn lock(
     let enabled: Option<bool> = sqlx::query_scalar(r#"
         SELECT enabled FROM auth_saml_registrations WHERE realm_id=$1 AND id=$2 AND client_id=$3
           AND revision=$4 AND sp_entity=$5 AND idp_entity=$6 AND sso_url=$7 AND acs_url=$8 FOR UPDATE
-    "#).bind(registration.realm()).bind(registration.connection()).bind(registration.client())
-        .bind(registration.revision()).bind(registration.sp_entity()).bind(registration.idp_entity())
-        .bind(registration.sso()).bind(registration.acs()).fetch_optional(&mut **tx).await.map_err(unavailable)?;
+    "#)
+        .bind(registration.realm())
+        .bind(registration.connection())
+        .bind(registration.client())
+        .bind(registration.revision())
+        .bind(registration.sp_entity())
+        .bind(registration.idp_entity())
+        .bind(registration.sso())
+        .bind(registration.acs())
+        .fetch_optional(&mut **tx)
+        .await
+        .map_err(unavailable)?;
     if enabled != Some(true) {
         return Err(Error::Unauthorized);
     }

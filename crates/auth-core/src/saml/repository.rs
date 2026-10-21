@@ -1,11 +1,27 @@
 use super::SamlRegistration;
-use crate::{Result, Verifier};
+use crate::{Error, Result, Verifier};
 use async_trait::async_trait;
 
 pub struct SamlRequestAdmission<'a> {
     pub request_id: &'a str,
     pub relay: Verifier,
     pub browser: Verifier,
+}
+
+impl SamlRequestAdmission<'_> {
+    /// The generated request-ID profile shared by use cases and storage ports.
+    pub fn validate(&self) -> Result<()> {
+        let id = self.request_id;
+        if !(2..=128).contains(&id.len())
+            || !id.starts_with('_')
+            || !id
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || c == b'_' || c == b'-')
+        {
+            return Err(Error::InvalidInput);
+        }
+        Ok(())
+    }
 }
 
 #[async_trait]
