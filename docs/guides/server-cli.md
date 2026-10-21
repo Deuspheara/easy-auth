@@ -1,0 +1,67 @@
+# Server command line and setup
+
+Build with Rust 1.95 from the repository root:
+
+```sh
+cargo build --locked -p easy-auth-server --bin easy-auth
+./target/debug/easy-auth --help
+./target/debug/easy-auth --version
+```
+
+`--help` (`-h`) and `--version` (`-V`) exit successfully without reading application
+configuration, opening a database, running migrations or starting a listener.
+Version reports the Cargo package version, not a Git revision or provider status.
+Only one option is accepted. Unknown arguments, positional values, combined options
+and extra arguments exit with status 2 and a fixed diagnostic that omits their
+values. Earlier versions ignored arguments; scripts must now invoke the server
+without arguments to start it. There are no command-line credential options.
+
+With no arguments, the existing environment-based startup runs. The binary does
+not automatically load `.env`. Follow the [local setup](../../README.md#run-locally)
+to start PostgreSQL and Mailpit, copy `.env.example`, and export its settings before
+starting the binary. That file contains development-only credentials. Use a
+disposable mailbox in Mailpit and open the sign-in link in the requesting browser.
+
+The minimal settings are `AUTH_REALM_ID` (realm UUID), `DATABASE_URL` (PostgreSQL),
+`AUTH_PUBLIC_URL` (the trusted public origin), and SMTP configuration.
+`AUTH_BIND` defaults to `127.0.0.1:8080`. Explicit `AUTH_DEVELOPMENT=true` permits
+only loopback HTTP/bind/SMTP configuration; production requires HTTPS and SMTP TLS.
+The deployment guide describes [transport and startup policy](../architecture/deployment.md).
+Help is usage information, not a configuration, database or provider health check.
+
+| Startup diagnostic | Check |
+| --- | --- |
+| `invalid command line; run easy-auth --help` | Remove extra/unsupported arguments; supply settings through the environment |
+| `AUTH_REALM_ID is required` | Export a stable realm UUID before starting |
+| `DATABASE_URL is required` | Export the database connection URL without putting it in arguments or logs |
+| `database connection failed` | Check the configured database service, connectivity and role permissions privately |
+| `AUTH_DEVELOPMENT must be true or false` | Use the exact lowercase value; production defaults to `false` |
+| `development bind must be loopback` | Use a loopback listener for development |
+| `development SMTP must be loopback` | Use the local development relay or configure production TLS |
+| `OIDC configuration requires the oidc-web server feature` | Build with `--features oidc-web` only when deliberately configuring the supported OIDC boundary |
+
+Startup can run migrations and provision the configured realm. Back up persistent
+data and review the [deployment requirements](../architecture/deployment.md) before
+running against an existing database. Do not paste environment dumps, connection
+URLs, callback queries, tokens or private file contents into diagnostic reports.
+
+## Provider and UI boundaries
+
+The ordinary server offers the current email/session flows. Passwords require the
+explicit [password corpus setup](passwords.md). Optional components require their
+documented construction and acceptance gates; compiling a feature is not provider
+validation or permission to enable another authentication path.
+
+| Integration | Current setup reference and limit |
+| --- | --- |
+| Enterprise OIDC | [Browser settings](oidc-web.md) and [startup contract](../architecture/deployment.md#explicit-oidc-browser-startup); exact HTTPS issuer/callback and explicit client authentication |
+| Google web/native | [Component and acceptance guide](google.md); experimental components/examples do not activate Google in ordinary server startup; registered-provider/OS/lifecycle evidence remains required |
+| Passkeys/custom UI | [Enrollment](passkey-enrollment.md), [sign-in](passkey-authentication.md) and [management/recovery](passkey-management.md); preserve RP/origin, browser proof and stronger-account policy; ordinary activation remains gated |
+| Apple | Not implemented; Apple client-secret, capability, callback/native and grant-lifecycle acceptance remain pending |
+| SAML | No production verifier, ACS or metadata startup option; [dependency gate](../research/protocol-dependencies.md) and independent security validation remain open |
+| Outbound OIDC issuer | Not implemented; the server is not an authorization server for unrelated applications |
+
+Custom clients use the [public API contract](../architecture/api-contract.md),
+preserving exact Origin, same-browser proof cookies and explicit confirmations.
+Application authorization remains the embedding application's responsibility.
+These CLI checks do not establish production readiness or provider interoperability.

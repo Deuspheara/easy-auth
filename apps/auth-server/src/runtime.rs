@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 
+#[tokio::main]
 pub(super) async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt()
         .with_env_filter("easy_auth=info,easy_auth_axum=info")

@@ -51,6 +51,9 @@ routes, complete provider lifecycle and ordinary activation remain gated. See th
 
 ## Run locally
 
+The binary supports `--help` and `--version` without configuration or database
+access. See [command-line usage and setup diagnostics](docs/guides/server-cli.md).
+
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).
 
 ```sh
