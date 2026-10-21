@@ -61,7 +61,8 @@ pub use ports::{EmailDelivery, Repository};
 #[cfg(feature = "saml-requests")]
 pub use saml::{
     MAX_SAML_PENDING_PER_CONNECTION, SAML_REQUEST_LIFETIME_SECONDS, SamlBrowserProof,
-    SamlRegistration, SamlRequestAdmission, SamlRequestRepository, SamlStart, SamlTransactions,
+    SamlPreparedResponse, SamlRegistration, SamlRequestAdmission, SamlRequestRepository,
+    SamlRequestTiming, SamlStart, SamlTransactions,
 };
 #[cfg(feature = "saml-certificates")]
 pub use saml::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};

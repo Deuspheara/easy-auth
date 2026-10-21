@@ -3,7 +3,7 @@ use crate::{Postgres, deadlines::Deadline, unavailable};
 use async_trait::async_trait;
 use auth_core::{
     Error, MAX_SAML_PENDING_PER_CONNECTION, Result, SAML_REQUEST_LIFETIME_SECONDS,
-    SamlRegistration, SamlRequestAdmission, SamlRequestRepository,
+    SamlRegistration, SamlRequestAdmission, SamlRequestRepository, SamlRequestTiming,
 };
 
 #[async_trait]
@@ -69,5 +69,13 @@ impl SamlRequestRepository for Postgres {
     ) -> Result<()> {
         super::consumption::take(self, registration, admission).await?;
         Ok(())
+    }
+
+    async fn take_saml_request(
+        &self,
+        registration: &SamlRegistration,
+        admission: SamlRequestAdmission<'_>,
+    ) -> Result<SamlRequestTiming> {
+        super::consumption::take(self, registration, admission).await
     }
 }

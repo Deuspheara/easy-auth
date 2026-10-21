@@ -1,4 +1,4 @@
-use super::SamlRegistration;
+use super::{SamlRegistration, SamlRequestTiming};
 use crate::{Error, Result, Verifier};
 use async_trait::async_trait;
 
@@ -42,4 +42,18 @@ pub trait SamlRequestRepository: Send + Sync {
         registration: &SamlRegistration,
         admission: SamlRequestAdmission<'_>,
     ) -> Result<()>;
+
+    /// Commit one-use consumption under the same exact bindings as cancellation.
+    /// Return original persisted expiry and observed database time in microseconds.
+    /// No lock may span subsequent XML parsing/verification. This is not an
+    /// Assertion replay store or a grant to create a user/session.
+    ///
+    /// Existing adapters fail closed until they implement this new capability.
+    async fn take_saml_request(
+        &self,
+        _registration: &SamlRegistration,
+        _admission: SamlRequestAdmission<'_>,
+    ) -> Result<SamlRequestTiming> {
+        Err(Error::Unavailable)
+    }
 }

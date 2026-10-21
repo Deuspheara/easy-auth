@@ -140,7 +140,8 @@ cannot reuse a sign-in proof or silently fall back to a weaker credential.
 | --- | --- | --- | --- | --- |
 | Dependency source/features/patch maintenance and distribution | Experimental candidate/patches exist | Historical pin-scoped suites/inventory exist | Internal assessment only | Pending |
 | XML/C14N/signature/reference/verified-payload binding | Library candidate plus recorded patches | Existing bounded vectors/corpus; additional assurance outstanding | Internal source assessment only | Pending |
-| Trusted configuration, request/correlation/replay and realm isolation | Application integration tracked by AUTH-33/34/35 | Must record actual new integration/real PostgreSQL commands | Pending implementation review | Pending |
+| Outgoing metadata, browser-bound request state/preparation and leaf-pin configuration | Opt-in AUTH-33 components implemented; no authentication grant | Core and real PostgreSQL scenarios; commands/limits in the SAML guide | Internal source/maintainability review only | Pending |
+| Signed protocol conditions, Assertion replay and identity/session lifecycle | AUTH-34/35 integration remains unfinished | Not established by request/certificate tests | Pending | Pending |
 | End-to-end IdP interoperability, identity/session and lifecycle | Not established by dependency tests | Owned IdP/browser/database evidence required; Entra/Okta coverage explicitly recorded | Pending | Pending |
 | Independent security review and activation decision | Reviewer/scope/decision record required | Not replaced by a green build or internal agent review | Pending | Pending |
 

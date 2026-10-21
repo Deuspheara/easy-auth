@@ -63,6 +63,31 @@ current enabled registration. Wrong proofs leave pending state untouched. It is
 one-use, has no user/session effect and never verifies or consumes an Assertion.
 Cancellation/storage errors remain distinguishable from successful cancellation.
 
+## Preparing a response for verification
+
+`SamlTransactions::prepare_response` takes the exact request ID, RelayState and
+independent browser proof. PostgreSQL consumes that request under the current
+exact enabled registration and both proof hashes. It returns `SamlPreparedResponse`
+with the original request ID, registration/revision, original database expiry and
+observed database time in microseconds. Debug output is redacted, and the context
+has no public constructor or clone. Custom storage adapters receive a default
+unavailable implementation until they implement `take_saml_request`.
+
+This recognizes and consumes browser-bound request state only. It accepts no XML,
+checks no signature or signed InResponseTo, and grants no identity/session. The
+future verifier must compare the authenticated response and bearer InResponseTo
+with this request ID, apply all protocol/certificate checks and return a separate
+verified projection. Final persistence must recheck current source authority and
+original/signed deadlines and atomically retain response/Assertion replay keys.
+The timing port record is trusted storage metadata, not a verification proof.
+
+Preparation and cancellation share the same registry-before-request lock order,
+expiry check, one-use delete, final clock check and commit. Wrong proofs leave
+state intact; an expired/stale/wrong-namespace operation fails closed. No storage
+lock spans parsing or cryptography. Once committed, preparation spends the request
+even if later verification is invalid or unavailable; retry needs a new request.
+It cannot be reused for cancellation, a second preparation or account management.
+
 ## Operator-pinned IdP certificates
 
 The separate opt-in core/PostgreSQL `saml-certificates` feature adds trusted
@@ -108,7 +133,7 @@ current time; no key/signature fixture is generated.
 
 The requests feature alone has no certificate trust. Neither optional component
 implements signature verification, verified Assertion extraction, issuer/audience/recipient/
-destination/time/NameID validation, response correlation consumption, Assertion
+destination/time/NameID or signed InResponseTo validation, response/Assertion
 replay protection, JIT/identity mapping or source-bound session/lifecycle commit.
 Pending AuthnRequest uniqueness is not a substitute for the Assertion replay ledger.
 Those integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,

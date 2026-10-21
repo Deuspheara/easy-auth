@@ -4,7 +4,9 @@ The opt-in core/PostgreSQL `saml-requests` Rust component adds no HTTP route or
 OpenAPI operation. `SamlRegistration::unsigned_redirect` selects the explicit
 outgoing profile; `SamlTransactions::start` persists browser-bound request state
 and `cancel` removes only that operation under both proofs/current registration.
-Neither operation accepts an Assertion or grants a user/session. The normal SAML
+`prepare_response` additionally consumes bound state and returns original DB timing
+for future verification; it accepts no XML or signed protocol claims. None of these
+operations grant a user/session. The normal SAML
 ACS remains absent. See the [component contract and limits](../guides/saml.md).
 
 The separate opt-in `saml-certificates` component adds operator-pinned public

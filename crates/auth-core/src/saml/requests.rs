@@ -1,5 +1,6 @@
 use super::{
-    SamlBrowserProof, SamlRegistration, SamlRequestAdmission, SamlRequestRepository, SamlStart,
+    SamlBrowserProof, SamlPreparedResponse, SamlRegistration, SamlRequestAdmission,
+    SamlRequestRepository, SamlStart,
 };
 use crate::{Error, Result, Secret};
 use std::sync::Arc;
@@ -75,5 +76,33 @@ impl SamlTransactions {
                 },
             )
             .await
+    }
+
+    /// Consume a bound request before response verification. Success means only
+    /// request correlation was established; it cannot authenticate a subject.
+    pub async fn prepare_response(
+        &self,
+        request_id: &str,
+        relay: &Secret,
+        browser: &SamlBrowserProof,
+    ) -> Result<SamlPreparedResponse> {
+        let admission = SamlRequestAdmission {
+            request_id,
+            relay: relay.verifier(),
+            browser: browser.0.verifier(),
+        };
+        admission.validate().map_err(|_| Error::Unauthorized)?;
+        let timing = self
+            .repository
+            .take_saml_request(&self.registration, admission)
+            .await?;
+        if timing.observed_at_us <= 0 || timing.observed_at_us >= timing.expires_at_us {
+            return Err(Error::Unavailable);
+        }
+        Ok(SamlPreparedResponse {
+            registration: self.registration.clone(),
+            request_id: request_id.to_owned(),
+            timing,
+        })
     }
 }

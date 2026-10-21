@@ -2,6 +2,7 @@
 mod certificates;
 mod configuration;
 mod metadata;
+mod prepared;
 mod proofs;
 mod repository;
 mod requests;
@@ -9,6 +10,7 @@ mod requests;
 #[cfg(feature = "saml-certificates")]
 pub use certificates::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
 pub use configuration::SamlRegistration;
+pub use prepared::{SamlPreparedResponse, SamlRequestTiming};
 pub use proofs::{SamlBrowserProof, SamlStart};
 pub use repository::{SamlRequestAdmission, SamlRequestRepository};
 pub use requests::{
@@ -17,3 +19,6 @@ pub use requests::{
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod preparation_tests;
