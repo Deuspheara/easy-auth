@@ -1,0 +1,122 @@
+# ADR 0021: SAML message verification and staged approval
+
+Date: 2026-10-21. Status: accepted engineering direction; **production approval pending**.
+
+## Decision
+
+Use the complete `saml-rs` strict message component over Bergshamra/AWS-LC as
+the preferred qualification path. Keep exact RSA-SHA256/SHA-256, exclusive
+canonicalization, configured certificate trust and verified-object coverage
+mandatory. Do not implement XML signatures, reference resolution or
+canonicalization in easy-auth. A signature success boolean cannot authenticate
+an independently parsed Assertion.
+
+This selects an integration direction, **not an approved production dependency**.
+The assessed source is saml-rs 0.6.1 at
+`3b289001a7a84d5a7ff7af2671991ab7098090bd`, defaults disabled and only
+`crypto-aws-lc`. Its recorded lock selects Bergshamra 0.9.2. The existing three
+[qualification patches](../../../tests/provider/saml/rust-policy/README.md)
+provide the exact signature/digest profile and complete-document EOF check.
+They are neither an upstream release nor an independently approved maintained
+fork. Do not silently replace them with the broader unpatched strict profile.
+Production adoption requires upstream acceptance or a separately reviewed,
+explicitly owned patch-maintenance/distribution decision. No new cryptographic
+implementation or unreviewed production fork is authorized by this ADR.
+
+Proceed with ordinary configuration, metadata and request/persistence integration
+while that adoption decision is open. Keep such components opt-in and incapable
+of converting unverified XML into user/session authority. Default application
+composition must expose no SAML ACS. Missing approval cannot select unsigned,
+compatibility, inline-key or alternative-algorithm fallback.
+
+## Evidence and alternatives
+
+Current release/activity metadata was checked against the upstream repositories
+and crates.io on this date. Activity is maintenance evidence, not an audit.
+Historical observations remain in the linked assessments; no new adversarial
+probe or cryptographic bypass experiment is required by this decision.
+
+| Option | Maintenance, integration and deployment | Verification boundary and decision |
+| --- | --- | --- |
+| [Samael 0.0.22](https://github.com/njaremko/samael) / [xmlsec](https://github.com/lsh123/xmlsec) | MIT Rust wrapper; xmlsec has a longer native deployment history. Requires compatible libxml2/xmlsec/OpenSSL and build tooling. Samael last push July 17; xmlsec October 20. Native distribution versions/licenses/advisories require separate inventory. | Established native C14N/signature engine. The assessed wrapper internally uses recovery-enabled parser defaults and exposes no strict parser policy at that boundary. Existing repository observations retain malformed/DTD acceptance and an ignored-positive failure. Reject the current wrapper for production; a maintained native hardening path remains an alternative, not an implemented two-flag fix. |
+| [saml-rs 0.6.1](https://github.com/salasebas/saml-rs) | MIT; Rust 1.88 minimum fits our 1.95 toolchain. Last push October 13; pre-1.0, no external audit established. Defaults pull broad providers/features; explicitly select AWS-LC only. Native AWS-LC build/distribution requirements remain. | Complete message/profile layer delegates C14N/crypto to Bergshamra and binds returned Assertion coverage to verified references. Existing patched qualification provides the narrowest matching policy. Preferred candidate, subject to maintained adoption and independent approval. |
+| [Bergshamra](https://github.com/kushaldas/bergshamra) directly | BSD-2-Clause; current published 0.11.0, last push October 16. Backend and XML dependencies are version-specific. Current 0.11 documentation is not evidence for the assessed 0.9.2 graph. | Exposes verified Signature/reference nodes and digest evidence, trusted-key and strict-reference controls. It remains an XML security engine: direct adoption would move more SAML object/profile orchestration into easy-auth. Prefer the complete SAML component; do not infer a verified identity from positional strict mode alone. |
+| [Gamlastan 0.10.0](https://github.com/kushaldas/gamlastan) | BSD-2-Clause; active October 20 source at `e1c4680`. Complete SAML types/profiles and documented hardening, including verified-object binding. Its current manifest unconditionally enables Bergshamra and Kryptering RustCrypto/legacy/PQ/PKCS11 support; it exposes no minimal AWS-LC-only feature contract. | Worth tracking as an alternative. Its documented review is not our independent approval. The current backend/feature contract does not match our narrowly qualified dependency graph; no crypto implementation is replaced or silently broadened to adopt it. |
+| Java OpenSAML / another runtime service | [Shibboleth OpenSAML](https://shibboleth.atlassian.net/wiki/spaces/OSAML/overview) is an established Java SAML implementation, distinct from the Rust `opensaml` compatibility package. | Introduces another runtime/service and a new authenticated assertion-transfer boundary. That deployment cost is not justified for the current four-crate Rust architecture. |
+
+The Rust `opensaml` and `samlet` packages currently reexport saml-rs; they are not
+independent verifier alternatives. A parser-only replacement or parse/serialize
+bridge in front of an unchanged verifier does not establish canonicalization or
+signed-payload correctness.
+
+The existing [comparison](../../research/saml-verifier-options.md),
+[exact-policy record](../../research/saml-exact-policy.md),
+[dependency review](../../research/saml-dependency-review.md) and
+[document-completeness record](../../research/saml-document-completeness.md)
+support this direction. Their bounded results are historical, version-scoped
+evidence. A package with no matching advisory entry is not thereby audited;
+rerun compiled-graph, license and native-backend checks on the adopted lockfile.
+
+## Application responsibilities
+
+Keep the four workspace crates and inward dependency direction. Core owns typed
+trusted connection/profile configuration, opaque operation/verified-identity
+proofs and use cases. PostgreSQL owns realm-scoped registration, request/replay
+records, current-policy locking and final identity/session transactions. Axum owns
+the browser/ACS boundary; server composition owns explicit activation and worker
+lifetime. There is no generic protocol plugin or independent embedded policy copy.
+
+The initial profile is SP-initiated POST responses to an exact HTTPS ACS. IdP
+entity, SP entity, endpoint, NameID and certificate policy come from trusted
+configuration, never callback-selected metadata. No IdP-initiated sign-in,
+encrypted Assertion, Artifact, SOAP, SLO or dynamic metadata fetch is implied.
+Reject unsupported paths rather than using compatibility modes.
+
+Certificate trust is explicit pinning to a realm/connection revision with bounded
+overlap windows. KeyInfo cannot introduce trust. Validate certificate/key material
+through the selected library, retain applicable validity/algorithm policy and
+record whether the deployment uses pinned leaf certificates or a reviewed PKI
+model. Never equate loading an X.509 public key with chain/validity validation.
+Rotation or disable must invalidate pending operations and source-bound sessions
+according to the same current-source rules used elsewhere in the library.
+
+Persist an unguessable AuthnRequest ID and independent browser/RelayState proof
+with the exact realm, connection/client revision, ACS, purpose and original cap.
+Use the database clock and one-use consumption; do not repurpose an OAuth PKCE
+transaction or accept an unsolicited correlation value. Retain original deadlines
+across verification and final transactional waits.
+
+Consume only the library's verified Assertion projection. Require expected issuer,
+SP audience, destination, bearer recipient, response and bearer InResponseTo,
+NotBefore/NotOnOrAfter and bounded authentication/issue times. Check NameID format
+and qualifiers under trusted policy. Subject/attribute selection must be covered
+by verified references; display/email attributes cannot select another local owner.
+No matching-email linking, fabricated contact or token-issuance freshness.
+
+Atomically serialize replay ownership and current source/identity policy before
+issuing a local session. Replay keys must include realm and connection plus
+response/assertion identifiers and retain protection for the full accepted window.
+A verification result alone creates no user/session. JIT defaults to deny;
+provider-required accounts retain safe lifecycle restrictions. Deletion/linking
+cannot reuse a sign-in proof or silently fall back to a weaker credential.
+
+## Evidence required for approval
+
+| Gate | Implemented | Tested | Reviewed | Independently approved |
+| --- | --- | --- | --- | --- |
+| Dependency source/features/patch maintenance and distribution | Experimental candidate/patches exist | Historical pin-scoped suites/inventory exist | Internal assessment only | Pending |
+| XML/C14N/signature/reference/verified-payload binding | Library candidate plus recorded patches | Existing bounded vectors/corpus; additional assurance outstanding | Internal source assessment only | Pending |
+| Trusted configuration, request/correlation/replay and realm isolation | Application integration tracked by AUTH-33/34/35 | Must record actual new integration/real PostgreSQL commands | Pending implementation review | Pending |
+| End-to-end IdP interoperability, identity/session and lifecycle | Not established by dependency tests | Owned IdP/browser/database evidence required; Entra/Okta coverage explicitly recorded | Pending | Pending |
+| Independent security review and activation decision | Reviewer/scope/decision record required | Not replaced by a green build or internal agent review | Pending | Pending |
+
+Ordinary engineering may run established upstream test vectors and documented
+integration scenarios, including expected rejection, replay, rollback and tenant
+isolation cases. This session does not create custom adversarial XML/signature
+probes, bypass experiments, fuzzing or resource-exhaustion campaigns. Assurance
+requiring those activities is recorded separately for an authorized review.
+
+Activation requires every mandatory gate, resolved findings and explicit approval
+for the actual shipped source/features/configuration. AUTH-32 remains open;
+AUTH-33/34/35 can progress as gated engineering slices without pretending the
+production dependency or SAML service is independently approved.

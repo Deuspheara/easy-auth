@@ -24,6 +24,10 @@ Inbound OIDC clients and SAML SPs resolve verified external identities. Outbound
 
 See domain-model, auth-flows, api-contract, deployment and the threat model. Authentication release is blocked on the six method categories, issuer interoperability and security review, even if alpha email works.
 
+[ADR 0021](adr/0021-saml-verification-and-approval.md) records the SAML verifier
+recommendation and separate implementation, test, review and independent-approval
+gates. Gated integration work may progress; normal SAML activation remains closed.
+
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
 current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`
 adapter in the server library. Embedded consumers share that adapter. Short registry

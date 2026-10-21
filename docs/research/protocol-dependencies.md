@@ -31,6 +31,10 @@ Assessment updated: 2026-10-19. Candidates require lockfile/advisory and license
 
 **Hard SAML release blocker:** until a specific pinned dependency passes signature-wrapping, duplicate-ID, unsigned-claims, attacker-KeyInfo, DTD/XXE, replay, audience/destination/recipient/issuer/time/InResponseTo tests and a focused security review, ship no SAML ACS. Do not silently accept unsigned responses. Native dependencies are preferable to unreviewed custom verification.
 
+[ADR 0021](../architecture/adr/0021-saml-verification-and-approval.md) records the
+current candidate recommendation, additional alternatives and staged approval.
+Ordinary integration is not a production-dependency or independent audit approval.
+
 AUTH-32's [isolated native checkpoint](saml-assessment.md#auth-32-native-checkpoint--2026-10-20)
 adds 86 passing upstream samael tests and a separately preserved ignored-positive
 failure. It resolves the unexecuted native-build gap only; it does not select a
