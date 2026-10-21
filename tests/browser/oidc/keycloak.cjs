@@ -78,6 +78,8 @@ async function start(directory, origin, redirect) {
     let mapper;
     let anotherUserSequence=0;
     return {image:IMAGE, base, issuer:origin+'/realms/'+realm, client, secret, username, password,
+      // Realm-scoped owned fixture administration; never a production service.
+      admin,
       subject:users[0].id, email:username+'@localhost.test', realm, stop,
       async identityClaims() {
         const scopes=await admin('/client-scopes');

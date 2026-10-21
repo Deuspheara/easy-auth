@@ -829,3 +829,19 @@ routes. The cross-site exception never owns persistence or grants authority.
 New source/test modules stay below 300 lines. The visible route composition and
 ordered browser lifecycle cases retain setup/bindings/result together. The shared
 ordinary IdP producer under `tests/support/saml/` has no local authority bypass.
+
+
+AUTH-35's actual Keycloak acceptance uses a separate developer-only example with
+private configuration/command types, production-router composition and owned
+listener/source lifetime in named modules. PostgreSQL exposes no additional
+implementation API: the fixture retains its own pool clone solely for aggregate
+reads. Keycloak profile/pins, private process ownership and ordered browser cases
+are separate test modules. The shared existing provider factory adds only its
+realm-scoped administrative port. Longer startup/cleanup and ordered cases retain
+resource/transaction order visibly; all new modules stay below 300 lines.
+
+The provider timing observer wraps only the identity repository port, forwards the
+original proof/verifier unchanged and records scalar/hash facts after a successful
+production commit. Its separate aggregate read compares retained signed caps and
+stored session values. It adds no XML access, authentication policy or alternative
+verification implementation, and cannot create authority directly.

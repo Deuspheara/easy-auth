@@ -4540,3 +4540,79 @@ workflow syntax; the repaired YAML parses locally. The command itself had alread
 passed all six isolated HTTP tests. This is a CI configuration failure, not a hosted
 Rust/browser pass or a relaxed verification requirement. Subsequent hosted results
 remain separately tracked. Earlier `2386410` CI completed successfully.
+
+## AUTH-35 actual Keycloak SAML acceptance — 2026-10-22
+
+The [provider guide](../guides/saml-providers.md) and
+[owned suite](../../tests/browser/saml-keycloak/README.md) record **ten passing
+ordinary checks** against actual Keycloak26.8.1 at the existing image digest,
+Chromium156.0.8078.4/Playwright1.64.1/macOS arm64 and real PostgreSQL. The
+[record](../../tests/browser/saml-keycloak/results/2026-10-22/keycloak-rollover.json)
+contains exact source/binary hashes, version, case and cleanup evidence.
+
+The real IdP signs both the Response and Assertion using RSA-SHA256/exclusive
+canonicalization, persistent NameID and an explicitly configured180-second assertion
+lifetime. Fresh contexts perform normal username/password login and actual SAML
+POST through the unchanged gated router/core verifier/final grant. No XML is edited,
+no signing key is exported, no custom cryptographic fixture/probe is created and no
+signature/trust-bypass, fuzz, stress or signature-concurrency experiment runs.
+
+Cases cover default-deny/no authority; actual signed identity/session; rejection of
+a newly active unapproved signer; explicit old/new overlap and source-session
+invalidation; the original still-enabled signer during overlap; new-pin-only
+ownership; existing subject under JIT deny; identical provider subject and local
+connection/client IDs mapped separately in two realms; and disable of one source
+with continued access to the other. Native key changes use the provider's existing
+ordinary administrative lifecycle. No callback certificate/metadata auto-trust or
+algorithm/verification fallback is introduced.
+
+A final timing case observes only the real opaque proof at the identity repository
+port and delegates it unchanged to PostgreSQL. All six committed grants preserve
+actual signed AuthnInstant exactly; stored expiry stays within the retained signed
+session limit and exceeds the separate short admission cap. All six retained
+session limits are stricter than AuthnInstant+24hours. The inspected typed timing
+contract can produce that stricter bound only from signed SessionNotOnOrAfter,
+closing this ordinary wire-path gap for the recorded Keycloak profile. The observer
+records scalar/hash facts after real successful commit; it cannot construct a
+proof or directly grant a session and adds no XML parser or verifier.
+
+Final aggregates: users2, identities2, sessions6, audit6, replay reservations12,
+pending0, owning identity realms2, exact subjects1. Owned process/database/container
+and private TLS/admin files were cleaned up without emergency cleanup or unexpected
+diagnostics. Browser TLS tolerance is isolated to the private fixture context;
+production TLS/certificate/pin/algorithm requirements stay unchanged. No protocol
+payload, header, private key, credential or personal identity enters reports.
+
+The developer-only example keeps configuration/commands, router composition,
+listener/source lifetime and timing observation separate. Private fixture commands
+can change trusted configuration/selected fixed realm, not manufacture local
+proofs/identities/sessions. The existing Keycloak bootstrap exposes its already
+realm-scoped administrative helper; its OIDC configuration/flows are unchanged.
+An initial compiler check found an attempted nonexistent public pool method;
+retaining a private fixture pool clone fixed that without widening PostgreSQL's API.
+
+Standard real-PG `cargo test --locked --workspace` passed111 cases and
+`cargo test --locked --workspace --all-features` passed723 parent-suite cases plus
+its child redaction control, with zero failures/ignored. Those runs preceded the
+final test-only timing observation, which was subsequently compiled, strictly
+linted and exercised by all ten actual Keycloak checks. Both default/all-feature
+strict all-target Clippy, formatting/diff/YAML parse checks, warning-free docs,
+234-file/three-patch source inventory and four integrity-checker tests passed.
+Compiled advisory and all-feature cargo-deny checks passed without new exceptions;
+inactive SQLx/MySQL RSA remains visible. Production sources, migrations, dependency
+versions, qualified vendor source and its three patches are unchanged by this slice.
+
+Microsoft/Okta documentation-only integration is now recorded separately. Microsoft's
+documented ten-minute minimum plus added Conditions skew conflicts with the current
+300-second signed-validity ceiling; this is an explicit compatibility inference,
+not a tested tenant or reason to weaken policy. Okta was not contacted. Keycloak's
+normal persistent-subject success does not establish all qualified NameID or
+lossless qualified-attribute extraction. Attribute projection, broader providers,
+complete purpose-bound lifecycle, maintained distribution/dependency/XML/backend
+review and independent approval remain open. Internal source/boundary review is
+not an independent audit. Normal server SAML remains disabled.
+
+Final source/report Gitleaks also passed with the existing exact public-fixture
+allowlists. The parsed CI workflow now requires this actual-Keycloak suite after
+the existing owned SAML POST browser check; hosted results remain separate from
+local acceptance. No source/patch/algorithm/trust exception was added.

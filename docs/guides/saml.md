@@ -292,7 +292,8 @@ or itself create a local session. The final identity transaction enforces both
 distinct caps and retains any shorter database-default session lifetime.
 Typed timing tests cover the optional statement cap and real signed/mapped controls
 retain the resulting bound. The pinned ordinary IdP producer does not emit the
-optional statement expiry, so that wire case remains actual-IdP acceptance work.
+optional statement expiry. The owned actual Keycloak acceptance below now covers
+that wire case for its recorded profile; other provider profiles remain separate.
 
 ## Gated browser engineering composition
 
@@ -330,3 +331,10 @@ The [gated OpenAPI contract](../architecture/openapi-saml-web.json) is generated
 with `cargo run --locked -p easy-auth-axum --features saml-web --example export_saml_web_openapi`.
 Its live publication and normal-contract separation are checked by the isolated
 HTTP contract suite. It does not change the ordinary API document.
+
+
+The [provider acceptance guide](saml-providers.md) records ten owned actual
+Keycloak26.8.1 browser/rollover/realm cases, with source and cleanup evidence.
+It also distinguishes documentation-only Entra/Okta integration from tested
+support; Entra's documented lifetime minimum conflicts with the existing strict
+five-minute signed-validity profile. No verifier restriction was relaxed.

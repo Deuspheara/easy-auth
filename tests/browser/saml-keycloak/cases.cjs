@@ -1,0 +1,63 @@
+'use strict';
+const assert=require('node:assert/strict');
+const certificates=require('./provider.cjs');
+const {login,status}=require('./browser.cjs');
+async function run(owner,provider,browser,origin,initial) {
+  const sessions=[];const cases=[];
+  const configure=(realm,pins,jit='allow')=>owner.command('configure',{realm,certificates:pins,jit});
+  const signIn=async(expected=204)=>{
+    const session=await login(browser,origin,provider,expected);
+    if(session)sessions.push(session);
+    return session;
+  };
+  try {
+    await signIn(401);
+    let facts=(await owner.command('facts')).facts;
+    assert.equal(facts.users,0);assert.equal(facts.sessions,0);assert.equal(facts.replays,0);
+    cases.push('actual_signed_default_deny_grants_nothing');
+    await configure(0,[initial.pin]);
+    const first=await signIn();
+    cases.push('real_keycloak_post_signature_identity_session');
+    await provider.rotate();
+    const next=await certificates.active(provider);
+    assert.notEqual(next.kid,initial.kid);
+    await signIn(401);
+    assert.equal((await owner.command('facts')).facts.sessions,1);
+    cases.push('ordinary_rollover_requires_explicit_new_pin');
+    await configure(0,[initial.pin,next.pin]);
+    assert.equal(await status(first),401);
+    const overlap=await signIn();assert.equal(overlap.user.id,first.user.id);
+    cases.push('approved_overlap_accepts_new_signer_and_revokes_old_source_session');
+    await certificates.activeComponent(provider,next.component,false);
+    assert.equal((await certificates.active(provider)).kid,initial.kid);
+    const old=await signIn();assert.equal(old.user.id,first.user.id);
+    cases.push('approved_overlap_accepts_still_enabled_original_signer');
+    await certificates.activeComponent(provider,next.component,true);
+    assert.equal((await certificates.active(provider)).kid,next.kid);
+    await configure(0,[next.pin]);
+    const retired=await signIn();assert.equal(retired.user.id,first.user.id);
+    cases.push('new_pin_only_resolves_existing_exact_subject');
+    await configure(0,[next.pin],'deny');
+    const existing=await signIn();assert.equal(existing.user.id,first.user.id);
+    cases.push('explicit_deny_still_resolves_bound_subject');
+    await configure(1,[next.pin]);
+    assert.equal(await status(existing),401);
+    const tenant=await signIn();
+    assert.notEqual(tenant.user.id,first.user.id);assert.notEqual(tenant.user.realm_id,first.user.realm_id);
+    assert.equal(tenant.user.display_name,first.user.display_name);
+    facts=(await owner.command('facts')).facts;
+    assert.equal(facts.identity_realms,2);assert.equal(facts.subjects,1);
+    cases.push('same_provider_subject_and_local_ids_are_realm_isolated');
+    await owner.command('disable');assert.equal(await status(tenant),401);
+    await owner.command('select',{realm:0});assert.equal(await status(existing),200);
+    assert.equal(await status(tenant),401);
+    cases.push('disable_and_trusted_realm_selection_preserve_other_source');
+    facts=(await owner.command('facts')).facts;
+    assert.equal(facts.timing.grants,6);
+    assert.equal(facts.timing.exact_signed_authn&&facts.timing.verified_session_caps&&facts.timing.session_exceeds_admission_cap,true);
+    assert.equal(facts.timing.signed_statement_caps_below_default,6);
+    cases.push('actual_signed_session_deadlines_and_authn_time_survive_commit');
+    return {cases,facts};
+  } finally {for(const s of sessions)await s.context.close();}
+}
+module.exports={run};

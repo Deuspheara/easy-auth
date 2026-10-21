@@ -185,3 +185,12 @@ those existing core/PG services. It preserves Lax cookies and detects existing
 sessions at same-origin finish. Normal router/server startup stays unchanged.
 [ADR 0024](adr/0024-saml-web-delivery.md) separates ordinary HTTP/browser evidence
 from deployed IdP interoperability and mandatory independent approval.
+
+
+Owned Keycloak26.8.1 acceptance now exercises the same gated SAML HTTP/core/PG
+composition with ten actual provider cases: persistent identity, explicit JIT,
+provider-managed certificate overlap/retirement, equal-subject tenant isolation
+and disable. No production implementation or cryptographic policy was changed.
+The [provider guide](../guides/saml-providers.md) scopes that evidence and records
+Entra's documented lifetime incompatibility and untested Okta requirements. Full
+qualified attributes/lifecycle and independent approval remain gates.

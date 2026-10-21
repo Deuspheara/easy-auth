@@ -73,3 +73,15 @@ production dependency approval, an independent audit, qualified-attribute suppor
 or a complete purpose-bound deletion lifecycle. ADRs 0021–0023 retain maintained
 source/patch approval, XML/backend review, actual IdP rollover/identity/lifecycle
 interoperability and named independent approval before production activation.
+
+
+## Subsequent ordinary provider evidence
+
+Owned Keycloak26.8.1 acceptance now supplements the earlier offline producer with
+ten actual browser/PG cases covering persistent subject, default-deny/explicit JIT,
+provider-managed old/new certificate overlap, fresh source sessions, tenant
+isolation and disable. Fixture-only private administration composes production
+configuration/routers and grants no local authority directly. See the
+[provider guide](../../guides/saml-providers.md) for scope and unsupported targets.
+This evidence does not approve all qualifiers/attributes/lifecycle, the dependency
+or independent security gate; production composition remains disabled.
