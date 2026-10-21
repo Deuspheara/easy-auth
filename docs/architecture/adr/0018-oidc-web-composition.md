@@ -13,12 +13,12 @@ by complete explicit settings in the shared server application factory.
 
 ## Context and scope
 
-Core/PostgreSQL already own one-use OAuth state, reviewed document/token transport,
-signature/claim verification, mapping/JIT, current-source provider sessions and
-purpose-bound account deletion. A private fixture's session bootstrap is not a
-supported login boundary. Embedded and standalone consumers need the same browser
-sign-in and deletion composition without repeating policy or persisting credentials
-in a script, URL or public configuration response.
+Core/PostgreSQL already own one-use OAuth state and reviewed transport for documents
+and tokens. They also own signature/claim verification, mapping/JIT, current-source
+provider sessions and purpose-bound account deletion. A private fixture's session
+bootstrap is not a supported login boundary. Embedded and standalone consumers
+need the same browser sign-in and deletion composition without repeating policy
+or persisting credentials in a script, URL or public configuration response.
 
 One `OAuthConnection` binds one exact redirect URI and a realm/connection/local-client
 identity namespace. Giving sign-in and deletion different local clients would change

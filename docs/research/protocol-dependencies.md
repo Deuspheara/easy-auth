@@ -264,3 +264,29 @@ remain gated.
 The [complete-document follow-up](saml-document-completeness.md) fixes a confirmed
 EOF-stack admission bug with a minimal upstream patch and repeats signed/resource
 qualification. Independent review, upstream adoption and SAML activation stay open.
+
+## AUTH-48 workspace TLS dependency update — 2026-10-21
+
+The standard workspace audit identified compiled
+[RUSTSEC-2026-0382](https://rustsec.org/advisories/RUSTSEC-2026-0382.html)
+in rustls-webpki 0.103.15 and
+[RUSTSEC-2026-0381](https://rustsec.org/advisories/RUSTSEC-2026-0381.html)
+in webpki-roots 1.0.9. The workspace lock now selects the documented patched
+releases **0.103.16** and **1.0.10**. The direct root-store requirement is at least
+1.0.10; the 0.26.11 compatibility package reexports the same patched 1.x store.
+Earlier version inventories above remain historical evidence.
+
+These are upstream patches: the verifier rejects the distrusted intermediate keys
+and the root bundle removes the affected root. No application verifier, TLS
+configuration, origin/address policy, algorithms or feature selection changes.
+The rustls-webpki fix is transitive and retained in Cargo.lock; builds must honor
+the lock and downstream resolvers must select a patched version too. No new
+dependency or license exception is introduced.
+
+`python3 scripts/audit.py` passes for the all-platform/all-feature compiled graph
+with cargo-audit 0.22.2 and RustSec revision
+`4b587f00996ebe5c05a73eaef105ef241e876414`. It still reports inactive SQLx/MySQL
+rsa 0.9.10 / RUSTSEC-2023-0071, without a global ignore. Cargo-deny 0.20.2
+`--all-features check` passes advisories, bans, licenses and sources; existing
+duplicate-version/unused-license warnings remain. Neither check audits the
+separate SAML research dependency graph or clears its independent-review gate.
