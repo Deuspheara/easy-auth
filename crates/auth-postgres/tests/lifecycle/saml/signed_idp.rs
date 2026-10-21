@@ -66,6 +66,18 @@ pub(super) fn response_from(
     issuer: &str,
     lifetime: Duration,
 ) -> SamlPostResponse {
+    SamlPostResponse::parse(response_field_from(f, start, name_id, issuer, lifetime)).unwrap()
+}
+
+/// Actual library-produced untrusted POST field, reusable for normal delivery
+/// retries. No XML mutation, custom signature operation or proof construction.
+pub(super) fn response_field_from(
+    f: &Fixture,
+    start: &SamlStart,
+    name_id: NameId,
+    issuer: &str,
+    lifetime: Duration,
+) -> String {
     let reg = &f.registration;
     let config = IdpConfig::builder(EntityId::try_new(issuer).unwrap())
         .sso_endpoint(SsoEndpoint::redirect(reg.sso()).unwrap())
@@ -110,7 +122,7 @@ pub(super) fn response_from(
                 .apply_web_browser_sso_generation_rules(),
         )
         .unwrap();
-    let field = response
+    response
         .post_form()
         .unwrap()
         .fields()
@@ -118,8 +130,7 @@ pub(super) fn response_from(
         .find(|f| f.name() == "SAMLResponse")
         .unwrap()
         .value()
-        .to_owned();
-    SamlPostResponse::parse(field).unwrap()
+        .to_owned()
 }
 
 fn fixture_signing_key() -> String {

@@ -20,7 +20,7 @@ impl Postgres {
         let rows = if user.authentication_policy == AuthenticationPolicy::ProviderRequired {
             #[cfg(feature = "oidc-identities")]
             {
-                super::oidc::list(
+                super::provider_listing::list(
                     &mut tx,
                     realm,
                     user.id,

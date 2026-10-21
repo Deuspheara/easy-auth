@@ -6,3 +6,6 @@ mod ownership;
 mod revocation;
 mod source;
 mod validation;
+
+#[cfg(feature = "oidc-identities")]
+mod provider_listing;

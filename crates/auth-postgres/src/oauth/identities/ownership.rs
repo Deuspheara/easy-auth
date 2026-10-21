@@ -1,5 +1,8 @@
-use crate::{identity::user_from_row, locking::lock_email, unavailable};
-use auth_core::{AuthenticationPolicy, Error, OidcJitPolicy, OidcMappedIdentity, Result, User};
+use crate::{
+    identity::{lock_provider_user, user_from_row},
+    unavailable,
+};
+use auth_core::{Error, OidcJitPolicy, OidcMappedIdentity, Result, User};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
@@ -35,27 +38,7 @@ pub(super) async fn resolve(
         .await
         .map_err(unavailable)?;
     if let Some((identity, owner, email)) = existing {
-        if let Some(email) = &email {
-            lock_email(tx, c.realm(), email).await?;
-        }
-        let row = sqlx::query(
-            r#"
-            SELECT id,email,display_name,authentication_policy FROM auth_users
-            WHERE realm_id=$1 AND id=$2 AND email IS NOT DISTINCT FROM $3::text
-            FOR UPDATE
-        "#,
-        )
-        .bind(c.realm())
-        .bind(owner)
-        .bind(email)
-        .fetch_optional(&mut **tx)
-        .await
-        .map_err(unavailable)?
-        .ok_or(Error::Unauthorized)?;
-        let user = user_from_row(c.realm(), &row)?;
-        if user.authentication_policy != AuthenticationPolicy::ProviderRequired {
-            return Err(Error::Unauthorized);
-        }
+        let user = lock_provider_user(tx, c.realm(), owner, email.as_deref()).await?;
         let bound: Option<Uuid> = sqlx::query_scalar(
             r#"
             SELECT id FROM auth_oidc_identities
