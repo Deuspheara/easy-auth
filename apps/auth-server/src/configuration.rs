@@ -1,5 +1,7 @@
 #[path = "configuration/database.rs"]
 mod database;
+#[path = "configuration/environment.rs"]
+mod environment;
 #[path = "configuration/mail.rs"]
 mod mail;
 #[path = "configuration/oidc/mod.rs"]
@@ -10,14 +12,11 @@ mod passwords;
 use auth_axum::BrowserConfig;
 use auth_core::Auth;
 use auth_postgres::Postgres;
+use environment::setting;
 use std::{env, net::SocketAddr, sync::Arc};
 use uuid::Uuid;
 
 type StartupResult<T> = Result<T, Box<dyn std::error::Error>>;
-
-fn setting(name: &str, default: &str) -> String {
-    env::var(name).unwrap_or_else(|_| default.to_owned())
-}
 
 pub(crate) struct Parameters {
     pub browser: BrowserConfig,
