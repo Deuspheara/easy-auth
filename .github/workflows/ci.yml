@@ -72,7 +72,8 @@ jobs:
       - name: Verify Google HTTPS boundary without passkeys
         run: cargo test --locked -p easy-auth-axum --features google-web --test browser google_web
       - name: Verify gated SAML HTTP without unrelated providers
-        run: cargo test --locked -p easy-auth-axum --features saml-web --test browser saml::
+        run: |
+          cargo test --locked -p easy-auth-axum --features saml-web --test browser saml::
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

@@ -4532,3 +4532,11 @@ test-module organization and checked-in/live/generated OpenAPI equality checks.
 The final rebuilt browser binary passed all eight observations with refreshed
 source hashes and verified cleanup. The final source/OpenAPI/report secret scan
 and warning-free Rustdoc checks also passed.
+
+The first hosted workflow for `c6cbc0c` failed validation before creating any jobs:
+the new plain YAML `run` value ended in `saml::`. A local Ruby/Psych parse reproduced
+"mapping values are not allowed" at that line. Using a block scalar fixes the
+workflow syntax; the repaired YAML parses locally. The command itself had already
+passed all six isolated HTTP tests. This is a CI configuration failure, not a hosted
+Rust/browser pass or a relaxed verification requirement. Subsequent hosted results
+remain separately tracked. Earlier `2386410` CI completed successfully.
