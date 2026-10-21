@@ -34,6 +34,7 @@ josekit = { version = "=0.10.3", default-features = false }
 reqwest = { version = "=0.13.5", default-features = false, features = ["rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 webpki-roots = "1.0.10"
+saml-rs = { version = "=0.6.1", default-features = false }
 webauthn-rs = { version = "=0.5.5", default-features = false, features = ["danger-allow-state-serialisation", "conditional-ui"] }
 
 [workspace.lints.rust]

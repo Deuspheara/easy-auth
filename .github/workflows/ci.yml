@@ -37,6 +37,10 @@ jobs:
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features google
+      - name: Verify gated SAML requests without a cryptographic provider
+        run: |
+          cargo test --locked -p easy-auth-core --features saml-requests saml::
+          cargo test --locked -p easy-auth-postgres --features saml-requests --test lifecycle saml::
       - name: Verify Google PostgreSQL integration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
       - name: Verify stable native OAuth registration without passkeys

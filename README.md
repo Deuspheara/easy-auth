@@ -51,6 +51,10 @@ routes, complete provider lifecycle and ordinary activation remain gated. See th
 
 ## Run locally
 
+The opt-in [SAML request component](docs/guides/saml.md) provides outgoing metadata,
+AuthnRequests and browser-bound PostgreSQL request state. It accepts no assertions
+and enables no SAML login; verification, interoperability and approval remain gated.
+
 The binary supports `--help` and `--version` without configuration or database
 access. See [command-line usage and setup diagnostics](docs/guides/server-cli.md).
 

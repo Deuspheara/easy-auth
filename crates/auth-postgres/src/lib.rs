@@ -13,6 +13,8 @@ mod passkeys;
 mod passwords;
 mod recovery;
 mod repository;
+#[cfg(feature = "saml-requests")]
+mod saml;
 mod sessions;
 
 use auth_core::{Error, Result};

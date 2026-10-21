@@ -28,6 +28,12 @@ See domain-model, auth-flows, api-contract, deployment and the threat model. Aut
 recommendation and separate implementation, test, review and independent-approval
 gates. Gated integration work may progress; normal SAML activation remains closed.
 
+The opt-in core/PostgreSQL `saml-requests` component implements trusted outgoing
+registration, library-generated SP metadata/Redirect requests, hash-only browser/
+RelayState persistence and one-use cancellation. It uses the crypto-disabled
+producer only and grants no identity/session. [Component limits](../guides/saml.md)
+remain explicit; the verifier, ACS and lifecycle approval gates are still open.
+
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
 current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`
 adapter in the server library. Embedded consumers share that adapter. Short registry

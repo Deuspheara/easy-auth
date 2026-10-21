@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+saml-requests = ["auth-core/saml-requests"]
 google = ["oidc-identities", "auth-core/google"]
 oidc-identities = ["oidc-verification", "auth-core/oidc-identities"]
 oidc-verification = ["oidc-egress", "auth-core/oidc-verification"]

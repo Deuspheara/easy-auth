@@ -1,5 +1,12 @@
 # HTTP contract v1
 
+The opt-in core/PostgreSQL `saml-requests` Rust component adds no HTTP route or
+OpenAPI operation. `SamlRegistration::unsigned_redirect` selects the explicit
+outgoing profile; `SamlTransactions::start` persists browser-bound request state
+and `cancel` removes only that operation under both proofs/current registration.
+Neither operation accepts an Assertion or grants a user/session. The normal SAML
+ACS remains absent. See the [component contract and limits](../guides/saml.md).
+
 AUTH-56 adds the trusted PostgreSQL
 `load_or_initialize_oidc_identity_policy(&definition)` operation and narrow core
 `OidcIdentityPolicy::with_persisted_revision` metadata API. Matching startup loads

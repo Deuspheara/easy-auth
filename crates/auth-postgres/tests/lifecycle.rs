@@ -24,6 +24,9 @@ mod passkeys;
 mod passwords;
 #[path = "lifecycle/recovery.rs"]
 mod recovery;
+#[cfg(feature = "saml-requests")]
+#[path = "lifecycle/saml/mod.rs"]
+mod saml;
 #[path = "lifecycle/sessions/mod.rs"]
 mod sessions;
 

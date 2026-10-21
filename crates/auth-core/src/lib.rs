@@ -13,6 +13,8 @@ mod oidc;
 mod passkeys;
 mod password;
 mod ports;
+#[cfg(feature = "saml-requests")]
+mod saml;
 mod secret;
 mod sessions;
 
@@ -56,6 +58,11 @@ pub use passkeys::{
 };
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};
+#[cfg(feature = "saml-requests")]
+pub use saml::{
+    MAX_SAML_PENDING_PER_CONNECTION, SAML_REQUEST_LIFETIME_SECONDS, SamlBrowserProof,
+    SamlRegistration, SamlRequestAdmission, SamlRequestRepository, SamlStart, SamlTransactions,
+};
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 

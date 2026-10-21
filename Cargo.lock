@@ -535,6 +535,7 @@ dependencies = [
  "ipnet",
  "josekit",
  "rand 0.8.8",
+ "saml-rs",
  "serde",
  "serde_json",
  "sha2",
@@ -1740,6 +1741,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "quick-xml"
+version = "0.42.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41b1177fdf999d2321d3fb46ff47159d9c1fb9ad66a4879f8c50a0b504615e9b"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2065,6 +2075,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "saml-rs"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4997d94a9df26e1e2768acc8fedc70afeb456d503f7af4cd85d8d8bd363ab984"
+dependencies = [
+ "base64 0.23.1",
+ "flate2",
+ "quick-xml",
+ "thiserror 2.0.21",
+ "time",
+ "url",
+ "uuid",
 ]
 
 [[package]]
