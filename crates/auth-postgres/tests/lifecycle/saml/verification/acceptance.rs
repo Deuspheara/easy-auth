@@ -34,6 +34,11 @@ async fn actual_signed_post_extracts_bound_facts_without_creating_local_authorit
     assert!(proof.authenticated_at_us() > 0 && proof.authenticated_at_us() < proof.expires_at_us());
     assert!(proof.expires_at_us() <= original_cap);
     assert_eq!(
+        proof.session_expires_at_us(),
+        proof.authenticated_at_us() + 24 * 60 * 60 * 1_000_000
+    );
+    assert!(proof.expires_at_us() <= proof.session_expires_at_us());
+    assert_eq!(
         proof.certificate_fingerprint(),
         setup::trust().certificates()[0].fingerprint()
     );

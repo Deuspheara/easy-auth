@@ -11,6 +11,7 @@ pub struct VerifiedSamlAssertion {
     pub(super) subject: Zeroizing<String>,
     pub(super) authn_at_us: i64,
     pub(super) expires_at_us: i64,
+    pub(super) session_expires_at_us: i64,
     pub(super) certificate: [u8; 32],
     pub(super) replay: Vec<SamlReplayRecord>,
 }
@@ -26,6 +27,12 @@ impl VerifiedSamlAssertion {
     }
     pub fn expires_at_us(&self) -> i64 {
         self.expires_at_us
+    }
+    /// Upper bound for a future local session, from actual signed authn time,
+    /// fixed 24h policy and any signed SessionNotOnOrAfter. Distinct from the
+    /// short original-request/assertion admission cap. Grants no session alone.
+    pub fn session_expires_at_us(&self) -> i64 {
+        self.session_expires_at_us
     }
     pub fn certificate_fingerprint(&self) -> &[u8; 32] {
         &self.certificate

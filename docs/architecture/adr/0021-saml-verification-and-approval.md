@@ -208,3 +208,12 @@ opaque-proof limits, worker cancellation semantics and remaining atomic commit
 requirements are documented in the [component guide](../../guides/saml.md).
 Independent XML/backend review, maintained dependency acceptance and actual
 IdP/browser/lifecycle interoperability remain mandatory before activation.
+
+
+Persistent NameID additionally enforces the protocol's 256-character bound
+(Approved Errata 05 E78), with the original 1024-byte cap retained. Admission and
+local-session time caps remain separate: the verified proof carries signed
+SessionNotOnOrAfter, when present, limited by the fixed 24-hour age policy from
+actual AuthnInstant (E26/E79). Final session creation must honor that upper bound
+and the independent short admission cap. This is ordinary profile integration,
+not a claim of complete SAML compliance or passed independent security review.

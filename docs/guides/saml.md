@@ -278,3 +278,15 @@ remains, with a separate character count. Ordinary signed IdP-API cases cover 25
 ASCII characters, 257 rejection and 256 four-byte Unicode characters. Optional
 display metadata still has its separate 256-byte bound; a valid multibyte persistent
 subject can exceed that presentation limit without losing its exact identity value.
+
+
+The verified proof also carries a distinct `session_expires_at_us` upper bound
+for eventual local-session creation: the earlier of signed AuthnInstant plus the
+fixed 24-hour application limit and signed SessionNotOnOrAfter when present.
+This follows the session guidance in
+[OASIS Approved Errata 05 E26/E79](https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.html).
+It does not reuse the short request/Assertion admission deadline as cookie lifetime
+or create a local session. The final transaction must enforce both distinct caps.
+Typed timing tests cover the optional statement cap and real signed/mapped controls
+retain the resulting bound. The pinned ordinary IdP producer does not emit the
+optional statement expiry, so that wire case remains actual-IdP acceptance work.

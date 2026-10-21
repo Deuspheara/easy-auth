@@ -11,6 +11,7 @@ async fn only_actual_proof_of_exact_registration_maps_without_granting_authority
     assert!(matches!(stale.map(proof), Err(Error::Unauthorized)));
     let proof = verify(&f, "Opaque-Subject").await;
     let deadline = proof.expires_at_us();
+    let session_limit = proof.session_expires_at_us();
     let certificate = *proof.certificate_fingerprint();
     let replay_hash = *proof.replay_reservations()[0].hash();
     let mapped = policy.map(proof).unwrap();
@@ -20,6 +21,7 @@ async fn only_actual_proof_of_exact_registration_maps_without_granting_authority
     assert_eq!(mapped.display_name(), Some("Opaque-Subject"));
     assert_eq!(mapped.assertion().replay_reservations().len(), 2);
     assert_eq!(mapped.assertion().expires_at_us(), deadline);
+    assert_eq!(mapped.assertion().session_expires_at_us(), session_limit);
     assert_eq!(mapped.assertion().certificate_fingerprint(), &certificate);
     assert_eq!(
         mapped.assertion().replay_reservations()[0].hash(),

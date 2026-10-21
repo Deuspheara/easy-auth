@@ -24,12 +24,8 @@ pub(super) fn project(
         now,
         timing::MESSAGE_AGE_US,
     )?;
-    let authn = session
-        .authn_session()
-        .authn_instant()
-        .ok_or(Error::Unauthorized)?;
-    let authn_until = timing::recent_instant(authn, now, timing::AUTHN_AGE_US)?;
-    let authn_at_us = timing::instant(authn)?;
+    let (authn_at_us, session_expires_at_us) =
+        timing::authentication_session(session.authn_session(), now)?;
     let conditions_until = timing::instant(session.not_on_or_after().ok_or(Error::Unauthorized)?)?;
     if reservations.0.len() != 2 || conditions_until <= now || conditions_until > assertion_until {
         return Err(Error::Unauthorized);
@@ -38,7 +34,7 @@ pub(super) fn project(
         .expires_at_us()
         .min(response_until)
         .min(assertion_until)
-        .min(authn_until)
+        .min(session_expires_at_us)
         .min(conditions_until)
         .min(
             pin.approved_until()
@@ -60,6 +56,7 @@ pub(super) fn project(
         subject: Zeroizing::new(subject),
         authn_at_us,
         expires_at_us,
+        session_expires_at_us,
         certificate: *pin.fingerprint(),
         replay: reservations.0,
     })

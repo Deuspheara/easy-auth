@@ -1,5 +1,5 @@
 use crate::{Error, Result};
-use saml_rs::SamlInstant;
+use saml_rs::{AuthnSession, SamlInstant};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
@@ -49,4 +49,22 @@ pub(super) fn recent(value: i64, now: i64, age: i64) -> Result<i64> {
         return Err(Error::Unauthorized);
     }
     Ok(until)
+}
+
+/// Separate the short admission deadline from the maximum session derived from
+/// signed authentication. Approved Errata 05 E26/E79 retain SessionNotOnOrAfter;
+/// our fixed 24h authn-age policy is a further application limit.
+pub(super) fn authentication_session(authn: &AuthnSession, now: i64) -> Result<(i64, i64)> {
+    let instant = authn.authn_instant().ok_or(Error::Unauthorized)?;
+    let authn_until = recent_instant(instant, now, AUTHN_AGE_US)?;
+    let session_until = authn
+        .not_on_or_after()
+        .map(self::instant)
+        .transpose()?
+        .unwrap_or(authn_until)
+        .min(authn_until);
+    if session_until <= now {
+        return Err(Error::Unauthorized);
+    }
+    Ok((self::instant(instant)?, session_until))
 }
