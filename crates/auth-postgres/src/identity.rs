@@ -17,7 +17,7 @@ pub(crate) fn user_from_row(realm: Uuid, row: &PgRow) -> Result<User> {
 /// Caller already holds source/policy and scoped subject serialization. Preserve
 /// email -> owner lock order and the original email snapshot; a vanished/changed
 /// owner is rejected and cannot fall through to creating a replacement account.
-#[cfg(feature = "oidc-identities")]
+#[cfg(any(feature = "oidc-identities", feature = "saml-identities"))]
 pub(crate) async fn lock_provider_user(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     realm: Uuid,

@@ -1,7 +1,16 @@
+mod commit_faults;
 mod concurrency;
 mod configuration;
+mod constraints;
+mod deletion;
+mod delivery;
+mod delivery_setup;
 mod isolation;
 mod mapping;
 mod migration;
+mod namespace;
 mod rollback;
+mod sessions;
 mod setup;
+mod signin;
+mod waits;

@@ -7,5 +7,4 @@ mod lifecycle;
 mod provider;
 mod session_age;
 mod setup;
-#[path = "../../../../../../tests/support/google/waits.rs"]
-mod waits;
+use crate::support::observation as waits;

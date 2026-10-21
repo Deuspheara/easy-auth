@@ -34,4 +34,6 @@ mod tests;
 mod preparation_tests;
 
 #[cfg(feature = "saml-identities")]
-pub use identities::{SamlIdentityPolicy, SamlJitPolicy, SamlMappedIdentity};
+pub use identities::{
+    SamlIdentityPolicy, SamlIdentityRepository, SamlJitPolicy, SamlMappedIdentity, SamlSignIn,
+};

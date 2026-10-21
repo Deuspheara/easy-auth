@@ -7,5 +7,8 @@ mod revocation;
 mod source;
 mod validation;
 
-#[cfg(feature = "oidc-identities")]
+#[cfg(any(feature = "oidc-identities", feature = "saml-identities"))]
 mod provider_listing;
+
+#[cfg(feature = "saml-identities")]
+mod saml;

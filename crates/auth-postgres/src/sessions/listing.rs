@@ -1,5 +1,5 @@
 use crate::{Postgres, unavailable};
-#[cfg(not(feature = "oidc-identities"))]
+#[cfg(not(any(feature = "oidc-identities", feature = "saml-identities")))]
 use auth_core::Error;
 use auth_core::{AuthenticationPolicy, Result, SessionInfo, SessionPage, Verifier};
 use sqlx::Row;
@@ -18,7 +18,7 @@ impl Postgres {
         let (user, current_id, deadline) =
             super::validation::active_caller(&mut tx, realm, current).await?;
         let rows = if user.authentication_policy == AuthenticationPolicy::ProviderRequired {
-            #[cfg(feature = "oidc-identities")]
+            #[cfg(any(feature = "oidc-identities", feature = "saml-identities"))]
             {
                 super::provider_listing::list(
                     &mut tx,
@@ -30,7 +30,7 @@ impl Postgres {
                 )
                 .await?
             }
-            #[cfg(not(feature = "oidc-identities"))]
+            #[cfg(not(any(feature = "oidc-identities", feature = "saml-identities")))]
             {
                 return Err(Error::Unauthorized);
             }
@@ -46,6 +46,7 @@ impl Postgres {
                     ELSE NULL END AS authenticated_at_ms
             FROM auth_sessions
             WHERE realm_id=$1 AND user_id=$2 AND revoked_at IS NULL
+              AND authentication_method NOT IN ('oidc','saml')
               AND expires_at>statement_timestamp()
               AND last_seen_at>statement_timestamp()-interval '30 minutes'
               AND (authentication_method='passkey' OR EXISTS (

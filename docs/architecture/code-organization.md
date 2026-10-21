@@ -807,3 +807,14 @@ below 300 lines. Ordered configuration and upgrade scenarios preserve exact stat
 negative results and positive controls as function-size exceptions. Core mapping
 adds no SQL, raw XML or provider engine; normal composition/HTTP remain unchanged.
 No unrelated cleanup is deferred.
+
+
+AUTH-34 keeps the SAML final transaction visible in `saml/identities/completion.rs`.
+Ownership, replay reservation, session creation and erased-subject cooldown are
+cohesive private modules under that feature. `sessions/saml/` owns source guard
+and inventory, composed explicitly with existing sources. Core sign-in owns the
+port and returned secret; it contains no SQL. No handler, entry file or verifier
+acquires persistence policy. The shared existing provider-owner lock remains in
+`identity.rs`; test lock/clock observation lives in `tests/support/postgres/`.
+Ordered transaction/wait tests keep observation and rollback assertions together
+for review; new modules remain below 300 lines. No unrelated cleanup is deferred.

@@ -44,14 +44,17 @@ is introduced, and no storage lock spans certificate parsing.
 The explicit `saml-verification` core/PostgreSQL feature adds the concrete qualified
 AWS-LC message adapter and fresh database configuration/clock port. Authenticated
 typed facts and staged replay hashes return an opaque proof without local authority.
-Durable replay, identity/session/lifecycle and HTTP remain implementation gates.
+Final authority is supplied only by the separate opt-in identity component;
+HTTP and complete lifecycle acceptance remain gates.
 Normal composition exposes no SAML ACS; no independent approval is established.
 
 The gated `saml-identities` feature adds exact-registration default-deny policy,
-opaque mapping and atomic registration/pin/policy configuration. It creates no local
-identity/session or durable replay grant. Attribute-selected mapping and final
-source-bound lifecycle remain unsupported; [ADR 0022](adr/0022-saml-identity-policy.md)
-records the current subject namespace and limits. Normal SAML remains disabled.
+opaque mapping and atomic registration/pin/policy configuration. `SamlSignIn` now
+commits durable replay, exact-subject ownership, source-bound session and audit
+atomically. Current-source authentication/inventory/revocation fail closed, including
+backend-disabled builds. Attribute-selected mapping, HTTP and complete purpose-bound
+lifecycle remain unsupported; [ADR 0023](adr/0023-saml-identity-session-commit.md)
+records this boundary. Normal SAML remains disabled.
 
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
 current enabled configuration checks in PostgreSQL, and the concrete `OidcHttps`

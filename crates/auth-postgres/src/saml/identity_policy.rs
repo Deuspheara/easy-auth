@@ -45,7 +45,7 @@ pub(super) async fn load(
     reg: &SamlRegistration,
 ) -> Result<SamlIdentityPolicy> {
     configuration::lock(tx, reg).await?;
-    let jit: String = sqlx::query_scalar("SELECT jit FROM auth_saml_identity_policies WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision=$4")
+    let jit: String = sqlx::query_scalar("SELECT jit FROM auth_saml_identity_policies WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision=$4 FOR SHARE")
         .bind(reg.realm()).bind(reg.connection()).bind(reg.client()).bind(reg.revision())
         .fetch_optional(&mut **tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
     let jit = match jit.as_str() {
@@ -54,4 +54,11 @@ pub(super) async fn load(
         _ => return Err(Error::Unavailable),
     };
     Ok(SamlIdentityPolicy::new(reg.clone()).with_jit(jit))
+}
+
+pub(super) async fn lock(tx: &mut Transaction<'_, Pg>, policy: &SamlIdentityPolicy) -> Result<()> {
+    if load(tx, policy.registration()).await? != *policy {
+        return Err(Error::Unauthorized);
+    }
+    Ok(())
 }

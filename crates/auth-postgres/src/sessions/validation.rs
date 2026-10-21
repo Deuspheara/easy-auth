@@ -45,7 +45,7 @@ pub(super) async fn active_caller(
     .await
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
-    #[cfg(feature = "oidc-identities")]
+    #[cfg(any(feature = "oidc-identities", feature = "saml-identities"))]
     source.recheck(tx, realm, current).await?;
     let row = sqlx::query(
         r#"
@@ -55,9 +55,9 @@ pub(super) async fn active_caller(
           AND s.expires_at>clock_timestamp()
           AND s.last_seen_at>clock_timestamp()-interval '30 minutes'
           AND s.authentication_method=$4
-          AND ((u.authentication_policy='mailbox' AND s.authentication_method<>'oidc')
+          AND ((u.authentication_policy='mailbox' AND s.authentication_method NOT IN ('oidc','saml'))
             OR (u.authentication_policy='passkey_required' AND s.authentication_method='passkey')
-            OR (u.authentication_policy='provider_required' AND s.authentication_method='oidc'))
+            OR (u.authentication_policy='provider_required' AND s.authentication_method IN ('oidc','saml')))
         "#,
     )
     .bind(realm)

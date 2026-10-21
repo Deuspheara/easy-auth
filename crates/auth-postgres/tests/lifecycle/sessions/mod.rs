@@ -2,6 +2,8 @@ mod concurrency;
 mod inventory;
 mod migration;
 mod revocation;
+#[cfg(not(feature = "saml-identities"))]
+mod saml_unavailable;
 
 use crate::support::*;
 use auth_core::{Repository, Secret};

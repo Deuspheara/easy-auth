@@ -1,7 +1,8 @@
 # ADR 0022: Gated SAML identity policy and exact subject namespace
 
 Date: 2026-10-21. Status: accepted for opt-in core/PostgreSQL configuration and
-mapping only; final replay/identity/session/lifecycle and production approval open.
+mapping; [ADR 0023](0023-saml-identity-session-commit.md) extends final
+replay/identity/session behavior. Complete lifecycle and production approval remain open.
 
 ## Decision and boundary
 
@@ -85,9 +86,10 @@ mapping with no local user/session/audit writes. Mapping rejects mismatched revi
 and preserves absent optional presentation. These are engineering tests and internal
 review; they are not an independent security audit or actual IdP interoperability.
 
-AUTH-34 still owns durable response/Assertion replay and the final atomic
-identity/session transaction. Source-bound validation, inventory, reauthentication,
-revocation/deletion and HTTP/browser handling need their own complete acceptance.
+AUTH-34 now implements durable response/Assertion replay, the final atomic
+identity/session transaction and source-bound validation/inventory/revocation as
+recorded in ADR 0023. Purpose-bound deletion and HTTP/browser handling still need
+implementation and complete acceptance.
 AUTH-35 retains actual Keycloak rollover, supported attribute policy, cross-tenant
 final identity behavior and Entra/Okta documentation. Maintained dependency approval,
 XML/signature/backend review and separate named independent approval remain gates

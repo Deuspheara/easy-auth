@@ -5,6 +5,8 @@ use uuid::Uuid;
 
 pub(super) enum Source {
     Local(String),
+    #[cfg(feature = "saml-identities")]
+    Saml(super::saml::LockedSource),
     #[cfg(feature = "oidc-identities")]
     Oidc(super::oidc::LockedSource),
 }
@@ -26,26 +28,45 @@ impl Source {
         .await
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;
-        if method != "oidc" {
-            return Ok(Self::Local(method));
+        match method.as_str() {
+            "oidc" => {
+                #[cfg(feature = "oidc-identities")]
+                {
+                    Ok(Self::Oidc(
+                        super::oidc::LockedSource::lock(tx, realm, current).await?,
+                    ))
+                }
+                #[cfg(not(feature = "oidc-identities"))]
+                {
+                    Err(Error::Unauthorized)
+                }
+            }
+            "saml" => {
+                #[cfg(feature = "saml-identities")]
+                {
+                    Ok(Self::Saml(
+                        super::saml::LockedSource::lock(tx, realm, current).await?,
+                    ))
+                }
+                #[cfg(not(feature = "saml-identities"))]
+                {
+                    Err(Error::Unauthorized)
+                }
+            }
+            _ => Ok(Self::Local(method)),
         }
-        #[cfg(feature = "oidc-identities")]
-        {
-            return Ok(Self::Oidc(
-                super::oidc::LockedSource::lock(tx, realm, current).await?,
-            ));
-        }
-        #[cfg(not(feature = "oidc-identities"))]
-        Err(Error::Unauthorized)
     }
+
     pub(super) fn method(&self) -> &str {
         match self {
             Self::Local(method) => method,
+            #[cfg(feature = "saml-identities")]
+            Self::Saml(_) => "saml",
             #[cfg(feature = "oidc-identities")]
             Self::Oidc(_) => "oidc",
         }
     }
-    #[cfg(feature = "oidc-identities")]
+    #[cfg(any(feature = "oidc-identities", feature = "saml-identities"))]
     pub(super) async fn recheck(
         &self,
         tx: &mut Transaction<'_, Postgres>,
@@ -54,6 +75,8 @@ impl Source {
     ) -> Result<()> {
         match self {
             Self::Local(_) => Ok(()),
+            #[cfg(feature = "saml-identities")]
+            Self::Saml(source) => source.recheck(tx, realm, current).await,
             #[cfg(feature = "oidc-identities")]
             Self::Oidc(source) => source.recheck(tx, realm, current).await,
         }
@@ -67,6 +90,8 @@ impl Source {
     ) -> Result<Uuid> {
         match self {
             Self::Local(_) => fresh_session(tx, realm, owner, current).await,
+            #[cfg(feature = "saml-identities")]
+            Self::Saml(source) => source.fresh_session(tx, realm, owner, current).await,
             #[cfg(feature = "oidc-identities")]
             Self::Oidc(source) => source.fresh_session(tx, realm, owner, current).await,
         }

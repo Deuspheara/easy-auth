@@ -1,6 +1,9 @@
 pub(crate) mod legacy;
 #[cfg(feature = "oauth-transactions")]
 pub(crate) mod legacy_oauth;
+#[cfg(any(feature = "saml-identities", feature = "google"))]
+#[path = "../../../../tests/support/postgres/observation.rs"]
+pub(crate) mod observation;
 pub(crate) mod schema;
 
 use auth_core::{Repository, Secret};

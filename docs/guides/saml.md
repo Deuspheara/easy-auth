@@ -188,7 +188,8 @@ writes, with a final DB-clock check. Replay namespaces must survive revision cha
 
 ## Remaining implementation and approval
 
-Durable replay rejection, identity resolution/JIT provisioning, source-bound session/lifecycle commit
+The separate identity component supplies durable replay rejection, identity
+resolution/JIT provisioning and source-bound session commit. Complete lifecycle
 and the HTTP/browser boundary are not implemented by these components. Pending
 AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
 These integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
@@ -258,8 +259,9 @@ enabled definition. Any revision change, including disable or pin-only replaceme
 invalidates the previous policy atomically. Migration 0023 preserves all original
 registration, pin and pending-request values and grants no default mapping authority.
 
-Mapping policy, its storage and tests do not implement JIT/session creation, durable
-replay rejection or source-bound lifecycle. Attribute-selected mapping remains
+Mapping and configuration alone grant no authority. `SamlSignIn` now consumes
+the mapped proof in the final PostgreSQL replay/identity/session/audit transaction;
+see [ADR 0023](../architecture/adr/0023-saml-identity-session-commit.md). Attribute-selected mapping remains
 unsupported because the pinned typed extraction does not preserve NameFormat.
 Actual qualifier/attribute/IdP/browser acceptance and independent approval remain
 open. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the boundary.
@@ -281,12 +283,13 @@ subject can exceed that presentation limit without losing its exact identity val
 
 
 The verified proof also carries a distinct `session_expires_at_us` upper bound
-for eventual local-session creation: the earlier of signed AuthnInstant plus the
+for local-session creation: the earlier of signed AuthnInstant plus the
 fixed 24-hour application limit and signed SessionNotOnOrAfter when present.
 This follows the session guidance in
 [OASIS Approved Errata 05 E26/E79](https://docs.oasis-open.org/security/saml/v2.0/errata05/os/saml-v2.0-errata05-os.html).
 It does not reuse the short request/Assertion admission deadline as cookie lifetime
-or create a local session. The final transaction must enforce both distinct caps.
+or itself create a local session. The final identity transaction enforces both
+distinct caps and retains any shorter database-default session lifetime.
 Typed timing tests cover the optional statement cap and real signed/mapped controls
 retain the resulting bound. The pinned ordinary IdP producer does not emit the
 optional statement expiry, so that wire case remains actual-IdP acceptance work.

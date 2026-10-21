@@ -170,14 +170,24 @@ consumed request state, local user/provider identity and local session authority
 It retains exact registration revision, persistent subject, actual signed authn
 time, original/signed/certificate caps, selected approved pin and authenticated
 response/Assertion replay hashes. Replay records are staged, not committed; the
-future durable ledger and identity/session transaction must remain realm-scoped,
+durable ledger and identity/session transaction in the separate identity component remain realm-scoped,
 recheck current source and retain replay uniqueness across configuration rotation.
 Raw XML, public email claims and mere signature success cannot select a local owner.
 
 
 `SamlIdentityPolicy` and `SamlMappedIdentity` separate trusted default-deny JIT
-configuration, real signature evidence and future local identity authority. The
+configuration, real signature evidence and local identity authority. The
 persistent subject's owning namespace includes both configured IdP and SP entities
 in addition to realm/connection/client. Presentation is optional metadata; it cannot
 select ownership, local contact, roles or fallback credentials. Mapping and stored
 policy create no local identities, replay admission, sessions or audit facts.
+
+
+`SamlSignIn` consumes a mapped proof exactly once through a current-policy final
+transaction. Migration 0024 separates exact SAML identity ownership, hash-only
+response/Assertion replay, hash-only deleted-subject cooldown and session source
+provenance. The signed session limit is distinct from admission expiry. Sessions
+retain actual authentication time and source revision; current source policy is
+required for authentication/inventory/fresh revocation. The typed
+`SamlAuthenticated` audit fact has only committed user/session references.
+[ADR 0023](adr/0023-saml-identity-session-commit.md) records lock order and limits.

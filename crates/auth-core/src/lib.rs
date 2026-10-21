@@ -69,7 +69,9 @@ pub use saml::{
 #[cfg(feature = "saml-certificates")]
 pub use saml::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
 #[cfg(feature = "saml-identities")]
-pub use saml::{SamlIdentityPolicy, SamlJitPolicy, SamlMappedIdentity};
+pub use saml::{
+    SamlIdentityPolicy, SamlIdentityRepository, SamlJitPolicy, SamlMappedIdentity, SamlSignIn,
+};
 #[cfg(feature = "saml-verification")]
 pub use saml::{
     SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,

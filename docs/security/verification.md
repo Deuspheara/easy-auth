@@ -4404,3 +4404,60 @@ XML/signature/backend review and separate named independent approval remain open
 Normal SAML stays disabled. Internal code/maintainability review checks cohesive
 modules, exact visibility, no policy duplication, scope, transaction ownership,
 closed modes and original caps; it is not independent security review.
+
+## AUTH-34 gated SAML authority transaction — 2026-10-21
+
+The opt-in core/PostgreSQL identity component now consumes real verified/mapped
+input in the atomic durable replay, exact-subject owner/JIT, source-session and
+closed audit transaction described in
+[ADR 0023](../architecture/adr/0023-saml-identity-session-commit.md). This is
+implementation and ordinary engineering evidence, not a production approval.
+
+`cargo test --locked --workspace --all-features` passed with real PostgreSQL:
+core 110, Axum 2 unit/116 browser, PostgreSQL 406 lifecycle, server 54 unit/6 native
+return/7 native operation/12 example acceptance cases, with zero failures or ignored
+cases. The core subprocess redaction control also passed independently. Four final
+SAML cases were added after that broad run; the final
+`cargo test --locked -p easy-auth-postgres --features saml-identities --test lifecycle saml::`
+then passed **52 cases**, including those additions. Default workspace verification
+is recorded separately below; these counts are not distinct audits.
+
+New ordinary cases cover committed replay across client/revision changes, exactly
+one database-commit winner after sequential signature verification, rollback at
+every authority write, observed final-audit expiry, both source-disable orderings,
+owner-policy changes after observed waits, exact cross-realm/case ownership,
+maximum legal entity/Unicode-subject index size, database session policy clamping,
+provenance/audit constraints, additive migration preservation and erased-owner
+cooldown/replay retention. The default-build stored-SAML rejection and own logout
+control passed separately. This seeded storage capability case is not signature or
+actual IdP evidence. Deletion tests use privileged persistence erasure, not a new
+self-service deletion ceremony.
+
+The maximum-size test's first setup failed the existing verified-mailbox constraint:
+its provider-only user omitted an explicit null verification timestamp. Correcting
+the owned fixture resolved that failure; production constraints were unchanged.
+Strict all-feature Clippy initially reported duplicate loading of the extracted
+PostgreSQL observer; reusing one support import fixed it without a lint suppression.
+Subsequent default/all-feature all-target strict Clippy, formatting/diff checks,
+warning-free all-feature docs, source integrity (234 files/three patches and four
+checker tests), compiled advisory and all-feature cargo-deny checks passed.
+The full lock still reports inactive SQLx/MySQL rsa/RUSTSEC-2023-0071; no new ignore
+was added. Current source secret scanning passed with exact upstream fixture
+allowlists. User-owned unfinished research changes were excluded and not executed.
+
+The selected source/algorithms/pins/verifier are unchanged. No new adversarial XML,
+signature bypass/trust bypass, fuzz, stress or signature-concurrency experiments
+were performed. Local IdP-facade issuance uses unchanged public upstream fixtures;
+it is not a deployed Shibboleth, Keycloak, Entra or Okta exchange. Optional signed
+session expiry and wire qualifier/attribute acceptance retain their documented
+producer/projection limitations. Normal SAML remains disabled pending maintained
+distribution/patch acceptance, dependency/XML/backend review, actual IdP/browser and
+complete lifecycle acceptance and an explicit independent approval record.
+
+The final `cargo test --locked --workspace` also passed with real PostgreSQL:
+**111 cases**, zero failures or ignored cases, including 76 PostgreSQL lifecycle
+cases and the backend-unavailable SAML control. The broader all-feature run above
+contains 713 parent-suite cases plus its independently executed child control;
+the final 52-case SAML run separately covers the four later additions.
+Narrow PostgreSQL SAML feature checks also passed: request-only **15 cases** and
+certificate-only **18 cases**, with zero failures/ignored and no verifier activation.

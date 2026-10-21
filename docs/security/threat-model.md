@@ -596,3 +596,23 @@ emitted; session validation/revocation and database destruction affect exclusive
 its fresh local realm. Provider grant cleanup remains separate owner action.
 Offline proof fixtures and public setup do not establish real Google/OS acceptance,
 genuine freshness, ordinary activation or an installed-client DB credential model.
+
+
+## Gated SAML local authority
+
+The opt-in final transaction consumes concrete verified/mapped input under exact
+current registration and default-deny policy. It reserves both authenticated IDs
+in a durable realm/connection namespace that survives client/revision replacement
+and erased owners. Full exact subject fields select ownership alongside their
+bounded database digest; presentation and email cannot select or merge users.
+Replay, owner/JIT, session and typed audit writes commit or roll back together,
+with the original deadline checked after every final write wait. No database lock
+spans XML verification. See [ADR 0023](../architecture/adr/0023-saml-identity-session-commit.md).
+
+Source-bound sessions retain actual signed authentication time and the distinct
+signed session cap. Disabled/stale source policy or an absent compiled backend
+rejects authority, while own logout remains possible. Account erasure cascades
+local authority and preserves a bounded hash-only cooldown against resurrection
+from still-valid preverified input. This is not purpose-bound SAML deletion or
+complete browser acceptance. Mandatory dependency/XML/backend/independent review
+and actual IdP interoperability remain open; normal SAML stays disabled.

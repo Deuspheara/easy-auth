@@ -9,3 +9,6 @@ mod verification;
 
 #[cfg(feature = "saml-identities")]
 mod identity_policy;
+
+#[cfg(feature = "saml-identities")]
+mod identities;

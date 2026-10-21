@@ -493,15 +493,19 @@ request state and a bounded POST field through concrete `SamlResponseVerifier`.
 `VerifiedSamlAssertion` contains authenticated persistent-subject/time/source/pin
 facts and hashed replay reservations, without raw XML or local session authority.
 It has no public constructor or clone/serialization contract. The PostgreSQL
-configuration/clock port requires exact current enabled registration. Durable
-replay and final identity/session commit remain unimplemented; normal HTTP APIs
-expose no SAML ACS. See the [SAML component guide](../guides/saml.md).
+configuration/clock port requires exact current enabled registration. The separate
+identity component owns final replay and local authority; normal HTTP APIs expose
+no SAML ACS. See the [SAML component guide](../guides/saml.md).
 
 
 The opt-in `saml-identities` Rust API binds `SamlIdentityPolicy` to exact full
 registration and defaults JIT to Deny. It consumes actual verified assertions into
 opaque `SamlMappedIdentity`, without local authority or durable replay commit.
 PostgreSQL configures registration, explicit pins and mapping policy atomically;
-current-policy reads require enabled exact registration. Attribute selection,
-identity/session creation and HTTP routes remain unsupported. See
-[ADR 0022](adr/0022-saml-identity-policy.md).
+current-policy reads require enabled exact registration. `SamlSignIn::finish`
+consumes the mapped proof through `SamlIdentityRepository::finish_saml_identity`
+and returns `(User, Secret)` only after atomic replay/identity/session/audit commit.
+`AuditEvent::SamlAuthenticated` records the committed user/session fact. Existing
+authentication, inventory, revocation and logout APIs enforce SAML source policy.
+Attribute selection, purpose-bound SAML deletion and HTTP routes remain unsupported.
+See [ADR 0023](adr/0023-saml-identity-session-commit.md).
