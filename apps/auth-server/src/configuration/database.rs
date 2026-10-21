@@ -1,10 +1,11 @@
+use super::required_setting;
 use auth_postgres::Postgres;
 use sqlx::postgres::PgPoolOptions;
-use std::{env, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 use uuid::Uuid;
 
 pub(super) async fn repository(realm: Uuid) -> Result<Arc<Postgres>, Box<dyn std::error::Error>> {
-    let database_url = env::var("DATABASE_URL").map_err(|_| "DATABASE_URL is required")?;
+    let database_url = required_setting("DATABASE_URL")?;
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .acquire_timeout(Duration::from_secs(5))
