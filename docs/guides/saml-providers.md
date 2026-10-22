@@ -8,7 +8,7 @@ startup exposes no SAML provider.
 
 | Provider/profile | Evidence | Remaining boundary |
 | --- | --- | --- |
-| Keycloak 26.8.1, pinned image, persistent NameID, unsigned Redirect request, signed POST Response and Assertion | Ten sign-in/rollover and eight confirmed-deletion browser/PostgreSQL cases passed on macOS arm64/Chromium156 | Other profiles/platforms, older authentication-time wire acceptance, explicit qualified NameID/attribute acceptance and independent approval |
+| Keycloak 26.8.1, pinned image, persistent NameID, unsigned Redirect request, signed POST Response and Assertion | Ten sign-in/rollover and eight confirmed-deletion browser/PostgreSQL cases passed on macOS arm64/Chromium156 | Other profiles/platforms, actual-provider older-authentication profile coverage, explicit qualified NameID/attribute acceptance and independent approval |
 | Microsoft Entra enterprise SAML | Official configuration reviewed; no tenant/account exercised | Documented lifetime policy conflicts with the current five-minute signed-validity ceiling; no compatibility or production-support claim |
 | Okta SAML application integration | Official field reference reviewed; no org/account exercised | Exact profile/time/qualified identity, rollover and lifecycle need actual acceptance; no interoperability claim |
 
@@ -44,9 +44,12 @@ The six grants also retain actual signed authentication time and the stricter
 signed SessionNotOnOrAfter bound through PostgreSQL; the session lifetime is
 distinct from short admission expiry. This covers the provider's actual normal persistent-subject output. It does not
 establish all explicit NameQualifier/SPNameQualifier cases or lossless qualified
-attribute extraction. The authenticated attribute NameFormat limitation in
-[ADR 0022](../architecture/adr/0022-saml-identity-policy.md) stays open; attributes
-cannot choose ownership, contact, roles or account linking.
+attribute extraction for all actual provider profiles. Maintained scalar
+NameFormat/value-group projection and ordinary old-authentication wire scenarios
+are now implemented and component-tested under
+[ADR 0028](../architecture/adr/0028-saml-attribute-and-authentication-facts.md),
+separately from this actual Keycloak evidence. Attribute-selected policy remains
+unsupported; attributes cannot choose ownership, contact, roles or account linking.
 
 Purpose-bound deletion preparation is implemented separately, with an actual
 initiating SAML session and retained original caps. The separate gated core/PostgreSQL

@@ -67,7 +67,10 @@ verification and the atomic source/owner/subject/freshness/replay-gated erasure
 transaction. An explicit same-policy HTTP extension now supplies separate private proof
 cookies and confirmation at start/finish. Eight owned Keycloak/Chromium deletion
 cases pass, including retained-SSO password challenge and newer signed AuthnInstant;
-older-authentication-time wire coverage and independent approval remain pending.
+ordinary old-authentication wire coverage now passes through the maintained
+producer and real PostgreSQL; independent approval remains pending.
+[ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md) also records the
+complete scalar attribute projection and unchanged NameID ownership policy.
 [ADR 0025](adr/0025-saml-account-deletion.md) records this staged boundary.
 
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
@@ -207,8 +210,9 @@ provider-managed certificate overlap/retirement, equal-subject tenant isolation
 and disable. No production implementation or cryptographic policy was changed.
 The [provider guide](../guides/saml-providers.md) scopes that evidence and records
 Entra's documented lifetime incompatibility and untested Okta requirements.
-Explicit qualified NameID/attribute profiles, older-authentication-time deletion wire coverage
-and independent approval remain gates. The separate confirmed-deletion suite covers
+Broader actual IdP qualified/attribute profiles and independent approval remain
+open. The ordinary older-authentication component wire gap is now covered by
+ADR 0028; this does not establish that profile for every actual IdP. The separate confirmed-deletion suite covers
 eight owned Keycloak cases; see [ADR 0025](adr/0025-saml-account-deletion.md).
 
 The optional `issuer-clients` core/PostgreSQL component now separates trusted

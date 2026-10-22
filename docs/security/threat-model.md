@@ -613,9 +613,10 @@ Source-bound sessions retain actual signed authentication time and the distinct
 signed session cap. Disabled/stale source policy or an absent compiled backend
 rejects authority, while own logout remains possible. Account erasure cascades
 local authority and preserves a bounded hash-only cooldown against resurrection
-from still-valid preverified input. This is not purpose-bound SAML deletion or
-complete browser acceptance. Mandatory dependency/XML/backend/independent review
-and actual IdP interoperability remain open; normal SAML stays disabled.
+from still-valid preverified input. Separate purpose-bound deletion and bounded
+owned Keycloak browser acceptance are implemented below. Mandatory source/XML/
+backend/independent review and broader actual IdP interoperability remain open;
+normal SAML stays disabled.
 
 
 The gated Axum SAML ACS is explicitly non-authoritative. Existing Lax cookies may
@@ -625,7 +626,7 @@ request/browser/RelayState binding precede core consumption and verification. Th
 keeps the ordinary session cookie and origin policy intact. Only the delivery page
 uses a cross-site exception, with shared timeout/security headers and no SQL or
 grant. See [ADR 0024](../architecture/adr/0024-saml-web-delivery.md). Normal startup
-remains unchanged; actual IdP, full lifecycle and independent approval stay open.
+remains unchanged; broader IdP/profile acceptance and independent approval stay open.
 
 
 The gated SAML deletion backend now consumes distinct opaque deletion-purpose
@@ -637,8 +638,19 @@ ForceAuthn intent, token issuance, email attribute or weaker method can erase an
 account. Compiled SAML logout/revocation cancels only bound deletion state in that
 same transaction, with no later source-lock acquisition and retained final expiry
 checks. Explicit same-origin HTTP confirmation is implemented with separate private
-proof cookies and a non-authoritative common ACS/operation selector. Actual IdP
-reauthentication-to-deletion browser acceptance remains open.
+proof cookies and a non-authoritative common ACS/operation selector. Bounded
+Keycloak retained-SSO password challenge and signed reauthentication-to-deletion
+acceptance pass; broader actual IdP/profile acceptance remains open.
+
+Maintained typed extraction now provides complete ordered scalar attributes from
+the same verifier-selected Assertion under existing XML limits. Core requires
+completeness, zeroizes/redacts these facts and never falls back to the legacy
+name-keyed aggregate or raw XML. NameFormat, duplicates and value groups cannot
+select or merge an owner, install contact/roles or override deny policy. New
+ordinary library-signed/real-PG time cases preserve old authentication across new
+issuance, retain the original24-hour session cap and reject stale authentication
+at final deletion. No verifier, DB clock or security policy is replaced. See
+[ADR 0028](../architecture/adr/0028-saml-attribute-and-authentication-facts.md).
 See [ADR0025](../architecture/adr/0025-saml-account-deletion.md); dependency/XML/
 backend and independent approval still gate normal activation.
 
