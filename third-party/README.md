@@ -1,12 +1,15 @@
-# Gated SAML qualification source
+# Maintained SAML dependency source
 
 `saml-rs/` is the Cargo package-layout source of upstream saml-rs at
 [`3b289001a7a84d5a7ff7af2671991ab7098090bd`](https://github.com/salasebas/saml-rs/tree/3b289001a7a84d5a7ff7af2671991ab7098090bd),
 with only the three existing qualification patches recorded in
-`tests/provider/saml/rust-policy/patches/`. It is **an engineering candidate,
-not an upstream release or an independently approved production fork**.
+`tests/provider/saml/rust-policy/patches/`. It is **a project-maintained engineering snapshot,
+not an upstream release or independently approved production dependency**.
 [ADR 0021](../docs/architecture/adr/0021-saml-verification-and-approval.md) retains
-the maintained-adoption, XML/backend review and independent approval gates.
+the XML/backend review and independent approval gates.
+[ADR 0027](../docs/architecture/adr/0027-maintained-saml-dependency.md) records
+the accepted easy-auth maintenance and source-distribution responsibility;
+upstream patch acceptance is no longer a prerequisite.
 
 The package retains upstream MIT licensing, published fixture provenance and all
 packaged source/tests. Existing upstream public test keys are intentional vectors,
@@ -41,5 +44,13 @@ upstream full lock's inactive advisory/yanked entries remain visible. Actual com
 features/advisories/licenses must be checked in the adopting workspace; no upstream
 ignore list is inherited. Keep build output outside the vendored source directory.
 
-Long-term patch ownership and distribution are still subject to explicit maintainer
-review. Shipping this candidate must not enable a normal SAML provider or ACS.
+Run `python3 scripts/qualify_saml_dependency.py` for unchanged candidate/core
+regressions with verified application dependency versions/features. It stages a
+private disposable workspace and preserves the actual source and lock. The finite
+result is written under `target/`; source integrity and full application checks
+remain separate requirements. No scan result or dependency security approval is
+inherited merely from a passing test run.
+
+Easy-auth maintainers own the retained patch set and source distribution under
+ADR 0027. Normal SAML provider/ACS activation still requires the separately recorded
+security review and approval. See the [current evidence review](../docs/security/saml-evidence-review.md).

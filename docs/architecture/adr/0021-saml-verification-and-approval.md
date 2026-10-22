@@ -29,6 +29,14 @@ of converting unverified XML into user/session authority. Default application
 composition must expose no SAML ACS. Missing approval cannot select unsigned,
 compatibility, inline-key or alternative-algorithm fallback.
 
+## Maintained distribution decision
+
+[ADR 0027](0027-maintained-saml-dependency.md) supersedes the unresolved ownership
+choice: easy-auth now maintains and distributes the existing patched source in
+this repository. The project owner's acceptance covers maintenance, not security
+approval. Upstream merging is no longer a prerequisite. The exact three patches,
+source pin, AWS-LC-only selection and all production security gates are retained.
+
 ## Reproducible gated source integration
 
 For ordinary integration engineering, retain the exact qualified source as a
@@ -170,7 +178,7 @@ boundaries and scoped results.
 
 | Gate | Implemented | Tested | Reviewed | Independently approved |
 | --- | --- | --- | --- | --- |
-| Dependency source/features/patch maintenance and distribution | Exact qualification snapshot, three recorded patches and AWS-LC-only graph; maintained adoption decision pending | Source inventory, upstream canonicalization tests and compiled-graph advisory/license checks; not maintenance approval | Internal assessment only | Pending |
+| Dependency source/features/patch maintenance and distribution | Project-owned source distribution under ADR 0027, three recorded patches and AWS-LC-only graph; security approval pending | Source inventory, upstream canonicalization tests and compiled-graph advisory/license checks; not maintenance approval | Internal assessment only | Pending |
 | XML/C14N/signature/reference/verified-payload binding | Library candidate plus recorded patches; no application XML verifier | Existing bounded vectors/corpus and ordinary integration; parser/reference/backend assurance outstanding | Internal source assessment only | Pending |
 | Outgoing metadata, browser-bound request state/preparation and leaf-pin configuration | Opt-in AUTH-33 components; preparation grants no authority | Core and real PostgreSQL configuration, correlation, cancellation, rollover and isolation checks | Internal implementation/maintainability review only | Pending |
 | Signed message/condition projection | Concrete AUTH-34 adapter returns an opaque proof | Ordinary signed component controls and the documented actual Keycloak profile; broader profile assurance pending | Internal implementation review only | Pending |

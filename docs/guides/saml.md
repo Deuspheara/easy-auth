@@ -5,6 +5,12 @@ ordinary ACS route or SAML local-session grant. [ADR 0021](../architecture/adr/0
 records the verifier recommendation and distinct approval requirements. An
 internal assessment and green tests do not constitute independent approval.
 
+The patched source is now maintained and distributed by easy-auth under
+[ADR 0027](../architecture/adr/0027-maintained-saml-dependency.md); an upstream
+merge is not required. The [current evidence review](../security/saml-evidence-review.md)
+records shipped-graph regression testing and the remaining security requirements.
+Maintenance ownership does not activate the provider or establish independent approval.
+
 ## Outgoing requests and metadata
 
 The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registration,
