@@ -189,9 +189,10 @@ writes, with a final DB-clock check. Replay namespaces must survive revision cha
 ## Remaining implementation and approval
 
 The separate identity component supplies durable replay rejection, identity
-resolution/JIT provisioning and source-bound session commit. Complete lifecycle
-remains open; a separate gated Axum component supplies HTTP/browser delivery below. Pending
-AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
+resolution/JIT provisioning and source-bound session commit. The separate gated
+Axum components below supply sign-in and purpose-bound confirmed deletion, with
+bounded actual Keycloak/Chromium acceptance. Broader profiles and independent
+approval remain open. Pending AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
 These integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
 one-use original caps and all existing account-policy invariants.
 
@@ -263,8 +264,9 @@ Mapping and configuration alone grant no authority. `SamlSignIn` now consumes
 the mapped proof in the final PostgreSQL replay/identity/session/audit transaction;
 see [ADR 0023](../architecture/adr/0023-saml-identity-session-commit.md). Attribute-selected mapping remains
 unsupported because the pinned typed extraction does not preserve NameFormat.
-Actual qualifier/attribute/IdP/browser acceptance and independent approval remain
-open. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the boundary.
+Explicit qualified NameID and lossless attribute projection, additional IdP profiles
+and independent approval remain open. The owned Keycloak browser evidence below
+covers only its documented persistent-subject profile. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the boundary.
 
 ```sh
 cargo test --locked -p easy-auth-core --features saml-identities saml::
@@ -323,8 +325,11 @@ exact signed subject, actual signed five-minute freshness, durable replay, atomi
 erasure/audit/optional stored-contact notice/cooldown and final earliest-cap check.
 The borrowed `validate_authentication_at` policy check uses trusted DB time and
 grants nothing by itself. Migration0026 indexes realm/owner/session invalidation
-without changing existing rows. The explicit HTTP/reference-client extension below supplies confirmation; actual
-IdP reauthentication-to-deletion/browser acceptance remains pending. No normal server flag or default deletion route
+without changing existing rows. The explicit HTTP/reference-client extension below
+supplies confirmation. Eight owned Keycloak/Chromium deletion cases pass, including
+a retained-SSO password challenge and newer signed AuthnInstant. A newly issued
+response carrying older-than-five-minute authentication remains untested;
+independent approval is also pending. No normal server flag or default deletion route
 is activated. See [ADR 0025](../architecture/adr/0025-saml-account-deletion.md).
 
 ## Gated browser engineering composition
@@ -355,9 +360,9 @@ See [ADR 0024](../architecture/adr/0024-saml-web-delivery.md) and the
 
 These are explicitly gated engineering routes. Normal SAML remains disabled until
 mandatory source/patch/dependency, XML/backend, actual IdP/lifecycle and independent
-approval requirements are met. Attribute selection and purpose-bound SAML account
-deletion through these browser routes remain unsupported; the separate gated
-backend is described above. Offline producer/browser evidence is not deployed-IdP
+approval requirements are met. Attribute selection remains unsupported. The base
+`saml-web` routes provide sign-in; purpose-bound deletion requires the separate
+explicit HTTP extension below. Offline producer/browser evidence is not deployed-IdP
 interoperability or an independent audit.
 
 The [gated OpenAPI contract](../architecture/openapi-saml-web.json) is generated
@@ -403,6 +408,12 @@ can prevent completion; no fresh request/token rewrites old authority or deadlin
 The [full gated contract](../architecture/openapi-saml-account-deletion.json)
 separates these selected routes from the sign-in-only document and normal API.
 Component tests use ordinary library-produced signatures and real PostgreSQL;
-existing owned-browser sign-in checks establish compatibility only. Actual provider
-reauthentication-to-deletion and independent approval are still pending. Normal
-SAML remains disabled.
+the separate owned Keycloak/Chromium suite covers eight actual provider deletion
+cases, alongside ten rollover/realm cases. Its retained-SSO case requires a password
+challenge and observes newer signed AuthnInstant after the existing erasure
+transaction commits.
+The [provider guide](saml-providers.md) and [ADR 0025](../architecture/adr/0025-saml-account-deletion.md)
+record the source, results and limits. Newly issued responses carrying
+older-than-five-minute authentication, qualified identity/attribute profiles,
+additional IdPs and independent approval remain unverified. Normal SAML remains
+disabled.

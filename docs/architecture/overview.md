@@ -33,7 +33,8 @@ registration, library-generated SP metadata/Redirect requests, hash-only browser
 RelayState persistence, one-use cancellation and response-preparation consumption
 with original database timing. Preparation is not a verified identity. It uses the crypto-disabled
 producer only and grants no identity/session. [Component limits](../guides/saml.md)
-remain explicit; the ACS and lifecycle implementation/approval gates are still open.
+remain explicit. The separately gated ACS and confirmed-deletion components are
+implemented below; dependency, XML/backend and independent approval gates stay open.
 
 The separate opt-in `saml-certificates` feature adds typed operator-approved leaf
 pins/windows in core and atomic revision-bound pin persistence/invalidation in
@@ -44,16 +45,17 @@ is introduced, and no storage lock spans certificate parsing.
 The explicit `saml-verification` core/PostgreSQL feature adds the concrete qualified
 AWS-LC message adapter and fresh database configuration/clock port. Authenticated
 typed facts and staged replay hashes return an opaque proof without local authority.
-Final authority is supplied only by the separate opt-in identity component;
-HTTP/browser and complete lifecycle acceptance remain gates.
+Final authority is supplied only by the separate opt-in identity component.
+The separately gated HTTP/browser and confirmed-deletion components have bounded
+owned Keycloak acceptance; broader profiles and independent approval remain gates.
 Normal composition exposes no SAML ACS; no independent approval is established.
 
 The gated `saml-identities` feature adds exact-registration default-deny policy,
 opaque mapping and atomic registration/pin/policy configuration. `SamlSignIn` now
 commits durable replay, exact-subject ownership, source-bound session and audit
 atomically. Current-source authentication/inventory/revocation fail closed, including
-backend-disabled builds. Attribute-selected mapping and complete purpose-bound
-lifecycle remain unsupported; [ADR 0023](adr/0023-saml-identity-session-commit.md)
+backend-disabled builds. Attribute-selected mapping remains unsupported.
+Purpose-bound confirmed deletion is implemented separately below; [ADR 0023](adr/0023-saml-identity-session-commit.md)
 records this boundary. Normal SAML remains disabled.
 
 `SamlDeletionRequests` adds separate deletion-purpose preparation under the same
@@ -63,8 +65,9 @@ request/session cap. Its opaque preparation grants no authentication or erasure.
 `SamlDeletionVerifier` and `SamlAccountDeletion` now compose unchanged signature
 verification and the atomic source/owner/subject/freshness/replay-gated erasure
 transaction. An explicit same-policy HTTP extension now supplies separate private proof
-cookies and confirmation at start/finish; actual provider deletion/browser
-acceptance remains pending.
+cookies and confirmation at start/finish. Eight owned Keycloak/Chromium deletion
+cases pass, including retained-SSO password challenge and newer signed AuthnInstant;
+older-authentication-time wire coverage and independent approval remain pending.
 [ADR 0025](adr/0025-saml-account-deletion.md) records this staged boundary.
 
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,
@@ -203,8 +206,10 @@ composition with ten actual provider cases: persistent identity, explicit JIT,
 provider-managed certificate overlap/retirement, equal-subject tenant isolation
 and disable. No production implementation or cryptographic policy was changed.
 The [provider guide](../guides/saml-providers.md) scopes that evidence and records
-Entra's documented lifetime incompatibility and untested Okta requirements. Full
-qualified attributes/lifecycle and independent approval remain gates.
+Entra's documented lifetime incompatibility and untested Okta requirements.
+Explicit qualified NameID/attribute profiles, older-authentication-time deletion wire coverage
+and independent approval remain gates. The separate confirmed-deletion suite covers
+eight owned Keycloak cases; see [ADR 0025](adr/0025-saml-account-deletion.md).
 
 The optional `issuer-clients` core/PostgreSQL component now separates trusted
 outbound HTTPS web-client registration and opaque hostname-sector subjects from
