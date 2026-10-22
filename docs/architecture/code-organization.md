@@ -875,3 +875,14 @@ optional routes/contracts and cookie hygiene without copying core/SQL policy.
 Feature tests separate confirmation/Origin/session/state boundaries, lifecycle/
 rollback and contract publication. All added source/test files stay below300lines;
 generated OpenAPI and source-hash evidence are intentional generated-size exceptions.
+
+
+Actual Keycloak deletion browser scenarios live in `saml-keycloak/deletion/`,
+separate from the unchanged sign-in/rollover cases. The runner selects one explicit
+suite and retains shared ownership/cleanup/source reporting. The existing fixture
+composes public deletion services only; observation records missing erased sessions
+explicitly rather than asserting historical timing from absent rows. The ordered
+seven-case lifecycle retains initial authority, no-change/cancel/different-subject
+controls and final local-versus-remote erasure together as a function-size review
+exception. Added/changed source files remain below300lines; no production policy,
+verifier or public API changes and no unrelated cleanup is deferred.

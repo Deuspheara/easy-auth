@@ -66,3 +66,29 @@ distinct from short admission expiry. All six grants carry a signed statement ca
 stricter than the fixed24-hour default, establishing the ordinary Keycloak
 SessionNotOnOrAfter wire path without parsing or recording XML. This is observation,
 not a replacement verifier or a grant bypass.
+
+
+## Confirmed account deletion
+
+Run the separate ordinary deletion cases with the same built fixture:
+
+```sh
+DATABASE_URL=postgres://… EASY_AUTH_SAML_KEYCLOAK_REPORT=/absolute/new-deletion-report.json node tests/browser/saml-keycloak/run.cjs --account-deletion
+```
+
+Seven cases cover genuine sign-in, an actual signed reauthentication return with
+no authority before second confirmation, wrong confirmation without state change,
+returned-operation cancellation, a real different provider subject rejected at
+completion, exact-subject confirmed local erasure with replay retention, and remote
+IdP account preservation. The fixed reference client and same-origin operation
+selector are exercised in Chromium. Only owned provider SSO cookies are cleared
+for ordinary account selection; application/session/proof cookies stay private.
+
+The fixture explicitly selects the existing deletion services. It creates no local
+authority outside normal sign-in and changes no production composition. The
+observer reports erased sessions separately with null historical timing checks;
+pre-erasure timing facts are retained in the report. Original ten-case assertions
+are unchanged. Both suites run in CI and clean only their own resources.
+Older authentication-time wire cases, qualified identities/attributes, other IdPs
+and independent approval remain separate. No custom XML/cryptographic fixture or
+adversarial probe is introduced.

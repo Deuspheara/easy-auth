@@ -102,6 +102,8 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features saml-web --example saml-keycloak-browser
           node tests/browser/saml-keycloak/run.cjs
+      - name: Verify actual Keycloak SAML confirmed account deletion
+        run: node tests/browser/saml-keycloak/run.cjs --account-deletion
       - run: node tests/browser/oidc/signin-client.cjs
       - name: Build and check supported OIDC startup composition
         run: |

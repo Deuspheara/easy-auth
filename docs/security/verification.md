@@ -4763,3 +4763,48 @@ Implementation, ordinary tests and internal review do not establish independent
 approval. Maintained source/patch/dependency/native/XML review, qualified profile/
 attribute limitations and independent approval still gate production SAML. Normal
 SAML stays disabled; subsequent exact-head hosted CI is tracked separately.
+
+## Actual Keycloak SAML deletion acceptance (2026-10-22)
+
+AUTH-57 now has seven actual Keycloak26.8.1/Chromium156/PostgreSQL cases, using
+`node tests/browser/saml-keycloak/run.cjs --account-deletion` and the existing
+`cargo build --locked -p easy-auth-axum --features saml-web --example
+saml-keycloak-browser`. The public record is
+[account-deletion.json](../../tests/browser/saml-keycloak/results/2026-10-22-account-deletion.json),
+with exact working-tree source hashes, binary hash, image digest and finite facts.
+The suite covers real initiating sign-in, no authority before second confirmation,
+wrong phrase/no state change, cancellation, a genuinely different IdP subject
+rejected, exact-subject confirmed local erasure/replay retention and preservation
+of the remote IdP account. All seven pass with normal owned process/database/
+container cleanup and no diagnostic/emergency path. No custom XML, signature,
+cryptographic fixture, proof constructor or signature concurrency experiment runs.
+
+Final source validation: `cargo fmt --all -- --check`; default and all-feature
+`cargo clippy --locked --workspace --all-targets [--all-features] -- -D warnings`;
+`cargo test --locked --workspace [--all-features]` all pass. Default tests:111;
+all-feature tests:765 parent cases plus one child redaction case, zero failures or
+ignored cases, including all444 real PostgreSQL lifecycle cases. These commands
+use the existing local development PostgreSQL and `CARGO_INCREMENTAL=0`.
+`python3 scripts/check_saml_source.py` checks234 files/three unchanged patches;
+its four unittest cases pass. Compiled-graph `scripts/audit.py`, all-feature
+cargo-deny, redacted current ordinary-source Gitleaks, JavaScript syntax, workflow
+YAML and diff checks pass. Inactive SQLx/MySQL rsa0.9.10 advisory remains visible;
+no new dependency, algorithm, trust or scan exception is introduced. Untouched
+user research files are excluded from these source changes and secret snapshots.
+
+The observer marks missing erased-session historical timing unavailable rather
+than silently claiming it passed; the report retains actual pre-erasure timing.
+This new suite does not establish older-AuthnInstant wire rejection, explicit
+qualified NameID/attribute projection, another provider/platform, maintained
+patch/distribution acceptance, comprehensive XML/backend review or independent
+approval. Ordinary SAML/server activation remains disabled. The exact final
+commit's hosted CI receipt is tracked separately in Huly; local passes are not a
+claim that a still-running hosted workflow succeeded.
+
+The original ten actual Keycloak rollover/realm cases also pass unchanged against
+this extended fixture. All six stored sessions retain exact signed authentication
+time and their stricter signed session caps; no pending requests remain. See the
+[regression record](../../tests/browser/saml-keycloak/results/2026-10-22-deletion-fixture-rollover-regression.json).
+Its normal cleanup has no emergency or diagnostic path. Both acceptance runs use
+the same final fixture binary and source hashes; no Rust/JavaScript implementation
+changed after these checks.

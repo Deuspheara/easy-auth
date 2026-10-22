@@ -2,8 +2,8 @@
 
 Date: 2026-10-22. Status: core/PostgreSQL preparation, verification orchestration and erasure
 implemented for opt-in engineering, including explicit HTTPS confirmation routes
-and reference client. Actual provider deletion/browser acceptance and production
-approval remain pending.
+and reference client. Actual Keycloak deletion/browser acceptance passes for the
+recorded profile; dependency, XML/backend and independent production approval remain pending.
 
 ## Decision
 
@@ -84,9 +84,9 @@ scenarios; no production proof constructor or dependency is added.
 The core/PostgreSQL slice now implements concrete verification orchestration and
 final erasure as well as preparation. Revocation or source change rejects its use;
 the compiled SAML component now atomically cancels bound pending state on
-logout and individual/all-session revocation. The explicit HTTP confirmation implementation now has component evidence; actual
-IdP reauthentication-to-deletion still needs browser acceptance. Backend
-acceptance alone does not establish that usable browser ceremony.
+logout and individual/all-session revocation. The explicit HTTP confirmation implementation has component evidence and the
+recorded actual Keycloak/Chromium reauthentication-to-deletion acceptance below.
+This establishes that bounded browser ceremony, not broader provider approval.
 
 Real PostgreSQL tests cover original-row preservation, purpose/realm/owner/session/
 private-proof separation, closed foreign keys, ForceAuthn intent, one-use database
@@ -187,3 +187,31 @@ cross-site Lax-cookie absence, same-origin private proof presence, ambient-sessi
 protection and cleanup. That regression does not establish the new deletion UI or
 actual provider deletion ceremony. Both generated contracts are checked against
 live publication; normal SAML configuration remains disabled.
+
+
+## Actual Keycloak deletion acceptance
+
+Seven ordinary browser/PostgreSQL cases now pass through actual Keycloak26.8.1
+and the production verifier, mapping, private operation selector and deletion
+transaction. Real sign-in establishes the initiating session. A genuine signed
+reauthentication return creates no authority before the second typed confirmation;
+a wrong phrase changes no database facts, and cancellation retains the owner and
+session. Reauthentication as another real provider user rejects deletion. A new
+reauthentication as the exact initiating subject succeeds, leaving zero local users,
+identities, sessions or pending requests and four durable replay entries. An owned
+provider administrative read confirms the remote account still exists.
+
+The developer-only fixture explicitly composes the optional deletion services;
+normal application/server composition remains disabled. Clearing only the owned
+provider's SSO cookies permits ordinary account selection without disturbing the
+application session or proof cookies. No assertion, signature, XML or proof is
+edited or fabricated. All signature work is sequential. The original ten-case
+rollover/realm suite remains separate and unchanged. CI runs both suites.
+
+The timing observer now reports removed-session counts and null measurements for
+erased sessions rather than failing cleanup or treating absent historical rows as
+passing timing evidence. The deletion report retains pre-erasure timing facts; the
+original live-session suite retains its exact assertions. Cleanup proves normal
+fixture exit, database/container removal and no diagnostic/emergency path. This
+is not older-AuthnInstant wire coverage, qualified identity/attribute acceptance,
+an independent audit or permission to activate SAML.

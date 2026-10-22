@@ -39,9 +39,14 @@ impl Observations {
         let mut bounded_session = true;
         let mut distinct_caps = true;
         let mut statement_caps = 0;
+        let mut removed_sessions = 0;
         for record in &records {
-            let (authn,expiry):(i64,i64)=sqlx::query_as("SELECT (extract(epoch FROM authenticated_at)*1000000)::bigint,(extract(epoch FROM expires_at)*1000000)::bigint FROM auth_sessions WHERE realm_id=$1 AND token_hash=$2")
-                .bind(record.realm).bind(record.bearer.as_slice()).fetch_one(pool).await?;
+            let stored:Option<(i64,i64)>=sqlx::query_as("SELECT (extract(epoch FROM authenticated_at)*1000000)::bigint,(extract(epoch FROM expires_at)*1000000)::bigint FROM auth_sessions WHERE realm_id=$1 AND token_hash=$2")
+                .bind(record.realm).bind(record.bearer.as_slice()).fetch_optional(pool).await?;
+            let Some((authn, expiry)) = stored else {
+                removed_sessions += 1;
+                continue;
+            };
             exact_authn &= authn == record.authn;
             bounded_session &= expiry <= record.session;
             distinct_caps &= expiry > record.admission;
@@ -50,7 +55,13 @@ impl Observations {
             }
         }
         Ok(
-            serde_json::json!({"grants":records.len(),"exact_signed_authn":exact_authn,"verified_session_caps":bounded_session,"session_exceeds_admission_cap":distinct_caps,"signed_statement_caps_below_default":statement_caps}),
+            // Missing sessions after erasure cannot establish historical timing.
+            // Keep those measurements explicitly unavailable, never vacuously true.
+            serde_json::json!({"grants":records.len(),"removed_sessions":removed_sessions,
+                "exact_signed_authn":(removed_sessions == 0).then_some(exact_authn),
+                "verified_session_caps":(removed_sessions == 0).then_some(bounded_session),
+                "session_exceeds_admission_cap":(removed_sessions == 0).then_some(distinct_caps),
+                "signed_statement_caps_below_default":statement_caps}),
         )
     }
 }

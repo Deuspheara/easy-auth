@@ -7,7 +7,9 @@ use axum::{
     response::Response,
     routing::any,
 };
-use easy_auth_axum::{BrowserConfig, SamlWebServices, experimental_saml_web_router};
+use easy_auth_axum::{
+    BrowserConfig, SamlAccountDeletionWebServices, SamlWebServices, experimental_saml_web_router,
+};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower::ServiceExt;
@@ -18,8 +20,15 @@ pub(super) fn build(
     policy: SamlIdentityPolicy,
     observations: Arc<Observations>,
 ) -> FixtureResult<Router> {
+    let deletion = SamlAccountDeletionWebServices::new(
+        policy.clone(),
+        store.clone(),
+        store.clone(),
+        store.clone(),
+    )?;
     let services =
-        SamlWebServices::new(policy.clone(), store.clone(), store.clone(), observations)?;
+        SamlWebServices::new(policy.clone(), store.clone(), store.clone(), observations)?
+            .with_account_deletion(deletion)?;
     Ok(experimental_saml_web_router(
         Auth::new(policy.registration().realm(), store, Arc::new(DisabledMail)),
         BrowserConfig::new(origin, false)?,
