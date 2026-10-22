@@ -60,12 +60,13 @@ pub fn oidc_web_router(
     browser: BrowserConfig,
     services: OidcWebServices,
 ) -> Result<Router> {
-    attach(
+    let router = attach(
         configured_router(auth.clone(), browser.clone(), oidc_web_openapi()),
         auth,
-        browser,
+        browser.clone(),
         services,
-    )
+    )?;
+    Ok(clear_proofs(router, browser))
 }
 
 pub(crate) fn attach(
@@ -102,21 +103,22 @@ pub(crate) fn attach(
         .layer(DefaultBodyLimit::max(8192))
         .layer(middleware::from_fn_with_state(base.clone(), boundary))
         .with_state(state);
-    Ok(router
-        .merge(routes)
-        .merge(deletion::routes(base.clone(), deletion))
-        .layer(middleware::from_fn_with_state(base, clear_revoked_proof)))
+    Ok(router.merge(routes).merge(deletion::routes(base, deletion)))
+}
+
+pub(crate) fn clear_proofs(router: Router, browser: BrowserConfig) -> Router {
+    router.layer(middleware::from_fn_with_state(browser, clear_revoked_proof))
 }
 
 async fn clear_revoked_proof(
-    State(state): State<AppState>,
+    State(browser): State<BrowserConfig>,
     request: Request,
     next: Next,
 ) -> Response {
     let mut response = next.run(request).await;
     super::super::cookies::clear_revoked_proofs(
         &mut response,
-        &state.browser,
+        &browser,
         &[&SIGN_IN_COOKIES, &ACCOUNT_DELETION_COOKIES],
     );
     response

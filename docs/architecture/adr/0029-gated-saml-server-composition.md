@@ -28,7 +28,10 @@ When both providers are selected, one base router and one merged OpenAPI contrac
 serve OIDC and SAML. Existing public single-provider constructors retain their
 behavior. SAML's bounded non-authoritative POST ACS remains the sole SAML cross-site
 exception; authority-changing completion keeps the existing same-origin boundary.
-Both providers retain their separate private proof-cookie cleanup.
+Both providers retain their separate private proof-cookie cleanup. OIDC cleanup
+wraps the complete combined router after SAML attachment, so a SAML deletion
+response clearing the local session also clears pending OIDC proofs. Applying that
+layer only before SAML attachment would miss the later provider routes.
 
 ## Trusted provisioning and restart
 
@@ -67,7 +70,7 @@ These are ordinary engineering checks. They do not approve XML/signature/backend
 security, native-resource assurance or independent review. Existing experimental
 constructors remain explicit engineering APIs. Normal production SAML stays disabled.
 
-Local verification on 2026-10-22 passes `cargo fmt --all -- --check`, strict
+Initial configuration verification at commit748a048 on 2026-10-22 passes `cargo fmt --all -- --check`, strict
 locked default/all-feature workspace all-target Clippy, warning-free all-feature
 workspace rustdoc, and locked workspace tests: 115 default and 798 all-feature
 result counts, including 466 real PostgreSQL lifecycle tests. The final combined
@@ -81,3 +84,16 @@ after restarting it the full HTTP suite passes all131cases. A local Python
 bytecode-cache permission error was resolved by using a writable temporary cache;
 the source/runner checks were rerun successfully. These infrastructure failures
 are not hidden skips, and none of this evidence closes the security approval gate.
+
+The final HTTP-only cleanup regression uses the ordinary cleared-session response
+convention from another provider route and asserts OIDC sign-in/deletion proof
+cookies expire. Its transport fixture constructs no assertion, identity or erasure
+proof. Combined real-router tests retain the ACS no-authority observation, exact
+Origin checks, both deletion contracts and both providers' logout proof cleanup.
+
+The outer-cleanup correction separately passes strict default/all-feature all-target
+Clippy, the115-result default workspace suite, all131HTTP integration cases and
+three HTTP unit cases (including the transport-only regression). Exact final full
+workspace and hosted CI receipts are recorded with their source commit in AUTH-34;
+the earlier798-result count identifies748a048 and is not silently attributed to
+the follow-up source. No approval gate is opened by either increment.
