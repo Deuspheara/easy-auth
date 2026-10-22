@@ -8,6 +8,11 @@ use saml_rs::{
     metadata::{Endpoint, IdpMetadataConfig, generate_idp_metadata},
 };
 
+// Match the selected verifier's established depth ceiling at the first local
+// parse, rather than building a deeper tree that the backend cannot accept.
+const MAX_VERIFIED_XML_DEPTH: usize = 128;
+const MAX_VERIFIED_XML_BYTES: usize = super::input::MAX_POST_RESPONSE_BYTES / 4 * 3;
+
 pub(super) fn acs(reg: &SamlRegistration) -> Result<AcsEndpoint, SamlError> {
     Ok(AcsEndpoint::post(reg.acs())?.with_index(0).mark_default())
 }
@@ -16,6 +21,8 @@ pub(super) fn sp(reg: &SamlRegistration) -> Result<Saml<Sp>, SamlError> {
     let mut metadata = SpMetadataConfig::new(vec![acs(reg)?]);
     metadata.name_id_format = vec![NameIdFormat::Persistent];
     let mut config = SpConfig::new(EntityId::try_new(reg.sp_entity())?, metadata);
+    config.xml.limits.max_depth = MAX_VERIFIED_XML_DEPTH;
+    config.xml.limits.max_bytes = MAX_VERIFIED_XML_BYTES;
     config.validation.assertions = AssertionSignaturePolicy::RequireSigned;
     config.validation.responses = ResponseSignaturePolicy::RequireSigned;
     config.validation.xml_signatures = XmlSignatureProfile::StrictRsaSha256;

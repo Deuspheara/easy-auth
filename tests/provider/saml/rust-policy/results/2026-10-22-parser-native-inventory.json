@@ -1,0 +1,62 @@
+{
+  "recorded_at": "2026-10-22T21:05:54.078508+00:00",
+  "source_base_commit": "58e8d343d65e6926921b288ed5f60648d4764b28",
+  "implementation_state": "working-tree",
+  "source_inventory_sha256": "9d80156a83caa7034b8210b43187db4e90d9d76d6d46f623d9b479927e75bb41",
+  "application_lock_sha256": "15de2a7ae03abe7273abbc69324192f307bf82964055c7562748a20245d49636",
+  "qualification_report_sha256": "fb0286d414388706dbaafdd98863cfd3eb8416cda2e41af95011c99fbd73f3f2",
+  "saml_activation_guard_sha256": "1f41a362c835c500a9a1680def200caee92c25e8fd601a053e9e00660e60ea54",
+  "reproducer_sha256": "41ba5f1427a2b419f757d0be55a7dceb10f144542f1c8eba8163a6022681eb2e",
+  "system": "Darwin",
+  "release": "27.2.0",
+  "machine": "arm64",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14) (Homebrew)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.3",
+  "ci_image": {},
+  "declared_build": "cargo build --locked -p easy-auth-server --bin easy-auth --example embedded --features saml-web,oidc-web",
+  "binary": {
+    "path": "target/debug/easy-auth",
+    "sha256": "f6835fe86f85b1502b55e31a1ad57b52ac01f7326597339dc569dacd08252761",
+    "bytes": 51153128
+  },
+  "openssl_pkg_config_version": "3.6.2",
+  "openssl_executable_version": "OpenSSL 3.6.2 7 Apr 2026 (Library: OpenSSL 3.6.2 7 Apr 2026)",
+  "linked_openssl_artifacts": [
+    {
+      "load_name": "libssl.3.dylib",
+      "resolved_name": "libssl.3.dylib",
+      "sha256": "26ecfd43c742914a142c8b414b1f308cefe0531fcc6e38b6d45021649850e758",
+      "bytes": 884560
+    },
+    {
+      "load_name": "libcrypto.3.dylib",
+      "resolved_name": "libcrypto.3.dylib",
+      "sha256": "ef2239cec921003b54b61968f00489271e2a2805d7d1b4e69d632423f38efe1e",
+      "bytes": 4845712
+    }
+  ],
+  "aws_lc_source": {
+    "sys_version": "0.46.0",
+    "archive_sha256": "f1622d8446a2d4b2ce0c7eefc73dd43a99779028d5ee5c2dd8073a658ba8a2bc",
+    "cmake_sha256": "71aaa63a923b55daa1036dc69137e5fb00eee01b5ac876b856ec9bd8c42b61cb",
+    "software_version": "5.11.0",
+    "scope": "bundled source identity; not native certification"
+  },
+  "core_verification_source_sha256": {
+    "crates/auth-core/src/saml/verification/admission.rs": "b6f18017709547e3eba8c0c4e50fe2595da3df6024a106f39d92ad9e10132c95",
+    "crates/auth-core/src/saml/verification/attributes.rs": "eb6163d8d4c42975adb24af9f6d9a63f3d78b65ef6c171f1e6ce2c3920b351c2",
+    "crates/auth-core/src/saml/verification/configuration.rs": "cba49d7e5506a04adb54a1bdbe73085098b0600ddf26c2d28a0000c889eaa6f5",
+    "crates/auth-core/src/saml/verification/flow.rs": "ab894bfa7ad145edf46fab713219334c5879b0e9c832e90402a7458d08e20cf4",
+    "crates/auth-core/src/saml/verification/input.rs": "c5b8fc6b1ba555e8b2e1d624238ee6cbf9580f5d0ca1eb759bd56dd0293a9d35",
+    "crates/auth-core/src/saml/verification/mod.rs": "3549e406591a01d0121be0ee45701b2b7810de9bd436afcde0f9d5313ec46390",
+    "crates/auth-core/src/saml/verification/projection.rs": "0ae546cb0a39afb01548943398833112d48ef48802a43c28bc9804d6f9ad8877",
+    "crates/auth-core/src/saml/verification/replay.rs": "d8472a9fc0d292d20c45eb680585faec330a06d5ec185edf621fae1bc9455168",
+    "crates/auth-core/src/saml/verification/repository.rs": "0aeacdf7070d537516f5d56d4f34988de52125d87f27b6cbff323bb348993ba1",
+    "crates/auth-core/src/saml/verification/subject.rs": "72b955d80fb7c9c657d0fb0c82dee46431247f99f633c738a189c0223a4f7a27",
+    "crates/auth-core/src/saml/verification/subject_tests.rs": "f4cb6424af575206a47244f3404ed06078ac0e8f5f33f40d1dda9eee2dbd7659",
+    "crates/auth-core/src/saml/verification/tests.rs": "7e42807a017b31576967926de61e0b8906bcd190e087cb8c992b15a8f91fe123",
+    "crates/auth-core/src/saml/verification/timing.rs": "f446c1d1f23a23f1536da1eb80c787669a76b709fd863149b69f313a3b9bf5f5",
+    "crates/auth-core/src/saml/verification/verified.rs": "fc7880abfdc66e2f661bed749fbaadfeaea72fda87b9a6a14dc1278bc7117e5f"
+  },
+  "scope": "observed development/CI build only; not a selected production deployment, independent audit, FIPS certification or resource envelope",
+  "production_security_approval": false
+}

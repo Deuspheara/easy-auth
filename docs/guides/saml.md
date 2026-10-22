@@ -511,3 +511,21 @@ provides that explicit same-registration composition for embedded consumers.
 Separately constructed compositions/processes still have separate budgets. The
 15-second await timeout is not a hard native execution or memory limit. Deployment
 resource assurance and independent approval remain required; SAML stays disabled.
+
+### Parser binding and process admission follow-up
+
+The concrete adapter now sets decoded XML192KiB and depth128 limits, and shares
+a two-task process gate across all verifier constructors in this linked core.
+Separate services can await that gate up to15s; local/composed overload still
+rejects immediately. Both permits remain with native work until actual exit.
+Material lookup and native await have their own15s boundaries; no timeout kills
+native execution. Other processes, retained waiting inputs and HTTP parsing still
+need deployment budgets. This supersedes per-instance-only descriptions above.
+
+Maintained patch0009 compares extraction with the verifier DOM before verification,
+including original ranges/selected Assertion, normalized values and expanded names.
+Namespace declarations are not attributes, literal text/CDATA follow XML1.0 EOL
+normalization, strict XML1.1 input rejects, and backend DTD/entity rejection is
+explicit. Cryptography/C14N and trust are unchanged. See ADR0030 and the
+[assessment](../security/saml-parser-native-follow-up.md). Normal SAML remains
+source-disabled pending the existing independent review/approval gates.

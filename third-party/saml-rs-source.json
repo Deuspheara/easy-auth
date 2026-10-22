@@ -248,12 +248,16 @@
       "sha256": "67a4f11dda5d2d7db4d4f7498688b219d0df6caae0a09b0bb862f5af7579c93a"
     },
     {
+      "path": "src/crypto/verify/document.rs",
+      "sha256": "d62fb75e32f1205e5e671e24a71c4619cd433af206610acfb7eda1c955019bd8"
+    },
+    {
       "path": "src/crypto/verify/execution.rs",
-      "sha256": "9a24e419e7df1b49478f3ddc3e9ceb409d2e7bcabf7beee607807fcb17d59a6d"
+      "sha256": "f1ea2a70d762eebdd5e94d6498655cc3411e92989774b9109d9cd7c769bec47d"
     },
     {
       "path": "src/crypto/verify/profile.rs",
-      "sha256": "5694dc8ddf46e6d472bb56fdf696887da11dbb3b15a1a8ce03d4310defdc21a6"
+      "sha256": "f6833af3df6bd7db3eabc565c74ea5ac2fbdb3fa8649b5dc51a0fe97177d087c"
     },
     {
       "path": "src/crypto/verify/tests/exact.rs",
@@ -261,7 +265,7 @@
     },
     {
       "path": "src/crypto/verify.rs",
-      "sha256": "135fa862ac4ce243218272217c2335eb516dea10540f302be37847bed8a21c59"
+      "sha256": "ee174540f4d9b7ce1777ff2327f3a1bc01b6397dd78e3f847a0f9b7bf96d4936"
     },
     {
       "path": "src/crypto/xml_syntax.rs",
@@ -461,7 +465,7 @@
     },
     {
       "path": "src/xml/dom.rs",
-      "sha256": "cbbb44e9728b45e92063db2e4008f184ec40b01142df4960a1b93eed3c8a756f"
+      "sha256": "b18c79c32c3abf4dd5b21ed3ce49161f8049118ab978a66f9bcea9f703ae12cf"
     },
     {
       "path": "src/xml/extract.rs",
@@ -986,7 +990,8 @@
     "0005-ordered-attribute-projection.patch": "402097b516612819aa91cdba62e44abecdef7fbc4226418f713e6344a04a5900",
     "0006-established-authentication-time.patch": "2d8e2fd674c9d5d288002a098ab0f7706ba1396adb78f9131152044e091ca1c6",
     "0007-validate-consumed-attribute-namespaces.patch": "6eae38f64ed620339df964028e62d89373713b25548bdf5789925dc6fe2b5c84",
-    "0008-preflight-backend-reference-execution.patch": "64ca0eb7c06db90cb774646293e6289805667ea31a3495c37b20adacc8ef0577"
+    "0008-preflight-backend-reference-execution.patch": "64ca0eb7c06db90cb774646293e6289805667ea31a3495c37b20adacc8ef0577",
+    "0009-bind-parser-extraction-to-verifier-dom.patch": "5795a13d988fcd239ba68bd6cea92b9e05a4b85d4372f8396202b28e7fb3df8b"
   },
   "package_version": "0.6.1",
   "revision": "3b289001a7a84d5a7ff7af2671991ab7098090bd",

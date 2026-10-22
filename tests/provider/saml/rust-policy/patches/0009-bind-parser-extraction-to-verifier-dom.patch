@@ -1,0 +1,583 @@
+diff --git a/src/crypto/verify.rs b/src/crypto/verify.rs
+--- a/src/crypto/verify.rs
++++ b/src/crypto/verify.rs
+@@ -10,6 +10,7 @@
+ //!   `SubjectConfirmationData`.
+ //! - Only content covered by a verified reference is returned for extraction.
+ 
++mod document;
+ mod execution;
+ mod profile;
+ use execution::preflight_backend_references;
+@@ -23,7 +24,9 @@
+ use crate::xml::dom::{self, Node, XmlLimits};
+ use bergshamra::core::ns as bergshamra_ns;
+ use bergshamra::dsig::verify::{verify_all_document_with_source, verify_document_with_source};
+-use bergshamra::xml::{uppsala, Document as BergshamraDocument, NodeId as BergshamraNodeId};
++#[cfg(test)]
++use bergshamra::xml::uppsala;
++use bergshamra::xml::{Document as BergshamraDocument, NodeId as BergshamraNodeId};
+ use bergshamra::{DsigContext, KeysManager, VerifiedReference, VerifyResult};
+ use std::collections::HashSet;
+ 
+@@ -268,6 +271,21 @@
+                 .all(|assertion| id_target_matches_node(targets, assertion)))
+ }
+ 
++fn selected_assertion(root: &Node) -> Option<&Node> {
++    if root.local_name == "Assertion" {
++        return Some(root);
++    }
++    if !root.local_name.contains("Response") {
++        return None;
++    }
++    let assertions = children_named(root, "Assertion");
++    assertions
++        .iter()
++        .find(|node| assertion_has_bearer_confirmation(node))
++        .copied()
++        .or_else(|| assertions.first().copied())
++}
++
+ /// Return the source of the content covered by a verified reference: the first
+ /// bearer `<Assertion>`, a consumed root element, or the whole `<Response>`
+ /// when assertions are encrypted.
+@@ -288,11 +306,7 @@
+                 }
+                 return Err(verified_content_not_covered());
+             }
+-            let chosen = assertions
+-                .iter()
+-                .find(|assertion| assertion_has_bearer_confirmation(assertion))
+-                .copied()
+-                .unwrap_or(assertions[0]);
++            let chosen = selected_assertion(root).ok_or_else(verified_content_not_covered)?;
+             return Ok(Some(xml[chosen.start..chosen.end].to_string()));
+         }
+         if has_child(root, "EncryptedAssertion") {
+@@ -462,6 +476,7 @@
+     signature_node: BergshamraNodeId,
+     references: &[VerifiedReference],
+     targets: &[VerifiedTarget],
++    assertion_node: Option<BergshamraNodeId>,
+ ) -> Result<Option<VerifiedEmbeddedSignature>, SamlError> {
+     let Some(root) = document.document_element() else {
+         return Ok(None);
+@@ -476,19 +491,13 @@
+     let response_covered = root_element
+         .matches_name_ns(crate::constants::namespace::PROTOCOL, "Response")
+         && (whole_document_covered || reference_covers_node(references, root));
+-    let assertion_node =
+-        if root_element.matches_name_ns(crate::constants::namespace::ASSERTION, "Assertion") {
+-            Some(root)
+-        } else if root_element.matches_name_ns(crate::constants::namespace::PROTOCOL, "Response") {
+-            bergshamra_child_element(
+-                document,
+-                root,
+-                crate::constants::namespace::ASSERTION,
+-                "Assertion",
+-            )
+-        } else {
+-            None
+-        };
++    let assertion_node = assertion_node.filter(|node| {
++        (root_element.matches_name_ns(crate::constants::namespace::PROTOCOL, "Response")
++            || root_element.matches_name_ns(crate::constants::namespace::ASSERTION, "Assertion"))
++            && document.element(*node).is_some_and(|element| {
++                element.matches_name_ns(crate::constants::namespace::ASSERTION, "Assertion")
++            })
++    });
+     let assertion_directly_covered = assertion_node.is_some_and(|assertion| {
+         reference_covers_node(references, assertion)
+             || (assertion == root && whole_document_covered)
+@@ -613,7 +622,13 @@
+ 
+     super::provider::ensure_crypto_provider_initialized()?;
+ 
+-    let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
++    let document = document::parse(xml, limits)?;
++    document::bind_extraction(
++        xml,
++        root,
++        &document,
++        XmlSignatureProfile::AllowProviderSupportedForCompatibility,
++    )?;
+     preflight_backend_references(
+         &document,
+         XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+@@ -753,7 +768,8 @@
+     let mut targets = Vec::new();
+     // Reuse this exact verifier DOM for every pinned certificate attempt and
+     // for evidence extraction from each successful signature node.
+-    let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
++    let document = document::parse(xml, limits)?;
++    let selected_assertion = document::bind_extraction(xml, root, &document, signature_profile)?;
+     preflight_backend_references(&document, signature_profile)?;
+     let mut verified_signature_nodes = HashSet::new();
+     let mut verified_embedded_signatures = Vec::new();
+@@ -792,6 +808,7 @@
+                                     signature_node,
+                                     &references,
+                                     &signature_targets,
++                                    selected_assertion,
+                                 )?;
+                                 // SSO evidence does not include LogoutRequest or
+                                 // LogoutResponse coverage. A protocol Response can
+diff --git a/src/crypto/verify/document.rs b/src/crypto/verify/document.rs
+new file mode 100644
+--- /dev/null
++++ b/src/crypto/verify/document.rs
+@@ -0,0 +1,189 @@
++//! Bind extraction to the verifier's parsed source without serializing XML.
++use super::selected_assertion;
++use crate::{
++    config::XmlSignatureProfile,
++    error::SamlError,
++    xml::dom::{Node, XmlLimits},
++};
++use bergshamra::xml::{uppsala, Document, NodeId};
++use quick_xml::{
++    events::{attributes::Attribute, BytesStart, Event},
++    name::{QName, ResolveResult},
++    NsReader, XmlVersion,
++};
++use std::borrow::Cow;
++
++pub(super) fn parse(xml: &str, limits: XmlLimits) -> Result<Document<'_>, SamlError> {
++    // Enforce the existing no-DTD policy independently in the backend parser.
++    // Never raise its established depth ceiling when local limits are larger.
++    let depth = limits
++        .max_depth
++        .min(uppsala::parser::DEFAULT_MAX_DEPTH as usize) as u32;
++    uppsala::Parser::new()
++        .with_forbid_dtd(true)
++        .with_forbid_entities(true)
++        .with_max_depth(depth)
++        .parse(xml)
++        .map_err(|_| mismatch())
++}
++
++fn mismatch() -> SamlError {
++    SamlError::SignedReferenceMismatch
++}
++
++fn same_namespace(resolved: ResolveResult<'_>, expected: Option<&str>) -> bool {
++    match resolved {
++        ResolveResult::Unbound => expected.unwrap_or_default().is_empty(),
++        ResolveResult::Bound(namespace) => {
++            // NsReader exposes the raw namespace-binding value. Normalize it
++            // as an XML attribute before comparing the backend's resolved URI.
++            let binding = Attribute {
++                key: QName("xmlns"),
++                value: Cow::Borrowed(namespace.as_ref()),
++            };
++            binding
++                .normalized_value(XmlVersion::Implicit1_0)
++                .is_ok_and(|value| value.as_ref() == expected.unwrap_or_default())
++        }
++        ResolveResult::Unknown(_) => false,
++    }
++}
++
++fn attributes_agree(
++    reader: &NsReader<&[u8]>,
++    start: &BytesStart<'_>,
++    element: &uppsala::Element<'_>,
++) -> Result<(), SamlError> {
++    let mut expected = element.attributes.iter();
++    for attribute in start.attributes() {
++        let attribute = attribute.map_err(|_| mismatch())?;
++        if attribute.key.as_namespace_binding().is_some() {
++            continue;
++        }
++        let expected = expected.next().ok_or_else(mismatch)?;
++        let (namespace, local) = reader.resolver().resolve_attribute(attribute.key);
++        if local.into_inner() != expected.name.local_name.as_ref()
++            || !same_namespace(namespace, expected.name.namespace_uri.as_deref())
++        {
++            return Err(mismatch());
++        }
++    }
++    if expected.next().is_some() {
++        return Err(mismatch());
++    }
++    Ok(())
++}
++
++fn namespaces_agree(
++    xml: &str,
++    document: &Document<'_>,
++    profile: XmlSignatureProfile,
++) -> Result<(), SamlError> {
++    let mut reader = NsReader::from_str(xml);
++    let mut elements = document
++        .descendants(document.root())
++        .into_iter()
++        .filter_map(|id| document.element(id));
++    loop {
++        let (namespace, event) = reader.read_resolved_event().map_err(|_| mismatch())?;
++        match event {
++            Event::Start(start) | Event::Empty(start) => {
++                let expected = elements.next().ok_or_else(mismatch)?;
++                if start.local_name().into_inner() != expected.name.local_name.as_ref()
++                    || !same_namespace(namespace, expected.name.namespace_uri.as_deref())
++                {
++                    return Err(mismatch());
++                }
++                attributes_agree(&reader, &start, expected)?;
++            }
++            Event::Decl(declaration)
++                if profile != XmlSignatureProfile::AllowProviderSupportedForCompatibility =>
++            {
++                if declaration.version().map_err(|_| mismatch())?.as_ref() != "1.0" {
++                    return Err(mismatch());
++                }
++            }
++            Event::Eof => break,
++            _ => {}
++        }
++    }
++    if elements.next().is_some() {
++        return Err(mismatch());
++    }
++    Ok(())
++}
++
++fn direct_text_agrees(local: &Node, document: &Document<'_>, id: NodeId) -> bool {
++    let mut remaining = local.text.as_str();
++    for child in document.children_iter(id) {
++        if let Some(uppsala::NodeKind::Text(text) | uppsala::NodeKind::CData(text)) =
++            document.node_kind(child)
++        {
++            let Some(rest) = remaining.strip_prefix(text.as_ref()) else {
++                return false;
++            };
++            remaining = rest;
++        }
++    }
++    remaining.is_empty()
++}
++
++fn check_node(
++    local: &Node,
++    document: &Document<'_>,
++    id: NodeId,
++) -> Result<std::ops::Range<usize>, SamlError> {
++    let element = document.element(id).ok_or_else(mismatch)?;
++    let range = document.node_range(id).ok_or_else(mismatch)?;
++    let attributes = element
++        .attributes
++        .iter()
++        .map(|a| (a.name.local_name.as_ref(), a.value.as_ref()));
++    if range != (local.start..local.end)
++        || element.name.local_name.as_ref() != local.local_name
++        || !local
++            .attrs
++            .iter()
++            .map(|(name, value)| (name.as_str(), value.as_str()))
++            .eq(attributes)
++        || !direct_text_agrees(local, document, id)
++    {
++        return Err(mismatch());
++    }
++    Ok(range)
++}
++
++/// Every local extraction value and element boundary must agree with the exact
++/// backend DOM. Expanded names are independently compared using NsReader.
++/// Returned identity names the actually selected source Assertion, not the first
++/// Assertion or a string-ID approximation. This is not canonicalization evidence.
++pub(super) fn bind_extraction(
++    xml: &str,
++    local: &Node,
++    document: &Document<'_>,
++    profile: XmlSignatureProfile,
++) -> Result<Option<NodeId>, SamlError> {
++    namespaces_agree(xml, document, profile)?;
++    let selected = selected_assertion(local).map(|node| node.start..node.end);
++    let root = document.document_element().ok_or_else(mismatch)?;
++    let mut pending = vec![(local, root)];
++    let mut selected_id = None;
++    while let Some((local, id)) = pending.pop() {
++        let range = check_node(local, document, id)?;
++        if selected.as_ref() == Some(&range) {
++            selected_id = Some(id);
++        }
++        let children: Vec<_> = document
++            .children_iter(id)
++            .filter(|child| document.element(*child).is_some())
++            .collect();
++        if local.children.len() != children.len() {
++            return Err(mismatch());
++        }
++        pending.extend(local.children.iter().zip(children));
++    }
++    if selected.is_some() && selected_id.is_none() {
++        return Err(mismatch());
++    }
++    Ok(selected_id)
++}
+diff --git a/src/crypto/verify/profile.rs b/src/crypto/verify/profile.rs
+--- a/src/crypto/verify/profile.rs
++++ b/src/crypto/verify/profile.rs
+@@ -31,13 +31,64 @@
+     children.next().is_none().then_some(only)
+ }
+ 
++/// Backend attribute lookup is local-name based. Strict policy rejects aliases
++/// before accepting a value so a qualified attribute cannot win its selection.
++pub(super) fn unqualified_attribute<'a>(
++    document: &'a BergshamraDocument<'_>,
++    node: BergshamraNodeId,
++    name: &str,
++) -> Result<Option<&'a str>, SamlError> {
++    let element = document
++        .element(node)
++        .ok_or(SamlError::SignedReferenceMismatch)?;
++    let mut value = None;
++    for attribute in &element.attributes {
++        if attribute.name.local_name.as_ref() != name {
++            continue;
++        }
++        if value.is_some()
++            || attribute.name.prefix.is_some()
++            || attribute
++                .name
++                .namespace_uri
++                .as_deref()
++                .is_some_and(|ns| !ns.is_empty())
++        {
++            return Err(SamlError::SignedReferenceMismatch);
++        }
++        value = Some(attribute.value.as_ref());
++    }
++    Ok(value)
++}
++
++/// The backend reads this C14N parameter by local name. Keep its namespace,
++/// cardinality and selector attribute unambiguous in strict execution.
++pub(super) fn inclusive_namespace_parameters(
++    document: &BergshamraDocument<'_>,
++    parent: BergshamraNodeId,
++) -> Result<(), SamlError> {
++    let mut seen = false;
++    for child in document.children_iter(parent) {
++        let Some(element) = document.element(child) else {
++            continue;
++        };
++        if element.name.local_name.as_ref() != "InclusiveNamespaces" {
++            continue;
++        }
++        if seen || !element.matches_name_ns(transform_algorithm::EXC_C14N, "InclusiveNamespaces") {
++            return Err(SamlError::SignedReferenceMismatch);
++        }
++        seen = true;
++        unqualified_attribute(document, child, "PrefixList")?;
++    }
++    Ok(())
++}
++
+ fn dsig_algorithm<'a>(
+     document: &'a BergshamraDocument<'_>,
+     node: BergshamraNodeId,
+-) -> Option<&'a str> {
+-    document
+-        .element(node)
+-        .and_then(|element| element.get_attribute(bergshamra_ns::attr::ALGORITHM))
++) -> Result<Option<&'a str>, SamlError> {
++    unqualified_attribute(document, node, bergshamra_ns::attr::ALGORITHM)
+ }
+ 
+ /// Check one verifier-accepted signature against the strict RSA-SHA2 profile.
+@@ -59,14 +110,15 @@
+         bergshamra_ns::node::CANONICALIZATION_METHOD,
+     )
+     .ok_or(SamlError::AlgorithmUnsupported)?;
+-    if dsig_algorithm(document, canonicalization) != Some(transform_algorithm::EXC_C14N) {
++    if dsig_algorithm(document, canonicalization)? != Some(transform_algorithm::EXC_C14N) {
+         return Err(SamlError::AlgorithmUnsupported);
+     }
++    inclusive_namespace_parameters(document, canonicalization)?;
+     let signature_method =
+         exactly_one_dsig_child(document, signed_info, bergshamra_ns::node::SIGNATURE_METHOD)
+             .ok_or(SamlError::AlgorithmUnsupported)?;
+     if !matches!(
+-        dsig_algorithm(document, signature_method),
++        dsig_algorithm(document, signature_method)?,
+         Some(
+             crate::constants::signature_algorithm::RSA_SHA256
+                 | crate::constants::signature_algorithm::RSA_SHA384
+@@ -77,10 +129,7 @@
+     }
+     let reference = exactly_one_dsig_child(document, signed_info, bergshamra_ns::node::REFERENCE)
+         .ok_or(SamlError::SignedReferenceMismatch)?;
+-    let Some(uri) = document
+-        .element(reference)
+-        .and_then(|element| element.get_attribute(bergshamra_ns::attr::URI))
+-    else {
++    let Some(uri) = unqualified_attribute(document, reference, bergshamra_ns::attr::URI)? else {
+         return Err(reference_resolution(
+             ReferenceResolutionReason::UnsupportedReferenceUri,
+         ));
+@@ -96,7 +145,7 @@
+         exactly_one_dsig_child(document, reference, bergshamra_ns::node::DIGEST_METHOD)
+             .ok_or(SamlError::AlgorithmUnsupported)?;
+     if !matches!(
+-        dsig_algorithm(document, digest_method),
++        dsig_algorithm(document, digest_method)?,
+         Some(
+             crate::constants::digest_algorithm::SHA256
+                 | crate::constants::digest_algorithm::SHA384
+@@ -108,8 +157,8 @@
+     // Evaluate the exact verified Signature/SignedInfo in the verifier DOM.
+     // No unsigned-node scan or parse/serialize bridge supplies policy evidence.
+     if profile == XmlSignatureProfile::StrictRsaSha256
+-        && (dsig_algorithm(document, signature_method) != Some(signature_algorithm::RSA_SHA256)
+-            || dsig_algorithm(document, digest_method) != Some(digest_algorithm::SHA256))
++        && (dsig_algorithm(document, signature_method)? != Some(signature_algorithm::RSA_SHA256)
++            || dsig_algorithm(document, digest_method)? != Some(digest_algorithm::SHA256))
+     {
+         return Err(SamlError::AlgorithmUnsupported);
+     }
+@@ -132,12 +181,13 @@
+             };
+             if !element.matches_name_ns(bergshamra_ns::DSIG, bergshamra_ns::node::TRANSFORM)
+                 || !matches!(
+-                    element.get_attribute(bergshamra_ns::attr::ALGORITHM),
++                    unqualified_attribute(document, child, bergshamra_ns::attr::ALGORITHM)?,
+                     Some(transform_algorithm::ENVELOPED_SIGNATURE | transform_algorithm::EXC_C14N)
+                 )
+             {
+                 return Err(SamlError::AlgorithmUnsupported);
+             }
++            inclusive_namespace_parameters(document, child)?;
+         }
+     }
+     Ok(())
+diff --git a/src/crypto/verify/execution.rs b/src/crypto/verify/execution.rs
+--- a/src/crypto/verify/execution.rs
++++ b/src/crypto/verify/execution.rs
+@@ -3,7 +3,10 @@
+ //! This is an execution boundary, not evidence that a signature authenticated
+ //! SAML content. Acceptance still checks the exact verified signature separately.
+ use super::{
+-    profile::{dsig_children, enforce_reference_transforms},
++    profile::{
++        dsig_children, enforce_reference_transforms, inclusive_namespace_parameters,
++        unqualified_attribute,
++    },
+     verified_target_from_uri,
+ };
+ use crate::{config::XmlSignatureProfile, error::SamlError};
+@@ -25,26 +28,50 @@
+         {
+             continue;
+         }
+-        // Check all direct SignedInfo/Transforms containers, a superset of the
+-        // backend's first-container selection. Missing structure still fails in
+-        // the backend; duplicate structure cannot hide an executable reference.
+         for signed_info in dsig_children(document, signature, ns::node::SIGNED_INFO) {
+-            for reference in dsig_children(document, signed_info, ns::node::REFERENCE) {
+-                let uri = document
+-                    .element(reference)
+-                    .and_then(|element| element.get_attribute(ns::attr::URI))
+-                    .unwrap_or_default();
+-                // In particular, reject relative paths before the backend's
+-                // resolver can fall back to reading from its working directory.
+-                verified_target_from_uri(uri)?;
+-                // The explicitly selected compatibility API retains its
+-                // provider-supported transforms. Production uses the exact
+-                // strict profile and never selects that compatibility mode.
+-                if profile != XmlSignatureProfile::AllowProviderSupportedForCompatibility {
+-                    enforce_reference_transforms(document, reference)?;
++            preflight_signed_info(document, signed_info, profile)?;
++        }
++    }
++    Ok(())
++}
++
++fn preflight_signed_info(
++    document: &Document<'_>,
++    signed_info: bergshamra::xml::NodeId,
++    profile: XmlSignatureProfile,
++) -> Result<(), SamlError> {
++    let strict = profile != XmlSignatureProfile::AllowProviderSupportedForCompatibility;
++    // Scan all direct containers, a superset of the backend's first selection.
++    if strict {
++        for kind in [
++            ns::node::CANONICALIZATION_METHOD,
++            ns::node::SIGNATURE_METHOD,
++        ] {
++            for method in dsig_children(document, signed_info, kind) {
++                unqualified_attribute(document, method, ns::attr::ALGORITHM)?;
++                if kind == ns::node::CANONICALIZATION_METHOD {
++                    inclusive_namespace_parameters(document, method)?;
+                 }
+             }
+         }
+     }
++    for reference in dsig_children(document, signed_info, ns::node::REFERENCE) {
++        let uri = if strict {
++            unqualified_attribute(document, reference, ns::attr::URI)?
++        } else {
++            document
++                .element(reference)
++                .and_then(|element| element.get_attribute(ns::attr::URI))
++        }
++        .unwrap_or_default();
++        // Reject paths before the resolver can use its working-directory fallback.
++        verified_target_from_uri(uri)?;
++        if strict {
++            for digest in dsig_children(document, reference, ns::node::DIGEST_METHOD) {
++                unqualified_attribute(document, digest, ns::attr::ALGORITHM)?;
++            }
++            enforce_reference_transforms(document, reference)?;
++        }
++    }
+     Ok(())
+ }
+diff --git a/src/xml/dom.rs b/src/xml/dom.rs
+--- a/src/xml/dom.rs
++++ b/src/xml/dom.rs
+@@ -159,8 +159,8 @@
+     limits: XmlLimits,
+ ) -> Result<Vec<(String, String)>, SamlError> {
+     let mut out = Vec::new();
+-    for attr in e.attributes() {
+-        if out.len() >= limits.max_attributes_per_element {
++    for (index, attr) in e.attributes().enumerate() {
++        if index >= limits.max_attributes_per_element {
+             return Err(limit_exceeded(
+                 "max XML attributes per element",
+                 limits.max_attributes_per_element,
+@@ -178,7 +178,12 @@
+                 limits.max_attribute_value_bytes,
+             ));
+         }
+-        out.push((key, value));
++        // Namespace declarations affect name resolution, not attribute values.
++        // Count and bound them above, but never expose a binding as an ID,
++        // Format, Name or other local-name field to the extractor.
++        if attr.key.as_namespace_binding().is_none() {
++            out.push((key, value));
++        }
+     }
+     Ok(out)
+ }
+@@ -317,14 +322,14 @@
+             }
+             Event::Text(e) => {
+                 if let Some(top) = stack.last_mut() {
+-                    checked_append_text(&mut top.text, e.as_ref(), limits)?;
++                    checked_append_text(&mut top.text, &e.xml10_content(), limits)?;
+                 } else if !is_xml_whitespace(e.as_ref()) {
+                     reject_non_document_content(mode)?;
+                 }
+             }
+             Event::CData(e) => {
+                 if let Some(top) = stack.last_mut() {
+-                    checked_append_text(&mut top.text, e.as_ref(), limits)?;
++                    checked_append_text(&mut top.text, &e.xml10_content(), limits)?;
+                 } else {
+                     reject_non_document_content(mode)?;
+                 }

@@ -31,13 +31,64 @@ fn exactly_one_dsig_child(
     children.next().is_none().then_some(only)
 }
 
+/// Backend attribute lookup is local-name based. Strict policy rejects aliases
+/// before accepting a value so a qualified attribute cannot win its selection.
+pub(super) fn unqualified_attribute<'a>(
+    document: &'a BergshamraDocument<'_>,
+    node: BergshamraNodeId,
+    name: &str,
+) -> Result<Option<&'a str>, SamlError> {
+    let element = document
+        .element(node)
+        .ok_or(SamlError::SignedReferenceMismatch)?;
+    let mut value = None;
+    for attribute in &element.attributes {
+        if attribute.name.local_name.as_ref() != name {
+            continue;
+        }
+        if value.is_some()
+            || attribute.name.prefix.is_some()
+            || attribute
+                .name
+                .namespace_uri
+                .as_deref()
+                .is_some_and(|ns| !ns.is_empty())
+        {
+            return Err(SamlError::SignedReferenceMismatch);
+        }
+        value = Some(attribute.value.as_ref());
+    }
+    Ok(value)
+}
+
+/// The backend reads this C14N parameter by local name. Keep its namespace,
+/// cardinality and selector attribute unambiguous in strict execution.
+pub(super) fn inclusive_namespace_parameters(
+    document: &BergshamraDocument<'_>,
+    parent: BergshamraNodeId,
+) -> Result<(), SamlError> {
+    let mut seen = false;
+    for child in document.children_iter(parent) {
+        let Some(element) = document.element(child) else {
+            continue;
+        };
+        if element.name.local_name.as_ref() != "InclusiveNamespaces" {
+            continue;
+        }
+        if seen || !element.matches_name_ns(transform_algorithm::EXC_C14N, "InclusiveNamespaces") {
+            return Err(SamlError::SignedReferenceMismatch);
+        }
+        seen = true;
+        unqualified_attribute(document, child, "PrefixList")?;
+    }
+    Ok(())
+}
+
 fn dsig_algorithm<'a>(
     document: &'a BergshamraDocument<'_>,
     node: BergshamraNodeId,
-) -> Option<&'a str> {
-    document
-        .element(node)
-        .and_then(|element| element.get_attribute(bergshamra_ns::attr::ALGORITHM))
+) -> Result<Option<&'a str>, SamlError> {
+    unqualified_attribute(document, node, bergshamra_ns::attr::ALGORITHM)
 }
 
 /// Check one verifier-accepted signature against the strict RSA-SHA2 profile.
@@ -59,14 +110,15 @@ pub(super) fn enforce_strict_profile_on_verified_signature(
         bergshamra_ns::node::CANONICALIZATION_METHOD,
     )
     .ok_or(SamlError::AlgorithmUnsupported)?;
-    if dsig_algorithm(document, canonicalization) != Some(transform_algorithm::EXC_C14N) {
+    if dsig_algorithm(document, canonicalization)? != Some(transform_algorithm::EXC_C14N) {
         return Err(SamlError::AlgorithmUnsupported);
     }
+    inclusive_namespace_parameters(document, canonicalization)?;
     let signature_method =
         exactly_one_dsig_child(document, signed_info, bergshamra_ns::node::SIGNATURE_METHOD)
             .ok_or(SamlError::AlgorithmUnsupported)?;
     if !matches!(
-        dsig_algorithm(document, signature_method),
+        dsig_algorithm(document, signature_method)?,
         Some(
             crate::constants::signature_algorithm::RSA_SHA256
                 | crate::constants::signature_algorithm::RSA_SHA384
@@ -77,10 +129,7 @@ pub(super) fn enforce_strict_profile_on_verified_signature(
     }
     let reference = exactly_one_dsig_child(document, signed_info, bergshamra_ns::node::REFERENCE)
         .ok_or(SamlError::SignedReferenceMismatch)?;
-    let Some(uri) = document
-        .element(reference)
-        .and_then(|element| element.get_attribute(bergshamra_ns::attr::URI))
-    else {
+    let Some(uri) = unqualified_attribute(document, reference, bergshamra_ns::attr::URI)? else {
         return Err(reference_resolution(
             ReferenceResolutionReason::UnsupportedReferenceUri,
         ));
@@ -96,7 +145,7 @@ pub(super) fn enforce_strict_profile_on_verified_signature(
         exactly_one_dsig_child(document, reference, bergshamra_ns::node::DIGEST_METHOD)
             .ok_or(SamlError::AlgorithmUnsupported)?;
     if !matches!(
-        dsig_algorithm(document, digest_method),
+        dsig_algorithm(document, digest_method)?,
         Some(
             crate::constants::digest_algorithm::SHA256
                 | crate::constants::digest_algorithm::SHA384
@@ -108,8 +157,8 @@ pub(super) fn enforce_strict_profile_on_verified_signature(
     // Evaluate the exact verified Signature/SignedInfo in the verifier DOM.
     // No unsigned-node scan or parse/serialize bridge supplies policy evidence.
     if profile == XmlSignatureProfile::StrictRsaSha256
-        && (dsig_algorithm(document, signature_method) != Some(signature_algorithm::RSA_SHA256)
-            || dsig_algorithm(document, digest_method) != Some(digest_algorithm::SHA256))
+        && (dsig_algorithm(document, signature_method)? != Some(signature_algorithm::RSA_SHA256)
+            || dsig_algorithm(document, digest_method)? != Some(digest_algorithm::SHA256))
     {
         return Err(SamlError::AlgorithmUnsupported);
     }
@@ -132,12 +181,13 @@ pub(super) fn enforce_reference_transforms(
             };
             if !element.matches_name_ns(bergshamra_ns::DSIG, bergshamra_ns::node::TRANSFORM)
                 || !matches!(
-                    element.get_attribute(bergshamra_ns::attr::ALGORITHM),
+                    unqualified_attribute(document, child, bergshamra_ns::attr::ALGORITHM)?,
                     Some(transform_algorithm::ENVELOPED_SIGNATURE | transform_algorithm::EXC_C14N)
                 )
             {
                 return Err(SamlError::AlgorithmUnsupported);
             }
+            inclusive_namespace_parameters(document, child)?;
         }
     }
     Ok(())

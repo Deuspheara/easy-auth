@@ -159,8 +159,8 @@ fn read_attrs(
     limits: XmlLimits,
 ) -> Result<Vec<(String, String)>, SamlError> {
     let mut out = Vec::new();
-    for attr in e.attributes() {
-        if out.len() >= limits.max_attributes_per_element {
+    for (index, attr) in e.attributes().enumerate() {
+        if index >= limits.max_attributes_per_element {
             return Err(limit_exceeded(
                 "max XML attributes per element",
                 limits.max_attributes_per_element,
@@ -178,7 +178,12 @@ fn read_attrs(
                 limits.max_attribute_value_bytes,
             ));
         }
-        out.push((key, value));
+        // Namespace declarations affect name resolution, not attribute values.
+        // Count and bound them above, but never expose a binding as an ID,
+        // Format, Name or other local-name field to the extractor.
+        if attr.key.as_namespace_binding().is_none() {
+            out.push((key, value));
+        }
     }
     Ok(out)
 }
@@ -317,14 +322,14 @@ fn parse_roots_inner(
             }
             Event::Text(e) => {
                 if let Some(top) = stack.last_mut() {
-                    checked_append_text(&mut top.text, e.as_ref(), limits)?;
+                    checked_append_text(&mut top.text, &e.xml10_content(), limits)?;
                 } else if !is_xml_whitespace(e.as_ref()) {
                     reject_non_document_content(mode)?;
                 }
             }
             Event::CData(e) => {
                 if let Some(top) = stack.last_mut() {
-                    checked_append_text(&mut top.text, e.as_ref(), limits)?;
+                    checked_append_text(&mut top.text, &e.xml10_content(), limits)?;
                 } else {
                     reject_non_document_content(mode)?;
                 }

@@ -955,3 +955,15 @@ The facade remains a documented upstream size exception, not a place for another
 responsibility. Core verifier capacity sharing checks identical registration;
 Axum composition joins admission without replacing either repository or proof
 policy. No new dependency, global registry or generic admission framework is added.
+
+AUTH-32's parser/native follow-up owns parsed-view/range/namespace agreement in a
+private maintained `crypto/verify/document.rs` module. The existing upstream DOM
+and verification facade retain minimal propagation/correction deltas for an exact
+incremental patch, a deliberate upstream size exception. Core process admission
+has a focused private `verification/admission.rs`; the longer async flow keeps
+admission/material/clock/closure ownership and cancellation boundaries visible.
+The C14N qualifier reuses existing graph/report/staging logic. Its longer ordered
+orchestration keeps source identity, selected graph/package, test invocation and
+post-test freeze checks together for review. All new modules stay under300lines;
+full graph receipts are deliberate generated-evidence size exceptions. No generic
+resource framework, protocol policy copy, new runtime dependency or proof API.

@@ -67,6 +67,7 @@ impl SamlResponseVerifier {
             .clone()
             .try_acquire_owned()
             .map_err(|_| Error::RateLimited)?;
+        let process_permit = super::admission::acquire(VERIFY_TIMEOUT).await?;
         let material = tokio::time::timeout(
             VERIFY_TIMEOUT,
             self.repository
@@ -83,7 +84,7 @@ impl SamlResponseVerifier {
         // Timeout cannot abort native crypto. The blocking worker retains the
         // permit until it actually exits, including after caller cancellation.
         let worker = tokio::task::spawn_blocking(move || {
-            let _permit = permit;
+            let _permits = (permit, process_permit);
             verify(prepared, input, material)
         });
         tokio::time::timeout(VERIFY_TIMEOUT, worker)

@@ -42,7 +42,7 @@ then `git apply`, and run:
 cargo package --locked --allow-dirty --no-verify --no-default-features --features crypto-aws-lc
 ```
 
-After unpacking that original import archive, apply maintenance patches 0004/0005/0006/0007/0008 in order with
+After unpacking that original import archive, apply maintenance patches 0004/0005/0006/0007/0008/0009 in order with
 `git apply --check` then `git apply` from the package root. Patch0004 preserves typed
 NameID qualifiers through the built-in IdP response renderer; it changes no
 cryptographic verifier. Qualified successful responses refuse legacy custom
@@ -75,3 +75,13 @@ inherited merely from a passing test run.
 Easy-auth maintainers own the retained patch set and source distribution under
 ADR 0027. Normal SAML provider/ACS activation still requires the separately recorded
 security review and approval. See the [current evidence review](../docs/security/saml-evidence-review.md).
+
+Patch0009 corrects namespace-binding/text interpretation and binds extraction to
+all verifier-DOM ranges, values, expanded names and selected-Assertion identity.
+Backend DTD/entity flags and strict XML1.0 are explicit. Strict DSig selectors and
+InclusiveNamespaces parameters reject qualified/ambiguous aliases. This adds no custom
+canonicalizer/verifier. ADR0030 records compatibility and remaining assurance.
+Run `python3 scripts/qualify_saml_c14n.py` to additionally run the unchanged32
+selected-version canonicalization tests with the existing SAML/core suite on an
+identical normal/build graph. Only a verified archive copy in a disposable
+workspace is patched into that test graph; runtime dependencies remain unchanged.

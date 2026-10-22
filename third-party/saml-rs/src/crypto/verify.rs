@@ -10,6 +10,7 @@
 //!   `SubjectConfirmationData`.
 //! - Only content covered by a verified reference is returned for extraction.
 
+mod document;
 mod execution;
 mod profile;
 use execution::preflight_backend_references;
@@ -23,7 +24,9 @@ use crate::util::normalize_cert_string;
 use crate::xml::dom::{self, Node, XmlLimits};
 use bergshamra::core::ns as bergshamra_ns;
 use bergshamra::dsig::verify::{verify_all_document_with_source, verify_document_with_source};
-use bergshamra::xml::{uppsala, Document as BergshamraDocument, NodeId as BergshamraNodeId};
+#[cfg(test)]
+use bergshamra::xml::uppsala;
+use bergshamra::xml::{Document as BergshamraDocument, NodeId as BergshamraNodeId};
 use bergshamra::{DsigContext, KeysManager, VerifiedReference, VerifyResult};
 use std::collections::HashSet;
 
@@ -268,6 +271,21 @@ fn response_assertions_covered(root: &Node, targets: &[VerifiedTarget]) -> bool 
                 .all(|assertion| id_target_matches_node(targets, assertion)))
 }
 
+fn selected_assertion(root: &Node) -> Option<&Node> {
+    if root.local_name == "Assertion" {
+        return Some(root);
+    }
+    if !root.local_name.contains("Response") {
+        return None;
+    }
+    let assertions = children_named(root, "Assertion");
+    assertions
+        .iter()
+        .find(|node| assertion_has_bearer_confirmation(node))
+        .copied()
+        .or_else(|| assertions.first().copied())
+}
+
 /// Return the source of the content covered by a verified reference: the first
 /// bearer `<Assertion>`, a consumed root element, or the whole `<Response>`
 /// when assertions are encrypted.
@@ -288,11 +306,7 @@ fn verified_content(
                 }
                 return Err(verified_content_not_covered());
             }
-            let chosen = assertions
-                .iter()
-                .find(|assertion| assertion_has_bearer_confirmation(assertion))
-                .copied()
-                .unwrap_or(assertions[0]);
+            let chosen = selected_assertion(root).ok_or_else(verified_content_not_covered)?;
             return Ok(Some(xml[chosen.start..chosen.end].to_string()));
         }
         if has_child(root, "EncryptedAssertion") {
@@ -462,6 +476,7 @@ fn verified_embedded_signature(
     signature_node: BergshamraNodeId,
     references: &[VerifiedReference],
     targets: &[VerifiedTarget],
+    assertion_node: Option<BergshamraNodeId>,
 ) -> Result<Option<VerifiedEmbeddedSignature>, SamlError> {
     let Some(root) = document.document_element() else {
         return Ok(None);
@@ -476,19 +491,13 @@ fn verified_embedded_signature(
     let response_covered = root_element
         .matches_name_ns(crate::constants::namespace::PROTOCOL, "Response")
         && (whole_document_covered || reference_covers_node(references, root));
-    let assertion_node =
-        if root_element.matches_name_ns(crate::constants::namespace::ASSERTION, "Assertion") {
-            Some(root)
-        } else if root_element.matches_name_ns(crate::constants::namespace::PROTOCOL, "Response") {
-            bergshamra_child_element(
-                document,
-                root,
-                crate::constants::namespace::ASSERTION,
-                "Assertion",
-            )
-        } else {
-            None
-        };
+    let assertion_node = assertion_node.filter(|node| {
+        (root_element.matches_name_ns(crate::constants::namespace::PROTOCOL, "Response")
+            || root_element.matches_name_ns(crate::constants::namespace::ASSERTION, "Assertion"))
+            && document.element(*node).is_some_and(|element| {
+                element.matches_name_ns(crate::constants::namespace::ASSERTION, "Assertion")
+            })
+    });
     let assertion_directly_covered = assertion_node.is_some_and(|assertion| {
         reference_covers_node(references, assertion)
             || (assertion == root && whole_document_covered)
@@ -613,7 +622,13 @@ pub fn verify_signature_with_limits(
 
     super::provider::ensure_crypto_provider_initialized()?;
 
-    let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
+    let document = document::parse(xml, limits)?;
+    document::bind_extraction(
+        xml,
+        root,
+        &document,
+        XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+    )?;
     preflight_backend_references(
         &document,
         XmlSignatureProfile::AllowProviderSupportedForCompatibility,
@@ -753,7 +768,8 @@ pub(crate) fn verify_signatures_detailed_with_profile(
     let mut targets = Vec::new();
     // Reuse this exact verifier DOM for every pinned certificate attempt and
     // for evidence extraction from each successful signature node.
-    let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
+    let document = document::parse(xml, limits)?;
+    let selected_assertion = document::bind_extraction(xml, root, &document, signature_profile)?;
     preflight_backend_references(&document, signature_profile)?;
     let mut verified_signature_nodes = HashSet::new();
     let mut verified_embedded_signatures = Vec::new();
@@ -792,6 +808,7 @@ pub(crate) fn verify_signatures_detailed_with_profile(
                                     signature_node,
                                     &references,
                                     &signature_targets,
+                                    selected_assertion,
                                 )?;
                                 // SSO evidence does not include LogoutRequest or
                                 // LogoutResponse coverage. A protocol Response can

@@ -3,7 +3,10 @@
 //! This is an execution boundary, not evidence that a signature authenticated
 //! SAML content. Acceptance still checks the exact verified signature separately.
 use super::{
-    profile::{dsig_children, enforce_reference_transforms},
+    profile::{
+        dsig_children, enforce_reference_transforms, inclusive_namespace_parameters,
+        unqualified_attribute,
+    },
     verified_target_from_uri,
 };
 use crate::{config::XmlSignatureProfile, error::SamlError};
@@ -25,25 +28,49 @@ pub(super) fn preflight_backend_references(
         {
             continue;
         }
-        // Check all direct SignedInfo/Transforms containers, a superset of the
-        // backend's first-container selection. Missing structure still fails in
-        // the backend; duplicate structure cannot hide an executable reference.
         for signed_info in dsig_children(document, signature, ns::node::SIGNED_INFO) {
-            for reference in dsig_children(document, signed_info, ns::node::REFERENCE) {
-                let uri = document
-                    .element(reference)
-                    .and_then(|element| element.get_attribute(ns::attr::URI))
-                    .unwrap_or_default();
-                // In particular, reject relative paths before the backend's
-                // resolver can fall back to reading from its working directory.
-                verified_target_from_uri(uri)?;
-                // The explicitly selected compatibility API retains its
-                // provider-supported transforms. Production uses the exact
-                // strict profile and never selects that compatibility mode.
-                if profile != XmlSignatureProfile::AllowProviderSupportedForCompatibility {
-                    enforce_reference_transforms(document, reference)?;
+            preflight_signed_info(document, signed_info, profile)?;
+        }
+    }
+    Ok(())
+}
+
+fn preflight_signed_info(
+    document: &Document<'_>,
+    signed_info: bergshamra::xml::NodeId,
+    profile: XmlSignatureProfile,
+) -> Result<(), SamlError> {
+    let strict = profile != XmlSignatureProfile::AllowProviderSupportedForCompatibility;
+    // Scan all direct containers, a superset of the backend's first selection.
+    if strict {
+        for kind in [
+            ns::node::CANONICALIZATION_METHOD,
+            ns::node::SIGNATURE_METHOD,
+        ] {
+            for method in dsig_children(document, signed_info, kind) {
+                unqualified_attribute(document, method, ns::attr::ALGORITHM)?;
+                if kind == ns::node::CANONICALIZATION_METHOD {
+                    inclusive_namespace_parameters(document, method)?;
                 }
             }
+        }
+    }
+    for reference in dsig_children(document, signed_info, ns::node::REFERENCE) {
+        let uri = if strict {
+            unqualified_attribute(document, reference, ns::attr::URI)?
+        } else {
+            document
+                .element(reference)
+                .and_then(|element| element.get_attribute(ns::attr::URI))
+        }
+        .unwrap_or_default();
+        // Reject paths before the resolver can use its working-directory fallback.
+        verified_target_from_uri(uri)?;
+        if strict {
+            for digest in dsig_children(document, reference, ns::node::DIGEST_METHOD) {
+                unqualified_attribute(document, digest, ns::attr::ALGORITHM)?;
+            }
+            enforce_reference_transforms(document, reference)?;
         }
     }
     Ok(())
