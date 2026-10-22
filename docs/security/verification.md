@@ -4889,3 +4889,16 @@ the recorded Keycloak26.8.1/Chromium profile. It is not rejection of a newly iss
 deletion response containing authentication older than five minutes, qualified
 NameID/attribute approval, other-provider interoperability, comprehensive XML/
 backend review or independent audit. AUTH-32/35 remain open; SAML stays disabled.
+
+## CI dependency/tool cache preparation (AUTH-58)
+
+The workflow adds push-only, immutable-environment/dependency-keyed caches for
+public dependencies and a separate tool install root. Workspace package outputs
+are pruned only after all existing checks pass. Both normal security-tool installers
+and all source/secret/advisory/license/tests remain; job permissions and the secret
+job are unchanged. [CI guide](../guides/ci.md) records the exact action pin, paths,
+inputs,199-second observed tool-install baseline and exclusions. Local YAML/embedded
+Python/bash checks, full previous-step sequence comparison, key-segregation and
+cold-fallback checks pass. This is workflow-only; Rust/source/DB baselines retain
+their exact original commit scope. Cold save and subsequent warm hosted verification
+are pending; no speedup or production/security approval is claimed yet.

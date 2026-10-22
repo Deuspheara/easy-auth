@@ -29,6 +29,42 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libssl-dev pkg-config cmake
+      - name: Identify dependency cache environment
+        id: cache-environment
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib, os, subprocess
+          image = [os.environ.get("ImageOS"), os.environ.get("ImageVersion")]
+          metadata = None
+          if all(image):
+              try:
+                  compiler = subprocess.check_output(["rustc", "-vV"], text=True)
+                  native = subprocess.check_output(["dpkg-query", "-W", "-f=${binary:Package}=${Version}\n", "libssl-dev", "pkg-config", "cmake", "gcc", "g++", "libc6-dev"], text=True)
+                  metadata = "\n".join([*image, compiler, native])
+              except (OSError, subprocess.CalledProcessError):
+                  pass  # Cache metadata failure falls back to the normal cold checks.
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              if metadata is not None:
+                  print("available=true", file=output)
+                  print("fingerprint=" + hashlib.sha256(metadata.encode()).hexdigest(), file=output)
+              else:
+                  print("available=false", file=output)
+          PYTHON
+          printf '%s\n' "$RUNNER_TEMP/easy-auth-security-tools/bin" >> "$GITHUB_PATH"
+      - name: Reuse dependency builds and security tools on trusted pushes
+        if: github.event_name == 'push' && steps.cache-environment.outputs.available == 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: |
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target/debug/.fingerprint
+            target/debug/build
+            target/debug/deps
+            ${{ runner.temp }}/easy-auth-security-tools
+          key: rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}-${{ github.sha }}
+          restore-keys: |
+            rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}-
       - run: python3 scripts/check_saml_source.py
       - run: python3 -m unittest scripts.test_saml_source
       - run: cargo fmt --all -- --check
@@ -137,10 +173,13 @@ jobs:
       - run: python3 scripts/smoke_recovery_notice.py
         env:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-      - run: cargo install cargo-audit --locked
+      - run: cargo install cargo-audit --locked --root "$RUNNER_TEMP/easy-auth-security-tools"
       - run: python3 scripts/audit.py
-      - run: cargo install cargo-deny --locked
+      - run: cargo install cargo-deny --locked --root "$RUNNER_TEMP/easy-auth-security-tools"
       - run: cargo deny --all-features check
+      - name: Retain only dependency build outputs in the cache
+        if: github.event_name == 'push' && steps.cache-environment.outputs.available == 'true'
+        run: cargo clean -p easy-auth-core -p easy-auth-postgres -p easy-auth-axum -p easy-auth-server
   secrets:
     runs-on: ubuntu-latest
     steps:
