@@ -74,7 +74,7 @@ validation or permission to enable another authentication path.
 | Passkeys/custom UI | [Enrollment](passkey-enrollment.md), [sign-in](passkey-authentication.md) and [management/recovery](passkey-management.md); preserve RP/origin, browser proof and stronger-account policy; ordinary activation remains gated |
 | Apple | Not implemented; Apple client-secret, capability, callback/native and grant-lifecycle acceptance remain pending |
 | SAML | No production verifier, ACS or metadata startup option; [dependency gate](../research/protocol-dependencies.md) and independent security validation remain open |
-| Outbound OIDC issuer | Not implemented; the server is not an authorization server for unrelated applications |
+| Outbound OIDC issuer | No issuer endpoints; [gated client metadata](issuer-clients.md) does not activate an authorization server |
 
 Custom clients use the [public API contract](../architecture/api-contract.md),
 preserving exact Origin, same-browser proof cookies and explicit confirmations.

@@ -6,6 +6,8 @@ mod display_name;
 mod email;
 mod error;
 mod identity;
+#[cfg(feature = "issuer-clients")]
+mod issuer;
 mod notifications;
 #[cfg(feature = "oauth-transactions")]
 mod oauth;
@@ -107,4 +109,9 @@ pub use saml::{
     MAX_SAML_DELETION_AUTH_AGE_SECONDS, SamlAccountDeletion, SamlAccountDeletionRepository,
     SamlDeletionBinding, SamlDeletionRequestContext, SamlDeletionRequestRepository,
     SamlDeletionRequests, SamlDeletionVerifier, SamlPreparedDeletion, SamlVerifiedDeletion,
+};
+
+#[cfg(feature = "issuer-clients")]
+pub use issuer::{
+    IssuerClientKind, IssuerClientRegistration, MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
 };

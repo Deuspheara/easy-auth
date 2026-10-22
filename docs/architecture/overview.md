@@ -205,3 +205,10 @@ and disable. No production implementation or cryptographic policy was changed.
 The [provider guide](../guides/saml-providers.md) scopes that evidence and records
 Entra's documented lifetime incompatibility and untested Okta requirements. Full
 qualified attributes/lifecycle and independent approval remain gates.
+
+The optional `issuer-clients` core/PostgreSQL component now separates trusted
+outbound HTTPS web-client registration and opaque hostname-sector subjects from
+inbound federation. It adds no HTTP/issuer startup route, authentication grant or
+user-consent completion. [ADR0026](adr/0026-outbound-client-registration.md) records
+exact redirects, fixed explicit-consent policy and stored random subject decisions.
+M07 and AUTH-32 release prerequisites remain open; this is gated engineering only.

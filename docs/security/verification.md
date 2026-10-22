@@ -4808,3 +4808,50 @@ time and their stricter signed session caps; no pending requests remain. See the
 Its normal cleanup has no emergency or diagnostic path. Both acceptance runs use
 the same final fixture binary and source hashes; no Rust/JavaScript implementation
 changed after these checks.
+
+## Gated outbound client metadata (AUTH-37, 2026-10-22)
+
+The optional `issuer-clients` core/PostgreSQL component has four ordinary core
+registration/redirect tests and twelve real PostgreSQL cases. Tests cover exact
+HTTPS web redirects and bounds, redaction/hash-only confidential metadata, fresh
+revisions, preserved disable, stale full definitions/credential rotation, closed
+storage policy, rollback, realm/hostname-sector/owner isolation, concurrent stable
+GUID allocation, actual account-erasure cascading, observed disable/erasure waits,
+and migration0027 preserving complete existing account/session rows. The feature
+adds no new dependency, issuer endpoint, consent completion or token authority.
+
+`cargo fmt --all -- --check`; default/all-feature strict all-target workspace
+Clippy; `cargo test --locked --workspace` and its all-feature counterpart pass.
+Default:111 tests. All-features:781 parent cases plus one child redaction case,
+including456 real PostgreSQL lifecycle cases; zero failures/ignored tests.
+The broad run preceded only the final equivalent grouped upsert column assignment;
+strict all-feature Clippy and the final isolated issuer core/PostgreSQL commands
+check that final form separately. `RUSTDOCFLAGS='-D warnings' cargo doc --locked
+--workspace --all-features --no-deps` passes for the same public API.
+
+`python3 scripts/check_saml_source.py`234 files/three unchanged patches and four
+checker tests pass. Compiled-graph audit and all-feature cargo-deny pass; the
+inactive SQLx/MySQL rsa advisory remains visible. Redacted ordinary-source Gitleaks
+passes without new exceptions. Its first finding was an identifier-only upsert
+assignment; equivalent grouped PostgreSQL column assignment removes that false
+positive without changing credential/revision/disable policy. Final focused checks
+validate the query. Workflow YAML, local guide/ADR links and diff checks pass.
+The unsent local review draft and unfinished user research are excluded from the
+source commits and scan snapshot.
+
+Initial test-development failures were corrected: an owned raw-delete ordering
+fixture correctly encountered the existing audit FK and now uses real confirmed
+account erasure while observing its audit/owner waits. Feature guards on a shared
+fixture did not apply across importing crates; lock observation was extracted
+byte-for-byte with existing reexports preserved, and an alias prevents duplicate
+module loading. Existing assertions/security checks are unchanged. Structural
+fixture extraction and new behavior are separate commits. No custom XML, crypto,
+signature-concurrency, fuzz/stress or bypass scenario runs.
+
+AUTH-37 remains In Progress: this is client/subject configuration metadata, with
+actual client-auth protocol negatives, explicit consent/code/token handling,
+native profiles and M07 interoperability still required. AUTH-32 remains a release
+prerequisite. Production SAML and outbound issuer activation remain disabled.
+Internal maintainability/source review is not independent protocol/security approval.
+Hosted exact-head CI is recorded separately in Huly and must not be inferred from
+these local results.

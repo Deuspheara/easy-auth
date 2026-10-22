@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-clients = ["auth-core/issuer-clients"]
 saml-identities = ["saml-verification", "auth-core/saml-identities"]
 saml-verification = ["saml-certificates", "auth-core/saml-verification"]
 saml-certificates = ["saml-requests", "auth-core/saml-certificates"]

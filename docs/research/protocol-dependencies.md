@@ -294,3 +294,10 @@ rsa 0.9.10 / RUSTSEC-2023-0071, without a global ignore. Cargo-deny 0.20.2
 `--all-features check` passes advisories, bans, licenses and sources; existing
 duplicate-version/unused-license warnings remain. Neither check audits the
 separate SAML research dependency graph or clears its independent-review gate.
+
+AUTH-37's optional `issuer-clients` metadata component reuses existing URL, UUID,
+Secret and PostgreSQL dependencies. It selects no new JOSE/token implementation,
+crypto primitive or remote sector-document client. Stored random sector/owner UUIDs
+follow the OIDC Core section8.1 GUID method. Reviewed signing/claims, client-auth
+protocol handling, real consent, conformance and M07 prerequisites remain gates;
+[ADR0026](../architecture/adr/0026-outbound-client-registration.md) bounds the slice.

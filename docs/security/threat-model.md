@@ -641,3 +641,17 @@ proof cookies and a non-authoritative common ACS/operation selector. Actual IdP
 reauthentication-to-deletion browser acceptance remains open.
 See [ADR0025](../architecture/adr/0025-saml-account-deletion.md); dependency/XML/
 backend and independent approval still gate normal activation.
+
+## Gated outbound issuer metadata
+
+AUTH-37's separate optional registration component accepts only trusted canonical
+HTTPS web-client definitions. Full current realm/client/revision/redirect/sector/
+authentication/credential policy is locked before an owner key; disable and stale
+snapshots reject even after waits. Only existing realm owners receive stable random
+hostname-sector subjects. Same-host clients intentionally share the OIDC sector;
+cross-host/realm mappings are distinct. No local UUID/email/provider subject is
+exposed as the outbound subject. Account erasure cascades mappings. Random stored
+UUIDs use existing randomness, with no new cryptographic scheme. A mapping or
+registered client is not consent, authenticated-client or token authority. No issuer
+route/startup path is enabled. AUTH-32 and M07 production prerequisites, real client
+authentication/consent/PKCE/issuance/key/conformance work remain open.

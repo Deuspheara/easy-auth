@@ -550,3 +550,14 @@ composition and adds only the non-authoritative operation selector. Normal publi
 OpenAPI/router/server configuration still activates no SAML provider. Component
 HTTP/real-PG checks and the existing owned browser sign-in regression are recorded;
 actual IdP deletion/browser acceptance and independent approval remain separate.
+
+## Outbound issuer client metadata component
+
+The opt-in core/PostgreSQL `issuer-clients` feature exposes trusted
+`IssuerClientRegistration` public/confidential HTTPS web configuration and
+Postgres configure/disable/enable/check/subject metadata methods. It adds no HTTP
+route or OpenAPI endpoint. Exact redirect allowlisting and stable realm/hostname-
+sector owner subjects are metadata boundaries, not client authentication, consent
+or authorization. Existing session/inbound federation contracts are unchanged.
+See [the guide](../guides/issuer-clients.md); actual authorize/token/consent and
+interoperability remain required before an outbound issuer can be enabled.

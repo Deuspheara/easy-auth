@@ -886,3 +886,15 @@ seven-case lifecycle retains initial authority, no-change/cancel/different-subje
 controls and final local-versus-remote erasure together as a function-size review
 exception. Added/changed source files remain below300lines; no production policy,
 verifier or public API changes and no unrelated cleanup is deferred.
+
+
+AUTH-37's opt-in core `issuer/` separates outbound registration and redirect policy
+from inbound federation. PostgreSQL `issuer/configuration.rs` owns trusted atomic
+replacement/current-definition/disable checks; `subjects.rs` keeps client-before-
+owner ordering and stable sector allocation in one visible transaction. No HTTP
+policy or issuer endpoint is introduced. Feature tests separate configuration,
+subject lifecycle, observed database orderings and migration preservation. They
+reuse the existing independent PostgreSQL observer; its audit/deadline helpers
+retain their original feature scope. All new modules remain below300lines. Longer
+ordered negative/positive test scenarios keep their invariants together. No generic
+client framework, new dependency or unrelated refactor is introduced.

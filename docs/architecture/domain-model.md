@@ -191,3 +191,14 @@ retain actual authentication time and source revision; current source policy is
 required for authentication/inventory/fresh revocation. The typed
 `SamlAuthenticated` audit fact has only committed user/session references.
 [ADR 0023](adr/0023-saml-identity-session-commit.md) records lock order and limits.
+
+## Gated outbound client metadata
+
+Separate optional `IssuerClientRegistration` describes trusted HTTPS web clients,
+realm/client/revision, exact redirects, hostname sector and public versus
+client_secret_basic verifier configuration. It does not represent an inbound
+provider or authenticated client. Additive migration0027 persists closed explicit-
+consent/pairwise policy plus realm-scoped random sector/owner subjects. A metadata
+mapping grants no consent, session or token authority; account erasure cascades it.
+[ADR0026](adr/0026-outbound-client-registration.md) and the
+[component guide](../guides/issuer-clients.md) describe limits. M07 remains gated.

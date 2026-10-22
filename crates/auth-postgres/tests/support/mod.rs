@@ -49,3 +49,15 @@ pub(crate) async fn reset_proof(store: &Postgres, realm: Uuid, email: &str) -> (
         .unwrap();
     (token, browser)
 }
+
+#[cfg(all(
+    feature = "issuer-clients",
+    not(any(feature = "saml-identities", feature = "google"))
+))]
+#[path = "../../../../tests/support/postgres/locks.rs"]
+pub(crate) mod lock_observation;
+#[cfg(all(
+    feature = "issuer-clients",
+    any(feature = "saml-identities", feature = "google")
+))]
+pub(crate) use observation as lock_observation;

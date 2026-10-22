@@ -35,3 +35,7 @@ mod audit;
 
 #[path = "lifecycle/identity/mod.rs"]
 mod identity;
+
+#[cfg(feature = "issuer-clients")]
+#[path = "lifecycle/issuer/mod.rs"]
+mod issuer;

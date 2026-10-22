@@ -4,6 +4,8 @@ mod audit;
 mod deadlines;
 mod email;
 mod identity;
+#[cfg(feature = "issuer-clients")]
+mod issuer;
 mod locking;
 mod notifications;
 #[cfg(feature = "oauth-transactions")]
