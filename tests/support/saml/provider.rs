@@ -25,7 +25,7 @@ pub(crate) fn trust() -> SamlCertificateTrust {
     .unwrap()
 }
 
-/// Unchanged library-generated ordinary SSO producer; not deployed-IdP evidence.
+/// Library-generated ordinary SSO producer; not deployed-IdP evidence.
 pub(crate) fn response_field_from(
     reg: &SamlRegistration,
     authorization_url: &str,
@@ -33,23 +33,27 @@ pub(crate) fn response_field_from(
     issuer: &str,
     lifetime: Duration,
 ) -> String {
-    let config = IdpConfig::builder(EntityId::try_new(issuer).unwrap())
-        .sso_endpoint(SsoEndpoint::redirect(reg.sso()).unwrap())
-        .credentials(Credentials {
-            signing_key: Some(PrivateKeyPem::new(fixture_signing_key())),
-            signing_certificate: Some(CertificatePem::new(
-                String::from_utf8(CERT.to_vec()).unwrap(),
-            )),
-            ..Default::default()
-        })
-        .validation(IdpValidationPolicy {
-            authn_requests: AuthnRequestValidationPolicy::AllowUnsignedVerifyIfPresent,
-            ..IdpValidationPolicy::recommended()
-        })
-        .issuance_lifetime(lifetime)
-        .build()
-        .unwrap();
-    let idp = Saml::idp(config).unwrap();
+    response_field_with(
+        reg,
+        authorization_url,
+        name_id,
+        issuer,
+        lifetime,
+        RespondSso::post()
+            .sign_response()
+            .apply_web_browser_sso_generation_rules(),
+    )
+}
+
+pub(crate) fn response_field_with(
+    reg: &SamlRegistration,
+    authorization_url: &str,
+    name_id: NameId,
+    issuer: &str,
+    lifetime: Duration,
+    options: RespondSso,
+) -> String {
+    let idp = identity_provider(reg, issuer, lifetime);
     let sp = SpDescriptor::from_metadata_xml_for(
         EntityId::try_new(reg.sp_entity()).unwrap(),
         &reg.metadata_xml(),
@@ -67,14 +71,7 @@ pub(crate) fn response_field_from(
         )
         .unwrap();
     let response = idp
-        .respond_sso(
-            &sp,
-            &received,
-            Subject::new(name_id, vec![]),
-            RespondSso::post()
-                .sign_response()
-                .apply_web_browser_sso_generation_rules(),
-        )
+        .respond_sso(&sp, &received, Subject::new(name_id, vec![]), options)
         .unwrap();
     response
         .post_form()
@@ -85,6 +82,30 @@ pub(crate) fn response_field_from(
         .unwrap()
         .value()
         .to_owned()
+}
+
+fn identity_provider(
+    reg: &SamlRegistration,
+    issuer: &str,
+    lifetime: Duration,
+) -> Saml<saml_rs::Idp> {
+    let config = IdpConfig::builder(EntityId::try_new(issuer).unwrap())
+        .sso_endpoint(SsoEndpoint::redirect(reg.sso()).unwrap())
+        .credentials(Credentials {
+            signing_key: Some(PrivateKeyPem::new(fixture_signing_key())),
+            signing_certificate: Some(CertificatePem::new(
+                String::from_utf8(CERT.to_vec()).unwrap(),
+            )),
+            ..Default::default()
+        })
+        .validation(IdpValidationPolicy {
+            authn_requests: AuthnRequestValidationPolicy::AllowUnsignedVerifyIfPresent,
+            ..IdpValidationPolicy::recommended()
+        })
+        .issuance_lifetime(lifetime)
+        .build()
+        .unwrap();
+    Saml::idp(config).unwrap()
 }
 
 fn fixture_signing_key() -> String {
