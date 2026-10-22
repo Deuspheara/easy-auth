@@ -215,3 +215,22 @@ original live-session suite retains its exact assertions. Cleanup proves normal
 fixture exit, database/container removal and no diagnostic/emergency path. This
 is not older-AuthnInstant wire coverage, qualified identity/attribute acceptance,
 an independent audit or permission to activate SAML.
+
+
+## Retained provider SSO acceptance
+
+The owned deletion suite now has eight ordinary cases, preserving its original
+seven assertions. After restoring the original account through real IdP login,
+cancel only the local pending deletion. A subsequent deletion request retains the
+provider SSO cookies and still requires an actual password challenge. After typed
+confirmation, the unchanged concrete verifier and PostgreSQL erasure succeed.
+The actual signed AuthnInstant at that completion is newer than the initial sign-in.
+
+A developer-only repository observer delegates the original opaque deletion proof
+unchanged and records its scalar timing comparison only after successful commit.
+It compares against the sole recorded realm/owner grant in this owned scenario;
+multiple candidate grants remain unknown, never a guessed initiating session. No
+new authority/policy, assertion extraction or production observer is added. Original
+account-switch/cancellation/remote-account/replay controls remain. This supplies
+retained-SSO reauthentication evidence, not older-than-five-minute assertion wire
+rejection, qualified identity/attribute acceptance or independent approval.

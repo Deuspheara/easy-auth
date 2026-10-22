@@ -2,7 +2,10 @@
 //! No proof constructor, XML access, policy fallback or authority setup exists.
 use super::FixtureResult;
 use async_trait::async_trait;
-use auth_core::{Result, SamlIdentityRepository, SamlMappedIdentity, User, Verifier};
+use auth_core::{
+    Result, SamlAccountDeletionRepository, SamlIdentityRepository, SamlMappedIdentity,
+    SamlVerifiedDeletion, User, Verifier,
+};
 use auth_postgres::Postgres;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
@@ -13,6 +16,7 @@ const FIXED_AUTHN_AGE_US: i64 = 24 * 60 * 60 * 1_000_000;
 #[derive(Clone)]
 struct Record {
     realm: Uuid,
+    user: Uuid,
     bearer: Verifier,
     authn: i64,
     admission: i64,
@@ -21,12 +25,14 @@ struct Record {
 pub(super) struct Observations {
     store: Arc<Postgres>,
     accepted: Mutex<Vec<Record>>,
+    deletion_authn_advanced: Mutex<Vec<Option<bool>>>,
 }
 impl Observations {
     pub fn new(store: Arc<Postgres>) -> Self {
         Self {
             store,
             accepted: Mutex::new(Vec::new()),
+            deletion_authn_advanced: Mutex::new(Vec::new()),
         }
     }
     pub async fn facts(&self, pool: &PgPool) -> FixtureResult<serde_json::Value> {
@@ -54,6 +60,11 @@ impl Observations {
                 statement_caps += 1;
             }
         }
+        let deletion = self
+            .deletion_authn_advanced
+            .lock()
+            .expect("owned deletion timing mutex")
+            .clone();
         Ok(
             // Missing sessions after erasure cannot establish historical timing.
             // Keep those measurements explicitly unavailable, never vacuously true.
@@ -61,7 +72,8 @@ impl Observations {
                 "exact_signed_authn":(removed_sessions == 0).then_some(exact_authn),
                 "verified_session_caps":(removed_sessions == 0).then_some(bounded_session),
                 "session_exceeds_admission_cap":(removed_sessions == 0).then_some(distinct_caps),
-                "signed_statement_caps_below_default":statement_caps}),
+                "signed_statement_caps_below_default":statement_caps,
+                "deletions":deletion.len(),"deletion_authn_advanced":deletion.last().copied().flatten()}),
         )
     }
 }
@@ -73,20 +85,52 @@ impl SamlIdentityRepository for Observations {
         bearer: Verifier,
     ) -> Result<User> {
         let proof = mapped.assertion();
-        let record = Record {
-            realm: proof.registration().realm(),
-            bearer,
-            authn: proof.authenticated_at_us(),
-            admission: proof.expires_at_us(),
-            session: proof.session_expires_at_us(),
-        };
+        let realm = proof.registration().realm();
+        let authn = proof.authenticated_at_us();
+        let admission = proof.expires_at_us();
+        let session = proof.session_expires_at_us();
         // All authority and rollback remain in the original repository. Record
         // only scalar timing/hash facts after its successful real commit.
         let user = self.store.finish_saml_identity(mapped, bearer).await?;
+        let record = Record {
+            realm,
+            user: user.id,
+            bearer,
+            authn,
+            admission,
+            session,
+        };
         self.accepted
             .lock()
             .expect("owned observations mutex")
             .push(record);
         Ok(user)
+    }
+}
+
+#[async_trait]
+impl SamlAccountDeletionRepository for Observations {
+    async fn finish_saml_account_deletion(&self, proof: SamlVerifiedDeletion) -> Result<()> {
+        let advanced = {
+            let records = self.accepted.lock().expect("owned observations mutex");
+            let mut initiating = records.iter().filter(|record| {
+                record.realm == proof.policy().registration().realm()
+                    && record.user == proof.binding().user
+            });
+            // This owned acceptance has exactly one initiating grant. Multiple
+            // records cannot identify its original session and remain unknown.
+            let first = initiating.next();
+            if initiating.next().is_some() {
+                None
+            } else {
+                first.map(|record| proof.assertion().authenticated_at_us() > record.authn)
+            }
+        };
+        self.store.finish_saml_account_deletion(proof).await?;
+        self.deletion_authn_advanced
+            .lock()
+            .expect("owned deletion timing mutex")
+            .push(advanced);
+        Ok(())
     }
 }

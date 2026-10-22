@@ -37,7 +37,7 @@ async function main() {
     fs.rmSync(directory,{recursive:true,force:true});
   }
   if(failure) {console.log(JSON.stringify({cleanup,provider_removed:removed}));throw failure;}
-  assert.equal(result.cases.length,deletion?7:10);
+  assert.equal(result.cases.length,deletion?8:10);
   assert.equal(cleanup.stopped&&cleanup.database_removed&&!cleanup.emergency_cleanup&&!cleanup.diagnostics&&removed,true);
   const sources=execFileSync('git',['ls-files','--cached','--others','--exclude-standard','-z'],{cwd:root}).toString().split('\0').filter(n=>n&&!n.includes('/results/')&&(/\.(rs|sql|toml|cjs|js|html)$/.test(n)||n==='Cargo.lock')&&(n.startsWith('crates/')||n.startsWith('apps/')||n.startsWith('tests/support/')||n.startsWith('tests/browser/saml-keycloak/')||n.startsWith('tests/browser/oidc/')||n==='Cargo.lock'||n==='Cargo.toml'));
   const report={recorded_at:new Date().toISOString(),node:process.version,chromium:version,playwright:require('../passkeys/node_modules/playwright/package.json').version,platform:process.platform,arch:process.arch,provider_image:provider.image,

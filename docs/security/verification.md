@@ -4855,3 +4855,37 @@ prerequisite. Production SAML and outbound issuer activation remain disabled.
 Internal maintainability/source review is not independent protocol/security approval.
 Hosted exact-head CI is recorded separately in Huly and must not be inferred from
 these local results.
+
+## Actual retained-SSO SAML reauthentication (AUTH-35, 2026-10-22)
+
+The Keycloak deletion acceptance now passes8/8 ordinary cases, retaining the
+original seven controls. It restores the original IdP account through real login,
+cancels only local pending deletion, retains provider SSO cookies, and starts a new
+ForceAuthn deletion request. The real password challenge and typed final confirmation
+lead through unchanged concrete verification and PostgreSQL erasure. A post-commit
+observer records that actual signed deletion authentication time is newer than the
+sole initial realm/owner grant. Multiple possible initial grants produce an unknown
+measurement, never inferred session correspondence. No raw XML, assertion, credential
+or timing value is exported. The original proof is forwarded unchanged; observation
+cannot mint authority or bypass failure. Normal cleanup has no diagnostic/emergency
+path. [Acceptance record](../../tests/browser/saml-keycloak/results/2026-10-22-retained-sso.json).
+
+The unchanged10-case rollover/realm suite passes against the same fixture binary
+and source, with original assertions intact and all six stored sign-in timings
+correct. Its deletion measurement is unavailable because no deletion occurs.
+[Regression record](../../tests/browser/saml-keycloak/results/2026-10-22-retained-sso-rollover.json).
+`cargo test --locked -p easy-auth-axum --features saml-web --test browser saml::`
+passes14/14 real-PG HTTP cases. The explicit example build, default/all-feature
+strict all-target Clippy, fmt, JS syntax, source234/three unchanged patches/four
+checker tests and diff checks pass. This change touches only developer fixture/
+acceptance and documentation; production Rust, migrations, dependencies and the
+cryptographic verifier are unchanged. The previous full workspace baseline111/
+782 including456 real-PG cases is commit8572eab, rather than a claimed new full run
+for this fixture-only change. Exact-head hosted CI provides its separate full run.
+The dependency audit/deny graph is unchanged from that recorded passing baseline.
+
+This establishes retained-SSO password reauthentication with newer signed time for
+the recorded Keycloak26.8.1/Chromium profile. It is not rejection of a newly issued
+deletion response containing authentication older than five minutes, qualified
+NameID/attribute approval, other-provider interoperability, comprehensive XML/
+backend review or independent audit. AUTH-32/35 remain open; SAML stays disabled.

@@ -2,15 +2,15 @@
 const assert=require('node:assert/strict');
 const {login,status}=require('../browser.cjs');
 const phrase='delete my account';
-async function reauthenticate(session,origin,credentials) {
+async function reauthenticate(session,origin,credentials,{keepSso=false}={}) {
   const page=session.page;
   // Clear only the owned provider's SSO cookies to allow ordinary account selection.
   // The initiating application's session and private proof cookies are untouched.
-  await session.context.clearCookies({domain:'fixture.invalid'});
+  if(!keepSso)await session.context.clearCookies({domain:'fixture.invalid'});
   await page.goto(origin+'/saml/account-delete');
   await page.locator('#delete-start input').fill(phrase);
   await page.getByRole('button',{name:'Continue to reauthentication',exact:true}).click();
-  await page.locator('#username').fill(credentials.username);
+  if(!keepSso)await page.locator('#username').fill(credentials.username);
   await page.locator('#password').fill(credentials.password);
   await page.locator('#kc-login').click();
   await page.locator('#delete-confirm').waitFor();
@@ -56,6 +56,12 @@ async function run(owner,provider,browser,origin,initial) {
     assert.equal(rejected.sessions,1);assert.equal(rejected.pending,0);assert.equal(rejected.replays,2);
     cases.push('real_other_provider_subject_cannot_erase_initiating_owner');
     await reauthenticate(session,origin,provider);
+    // Restore the original provider account through its real UI, then cancel
+    // only local pending deletion. The provider SSO session is retained.
+    await session.page.getByRole('button',{name:'Cancel deletion',exact:true}).click();
+    await session.page.getByText('Pending deletion cancelled.',{exact:true}).waitFor();
+    assert.equal(await status(session),200);
+    await reauthenticate(session,origin,provider,{keepSso:true});
     await confirm(session,204);
     assert.equal(await status(session),401);
     const erased=await facts();
@@ -63,6 +69,9 @@ async function run(owner,provider,browser,origin,initial) {
     assert.equal(erased.replays,4);
     assert.equal(erased.timing.grants,1);assert.equal(erased.timing.removed_sessions,1);
     assert.equal(erased.timing.exact_signed_authn,null,'erased session timing unavailable');
+    assert.equal(erased.timing.deletions,1);
+    assert.equal(erased.timing.deletion_authn_advanced,true);
+    cases.push('retained_provider_sso_requires_password_and_newer_signed_authentication');
     cases.push('fresh_actual_keycloak_assertion_commits_local_erasure_and_retains_replay');
     const users=await provider.admin('/users?username='+encodeURIComponent(provider.username)+'&exact=true');
     assert.equal(users.length,1);assert.equal(users[0].id,provider.subject);

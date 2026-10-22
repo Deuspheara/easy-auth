@@ -24,7 +24,7 @@ pub(super) fn build(
         policy.clone(),
         store.clone(),
         store.clone(),
-        store.clone(),
+        observations.clone(),
     )?;
     let services =
         SamlWebServices::new(policy.clone(), store.clone(), store.clone(), observations)?

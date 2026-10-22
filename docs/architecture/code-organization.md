@@ -898,3 +898,13 @@ reuse the existing independent PostgreSQL observer; its audit/deadline helpers
 retain their original feature scope. All new modules remain below300lines. Longer
 ordered negative/positive test scenarios keep their invariants together. No generic
 client framework, new dependency or unrelated refactor is introduced.
+
+
+The owned SAML timing observer now covers both actual grant and deletion repository
+boundaries, forwarding original opaque proofs unchanged. Its private records and
+post-commit scalar comparisons remain one measurement responsibility, below150lines.
+The ordered browser deletion case retains its existing controls and adds explicit
+retained-SSO credential challenge/newer-authentication evidence; no generic scenario
+framework or production policy is added. Multiple possible initiating grants leave
+measurement unavailable. Existing transaction/session/verification modules and
+assertions are unchanged.

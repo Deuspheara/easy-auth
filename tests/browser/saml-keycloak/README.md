@@ -76,13 +76,15 @@ Run the separate ordinary deletion cases with the same built fixture:
 DATABASE_URL=postgres://… EASY_AUTH_SAML_KEYCLOAK_REPORT=/absolute/new-deletion-report.json node tests/browser/saml-keycloak/run.cjs --account-deletion
 ```
 
-Seven cases cover genuine sign-in, an actual signed reauthentication return with
+Eight cases cover genuine sign-in, an actual signed reauthentication return with
 no authority before second confirmation, wrong confirmation without state change,
 returned-operation cancellation, a real different provider subject rejected at
 completion, exact-subject confirmed local erasure with replay retention, and remote
-IdP account preservation. The fixed reference client and same-origin operation
+IdP account preservation, plus retained provider SSO/password challenge with newer
+actual signed authentication time at successful deletion. The fixed reference client and same-origin operation
 selector are exercised in Chromium. Only owned provider SSO cookies are cleared
-for ordinary account selection; application/session/proof cookies stay private.
+for ordinary account selection; the retained-SSO scenario explicitly preserves
+them. Application/session/proof cookies stay private.
 
 The fixture explicitly selects the existing deletion services. It creates no local
 authority outside normal sign-in and changes no production composition. The
@@ -92,3 +94,10 @@ are unchanged. Both suites run in CI and clean only their own resources.
 Older authentication-time wire cases, qualified identities/attributes, other IdPs
 and independent approval remain separate. No custom XML/cryptographic fixture or
 adversarial probe is introduced.
+
+The deletion timing observer consumes no XML and creates no authority. It forwards
+the original verified deletion proof unchanged, and records only a scalar comparison
+after successful real erasure. The initial grant must be unique for that realm/owner;
+multiple grants produce an unavailable measurement rather than selecting a session
+heuristically. The new case requires one actual initial grant and a strictly newer
+signed deletion authentication time. Earlier seven-case reports retain their scope.

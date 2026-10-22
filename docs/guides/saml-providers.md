@@ -8,7 +8,7 @@ startup exposes no SAML provider.
 
 | Provider/profile | Evidence | Remaining boundary |
 | --- | --- | --- |
-| Keycloak 26.8.1, pinned image, persistent NameID, unsigned Redirect request, signed POST Response and Assertion | Ten sign-in/rollover and seven confirmed-deletion browser/PostgreSQL cases passed on macOS arm64/Chromium156 | Other profiles/platforms, older authentication-time wire acceptance, explicit qualified NameID/attribute acceptance and independent approval |
+| Keycloak 26.8.1, pinned image, persistent NameID, unsigned Redirect request, signed POST Response and Assertion | Ten sign-in/rollover and eight confirmed-deletion browser/PostgreSQL cases passed on macOS arm64/Chromium156 | Other profiles/platforms, older authentication-time wire acceptance, explicit qualified NameID/attribute acceptance and independent approval |
 | Microsoft Entra enterprise SAML | Official configuration reviewed; no tenant/account exercised | Documented lifetime policy conflicts with the current five-minute signed-validity ceiling; no compatibility or production-support claim |
 | Okta SAML application integration | Official field reference reviewed; no org/account exercised | Exact profile/time/qualified identity, rollover and lifecycle need actual acceptance; no interoperability claim |
 
@@ -51,9 +51,12 @@ cannot choose ownership, contact, roles or account linking.
 Purpose-bound deletion preparation is implemented separately, with an actual
 initiating SAML session and retained original caps. The separate gated core/PostgreSQL
 verification/erasure and explicit HTTP confirmation services are implemented;
-seven actual Keycloak/Chromium cases now cover signed return, no erasure before
+eight actual Keycloak/Chromium cases now cover signed return, no erasure before
 second confirmation, wrong phrase, cancellation, real different-subject rejection,
 exact-subject local erasure/replay retention and remote-account preservation.
+The retained-SSO case obtains a real password challenge and a newer signed
+AuthnInstant without clearing provider SSO cookies; its proof is observed only
+around unchanged production completion.
 ForceAuthn intent alone establishes no freshness. See
 [ADR 0025](../architecture/adr/0025-saml-account-deletion.md) for the implemented
 boundary and remaining approval work. These are separate from the ten sign-in
