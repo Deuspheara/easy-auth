@@ -5,7 +5,7 @@ WORKDIR /src
 RUN apt-get update && apt-get install -y --no-install-recommends cmake libssl-dev pkg-config python3 \
     && rm -rf /var/lib/apt/lists/*
 COPY Cargo.toml Cargo.lock ./
-COPY .cargo .cargo
+COPY .cargo/config.toml .cargo/config.toml
 COPY apps apps
 COPY crates crates
 COPY third-party third-party

@@ -1,10 +1,11 @@
-# Only build inputs; omit private review drafts, comparison/bounds work and secrets.
+# Only named build inputs. Reset each re-included parent before admitting children.
 **
 !Cargo.toml
 !Cargo.lock
 !LICENSE-MIT
 !LICENSE-APACHE
 !.cargo/
+.cargo/**
 !.cargo/config.toml
 !apps/
 !apps/**
@@ -13,25 +14,34 @@
 !third-party/
 !third-party/**
 !scripts/
+scripts/**
 !scripts/check_saml_source.py
 !scripts/qualify_saml_dependency.py
 !scripts/qualify_saml_c14n.py
 !scripts/record_saml_native.py
 !scripts/record_saml_build.py
 !tests/
+tests/**
 !tests/support/
 !tests/support/**
 !tests/provider/
+tests/provider/**
 !tests/provider/saml/
+tests/provider/saml/**
 !tests/provider/saml/rust-policy/
+tests/provider/saml/rust-policy/**
 !tests/provider/saml/rust-policy/patches/
 !tests/provider/saml/rust-policy/patches/**
 !docs/
+docs/**
 !docs/security/
+docs/security/**
 !docs/security/third-party-licenses/
 !docs/security/third-party-licenses/**
 !deploy/
+deploy/**
 !deploy/saml/
+deploy/saml/**
 !deploy/saml/Dockerfile
 !deploy/saml/Dockerfile.dockerignore
 !deploy/saml/proxy.Dockerfile

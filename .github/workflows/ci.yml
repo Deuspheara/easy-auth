@@ -213,6 +213,8 @@ jobs:
         run: docker build --progress=plain -f deploy/saml/Dockerfile --build-arg "SOURCE_REVISION=$GITHUB_SHA" -t easy-auth-saml-release:ci .
       - name: Build minimal TLS proxy with SAML blocked
         run: docker build --progress=plain -f deploy/saml/proxy.Dockerfile --build-arg "SOURCE_REVISION=$GITHUB_SHA" -t easy-auth-saml-proxy:ci .
+      - name: Verify private build-context exclusion with owned non-secret markers
+        run: python3 scripts/check_saml_build_context.py
       - name: Verify actual release startup, native inventory and enforced resource configuration
         run: python3 scripts/check_saml_release.py --image easy-auth-saml-release:ci --proxy-image easy-auth-saml-proxy:ci
         env:
@@ -226,6 +228,7 @@ jobs:
           name: saml-reference-release-${{ github.sha }}
           path: |
             target/saml-release-inventory.json
+            target/saml-build-context.json
             target/saml-release-advisories/auth.json
             target/saml-release-advisories/proxy.json
             target/saml-release-advisories/summary.json

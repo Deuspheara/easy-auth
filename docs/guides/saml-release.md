@@ -18,6 +18,7 @@ Both final images use a pinned Debian13 distroless base with no shell or package
 From a verified source revision:
 
 ```sh
+python3 scripts/check_saml_build_context.py
 docker build -f deploy/saml/Dockerfile --build-arg SOURCE_REVISION=FULL_VERIFIED_COMMIT -t easy-auth-saml-release:review .
 docker build -f deploy/saml/proxy.Dockerfile --build-arg SOURCE_REVISION=FULL_VERIFIED_COMMIT -t easy-auth-saml-proxy:review .
 python3 scripts/check_saml_release.py --image easy-auth-saml-release:review --proxy-image easy-auth-saml-proxy:review

@@ -8,7 +8,7 @@ def run(arguments, *, environment=None, timeout=120):
                             text=True, timeout=timeout)
     if result.returncode:
         operation = arguments[0] if arguments[0] in {
-            "run", "compose", "inspect", "create", "start", "export", "save", "rm"} else "operation"
+            "run", "compose", "inspect", "create", "start", "export", "save", "rm", "build"} else "operation"
         if operation == "compose":
             operation += "/" + next((value for value in arguments if value in {
                 "create", "ps", "down"}), "operation")
