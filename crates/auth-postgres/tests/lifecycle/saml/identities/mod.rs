@@ -1,3 +1,4 @@
+mod account_deletion;
 mod commit_faults;
 mod concurrency;
 mod configuration;

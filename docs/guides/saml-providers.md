@@ -49,8 +49,9 @@ attribute extraction. The authenticated attribute NameFormat limitation in
 cannot choose ownership, contact, roles or account linking.
 
 Purpose-bound deletion preparation is implemented separately, with an actual
-initiating SAML session and retained original caps. It does not yet verify a
-deletion assertion, erase an account or supply browser confirmation. ForceAuthn
+initiating SAML session and retained original caps. The separate gated core/PostgreSQL
+verification and erasure services are implemented, but browser confirmation and
+actual provider reauthentication-to-deletion acceptance remain pending. ForceAuthn
 intent alone establishes no freshness. See
 [ADR 0025](../architecture/adr/0025-saml-account-deletion.md) for the implemented
 boundary and required completion work; the ten Keycloak cases above do not cover

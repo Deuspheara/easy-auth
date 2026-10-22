@@ -295,7 +295,7 @@ retain the resulting bound. The pinned ordinary IdP producer does not emit the
 optional statement expiry. The owned actual Keycloak acceptance below now covers
 that wire case for its recorded profile; other provider profiles remain separate.
 
-## Deletion-purpose preparation only
+## Gated deletion-purpose backend
 
 The opt-in `saml-identities` feature exposes `SamlDeletionRequests` with a
 separate `SamlDeletionRequestRepository`. Construct it with the trusted exact
@@ -313,8 +313,15 @@ It is not a verified deletion proof or authority to erase anything. Revoked-sess
 pending state may remain until its bounded original expiry/cleanup.
 
 Migration 0025 preserves existing sign-in rows and adds closed composite bindings.
-The existing sign-in repository contract remains unchanged. Concrete verified
-deletion, atomic erasure, full invalidation cleanup, HTTP confirmation and actual
+The existing sign-in repository contract remains unchanged. `SamlDeletionVerifier` consumes the
+private preparation through the unchanged concrete verifier and exact mapping
+policy, returning a noncloneable `SamlVerifiedDeletion`. It cannot become a sign-in
+proof. `SamlAccountDeletion` requires this proof and delegates to the PostgreSQL
+transaction: exact current source/policy, active initiating session/owner/identity,
+exact signed subject, actual signed five-minute freshness, durable replay, atomic
+erasure/audit/optional stored-contact notice/cooldown and final earliest-cap check.
+The borrowed `validate_authentication_at` policy check uses trusted DB time and
+grants nothing by itself. Full invalidation cleanup, HTTP confirmation and actual
 IdP reauthentication-to-deletion remain pending. No server flag or deletion route
 is activated. See [ADR 0025](../architecture/adr/0025-saml-account-deletion.md).
 

@@ -6,6 +6,7 @@ use uuid::Uuid;
 pub(super) struct Owner {
     pub binding: SamlDeletionBinding,
     pub deadline: Deadline,
+    pub email: Option<String>,
 }
 /// Caller holds exact configuration/policy first. Do not select another source
 /// from browser input or reverse the existing email -> owner -> session order.
@@ -32,7 +33,7 @@ pub(super) async fn lock(
     .await
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
-    lock_provider_user(tx, reg.realm(), user, email.as_deref()).await?;
+    let owner = lock_provider_user(tx, reg.realm(), user, email.as_deref()).await?;
     let session: Uuid = sqlx::query_scalar(r#"
         SELECT id FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND token_hash=$3
           AND authentication_method='saml' AND saml_identity_id=$4 AND saml_revision=$5
@@ -76,5 +77,6 @@ pub(super) async fn lock(
             identity,
         },
         deadline,
+        email: owner.email,
     })
 }

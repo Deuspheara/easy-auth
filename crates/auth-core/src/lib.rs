@@ -104,6 +104,7 @@ pub use oidc::{
 
 #[cfg(feature = "saml-identities")]
 pub use saml::{
+    MAX_SAML_DELETION_AUTH_AGE_SECONDS, SamlAccountDeletion, SamlAccountDeletionRepository,
     SamlDeletionBinding, SamlDeletionRequestContext, SamlDeletionRequestRepository,
-    SamlDeletionRequests, SamlPreparedDeletion,
+    SamlDeletionRequests, SamlDeletionVerifier, SamlPreparedDeletion, SamlVerifiedDeletion,
 };

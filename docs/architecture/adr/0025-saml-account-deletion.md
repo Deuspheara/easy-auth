@@ -1,7 +1,7 @@
 # ADR 0025: Purpose-bound SAML account deletion
 
-Date: 2026-10-22. Status: preparation implemented for opt-in engineering;
-verified deletion, HTTP/browser delivery and production approval remain pending.
+Date: 2026-10-22. Status: core/PostgreSQL preparation, verification orchestration and erasure
+implemented for opt-in engineering; HTTP/browser delivery and production approval remain pending.
 
 ## Decision
 
@@ -37,22 +37,23 @@ Cancellation uses the same current-owner/private-proof checks. Storage failures
 remain Unavailable, rather than successful cancellation or credential rejection.
 Check the retained earliest deadline after the final blocking write before commit.
 
-## Required completion boundary
+## Implemented completion boundary
 
-The subsequent implementation must pass the private prepared response to the
-unchanged concrete verifier, then map the actual verified assertion under the
-exact policy into a distinct opaque deletion proof. No verifier stub, custom XML
+`SamlDeletionVerifier` passes the private prepared response to the unchanged
+concrete verifier, then maps the actual verified assertion under the exact policy
+into a distinct noncloneable, redacted `SamlVerifiedDeletion`. No verifier stub, custom XML
 bridge or proof constructor may substitute for this boundary. A deletion-purpose
 proof must never mint a sign-in session.
 
-Final erasure must recheck current full registration/policy, the active original
+`SamlAccountDeletion` delegates to PostgreSQL, which rechecks current full
+registration/policy, the active original
 owner/session/identity and exact signed subject. Require actual signed AuthnInstant
 within the existing five-minute freshness policy and no future authentication.
 Neither ForceAuthn, token issuance, request creation nor a newly created local
 session supplies freshness. Retain all original request/session, signed assertion,
 pin and signed-freshness caps through final commit.
 
-Complete signature verification before SQL authority locks. Reserve authenticated
+Signature verification completes before SQL authority locks. Reserve authenticated
 replay identifiers in the existing stable sorted namespace before owner locks;
 reuse the established optional-email/owner/session order and private account
 erasure tail. Replay reservation, local erasure, audit deidentification, safe
@@ -78,12 +79,12 @@ functions retain lock order, explicit bindings, rollback and final checks togeth
 Feature tests split migration, schema, binding, consumption, isolation and wait
 scenarios; no production proof constructor or dependency is added.
 
-The present slice implements preparation only. Revocation or source change rejects
-its use; revoked-session pending rows can remain bounded by their original expiry
-until cleanup. Full invalidation cleanup, concrete verified deletion, final atomic
-erasure, HTTP confirmation and actual IdP reauthentication-to-deletion still need
-implementation and evidence. Existing privileged account erasure/cooldown coverage
-does not establish this self-service ceremony.
+The core/PostgreSQL slice now implements concrete verification orchestration and
+final erasure as well as preparation. Revocation or source change rejects its use;
+revoked-session pending rows can remain bounded by their original expiry until
+cleanup. Full invalidation cleanup, HTTP confirmation and actual IdP
+reauthentication-to-deletion still need implementation and evidence. Backend
+acceptance alone does not establish that usable browser ceremony.
 
 Real PostgreSQL tests cover original-row preservation, purpose/realm/owner/session/
 private-proof separation, closed foreign keys, ForceAuthn intent, one-use database
@@ -95,3 +96,35 @@ Normal SAML remains disabled. ADRs 0021–0024 still require maintained source/p
 ownership, dependency/native/XML signature review, qualified identity/profile
 acceptance and independent approval. Implemented, tested, internally reviewed and
 independently approved are separate states; this ADR grants no production approval.
+
+
+## Backend evidence and limits
+
+Fourteen additional ordinary real-PostgreSQL cases exercise actual signed deletion,
+no authority before commit, exact signed subject, post-verification logout/policy/
+source denial, known ownership under JIT deny, another owner/realm, verified-contact
+notice without mailbox fallback, replay retention/cooldown, tail-write rollback,
+DB-only competing deletion/sign-in and observed final-audit/owner expiry waits.
+Both signature checks finish sequentially before each database-only ordering.
+An initial logout-negative expectation omitted the existing SessionRevoked audit;
+the corrected case explicitly captures that post-logout state and proves denied
+erasure changes none of it. No production check or existing assertion was weakened.
+
+A direct core freshness boundary check borrows a genuinely verified proof and
+supplies ordinary timestamp observations: before actual AuthnInstant and at/after
+its five-minute cap reject; the admitted boundary points grant nothing. PostgreSQL
+uses this same core policy with its own trusted database clock, retains the explicit
+not-future check and checks every earliest cap after the destructive tail. This is
+not a wire acceptance test for a newly issued response carrying an older AuthnInstant.
+The current ordinary IdP producer sets authentication time to issuance; broader
+actual-provider SSO/freshness acceptance remains separate. No XML, proof constructor,
+cryptographic verifier or database clock was modified to create that control.
+
+The final transaction reserves stable ordered replay keys before owner locks and
+uses the existing private erasure tail. Bound-session lookup resolves only the
+stored irreversible verifier of the opaque proof's initiating session, then runs
+the unchanged active-bearer/source/owner/identity guard and compares every bound ID
+under locks. The lookup returns no bearer and itself grants nothing. Locked stored
+contact, never a SAML attribute, supplies the optional notice. The longer final
+transaction keeps authorization, original/signed/freshness caps, erasure and its
+last database-clock check visible in one module below300 lines.
