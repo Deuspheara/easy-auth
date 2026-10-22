@@ -80,3 +80,22 @@ Independent review, findings resolution and an explicit source/profile-scoped
 production decision remain required by ADR 0021. Attribute-selected identity policy,
 qualified profile support and other IdPs gain no implied support from this decision.
 Normal server/router SAML remains disabled until the mandatory gates are satisfied.
+
+## Reference-processing follow-up
+
+Patch0008 adds a private `crypto/verify/execution.rs` execution preflight over the
+same namespace-aware verifier DOM and descendant traversal used by Bergshamra.
+Every processed signature's direct SignedInfo references must be supported
+same-document references before any digest/transform/key attempt. Strict profiles
+also restrict reference transform elements before execution, using the same
+allowlist as authenticated-signature policy. The exact RSA-SHA256 acceptance
+check remains on authenticated content, so unrelated signature algorithms cannot
+supply or change acceptance evidence. Explicit compatibility APIs retain their
+provider-supported transforms; the easy-auth adapter never selects that profile.
+
+Cryptography, canonicalization, trusted-key configuration and certificate policy
+remain delegated and unchanged. The single-signature API now passes its checked
+DOM to the backend rather than reparsing it. The original seven patches and all
+existing tests/fixtures remain unchanged. Inventory243 files/eight patches is a
+new source scope; historical qualification/security receipts retain their own
+scope. See the [findings follow-up](../../security/saml-reference-processing-follow-up.md).

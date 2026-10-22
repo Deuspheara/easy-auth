@@ -10,7 +10,9 @@
 //!   `SubjectConfirmationData`.
 //! - Only content covered by a verified reference is returned for extraction.
 
+mod execution;
 mod profile;
+use execution::preflight_backend_references;
 use profile::enforce_strict_profile_on_verified_signature;
 
 use super::keys::load_certificate;
@@ -20,9 +22,9 @@ use crate::error::{ReferenceResolutionReason, SamlError, SignatureVerificationRe
 use crate::util::normalize_cert_string;
 use crate::xml::dom::{self, Node, XmlLimits};
 use bergshamra::core::ns as bergshamra_ns;
-use bergshamra::dsig::verify::verify_all_document_with_source;
+use bergshamra::dsig::verify::{verify_all_document_with_source, verify_document_with_source};
 use bergshamra::xml::{uppsala, Document as BergshamraDocument, NodeId as BergshamraNodeId};
-use bergshamra::{verify, DsigContext, KeysManager, VerifiedReference, VerifyResult};
+use bergshamra::{DsigContext, KeysManager, VerifiedReference, VerifyResult};
 use std::collections::HashSet;
 
 fn children_named<'a>(node: &'a Node, name: &str) -> Vec<&'a Node> {
@@ -611,6 +613,12 @@ pub fn verify_signature_with_limits(
 
     super::provider::ensure_crypto_provider_initialized()?;
 
+    let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
+    preflight_backend_references(
+        &document,
+        XmlSignatureProfile::AllowProviderSupportedForCompatibility,
+    )?;
+
     // Try each metadata certificate individually (rolling-cert support): the
     // signature verifies if any one of the declared keys matches.
     let mut have_key = false;
@@ -638,7 +646,7 @@ pub fn verify_signature_with_limits(
             .with_require_reference_digests(true)
             .with_hmac_min_out_len(160)
             .with_insecure(true);
-        match verify(&ctx, xml) {
+        match verify_document_with_source(&ctx, &document, Some(xml)) {
             Ok(VerifyResult::Valid {
                 signature_node: _,
                 references,
@@ -746,6 +754,7 @@ pub(crate) fn verify_signatures_detailed_with_profile(
     // Reuse this exact verifier DOM for every pinned certificate attempt and
     // for evidence extraction from each successful signature node.
     let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
+    preflight_backend_references(&document, signature_profile)?;
     let mut verified_signature_nodes = HashSet::new();
     let mut verified_embedded_signatures = Vec::new();
     for cert in metadata_certs {

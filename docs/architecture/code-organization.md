@@ -946,3 +946,12 @@ as a cohesive composition-size exception. The longer ordered combined-router/sta
 keep both providers' boundaries and no-authority observations together as reviewed
 function-size exceptions. No schema, cryptographic verifier, generic provider
 framework or unrelated cleanup is introduced. Normal activation stays locked.
+
+AUTH-32's backend-processing correction adds a private, focused maintained
+`crypto/verify/execution.rs` module. The existing profile module owns the shared
+reference-transform allowlist; the upstream verification facade receives only
+DOM/preflight/delegation changes to keep the incremental upstream patch small.
+The facade remains a documented upstream size exception, not a place for another
+responsibility. Core verifier capacity sharing checks identical registration;
+Axum composition joins admission without replacing either repository or proof
+policy. No new dependency, global registry or generic admission framework is added.

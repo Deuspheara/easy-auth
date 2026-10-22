@@ -499,3 +499,15 @@ example with `--features saml-web,oidc-web` and run
 `python3 scripts/smoke_saml_startup.py`. The documented PostgreSQL development
 container or `EASY_AUTH_SMOKE_POSTGRES_CONTAINER` must be available. The runner owns
 and removes its disposable database and never activates SAML or exchanges assertions.
+
+### Verification admission scope
+
+A `SamlResponseVerifier` admits at most two operations and retains its permit
+until blocking verification actually exits, even after timeout/cancellation.
+When `SamlWebServices::with_account_deletion` attaches the identical policy,
+sign-in and deletion share those two permits while retaining separate repositories
+and purpose-bound proofs. `SamlDeletionVerifier::share_verification_capacity`
+provides that explicit same-registration composition for embedded consumers.
+Separately constructed compositions/processes still have separate budgets. The
+15-second await timeout is not a hard native execution or memory limit. Deployment
+resource assurance and independent approval remain required; SAML stays disabled.

@@ -6,7 +6,7 @@ use crate::error::{ReferenceResolutionReason, SamlError};
 use bergshamra::core::ns as bergshamra_ns;
 use bergshamra::xml::{Document as BergshamraDocument, NodeId as BergshamraNodeId};
 
-fn dsig_children(
+pub(super) fn dsig_children(
     document: &BergshamraDocument<'_>,
     parent: BergshamraNodeId,
     local_name: &str,
@@ -113,6 +113,14 @@ pub(super) fn enforce_strict_profile_on_verified_signature(
     {
         return Err(SamlError::AlgorithmUnsupported);
     }
+    enforce_reference_transforms(document, reference)
+}
+
+/// Restrict execution before digest processing as well as authenticated policy.
+pub(super) fn enforce_reference_transforms(
+    document: &BergshamraDocument<'_>,
+    reference: BergshamraNodeId,
+) -> Result<(), SamlError> {
     for transforms in dsig_children(document, reference, bergshamra_ns::node::TRANSFORMS) {
         // Bergshamra executes every direct child whose local name is
         // `Transform`, including elements outside the XML-DSig namespace.

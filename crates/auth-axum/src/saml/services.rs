@@ -34,11 +34,14 @@ impl SamlWebServices {
     /// The existing constructor and ordinary server expose no deletion routes.
     pub fn with_account_deletion(
         mut self,
-        services: SamlAccountDeletionWebServices,
+        mut services: SamlAccountDeletionWebServices,
     ) -> Result<Self> {
         if self.deletion.is_some() || services.policy != self.policy {
             return Err(Error::InvalidInput);
         }
+        // Both entry points share native admission; their repositories, proof
+        // types and operation-specific authority checks remain separate.
+        services.share_verification_capacity(&self.verifier)?;
         self.deletion = Some(Arc::new(services));
         Ok(self)
     }

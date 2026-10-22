@@ -1,0 +1,137 @@
+diff --git a/src/crypto/verify.rs b/src/crypto/verify.rs
+--- a/src/crypto/verify.rs
++++ b/src/crypto/verify.rs
+@@ -10,7 +10,9 @@
+ //!   `SubjectConfirmationData`.
+ //! - Only content covered by a verified reference is returned for extraction.
+ 
++mod execution;
+ mod profile;
++use execution::preflight_backend_references;
+ use profile::enforce_strict_profile_on_verified_signature;
+ 
+ use super::keys::load_certificate;
+@@ -20,9 +22,9 @@
+ use crate::util::normalize_cert_string;
+ use crate::xml::dom::{self, Node, XmlLimits};
+ use bergshamra::core::ns as bergshamra_ns;
+-use bergshamra::dsig::verify::verify_all_document_with_source;
++use bergshamra::dsig::verify::{verify_all_document_with_source, verify_document_with_source};
+ use bergshamra::xml::{uppsala, Document as BergshamraDocument, NodeId as BergshamraNodeId};
+-use bergshamra::{verify, DsigContext, KeysManager, VerifiedReference, VerifyResult};
++use bergshamra::{DsigContext, KeysManager, VerifiedReference, VerifyResult};
+ use std::collections::HashSet;
+ 
+ fn children_named<'a>(node: &'a Node, name: &str) -> Vec<&'a Node> {
+@@ -610,6 +612,12 @@
+     }
+ 
+     super::provider::ensure_crypto_provider_initialized()?;
++
++    let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
++    preflight_backend_references(
++        &document,
++        XmlSignatureProfile::AllowProviderSupportedForCompatibility,
++    )?;
+ 
+     // Try each metadata certificate individually (rolling-cert support): the
+     // signature verifies if any one of the declared keys matches.
+@@ -638,7 +646,7 @@
+             .with_require_reference_digests(true)
+             .with_hmac_min_out_len(160)
+             .with_insecure(true);
+-        match verify(&ctx, xml) {
++        match verify_document_with_source(&ctx, &document, Some(xml)) {
+             Ok(VerifyResult::Valid {
+                 signature_node: _,
+                 references,
+@@ -746,6 +754,7 @@
+     // Reuse this exact verifier DOM for every pinned certificate attempt and
+     // for evidence extraction from each successful signature node.
+     let document = uppsala::parse(xml).map_err(|error| SamlError::Crypto(error.to_string()))?;
++    preflight_backend_references(&document, signature_profile)?;
+     let mut verified_signature_nodes = HashSet::new();
+     let mut verified_embedded_signatures = Vec::new();
+     for cert in metadata_certs {
+diff --git a/src/crypto/verify/profile.rs b/src/crypto/verify/profile.rs
+--- a/src/crypto/verify/profile.rs
++++ b/src/crypto/verify/profile.rs
+@@ -6,7 +6,7 @@
+ use bergshamra::core::ns as bergshamra_ns;
+ use bergshamra::xml::{Document as BergshamraDocument, NodeId as BergshamraNodeId};
+ 
+-fn dsig_children(
++pub(super) fn dsig_children(
+     document: &BergshamraDocument<'_>,
+     parent: BergshamraNodeId,
+     local_name: &str,
+@@ -113,6 +113,14 @@
+     {
+         return Err(SamlError::AlgorithmUnsupported);
+     }
++    enforce_reference_transforms(document, reference)
++}
++
++/// Restrict execution before digest processing as well as authenticated policy.
++pub(super) fn enforce_reference_transforms(
++    document: &BergshamraDocument<'_>,
++    reference: BergshamraNodeId,
++) -> Result<(), SamlError> {
+     for transforms in dsig_children(document, reference, bergshamra_ns::node::TRANSFORMS) {
+         // Bergshamra executes every direct child whose local name is
+         // `Transform`, including elements outside the XML-DSig namespace.
+diff --git a/src/crypto/verify/execution.rs b/src/crypto/verify/execution.rs
+new file mode 100644
+--- /dev/null
++++ b/src/crypto/verify/execution.rs
+@@ -0,0 +1,50 @@
++//! Pre-execution constraints for every signature the backend can visit.
++//!
++//! This is an execution boundary, not evidence that a signature authenticated
++//! SAML content. Acceptance still checks the exact verified signature separately.
++use super::{
++    profile::{dsig_children, enforce_reference_transforms},
++    verified_target_from_uri,
++};
++use crate::{config::XmlSignatureProfile, error::SamlError};
++use bergshamra::core::ns;
++use bergshamra::xml::Document;
++
++/// Use the same DOM, namespace and descendant traversal as Bergshamra's
++/// `verify_all_document_with_source`, before any certificate attempt. Checking
++/// only Response/Assertion candidates misses other signatures processed there.
++/// No parse/serialize bridge or unsigned-node scan supplies acceptance evidence.
++pub(super) fn preflight_backend_references(
++    document: &Document<'_>,
++    profile: XmlSignatureProfile,
++) -> Result<(), SamlError> {
++    for signature in document.descendants(document.root()) {
++        if !document
++            .element(signature)
++            .is_some_and(|element| element.matches_name_ns(ns::DSIG, ns::node::SIGNATURE))
++        {
++            continue;
++        }
++        // Check all direct SignedInfo/Transforms containers, a superset of the
++        // backend's first-container selection. Missing structure still fails in
++        // the backend; duplicate structure cannot hide an executable reference.
++        for signed_info in dsig_children(document, signature, ns::node::SIGNED_INFO) {
++            for reference in dsig_children(document, signed_info, ns::node::REFERENCE) {
++                let uri = document
++                    .element(reference)
++                    .and_then(|element| element.get_attribute(ns::attr::URI))
++                    .unwrap_or_default();
++                // In particular, reject relative paths before the backend's
++                // resolver can fall back to reading from its working directory.
++                verified_target_from_uri(uri)?;
++                // The explicitly selected compatibility API retains its
++                // provider-supported transforms. Production uses the exact
++                // strict profile and never selects that compatibility mode.
++                if profile != XmlSignatureProfile::AllowProviderSupportedForCompatibility {
++                    enforce_reference_transforms(document, reference)?;
++                }
++            }
++        }
++    }
++    Ok(())
++}

@@ -42,8 +42,8 @@ then `git apply`, and run:
 cargo package --locked --allow-dirty --no-verify --no-default-features --features crypto-aws-lc
 ```
 
-After unpacking that original import archive, apply maintenance patches 0004/0005/0006/0007 in order with
-`git apply --check` then `git apply` from the package root. This preserves typed
+After unpacking that original import archive, apply maintenance patches 0004/0005/0006/0007/0008 in order with
+`git apply --check` then `git apply` from the package root. Patch0004 preserves typed
 NameID qualifiers through the built-in IdP response renderer; it changes no
 cryptographic verifier. Qualified successful responses refuse legacy custom
 rendering, which cannot preserve those fields. Patch 0005 adds a complete ordered
@@ -53,7 +53,11 @@ Both use the existing producer writer/signer and bounded extraction, never a new
 XML cryptographic verifier. See ADR 0028 for unavailable projection and template
 restrictions. Patch0007 extends the existing unqualified consumed-field list to
 NameFormat and the consumed NameID qualifiers before DOM projection. No new
-XML/security probe is introduced. PAOS qualification is not added.
+XML/security probe is introduced. Patch0008 checks every backend-visible signature's
+references on the verifier DOM before certificate attempts, and restricts executable
+transforms in the strict profiles. Explicit compatibility mode keeps its documented
+transform support; it is not used by easy-auth's production profile. Single-signature
+verification reuses the checked DOM. PAOS qualification is not added.
 
 The package's normalized Cargo manifest and `.cargo_vcs_info.json` intentionally
 retain version 0.6.1 and `dirty=true`; this is distinct from registry 0.6.1. The

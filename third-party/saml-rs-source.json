@@ -248,8 +248,12 @@
       "sha256": "67a4f11dda5d2d7db4d4f7498688b219d0df6caae0a09b0bb862f5af7579c93a"
     },
     {
+      "path": "src/crypto/verify/execution.rs",
+      "sha256": "9a24e419e7df1b49478f3ddc3e9ceb409d2e7bcabf7beee607807fcb17d59a6d"
+    },
+    {
       "path": "src/crypto/verify/profile.rs",
-      "sha256": "e236709e04420e2df1ec3ad3320fa577ae63907d7bcee5ec2b475382536e321d"
+      "sha256": "5694dc8ddf46e6d472bb56fdf696887da11dbb3b15a1a8ce03d4310defdc21a6"
     },
     {
       "path": "src/crypto/verify/tests/exact.rs",
@@ -257,7 +261,7 @@
     },
     {
       "path": "src/crypto/verify.rs",
-      "sha256": "0d4029d3dd6b761f8ca7d8b739d3ffa57bfd545e92c4388e0553cefacdcc3653"
+      "sha256": "135fa862ac4ce243218272217c2335eb516dea10540f302be37847bed8a21c59"
     },
     {
       "path": "src/crypto/xml_syntax.rs",
@@ -981,7 +985,8 @@
     "0004-preserve-nameid-qualifiers.patch": "3e73b2643fc95c31ca585fb57a07a2cfc9143570d417bd722075f8554e83a2ff",
     "0005-ordered-attribute-projection.patch": "402097b516612819aa91cdba62e44abecdef7fbc4226418f713e6344a04a5900",
     "0006-established-authentication-time.patch": "2d8e2fd674c9d5d288002a098ab0f7706ba1396adb78f9131152044e091ca1c6",
-    "0007-validate-consumed-attribute-namespaces.patch": "6eae38f64ed620339df964028e62d89373713b25548bdf5789925dc6fe2b5c84"
+    "0007-validate-consumed-attribute-namespaces.patch": "6eae38f64ed620339df964028e62d89373713b25548bdf5789925dc6fe2b5c84",
+    "0008-preflight-backend-reference-execution.patch": "64ca0eb7c06db90cb774646293e6289805667ea31a3495c37b20adacc8ef0577"
   },
   "package_version": "0.6.1",
   "revision": "3b289001a7a84d5a7ff7af2671991ab7098090bd",

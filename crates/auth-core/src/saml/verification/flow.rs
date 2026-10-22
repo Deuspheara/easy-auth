@@ -40,6 +40,20 @@ impl SamlResponseVerifier {
         })
     }
 
+    #[cfg(feature = "saml-identities")]
+    pub(crate) fn share_capacity_with(&mut self, other: &Self) -> Result<()> {
+        if self.registration != other.registration {
+            return Err(Error::InvalidInput);
+        }
+        // A timed-out/cancelled caller can leave native work in flight. Do not
+        // detach that work from its budget when joining another composition.
+        if self.workers.available_permits() != MAX_VERIFICATIONS {
+            return Err(Error::RateLimited);
+        }
+        self.workers = other.workers.clone();
+        Ok(())
+    }
+
     pub async fn verify(
         &self,
         prepared: SamlPreparedResponse,

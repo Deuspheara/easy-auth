@@ -23,6 +23,13 @@ impl SamlDeletionVerifier {
         let verifier = SamlResponseVerifier::new(policy.registration().clone(), repository)?;
         Ok(Self { policy, verifier })
     }
+    /// Share admission with sign-in for the identical registration, while
+    /// retaining this verifier's repository and deletion-specific proof policy.
+    /// Join before exposing the service; an occupied previous budget rejects.
+    /// This bounds one composition, not every independently constructed service.
+    pub fn share_verification_capacity(&mut self, sign_in: &SamlResponseVerifier) -> Result<()> {
+        self.verifier.share_capacity_with(sign_in)
+    }
     pub fn policy(&self) -> &SamlIdentityPolicy {
         &self.policy
     }

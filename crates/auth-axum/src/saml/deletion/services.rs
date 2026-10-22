@@ -1,6 +1,7 @@
 use auth_core::{
     Result, SamlAccountDeletion, SamlAccountDeletionRepository, SamlDeletionRequestRepository,
-    SamlDeletionRequests, SamlDeletionVerifier, SamlIdentityPolicy, SamlVerificationRepository,
+    SamlDeletionRequests, SamlDeletionVerifier, SamlIdentityPolicy, SamlResponseVerifier,
+    SamlVerificationRepository,
 };
 use std::sync::Arc;
 
@@ -13,6 +14,12 @@ pub struct SamlAccountDeletionWebServices {
     pub(super) deletion: SamlAccountDeletion,
 }
 impl SamlAccountDeletionWebServices {
+    pub(in crate::saml) fn share_verification_capacity(
+        &mut self,
+        verifier: &SamlResponseVerifier,
+    ) -> Result<()> {
+        self.verifier.share_verification_capacity(verifier)
+    }
     pub fn new(
         policy: SamlIdentityPolicy,
         requests: Arc<dyn SamlDeletionRequestRepository>,
