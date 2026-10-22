@@ -1,13 +1,10 @@
-use super::{cookies, delivery, handlers, pages, saml_web_openapi};
+use super::{cookies, delivery, handlers, pages, saml_web_openapi, services::SamlWebServices};
 use crate::{
     Auth, BrowserConfig,
     browser::{boundary, post_delivery_boundary},
     router::{AppState, configured_router},
 };
-use auth_core::{
-    Error, Result, SamlIdentityPolicy, SamlIdentityRepository, SamlRequestRepository,
-    SamlResponseVerifier, SamlSignIn, SamlTransactions, SamlVerificationRepository,
-};
+use auth_core::{Error, Result};
 use axum::{
     Router,
     extract::{DefaultBodyLimit, Request, State},
@@ -15,37 +12,12 @@ use axum::{
     response::Response,
     routing::{get, post},
 };
-use std::sync::Arc;
 
 pub(super) const ACS_PATH: &str = "/saml/acs";
 // Form encoding can expand each byte threefold; core independently enforces its
 // encoded SAMLResponse bound. No body field is ever a source/policy selector.
 const MAX_DELIVERY_BODY_BYTES: usize = 800 * 1024;
 
-#[derive(Clone)]
-pub struct SamlWebServices {
-    pub(super) policy: SamlIdentityPolicy,
-    pub(super) transactions: Arc<SamlTransactions>,
-    pub(super) verifier: Arc<SamlResponseVerifier>,
-    pub(super) sign_in: Arc<SamlSignIn>,
-}
-impl SamlWebServices {
-    /// Trusted exact policy; component source snapshots cannot drift apart.
-    pub fn new(
-        policy: SamlIdentityPolicy,
-        requests: Arc<dyn SamlRequestRepository>,
-        verification: Arc<dyn SamlVerificationRepository>,
-        identities: Arc<dyn SamlIdentityRepository>,
-    ) -> Result<Self> {
-        let reg = policy.registration().clone();
-        Ok(Self {
-            policy,
-            transactions: Arc::new(SamlTransactions::new(reg.clone(), requests)),
-            verifier: Arc::new(SamlResponseVerifier::new(reg, verification)?),
-            sign_in: Arc::new(SamlSignIn::new(identities)),
-        })
-    }
-}
 #[derive(Clone)]
 pub(super) struct WebState {
     pub base: AppState,

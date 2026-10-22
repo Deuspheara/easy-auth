@@ -127,6 +127,13 @@ SAML pending-state operations without taking source locks after owner locks.
 The coherent logout transaction keeps owner-before-session locking, revocation,
 bound pending cancellation and its typed audit together.
 
+Axum's SAML service construction lives in `saml/services.rs`, separate from route
+and middleware composition. Its private fixed three-cookie codec owns the shared
+request/RelayState/browser-proof parsing, setting and cleanup without exposing
+cookie policy options. Public service construction and sign-in behavior remain
+unchanged; focused real-PG HTTP contract, binding and lifecycle cases cover the
+extraction before another operation is added.
+
 Provider deletion now has a separate core use-case/port and PostgreSQL
 `account/provider_deletion/completion.rs` transaction. It reuses the full identity
 policy guard and owning active-provider authorization operation; only crate-private

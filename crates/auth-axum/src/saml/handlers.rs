@@ -23,13 +23,13 @@ pub(super) async fn start(
     query.map_err(|_| ApiError::Body(StatusCode::BAD_REQUEST))?;
     let Json(_) = body?;
     require_anonymous(&state.base.browser, &headers)?;
-    cookies::require_absent(&headers)?;
+    cookies::SIGN_IN.require_absent(&headers)?;
     let start = state.services.transactions.start().await?;
     let mut response = Json(SamlStartResponse {
         authorization_url: start.authorization_url().to_owned(),
     })
     .into_response();
-    cookies::set(&mut response, &state.base.browser, &start);
+    cookies::SIGN_IN.set(&mut response, &state.base.browser, &start);
     Ok(response)
 }
 
@@ -47,7 +47,7 @@ pub(super) async fn finish(
         Ok(session) => session_response(&state.base, &session),
         Err(error) => ApiError::from(error).into_response(),
     };
-    cookies::clear(&mut response, &state.base.browser);
+    cookies::SIGN_IN.clear(&mut response, &state.base.browser);
     Ok(response)
 }
 async fn complete(
@@ -56,7 +56,7 @@ async fn complete(
     input: SamlPostDelivery,
 ) -> auth_core::Result<Secret> {
     require_anonymous(&state.base.browser, headers)?;
-    let transaction = cookies::read(headers)?;
+    let transaction = cookies::SIGN_IN.read(headers)?;
     let returned = Secret::parse(input.relay)?;
     if returned.verifier() != transaction.relay.verifier() {
         return Err(Error::Unauthorized);
@@ -90,7 +90,7 @@ pub(super) async fn cancel(
     query.map_err(|_| ApiError::Body(StatusCode::BAD_REQUEST))?;
     let Json(_) = body?;
     let result = async {
-        let transaction = cookies::read(&headers)?;
+        let transaction = cookies::SIGN_IN.read(&headers)?;
         state
             .services
             .transactions
@@ -106,7 +106,7 @@ pub(super) async fn cancel(
         Ok(()) => StatusCode::NO_CONTENT.into_response(),
         Err(error) => ApiError::from(error).into_response(),
     };
-    cookies::clear(&mut response, &state.base.browser);
+    cookies::SIGN_IN.clear(&mut response, &state.base.browser);
     Ok(response)
 }
 #[utoipa::path(get,path="/saml/metadata",responses((status=200,body=String,content_type="application/samlmetadata+xml"),(status=400)))]
