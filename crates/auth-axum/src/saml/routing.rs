@@ -33,6 +33,25 @@ pub fn experimental_saml_web_router(
     browser: BrowserConfig,
     services: SamlWebServices,
 ) -> Result<Router> {
+    let api = if services.deletion.is_some() {
+        saml_account_deletion_web_openapi()
+    } else {
+        saml_web_openapi()
+    };
+    attach(
+        configured_router(auth.clone(), browser.clone(), api),
+        auth,
+        browser,
+        services,
+    )
+}
+
+pub(crate) fn attach(
+    router: Router,
+    auth: Auth,
+    browser: BrowserConfig,
+    services: SamlWebServices,
+) -> Result<Router> {
     let reg = services.policy.registration();
     if auth.realm() != reg.realm()
         || !browser.origin().starts_with("https://")
@@ -71,12 +90,7 @@ pub fn experimental_saml_web_router(
             base.clone(),
             post_delivery_boundary,
         ));
-    let api = if deletion_enabled {
-        saml_account_deletion_web_openapi()
-    } else {
-        saml_web_openapi()
-    };
-    Ok(configured_router(auth, browser, api)
+    Ok(router
         .merge(protected.merge(delivery).with_state(state))
         .layer(middleware::from_fn_with_state(
             (base.browser, deletion_enabled),

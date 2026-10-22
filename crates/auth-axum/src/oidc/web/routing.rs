@@ -60,6 +60,20 @@ pub fn oidc_web_router(
     browser: BrowserConfig,
     services: OidcWebServices,
 ) -> Result<Router> {
+    attach(
+        configured_router(auth.clone(), browser.clone(), oidc_web_openapi()),
+        auth,
+        browser,
+        services,
+    )
+}
+
+pub(crate) fn attach(
+    router: Router,
+    auth: Auth,
+    browser: BrowserConfig,
+    services: OidcWebServices,
+) -> Result<Router> {
     let connection = services.source.policy.configuration();
     if auth.realm() != connection.realm()
         || !browser.origin().starts_with("https://")
@@ -88,7 +102,7 @@ pub fn oidc_web_router(
         .layer(DefaultBodyLimit::max(8192))
         .layer(middleware::from_fn_with_state(base.clone(), boundary))
         .with_state(state);
-    Ok(configured_router(auth, browser, oidc_web_openapi())
+    Ok(router
         .merge(routes)
         .merge(deletion::routes(base.clone(), deletion))
         .layer(middleware::from_fn_with_state(base, clear_revoked_proof)))
