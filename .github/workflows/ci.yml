@@ -194,6 +194,42 @@ jobs:
       - name: Retain only dependency build outputs in the cache
         if: github.event_name == 'push' && steps.cache-environment.outputs.available == 'true'
         run: cargo clean -p easy-auth-core -p easy-auth-postgres -p easy-auth-axum -p easy-auth-server
+  saml-release:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: auth
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: auth
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U auth -d auth" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://auth:ci-only-password@localhost:5432/auth
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build disabled native SAML reference release
+        run: docker build --progress=plain -f deploy/saml/Dockerfile --build-arg "SOURCE_REVISION=$GITHUB_SHA" -t easy-auth-saml-release:ci .
+      - name: Build minimal TLS proxy with SAML blocked
+        run: docker build --progress=plain -f deploy/saml/proxy.Dockerfile --build-arg "SOURCE_REVISION=$GITHUB_SHA" -t easy-auth-saml-proxy:ci .
+      - name: Verify actual release startup, native inventory and enforced resource configuration
+        run: python3 scripts/check_saml_release.py --image easy-auth-saml-release:ci --proxy-image easy-auth-saml-proxy:ci
+        env:
+          EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      - name: Assess all image advisory severities and gate high or critical findings
+        run: python3 scripts/scan_saml_release.py --image easy-auth-saml-release:ci --proxy-image easy-auth-saml-proxy:ci
+      - name: Retain exact-source release review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saml-reference-release-${{ github.sha }}
+          path: |
+            target/saml-release-inventory.json
+            target/saml-release-advisories/auth.json
+            target/saml-release-advisories/proxy.json
+            target/saml-release-advisories/summary.json
+          retention-days: 14
   secrets:
     runs-on: ubuntu-latest
     steps:

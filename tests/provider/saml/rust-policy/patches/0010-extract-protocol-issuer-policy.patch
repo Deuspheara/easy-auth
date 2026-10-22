@@ -1,0 +1,69 @@
+diff --git a/src/flow.rs b/src/flow.rs
+--- a/src/flow.rs
++++ b/src/flow.rs
+@@ -26,6 +26,8 @@
+ };
+ use std::time::SystemTime;
+ use time::OffsetDateTime;
++
++mod issuer;
+ 
+ /// Decoded HTTP request inputs for a binding.
+ #[derive(Debug, Default, Clone)]
+@@ -884,21 +886,7 @@
+     expected_recipient: Option<&str>,
+     message_authenticated: bool,
+ ) -> Result<(), SamlError> {
+-    let should_validate_issuer = matches!(
+-        parser_type,
+-        ParserType::SamlRequest
+-            | ParserType::SamlResponse
+-            | ParserType::LogoutRequest
+-            | ParserType::LogoutResponse
+-    );
+-    if should_validate_issuer {
+-        if let Some(expected) = opts.from_issuer {
+-            let actual = extracted.get_str("issuer");
+-            if actual != Some(expected) {
+-                return Err(SamlError::issuer_mismatch(expected, actual));
+-            }
+-        }
+-    }
++    issuer::validate(parser_type, extracted, opts.from_issuer)?;
+     let is_response = matches!(
+         parser_type,
+         ParserType::SamlResponse | ParserType::LogoutResponse
+diff --git a/src/flow/issuer.rs b/src/flow/issuer.rs
+new file mode 100644
+--- /dev/null
++++ b/src/flow/issuer.rs
+@@ -0,0 +1,29 @@
++//! Expected protocol issuer policy; signature verification remains delegated.
++use crate::{constants::ParserType, error::SamlError, util::Value};
++
++pub(super) fn validate(
++    parser: ParserType,
++    extracted: &Value,
++    expected: Option<&str>,
++) -> Result<(), SamlError> {
++    let Some(expected) = expected else {
++        return Ok(());
++    };
++    if matches!(
++        parser,
++        ParserType::SamlRequest
++            | ParserType::SamlResponse
++            | ParserType::LogoutRequest
++            | ParserType::LogoutResponse
++    ) {
++        require(extracted.get_str("issuer"), expected)?;
++    }
++    Ok(())
++}
++
++fn require(actual: Option<&str>, expected: &str) -> Result<(), SamlError> {
++    if actual != Some(expected) {
++        return Err(SamlError::issuer_mismatch(expected, actual));
++    }
++    Ok(())
++}

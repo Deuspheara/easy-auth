@@ -42,7 +42,7 @@ then `git apply`, and run:
 cargo package --locked --allow-dirty --no-verify --no-default-features --features crypto-aws-lc
 ```
 
-After unpacking that original import archive, apply maintenance patches 0004/0005/0006/0007/0008/0009 in order with
+After unpacking that original import archive, apply maintenance patches 0004–0011 in order with
 `git apply --check` then `git apply` from the package root. Patch0004 preserves typed
 NameID qualifiers through the built-in IdP response renderer; it changes no
 cryptographic verifier. Qualified successful responses refuse legacy custom
@@ -85,3 +85,12 @@ Run `python3 scripts/qualify_saml_c14n.py` to additionally run the unchanged32
 selected-version canonicalization tests with the existing SAML/core suite on an
 identical normal/build graph. Only a verified archive copy in a disposable
 workspace is patched into that test graph; runtime dependencies remain unchanged.
+
+Patch0011 keeps expected-issuer policy in private `flow/issuer.rs`: configured login
+flows require both Response and Assertion issuers to match the expected IdP. The
+new `responseIssuer` extraction is envelope-scoped; `issuer` stays Assertion-scoped.
+This deliberately requires the otherwise protocol-optional Response Issuer in our
+narrow profile. Other message policies and flows without an expected issuer retain
+their contract. Existing tests/fixtures and all prior patches remain unchanged;
+new unit cases use extracted values without generating XML/cryptographic fixtures.
+ADR0031 finalizes this profile and the separately gated reference release image.

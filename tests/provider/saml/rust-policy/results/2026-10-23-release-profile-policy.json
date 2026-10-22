@@ -1,0 +1,1077 @@
+{
+  "recorded_at": "2026-10-22T22:15:12.199988+00:00",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14) (Homebrew)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.3",
+  "reproducer_sha256": "22a0941a560f6a2df9ab0e57d4c1322607ee43f8743f6077c0a31d9eba767f41",
+  "application_lock_sha256": "15de2a7ae03abe7273abbc69324192f307bf82964055c7562748a20245d49636",
+  "cargo_config_sha256": "9151db58732f429bd068df31778e66be8a4cfc93cc0d5280855bd017d090a3df",
+  "source_inventory_sha256": "5c017d7f38598cdc1be7c58b23a3da950ea7014a9aeadd5c483d3f2caa9a59fc",
+  "qualification_lock_sha256": "c320019267ed0019f5ac419dedf77a080102ed7ad2ca5898fad322c2096b427b",
+  "features": [
+    "crypto-aws-lc"
+  ],
+  "test_packages": [
+    "easy-auth-core",
+    "saml-rs",
+    "bergshamra-c14n"
+  ],
+  "dependency_versions_match": true,
+  "dependency_features_match": true,
+  "normal_build_packages": [
+    {
+      "name": "adler2",
+      "version": "2.0.1",
+      "features": []
+    },
+    {
+      "name": "android_system_properties",
+      "version": "0.1.6",
+      "features": []
+    },
+    {
+      "name": "anstream",
+      "version": "1.0.0",
+      "features": [
+        "auto",
+        "default",
+        "wincon"
+      ]
+    },
+    {
+      "name": "anstyle",
+      "version": "1.0.14",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "anstyle-parse",
+      "version": "1.0.0",
+      "features": [
+        "default",
+        "utf8"
+      ]
+    },
+    {
+      "name": "anstyle-query",
+      "version": "1.1.5",
+      "features": []
+    },
+    {
+      "name": "anstyle-wincon",
+      "version": "3.0.11",
+      "features": []
+    },
+    {
+      "name": "autocfg",
+      "version": "1.5.1",
+      "features": []
+    },
+    {
+      "name": "aws-lc-rs",
+      "version": "1.18.2",
+      "features": [
+        "alloc",
+        "aws-lc-sys",
+        "default",
+        "ring-io",
+        "ring-sig-verify"
+      ]
+    },
+    {
+      "name": "aws-lc-sys",
+      "version": "0.46.0",
+      "features": []
+    },
+    {
+      "name": "base64",
+      "version": "0.22.1",
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "base64",
+      "version": "0.23.1",
+      "features": [
+        "alloc",
+        "default",
+        "simd-unsafe",
+        "std"
+      ]
+    },
+    {
+      "name": "base64ct",
+      "version": "1.8.3",
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "bergshamra",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-c14n",
+      "version": "0.9.2",
+      "features": []
+    },
+    {
+      "name": "bergshamra-core",
+      "version": "0.9.2",
+      "features": []
+    },
+    {
+      "name": "bergshamra-crypto",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-dsig",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-enc",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-keys",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-pkcs12",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-transforms",
+      "version": "0.9.2",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "bergshamra-xml",
+      "version": "0.9.2",
+      "features": []
+    },
+    {
+      "name": "block-padding",
+      "version": "0.4.2",
+      "features": []
+    },
+    {
+      "name": "bumpalo",
+      "version": "3.20.3",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "cc",
+      "version": "1.8.0",
+      "features": [
+        "parallel"
+      ]
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.5",
+      "features": []
+    },
+    {
+      "name": "chrono",
+      "version": "0.4.45",
+      "features": [
+        "alloc",
+        "clock",
+        "iana-time-zone",
+        "now",
+        "std",
+        "winapi",
+        "windows-link"
+      ]
+    },
+    {
+      "name": "cipher",
+      "version": "0.5.2",
+      "features": [
+        "alloc",
+        "block-padding"
+      ]
+    },
+    {
+      "name": "clap",
+      "version": "4.6.7",
+      "features": [
+        "color",
+        "default",
+        "derive",
+        "error-context",
+        "help",
+        "std",
+        "suggestions",
+        "usage"
+      ]
+    },
+    {
+      "name": "clap_builder",
+      "version": "4.6.7",
+      "features": [
+        "color",
+        "error-context",
+        "help",
+        "std",
+        "suggestions",
+        "usage"
+      ]
+    },
+    {
+      "name": "clap_derive",
+      "version": "4.6.7",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "clap_lex",
+      "version": "1.1.1",
+      "features": []
+    },
+    {
+      "name": "cmake",
+      "version": "0.1.58",
+      "features": []
+    },
+    {
+      "name": "cms",
+      "version": "0.2.3",
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "colorchoice",
+      "version": "1.0.5",
+      "features": []
+    },
+    {
+      "name": "const-oid",
+      "version": "0.9.6",
+      "features": [
+        "db",
+        "std"
+      ]
+    },
+    {
+      "name": "core-foundation-sys",
+      "version": "0.8.7",
+      "features": [
+        "default",
+        "link"
+      ]
+    },
+    {
+      "name": "crc32fast",
+      "version": "1.5.2",
+      "features": []
+    },
+    {
+      "name": "crypto-common",
+      "version": "0.2.2",
+      "features": []
+    },
+    {
+      "name": "der",
+      "version": "0.7.10",
+      "features": [
+        "alloc",
+        "derive",
+        "flagset",
+        "oid",
+        "pem",
+        "std",
+        "zeroize"
+      ]
+    },
+    {
+      "name": "der_derive",
+      "version": "0.7.3",
+      "features": []
+    },
+    {
+      "name": "deranged",
+      "version": "0.5.9",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "displaydoc",
+      "version": "0.2.7",
+      "features": []
+    },
+    {
+      "name": "dunce",
+      "version": "1.0.5",
+      "features": []
+    },
+    {
+      "name": "find-msvc-tools",
+      "version": "0.1.14",
+      "features": []
+    },
+    {
+      "name": "flagset",
+      "version": "0.4.7",
+      "features": []
+    },
+    {
+      "name": "flate2",
+      "version": "1.1.10",
+      "features": [
+        "any_impl",
+        "miniz_oxide",
+        "rust_backend"
+      ]
+    },
+    {
+      "name": "form_urlencoded",
+      "version": "1.2.2",
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "fs_extra",
+      "version": "1.3.0",
+      "features": []
+    },
+    {
+      "name": "futures-core",
+      "version": "0.3.34",
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-task",
+      "version": "0.3.34",
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-util",
+      "version": "0.3.34",
+      "features": [
+        "alloc",
+        "slab",
+        "std"
+      ]
+    },
+    {
+      "name": "getrandom",
+      "version": "0.4.3",
+      "features": []
+    },
+    {
+      "name": "heck",
+      "version": "0.5.0",
+      "features": []
+    },
+    {
+      "name": "hex",
+      "version": "0.4.3",
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "hybrid-array",
+      "version": "0.4.15",
+      "features": []
+    },
+    {
+      "name": "iana-time-zone",
+      "version": "0.1.65",
+      "features": [
+        "fallback"
+      ]
+    },
+    {
+      "name": "iana-time-zone-haiku",
+      "version": "0.1.2",
+      "features": []
+    },
+    {
+      "name": "icu_collections",
+      "version": "2.3.0",
+      "features": []
+    },
+    {
+      "name": "icu_locale_core",
+      "version": "2.3.0",
+      "features": [
+        "zerovec"
+      ]
+    },
+    {
+      "name": "icu_normalizer",
+      "version": "2.3.0",
+      "features": [
+        "compiled_data"
+      ]
+    },
+    {
+      "name": "icu_normalizer_data",
+      "version": "2.3.0",
+      "features": []
+    },
+    {
+      "name": "icu_properties",
+      "version": "2.3.0",
+      "features": [
+        "compiled_data"
+      ]
+    },
+    {
+      "name": "icu_properties_data",
+      "version": "2.3.0",
+      "features": []
+    },
+    {
+      "name": "icu_provider",
+      "version": "2.3.1",
+      "features": [
+        "baked"
+      ]
+    },
+    {
+      "name": "idna",
+      "version": "1.1.0",
+      "features": [
+        "alloc",
+        "compiled_data",
+        "std"
+      ]
+    },
+    {
+      "name": "idna_adapter",
+      "version": "1.2.2",
+      "features": [
+        "compiled_data"
+      ]
+    },
+    {
+      "name": "inout",
+      "version": "0.2.5",
+      "features": [
+        "block-padding"
+      ]
+    },
+    {
+      "name": "is_terminal_polyfill",
+      "version": "1.70.2",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "jobserver",
+      "version": "0.1.35",
+      "features": []
+    },
+    {
+      "name": "js-sys",
+      "version": "0.3.106",
+      "features": [
+        "default",
+        "std",
+        "unsafe-eval"
+      ]
+    },
+    {
+      "name": "kryptering",
+      "version": "0.6.0",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "libc",
+      "version": "0.2.191",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "litemap",
+      "version": "0.8.3",
+      "features": []
+    },
+    {
+      "name": "log",
+      "version": "0.4.34",
+      "features": []
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.3",
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "features": [
+        "default",
+        "simd",
+        "simd-adler32",
+        "with-alloc"
+      ]
+    },
+    {
+      "name": "num-conv",
+      "version": "0.2.2",
+      "features": []
+    },
+    {
+      "name": "num-traits",
+      "version": "0.2.19",
+      "features": []
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4",
+      "features": []
+    },
+    {
+      "name": "once_cell_polyfill",
+      "version": "1.70.2",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "pem-rfc7468",
+      "version": "0.7.0",
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "percent-encoding",
+      "version": "2.3.2",
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "pin-project-lite",
+      "version": "0.2.17",
+      "features": []
+    },
+    {
+      "name": "pkcs8",
+      "version": "0.10.2",
+      "features": [
+        "alloc",
+        "pem",
+        "std"
+      ]
+    },
+    {
+      "name": "pkg-config",
+      "version": "0.3.34",
+      "features": []
+    },
+    {
+      "name": "potential_utf",
+      "version": "0.1.6",
+      "features": [
+        "zerovec"
+      ]
+    },
+    {
+      "name": "powerfmt",
+      "version": "0.2.1",
+      "features": []
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "quick-xml",
+      "version": "0.42.0",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "r-efi",
+      "version": "6.0.0",
+      "features": []
+    },
+    {
+      "name": "rustversion",
+      "version": "1.0.23",
+      "features": []
+    },
+    {
+      "name": "saml-rs",
+      "version": "0.6.1",
+      "features": [
+        "crypto-aws-lc"
+      ]
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.229",
+      "features": [
+        "result",
+        "std"
+      ]
+    },
+    {
+      "name": "serde_derive",
+      "version": "1.0.229",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "shlex",
+      "version": "2.0.1",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "simd-adler32",
+      "version": "0.3.10",
+      "features": []
+    },
+    {
+      "name": "slab",
+      "version": "0.4.12",
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "smallvec",
+      "version": "1.16.3",
+      "features": [
+        "const_generics"
+      ]
+    },
+    {
+      "name": "spki",
+      "version": "0.7.3",
+      "features": [
+        "alloc",
+        "pem",
+        "std"
+      ]
+    },
+    {
+      "name": "stable_deref_trait",
+      "version": "1.2.1",
+      "features": []
+    },
+    {
+      "name": "strsim",
+      "version": "0.11.1",
+      "features": []
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "features": [
+        "clone-impls",
+        "default",
+        "derive",
+        "extra-traits",
+        "full",
+        "parsing",
+        "printing",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "syn",
+      "version": "3.0.9",
+      "features": [
+        "clone-impls",
+        "default",
+        "derive",
+        "extra-traits",
+        "fold",
+        "full",
+        "parsing",
+        "printing",
+        "proc-macro",
+        "visit",
+        "visit-mut"
+      ]
+    },
+    {
+      "name": "synstructure",
+      "version": "0.14.0",
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "thiserror",
+      "version": "2.0.21",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "thiserror-impl",
+      "version": "2.0.21",
+      "features": []
+    },
+    {
+      "name": "time",
+      "version": "0.3.55",
+      "features": [
+        "alloc",
+        "default",
+        "parsing",
+        "std"
+      ]
+    },
+    {
+      "name": "time-core",
+      "version": "0.1.9",
+      "features": []
+    },
+    {
+      "name": "tinystr",
+      "version": "0.8.4",
+      "features": [
+        "zerovec"
+      ]
+    },
+    {
+      "name": "tsp-ltv",
+      "version": "0.5.0",
+      "features": [
+        "aws-lc"
+      ]
+    },
+    {
+      "name": "typenum",
+      "version": "1.20.1",
+      "features": [
+        "const-generics"
+      ]
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "features": []
+    },
+    {
+      "name": "untrusted",
+      "version": "0.7.1",
+      "features": []
+    },
+    {
+      "name": "uppsala",
+      "version": "0.10.1",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "url",
+      "version": "2.5.8",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "utf8_iter",
+      "version": "1.0.4",
+      "features": []
+    },
+    {
+      "name": "utf8parse",
+      "version": "0.2.2",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "uuid",
+      "version": "1.28.0",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "std",
+        "v4"
+      ]
+    },
+    {
+      "name": "wasm-bindgen",
+      "version": "0.2.129",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "wasm-bindgen-macro",
+      "version": "0.2.129",
+      "features": []
+    },
+    {
+      "name": "wasm-bindgen-macro-support",
+      "version": "0.2.129",
+      "features": []
+    },
+    {
+      "name": "wasm-bindgen-shared",
+      "version": "0.2.129",
+      "features": []
+    },
+    {
+      "name": "windows-core",
+      "version": "0.62.2",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "windows-implement",
+      "version": "0.60.2",
+      "features": []
+    },
+    {
+      "name": "windows-interface",
+      "version": "0.59.3",
+      "features": []
+    },
+    {
+      "name": "windows-link",
+      "version": "0.2.1",
+      "features": []
+    },
+    {
+      "name": "windows-result",
+      "version": "0.4.1",
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "windows-strings",
+      "version": "0.5.1",
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.61.2",
+      "features": [
+        "Wdk",
+        "Wdk_Foundation",
+        "Wdk_Storage",
+        "Wdk_Storage_FileSystem",
+        "Wdk_System",
+        "Wdk_System_IO",
+        "Win32",
+        "Win32_Foundation",
+        "Win32_Networking",
+        "Win32_Networking_WinSock",
+        "Win32_Security",
+        "Win32_Storage",
+        "Win32_Storage_FileSystem",
+        "Win32_System",
+        "Win32_System_Console",
+        "Win32_System_Diagnostics",
+        "Win32_System_Diagnostics_Debug",
+        "Win32_System_IO",
+        "Win32_System_Pipes",
+        "Win32_System_SystemServices",
+        "Win32_System_Threading",
+        "Win32_System_WindowsProgramming",
+        "default"
+      ]
+    },
+    {
+      "name": "writeable",
+      "version": "0.6.4",
+      "features": []
+    },
+    {
+      "name": "x509-cert",
+      "version": "0.2.5",
+      "features": [
+        "default",
+        "pem",
+        "std"
+      ]
+    },
+    {
+      "name": "yasna",
+      "version": "0.5.2",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "yoke",
+      "version": "0.8.3",
+      "features": [
+        "derive",
+        "zerofrom"
+      ]
+    },
+    {
+      "name": "yoke-derive",
+      "version": "0.8.4",
+      "features": []
+    },
+    {
+      "name": "zerofrom",
+      "version": "0.1.8",
+      "features": [
+        "derive"
+      ]
+    },
+    {
+      "name": "zerofrom-derive",
+      "version": "0.1.8",
+      "features": []
+    },
+    {
+      "name": "zeroize",
+      "version": "1.9.1",
+      "features": [
+        "alloc",
+        "default"
+      ]
+    },
+    {
+      "name": "zerotrie",
+      "version": "0.2.5",
+      "features": [
+        "yoke",
+        "zerofrom"
+      ]
+    },
+    {
+      "name": "zerovec",
+      "version": "0.11.8",
+      "features": [
+        "derive",
+        "yoke"
+      ]
+    },
+    {
+      "name": "zerovec-derive",
+      "version": "0.11.6",
+      "features": []
+    }
+  ],
+  "exit_code": 0,
+  "passed": 1149,
+  "failed": 0,
+  "ignored": 0,
+  "failed_tests": [],
+  "test_groups": 48,
+  "independent_security_approval": false,
+  "report_helper_sha256": "639d90a1d09c013bda0913dbdcb0b87acb3bb02a8ca9bd79761ebbd7763e83f8",
+  "core_verification_source_sha256": {
+    "crates/auth-core/src/saml/verification/admission.rs": "b6f18017709547e3eba8c0c4e50fe2595da3df6024a106f39d92ad9e10132c95",
+    "crates/auth-core/src/saml/verification/attributes.rs": "eb6163d8d4c42975adb24af9f6d9a63f3d78b65ef6c171f1e6ce2c3920b351c2",
+    "crates/auth-core/src/saml/verification/configuration.rs": "cba49d7e5506a04adb54a1bdbe73085098b0600ddf26c2d28a0000c889eaa6f5",
+    "crates/auth-core/src/saml/verification/flow.rs": "ab894bfa7ad145edf46fab713219334c5879b0e9c832e90402a7458d08e20cf4",
+    "crates/auth-core/src/saml/verification/input.rs": "c5b8fc6b1ba555e8b2e1d624238ee6cbf9580f5d0ca1eb759bd56dd0293a9d35",
+    "crates/auth-core/src/saml/verification/mod.rs": "3549e406591a01d0121be0ee45701b2b7810de9bd436afcde0f9d5313ec46390",
+    "crates/auth-core/src/saml/verification/projection.rs": "0ae546cb0a39afb01548943398833112d48ef48802a43c28bc9804d6f9ad8877",
+    "crates/auth-core/src/saml/verification/replay.rs": "d8472a9fc0d292d20c45eb680585faec330a06d5ec185edf621fae1bc9455168",
+    "crates/auth-core/src/saml/verification/repository.rs": "0aeacdf7070d537516f5d56d4f34988de52125d87f27b6cbff323bb348993ba1",
+    "crates/auth-core/src/saml/verification/subject.rs": "72b955d80fb7c9c657d0fb0c82dee46431247f99f633c738a189c0223a4f7a27",
+    "crates/auth-core/src/saml/verification/subject_tests.rs": "f4cb6424af575206a47244f3404ed06078ac0e8f5f33f40d1dda9eee2dbd7659",
+    "crates/auth-core/src/saml/verification/tests.rs": "7e42807a017b31576967926de61e0b8906bcd190e087cb8c992b15a8f91fe123",
+    "crates/auth-core/src/saml/verification/timing.rs": "f446c1d1f23a23f1536da1eb80c787669a76b709fd863149b69f313a3b9bf5f5",
+    "crates/auth-core/src/saml/verification/verified.rs": "fc7880abfdc66e2f661bed749fbaadfeaea72fda87b9a6a14dc1278bc7117e5f"
+  },
+  "c14n_source": {
+    "package": "bergshamra-c14n",
+    "version": "0.9.2",
+    "archive_sha256": "f9ea63f9d7b6cceeeef8ad96da61325c6ed6397e342377b552a0bf9917e266a9",
+    "copied_archive_files": 12,
+    "source_modified": false,
+    "archive_file_sha256": {
+      ".cargo_vcs_info.json": "906b94720e163806bb1e21fc7618b433a04c38d6656e0e0a89e4504803658e54",
+      "Cargo.lock": "25666b9e10411a1386c6507dcee5cbbb652a9fd3b6ef275f57ed9a9dc84d857b",
+      "Cargo.toml": "e0c7b215878478fefab368e843dd47a504d4ba2225c808bad1802bfe5468bcea",
+      "Cargo.toml.orig": "b278977a1689f488daf51e1672dfb00010cda6e7840a44b3a99341c351eee14f",
+      "README.md": "85996279de196aa04877e2f19c83b2c6bc7d07dee099b9d328459692756ae3f3",
+      "benches/c14n.rs": "c7fa2309afcbcd7d513d152ec1f5897a589e9bd30e0b1904425f8f3eac4dc270",
+      "src/escape.rs": "260fc2ffb1127c3f823f3478fc0aff9510d32294c7df8bb6f72547d7bcd2c662",
+      "src/exclusive.rs": "34bdea4f2f759acc763112b648f54a7802a9ca6150374d742ad721121ba32e32",
+      "src/inclusive.rs": "cbfee3b9caee8c66d689fb4c53f214b0a9fbfbe30ae14982fbedf1e0ab6dbe2a",
+      "src/inclusive11.rs": "dc32a734ff79ba98208edc6f00fb1aab988a83ef611fc264b85bc672f734ced9",
+      "src/lib.rs": "3362672283a0969e9880db05bf8452b5982da174378bee25657f434c2e562d95",
+      "src/render.rs": "b41925cd7b5a562f179de6e6a7942ec7da56bee8411aa96958269c7b32731673"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+# Explicit reference deployment; no database, mailbox or TLS secret is bundled.
+name: easy-auth-saml-reference
+services:
+  auth:
+    scale: 1
+    image: ${EASY_AUTH_IMAGE:?set the verified immutable release image}
+    env_file:
+      - path: ${AUTH_RUNTIME_ENV_FILE:?set a protected runtime environment file}
+        format: raw
+    environment:
+      AUTH_BIND: 0.0.0.0:8080
+      AUTH_DEVELOPMENT: "false"
+      AUTH_SAML_ENABLED: "false"
+      AUTH_OIDC_ENABLED: "false"
+    user: "65532:65532"
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 2.0
+    mem_limit: 1g
+    memswap_limit: 1g
+    pids_limit: 128
+    ulimits:
+      nofile: {soft: 1024, hard: 1024}
+    tmpfs: ["/tmp:size=16m,mode=1777,noexec,nosuid,nodev"]
+    stop_grace_period: 30s
+    restart: "no"
+    networks: [backend]
+  proxy:
+    scale: 1
+    image: ${EASY_AUTH_PROXY_IMAGE:?set the verified immutable proxy image}
+    entrypoint: [nginx, -g, "daemon off;"]
+    user: "65532:65532"
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 0.5
+    mem_limit: 128m
+    memswap_limit: 128m
+    pids_limit: 64
+    ulimits:
+      nofile: {soft: 512, hard: 512}
+    tmpfs: ["/tmp:size=16m,mode=1777,noexec,nosuid,nodev"]
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${AUTH_TLS_CERT_FILE:?set the public TLS certificate file}:/run/tls/certificate.pem:ro
+      - ${AUTH_TLS_KEY_FILE:?set the protected TLS key file}:/run/tls/private-key.pem:ro
+    ports: ["443:8443"]
+    stop_grace_period: 30s
+    restart: "no"
+    depends_on: [auth]
+    networks: [backend]
+networks:
+  backend:
+    driver: bridge

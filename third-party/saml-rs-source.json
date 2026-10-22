@@ -284,8 +284,12 @@
       "sha256": "553a768480463e902822b8727c77fe70d1dd1aac851d2f3ef3811c07bd2f75f2"
     },
     {
+      "path": "src/flow/issuer.rs",
+      "sha256": "018e58bb7faa7cfb2c2643164b0b879d4324ef67ec0d97bbab271187c89e0523"
+    },
+    {
       "path": "src/flow.rs",
-      "sha256": "63be3bc1bd8abf44f1c6cbfbafbdec67f25387dd49214d20203d7710475b3101"
+      "sha256": "1326b9ea4f6e4cbbafc6e0b068b75dc867d22e740837248224f3491918f8627f"
     },
     {
       "path": "src/idp/attributes.rs",
@@ -473,7 +477,7 @@
     },
     {
       "path": "src/xml/fields.rs",
-      "sha256": "c36165efced20e618e9ff9b8a4c9139bab865499cd554cc10aa335d4123a9cf0"
+      "sha256": "63f1c1a1b5407817c017a6caf4befc3e1849738df7f0a291d42265198570e154"
     },
     {
       "path": "src/xml/fragment.rs",
@@ -991,7 +995,9 @@
     "0006-established-authentication-time.patch": "2d8e2fd674c9d5d288002a098ab0f7706ba1396adb78f9131152044e091ca1c6",
     "0007-validate-consumed-attribute-namespaces.patch": "6eae38f64ed620339df964028e62d89373713b25548bdf5789925dc6fe2b5c84",
     "0008-preflight-backend-reference-execution.patch": "64ca0eb7c06db90cb774646293e6289805667ea31a3495c37b20adacc8ef0577",
-    "0009-bind-parser-extraction-to-verifier-dom.patch": "5795a13d988fcd239ba68bd6cea92b9e05a4b85d4372f8396202b28e7fb3df8b"
+    "0009-bind-parser-extraction-to-verifier-dom.patch": "5795a13d988fcd239ba68bd6cea92b9e05a4b85d4372f8396202b28e7fb3df8b",
+    "0010-extract-protocol-issuer-policy.patch": "24bb2b3e49e35eec3dc5a0842e7b6db1492a1477d4304fd88577321f2091230f",
+    "0011-require-response-issuer.patch": "85a6c21f0651075de21a05ca07b32f1e34e2a5ddf76e32da9a9b1cf24a54af1d"
   },
   "package_version": "0.6.1",
   "revision": "3b289001a7a84d5a7ff7af2671991ab7098090bd",

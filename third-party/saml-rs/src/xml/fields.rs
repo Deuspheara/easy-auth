@@ -107,6 +107,7 @@ pub fn login_response_fields(assertion: &str) -> Vec<ExtractorField> {
             &["Assertion", "Conditions", "AudienceRestriction", "Audience"],
         )
         .with_shortcut(assertion),
+        ExtractorField::new("responseIssuer", &["Response", "Issuer"]),
         ExtractorField::new("issuer", &["Assertion", "Issuer"]).with_shortcut(assertion),
         ExtractorField::new("nameID", &["Assertion", "Subject", "NameID"]).with_shortcut(assertion),
         ExtractorField::new("nameIDFormat", &["Assertion", "Subject", "NameID"])

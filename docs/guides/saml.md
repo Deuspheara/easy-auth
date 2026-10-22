@@ -11,6 +11,12 @@ merge is not required. The [current evidence review](../security/saml-evidence-r
 records shipped-graph regression testing and the remaining security requirements.
 Maintenance ownership does not activate the provider or establish independent approval.
 
+The finalized project profile and disabled reference release are described in
+[ADR0031](../architecture/adr/0031-saml-reference-release-profile.md) and the
+[release guide](saml-release.md). Patch0011 requires both Response and Assertion
+issuers to match the configured IdP. The current source inventory, rather than
+the historical patch counts below, identifies the maintained delivery.
+
 ## Outgoing requests and metadata
 
 The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registration,

@@ -23,6 +23,8 @@ PATCHES = (
     "0007-validate-consumed-attribute-namespaces.patch",
     "0008-preflight-backend-reference-execution.patch",
     "0009-bind-parser-extraction-to-verifier-dom.patch",
+    "0010-extract-protocol-issuer-policy.patch",
+    "0011-require-response-issuer.patch",
 )
 
 

@@ -1,5 +1,16 @@
 # Code organization
 
+The gated SAML release keeps protocol issuer policy in private maintained
+`flow/issuer.rs`; patch0010 is structural and patch0011 adds the explicit envelope
+issuer contract. Existing verifier primitives and public proof boundaries stay
+unchanged. Release scripts compose focused `scripts/saml_release/` Docker-command,
+artifact-inventory, ordinary-startup/resource, proxy and advisory modules. They
+contain no authentication policy or production verifier. Dedicated `deploy/saml/`
+files own the disabled reference images and deployment limits. Generated source/
+graph/advisory receipts are data size exceptions; new implementation modules and
+functions stay below the usual review thresholds. ADR0031 records source/profile
+and deployment scope separately from independent approval.
+
 AUTH-30 keeps core mapping, opaque proof and sign-in/port in focused
 `oidc/identities/` modules; signed profile decoding stays with verification.
 PostgreSQL `oauth/identity_policy.rs` owns configuration and exact current-policy

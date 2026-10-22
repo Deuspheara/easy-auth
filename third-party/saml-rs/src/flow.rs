@@ -27,6 +27,8 @@ use crate::xml::{
 use std::time::SystemTime;
 use time::OffsetDateTime;
 
+mod issuer;
+
 /// Decoded HTTP request inputs for a binding.
 #[derive(Debug, Default, Clone)]
 pub struct HttpRequest {
@@ -884,21 +886,7 @@ fn validate_context(
     expected_recipient: Option<&str>,
     message_authenticated: bool,
 ) -> Result<(), SamlError> {
-    let should_validate_issuer = matches!(
-        parser_type,
-        ParserType::SamlRequest
-            | ParserType::SamlResponse
-            | ParserType::LogoutRequest
-            | ParserType::LogoutResponse
-    );
-    if should_validate_issuer {
-        if let Some(expected) = opts.from_issuer {
-            let actual = extracted.get_str("issuer");
-            if actual != Some(expected) {
-                return Err(SamlError::issuer_mismatch(expected, actual));
-            }
-        }
-    }
+    issuer::validate(parser_type, extracted, opts.from_issuer)?;
     let is_response = matches!(
         parser_type,
         ParserType::SamlResponse | ParserType::LogoutResponse
