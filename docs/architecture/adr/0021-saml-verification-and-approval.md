@@ -162,16 +162,30 @@ cannot reuse a sign-in proof or silently fall back to a weaker credential.
 
 ## Evidence required for approval
 
+Current engineering evidence as of 2026-10-22. These states describe the opt-in
+components, not normal server activation. [ADR 0023](0023-saml-identity-session-commit.md),
+[ADR 0024](0024-saml-web-delivery.md), [ADR 0025](0025-saml-account-deletion.md)
+and the [provider guide](../../guides/saml-providers.md) record the implemented
+boundaries and scoped results.
+
 | Gate | Implemented | Tested | Reviewed | Independently approved |
 | --- | --- | --- | --- | --- |
-| Dependency source/features/patch maintenance and distribution | Experimental candidate/patches exist | Historical pin-scoped suites/inventory exist | Internal assessment only | Pending |
-| XML/C14N/signature/reference/verified-payload binding | Library candidate plus recorded patches | Existing bounded vectors/corpus; additional assurance outstanding | Internal source assessment only | Pending |
-| Outgoing metadata, browser-bound request state/preparation and leaf-pin configuration | Opt-in AUTH-33 components implemented; no authentication grant | Core and real PostgreSQL scenarios; commands/limits in the SAML guide | Internal source/maintainability review only | Pending |
-| Signed message/condition projection | Opt-in concrete AUTH-34 adapter; opaque proof only | Ordinary signed local POST, correlation/pin/configuration/storage controls; full condition matrix and actual IdP remain open | Internal implementation review only | Pending |
-| Exact-source identity policy and opaque mapping | Opt-in AUTH-35 default-deny configuration; no local grant | Core/real PostgreSQL mapping, rollback, migration, isolation/configuration checks | Internal implementation review only | Pending |
-| Durable Assertion replay and identity/session lifecycle | AUTH-34/35 integration remains unfinished | Not established by staged replay or message tests | Pending | Pending |
-| End-to-end IdP interoperability, identity/session and lifecycle | Not established by dependency tests | Owned IdP/browser/database evidence required; Entra/Okta coverage explicitly recorded | Pending | Pending |
-| Independent security review and activation decision | Reviewer/scope/decision record required | Not replaced by a green build or internal agent review | Pending | Pending |
+| Dependency source/features/patch maintenance and distribution | Exact qualification snapshot, three recorded patches and AWS-LC-only graph; maintained adoption decision pending | Source inventory, upstream canonicalization tests and compiled-graph advisory/license checks; not maintenance approval | Internal assessment only | Pending |
+| XML/C14N/signature/reference/verified-payload binding | Library candidate plus recorded patches; no application XML verifier | Existing bounded vectors/corpus and ordinary integration; parser/reference/backend assurance outstanding | Internal source assessment only | Pending |
+| Outgoing metadata, browser-bound request state/preparation and leaf-pin configuration | Opt-in AUTH-33 components; preparation grants no authority | Core and real PostgreSQL configuration, correlation, cancellation, rollover and isolation checks | Internal implementation/maintainability review only | Pending |
+| Signed message/condition projection | Concrete AUTH-34 adapter returns an opaque proof | Ordinary signed component controls and the documented actual Keycloak profile; broader profile assurance pending | Internal implementation review only | Pending |
+| Exact-source identity policy and opaque mapping | AUTH-35 default-deny configuration and exact persistent-subject mapping; no attribute-selected authority | Core/real PostgreSQL mapping, rollback, migration and isolation; actual Keycloak JIT/ownership checks; qualified NameID/attribute evidence incomplete | Internal implementation review only | Pending |
+| Durable Assertion replay and identity/session lifecycle | Atomic replay/identity/session/audit commit, current-source invalidation and separate purpose-bound confirmed deletion | Real PostgreSQL replay, rollback, lock ordering and tenant isolation; scoped HTTP/browser and actual Keycloak deletion evidence | Internal implementation/transaction review only | Pending |
+| End-to-end IdP interoperability, identity/session and lifecycle | Explicit gated HTTP composition; normal SAML disabled | Ten Keycloak rollover/realm and eight deletion cases, including retained-SSO challenge/newer signed authentication; older-authentication-time wire, qualified profiles and additional IdPs incomplete | Internal fixture/evidence review only | Pending |
+| Independent security review and activation decision | Reviewer/scope/decision record still required | No independent approval established by CI, internal review or owned interoperability | Pending | Pending |
+
+The retained-SSO implementation at `a2a89a96c61e1aa8f18a6dd2564417ad5e73fb7b`
+passed [full hosted CI 39771675708](https://github.com/Deuspheara/easy-auth/actions/runs/39771675708).
+The later cache-work commit `491aa4beee0ceb11443cb9730150154285116840` passed
+[full hosted CI 39773799129](https://github.com/Deuspheara/easy-auth/actions/runs/39773799129),
+including workspace, real PostgreSQL, isolated features, browser/provider, source,
+secret and dependency-policy checks. These receipts do not clear any pending
+maintenance, XML/backend or independent-approval requirement.
 
 Ordinary engineering may run established upstream test vectors and documented
 integration scenarios, including expected rejection, replay, rollback and tenant
@@ -204,10 +218,10 @@ library's complete typed message boundary, not a signature boolean plus separate
 parsed XML. Local generated metadata contains only trusted configuration and one
 pin. A required replay callback stages authenticated hash/deadline reservations;
 that is not durable replay protection or identity authority. Full fixed profile,
-opaque-proof limits, worker cancellation semantics and remaining atomic commit
-requirements are documented in the [component guide](../../guides/saml.md).
-Independent XML/backend review, maintained dependency acceptance and actual
-IdP/browser/lifecycle interoperability remain mandatory before activation.
+opaque-proof limits, worker cancellation semantics and separate atomic identity/
+session commit are documented in the [component guide](../../guides/saml.md).
+Independent XML/backend review, maintained dependency acceptance and the remaining
+profile/lifecycle assurance requirements stay mandatory before activation.
 
 
 Persistent NameID additionally enforces the protocol's 256-character bound
