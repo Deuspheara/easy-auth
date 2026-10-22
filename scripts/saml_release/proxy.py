@@ -17,6 +17,9 @@ def check(image):
             raise ValueError("reference proxy SAML route block missing")
     with tempfile.TemporaryDirectory(prefix="easy-auth-proxy-") as directory:
         folder = Path(directory)
+        # Linux bind mounts retain the host directory's ownership/mode. Only
+        # these already-public package fixtures may be traversed by container UID65532.
+        folder.chmod(0o755)
         # These exact public upstream files are already in the source inventory.
         # No certificate/key generation, signing, XML or TLS traffic occurs here.
         for original, name in [(fixtures / "sp_signing_cert.cer", "certificate.pem"),
