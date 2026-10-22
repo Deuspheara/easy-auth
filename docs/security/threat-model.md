@@ -626,3 +626,16 @@ keeps the ordinary session cookie and origin policy intact. Only the delivery pa
 uses a cross-site exception, with shared timeout/security headers and no SQL or
 grant. See [ADR 0024](../architecture/adr/0024-saml-web-delivery.md). Normal startup
 remains unchanged; actual IdP, full lifecycle and independent approval stay open.
+
+
+The gated SAML deletion backend now consumes distinct opaque deletion-purpose
+preparation through the unchanged verifier and requires exact current source,
+initiating owner/session/identity, signed subject, actual signed five-minute
+freshness, durable replay and every original/signed cap at final atomic erasure.
+It shares the existing audit/verified-contact notice/cooldown tail; no callback,
+ForceAuthn intent, token issuance, email attribute or weaker method can erase an
+account. Compiled SAML logout/revocation cancels only bound deletion state in that
+same transaction, with no later source-lock acquisition and retained final expiry
+checks. HTTP confirmation and actual IdP reauthentication-to-deletion remain open.
+See [ADR0025](../architecture/adr/0025-saml-account-deletion.md); dependency/XML/
+backend and independent approval still gate normal activation.

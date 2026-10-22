@@ -32,6 +32,8 @@ impl Postgres {
         .fetch_optional(&mut *tx)
         .await
         .map_err(unavailable)?;
+        #[cfg(feature = "saml-identities")]
+        crate::account::cancel_saml_deletion_session_requests(&mut tx, realm, user, target).await?;
         if let Some(session_id) = revoked {
             audit::record(
                 &mut tx,
@@ -66,6 +68,8 @@ impl Postgres {
         .execute(&mut *tx)
         .await
         .map_err(unavailable)?;
+        #[cfg(feature = "saml-identities")]
+        crate::account::cancel_saml_deletion_owner_requests(&mut tx, realm, user).await?;
         for table in ["auth_email_challenges", "auth_password_resets"] {
             // Fixed internal identifiers; no client input enters a table name.
             sqlx::query(&format!(

@@ -6,9 +6,9 @@ impl Postgres {
     pub(crate) async fn revoke(&self, realm: Uuid, session: Verifier) -> Result<()> {
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         // Lock the user before its session: audit ownership checks take user/session key locks.
-        let user: Option<Uuid> = sqlx::query_scalar(
+        let user: Option<(Uuid, Uuid)> = sqlx::query_as(
             r#"
-            SELECT u.id FROM auth_users u
+            SELECT u.id,s.id FROM auth_users u
             JOIN auth_sessions s ON s.realm_id=u.realm_id AND s.user_id=u.id
             WHERE s.realm_id=$1 AND s.token_hash=$2 FOR UPDATE OF u
         "#,
@@ -18,7 +18,9 @@ impl Postgres {
         .fetch_optional(&mut *tx)
         .await
         .map_err(unavailable)?;
-        if let Some(user_id) = user {
+        if let Some((user_id, initiating_session)) = user {
+            #[cfg(not(feature = "saml-identities"))]
+            let _ = initiating_session;
             let revoked: Option<Uuid> = sqlx::query_scalar(
                 r#"
                 UPDATE auth_sessions SET revoked_at=statement_timestamp()
@@ -32,6 +34,14 @@ impl Postgres {
             .fetch_optional(&mut *tx)
             .await
             .map_err(unavailable)?;
+            #[cfg(feature = "saml-identities")]
+            crate::account::cancel_saml_deletion_session_requests(
+                &mut tx,
+                realm,
+                user_id,
+                initiating_session,
+            )
+            .await?;
             if let Some(session_id) = revoked {
                 audit::record(
                     &mut tx,

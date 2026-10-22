@@ -309,8 +309,9 @@ the original request ID, private browser proof and RelayState. Wrong purpose,
 realm, source, revision, owner or session rejects without consuming another
 operation. The noncloneable redacted `SamlPreparedDeletion` retains the original
 earliest request/parent-session cap and cannot be passed to the sign-in verifier.
-It is not a verified deletion proof or authority to erase anything. Revoked-session
-pending state may remain until its bounded original expiry/cleanup.
+It is not a verified deletion proof or authority to erase anything. With the SAML backend compiled, logout and individual/all-session revocation
+atomically remove the appropriate bound pending state. Backend-disabled builds
+reject SAML authority; bounded pending state may remain until expiry or cleanup.
 
 Migration 0025 preserves existing sign-in rows and adds closed composite bindings.
 The existing sign-in repository contract remains unchanged. `SamlDeletionVerifier` consumes the
@@ -321,8 +322,9 @@ transaction: exact current source/policy, active initiating session/owner/identi
 exact signed subject, actual signed five-minute freshness, durable replay, atomic
 erasure/audit/optional stored-contact notice/cooldown and final earliest-cap check.
 The borrowed `validate_authentication_at` policy check uses trusted DB time and
-grants nothing by itself. Full invalidation cleanup, HTTP confirmation and actual
-IdP reauthentication-to-deletion remain pending. No server flag or deletion route
+grants nothing by itself. Migration0026 indexes realm/owner/session invalidation
+without changing existing rows. HTTP confirmation and actual IdP
+reauthentication-to-deletion remain pending. No server flag or deletion route
 is activated. See [ADR 0025](../architecture/adr/0025-saml-account-deletion.md).
 
 ## Gated browser engineering composition
@@ -354,7 +356,8 @@ See [ADR 0024](../architecture/adr/0024-saml-web-delivery.md) and the
 These are explicitly gated engineering routes. Normal SAML remains disabled until
 mandatory source/patch/dependency, XML/backend, actual IdP/lifecycle and independent
 approval requirements are met. Attribute selection and purpose-bound SAML account
-deletion remain unsupported. Offline producer/browser evidence is not deployed-IdP
+deletion through these browser routes remain unsupported; the separate gated
+backend is described above. Offline producer/browser evidence is not deployed-IdP
 interoperability or an independent audit.
 
 The [gated OpenAPI contract](../architecture/openapi-saml-web.json) is generated

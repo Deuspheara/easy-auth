@@ -34,3 +34,7 @@ impl Postgres {
 
 #[cfg(feature = "saml-identities")]
 mod saml_deletion;
+#[cfg(feature = "saml-identities")]
+pub(crate) use saml_deletion::invalidation::{
+    cancel_saml_deletion_owner_requests, cancel_saml_deletion_session_requests,
+};

@@ -4659,3 +4659,54 @@ actual IdP reauthentication-to-deletion acceptance. Those engineering requiremen
 remain pending alongside qualified identity/attribute support, maintained source/
 patch/dependency/native/XML review and independent approval. Internal review is
 not an independent audit. Normal SAML remains disabled.
+
+
+## 2026-10-22: Verified SAML erasure backend and atomic session invalidation
+
+The separate core deletion verifier now consumes opaque deletion preparation via
+the unchanged concrete signature adapter and exact mapping policy. Its redacted,
+noncloneable proof cannot become a sign-in proof. PostgreSQL rechecks current
+source/policy, bound active initiating owner/session/identity, exact signed subject
+and genuine signed five-minute freshness, reserves ordered durable replay and
+shares the existing account erasure/audit/stored-contact notice/cooldown tail.
+Original request/session, signed assertion/pin/session and freshness caps survive
+all writes; the final database-clock check follows the destructive tail.
+
+The initial eight new erasure cases produced seven passes and one failed test
+expectation: logout already records SessionRevoked, so expected audit cardinality
+was incorrect. The corrected new case explicitly captures the post-logout state
+and proves erasure denial leaves it unchanged. No existing assertion, verifier or
+production security check was weakened. Fourteen backend cases then passed,
+including actual signatures, wrong subject, changed source/policy/session, contact
+without weaker fallback, write failures, cooldown, DB-only competing deletion/
+sign-in and observed final audit/owner expiry waits. The direct freshness boundary
+case borrows a real signature proof and uses ordinary timestamp observations; it
+is not an old-AuthnInstant wire acceptance test or a replacement database clock.
+
+Six additional cases cover immediate bound-state cancellation on own logout,
+individual/all-session revocation, unrelated sign-in/owner/realm preservation,
+cleanup failure rollback, original caps expiring during cleanup waits and exact
+upgrade preservation. Migration0026 adds an unfiltered realm/owner/session index
+for those filters and parent cascades; migration0025 and all earlier migrations
+stay unchanged. The existing logout lock observer matches its additional session
+ID projection; negative lock-order/mutation/idempotence/audit-time assertions are
+unchanged. No new source lock is taken after the owner lock.
+
+Full default workspace tests passed111 cases. Full all-feature workspace tests
+passed757 parent-suite cases plus the child redaction control, including444 real
+PostgreSQL lifecycle cases, with zero failures/ignored. Default/all-feature strict
+all-target Clippy, formatting/diff, warning-free documentation,234-file/three-patch
+source integrity and four source-checker tests passed. Compiled advisory and
+all-feature cargo-deny checks passed without new exceptions; inactive SQLx/MySQL
+RSA remains explicitly visible. There is no dependency, cryptographic verifier,
+algorithm/trust restriction or normal provider-activation change.
+
+Source/boundary review is internal engineering review, not an independent audit.
+All new modules remain below300lines; coherent authorization/completion/logout
+transactions keep lock order, original caps, writes and final checks visible.
+HTTP confirmation and actual Keycloak reauthentication-to-deletion are still open.
+Qualified profile/attribute limitations, maintained distribution/patch decision,
+dependency/native/XML and independent approval remain distinct production gates.
+Normal SAML stays disabled. The separate unfinished user research was neither
+modified nor run. Hosted CI status must be checked for each exact subsequent head;
+local suite success does not establish a hosted pass.

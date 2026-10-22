@@ -22,7 +22,7 @@ async fn logout_waits_for_user_lock_without_holding_the_session_and_cannot_inver
     let logout = tokio::spawn(async move { logout_store.revoke(realm, verifier).await });
     tokio::time::timeout(Duration::from_secs(5),async {
         loop {
-            let waiting:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%SELECT u.id FROM auth_users u%FOR UPDATE OF u%')")
+            let waiting:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%SELECT u.id,s.id FROM auth_users u%FOR UPDATE OF u%')")
                 .fetch_one(&pool).await.unwrap();
             if waiting {break;}
             tokio::time::sleep(Duration::from_millis(10)).await;

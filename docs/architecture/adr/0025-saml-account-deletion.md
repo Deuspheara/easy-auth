@@ -81,8 +81,8 @@ scenarios; no production proof constructor or dependency is added.
 
 The core/PostgreSQL slice now implements concrete verification orchestration and
 final erasure as well as preparation. Revocation or source change rejects its use;
-revoked-session pending rows can remain bounded by their original expiry until
-cleanup. Full invalidation cleanup, HTTP confirmation and actual IdP
+the compiled SAML component now atomically cancels bound pending state on
+logout and individual/all-session revocation. HTTP confirmation and actual IdP
 reauthentication-to-deletion still need implementation and evidence. Backend
 acceptance alone does not establish that usable browser ceremony.
 
@@ -128,3 +128,26 @@ under locks. The lookup returns no bearer and itself grants nothing. Locked stor
 contact, never a SAML attribute, supplies the optional notice. The longer final
 transaction keeps authorization, original/signed/freshness caps, erasure and its
 last database-clock check visible in one module below300 lines.
+
+
+## Session invalidation and indexed access
+
+The compiled SAML backend cancels only deletion-purpose rows bound to the exact
+realm/owner/session on logout or individual revocation. Revoke-all cancels that
+realm owner's bound deletion rows across sessions, preserving anonymous sign-in,
+other owners and other realms. Cleanup shares the existing revocation transaction;
+its storage/audit failure rolls back revocation and pending deletion together.
+Fresh individual/all-session operations retain their original final deadline check
+past cleanup waits. Own logout remains allowed without a fresh provider session.
+No source lock is acquired after owner locks. Builds without this optional backend
+still reject stored SAML authority; bounded pending state may remain until expiry
+or later cleanup, but revocation cannot be reversed by recompiling a backend.
+
+The logout ownership query additionally selects the initiating session ID. Its
+existing independent lock observer matches that new projection; all negative
+lock-order, session-mutation, idempotence and audit-time assertions stay intact.
+Migration0026 adds the realm/owner/session index used by these new equality filters
+and parent cascades. It is unfiltered so FK-generated queries can use it too.
+An actual upgrade test preserves complete user/session/identity/request rows and
+original caps, checks the index definition and completes the original operation.
+Published migrations are unchanged. No performance/stress claim is made.

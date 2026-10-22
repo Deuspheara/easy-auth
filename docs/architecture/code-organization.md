@@ -120,7 +120,12 @@ consumption modules. Longer ordered authorization/preparation bodies keep source
 optional email, owner, session and identity locks, original caps, writes and final
 checks visible. Tests group binding, migration, schema, storage rollback, isolation
 and observed waits by responsibility. All added files remain below 300 lines;
-verified erasure and HTTP confirmation are explicitly pending in ADR 0025.
+the longer final erasure transaction keeps authorization, replay, shared erasure
+and original/signed/freshness caps visible together. HTTP confirmation remains
+pending in ADR 0025. Session invalidation delegates to focused crate-private
+SAML pending-state operations without taking source locks after owner locks.
+The coherent logout transaction keeps owner-before-session locking, revocation,
+bound pending cancellation and its typed audit together.
 
 Provider deletion now has a separate core use-case/port and PostgreSQL
 `account/provider_deletion/completion.rs` transaction. It reuses the full identity
