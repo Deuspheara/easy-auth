@@ -416,7 +416,12 @@ fn consumed_attributes(element: &ExpandedName) -> &'static [&'static [u8]] {
         (NamespaceKind::Protocol, b"StatusCode") => &[b"Value"],
         (NamespaceKind::Protocol, b"NameIDPolicy") => &[b"Format", b"AllowCreate"],
         (NamespaceKind::Assertion, b"Conditions") => &[b"NotBefore", b"NotOnOrAfter"],
-        (NamespaceKind::Assertion, b"NameID") => &[b"Format"],
+        (NamespaceKind::Assertion, b"NameID") => &[
+            b"Format",
+            b"NameQualifier",
+            b"SPNameQualifier",
+            b"SPProvidedID",
+        ],
         (NamespaceKind::Assertion, b"SubjectConfirmation") => &[b"Method"],
         (NamespaceKind::Assertion, b"SubjectConfirmationData") => {
             &[b"NotOnOrAfter", b"Recipient", b"InResponseTo"]
@@ -424,7 +429,7 @@ fn consumed_attributes(element: &ExpandedName) -> &'static [&'static [u8]] {
         (NamespaceKind::Assertion, b"AuthnStatement") => {
             &[b"AuthnInstant", b"SessionNotOnOrAfter", b"SessionIndex"]
         }
-        (NamespaceKind::Assertion, b"Attribute") => &[b"Name"],
+        (NamespaceKind::Assertion, b"Attribute") => &[b"Name", b"NameFormat"],
         _ => &[],
     }
 }

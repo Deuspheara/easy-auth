@@ -17,7 +17,7 @@ The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registrat
 metadata, request persistence, cancellation and response preparation. It selects
 the [packaged qualification source](../../third-party/README.md) of saml-rs
 **0.6.1** at `3b289001a7a84d5a7ff7af2671991ab7098090bd`, with the three retained
-qualification patches plus ordinary producer/projection patches 0004–0006, defaults disabled and **no cryptographic provider enabled**.
+qualification patches plus ordinary producer/projection patches 0004–0007, defaults disabled and **no cryptographic provider enabled**.
 Source/patch hashes and existing upstream vectors are retained. This is a gated
 engineering dependency, not an upstream release or production verifier approval.
 The earlier registry producer at `6b414db010235f6c2d1121944b42919a82325b06`
@@ -449,3 +449,8 @@ event separately from issuance, requires built-in Web Browser SSO generation, an
 rejects invalid/future dates. It authenticates no event itself. The unchanged
 application verifier and database still enforce actual signed age and every cap.
 See the [activation status](../security/saml-activation-status.md) for exact remaining gates.
+
+Patch0007 wires NameFormat and consumed NameID qualifiers through the existing
+unqualified-attribute validator before local-name DOM projection. This is a static
+consumed-field completeness fix; no custom namespace/crypto probe or new verifier
+was introduced, and independent namespace/binding review is still pending.

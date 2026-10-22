@@ -16,6 +16,12 @@ verifier. Preserve Name, optional NameFormat (including absent versus empty), al
 scalar text values, duplicates, empty values and record groups. No normalization,
 format inference, name-based merge or schema-type coercion is performed.
 
+Patch0007 declares NameFormat and all consumed NameID qualifiers in the existing
+unqualified-attribute validation list before the local-name DOM projection. Static
+source review found these consumed-field declarations missing. This reuses the
+existing namespace validator; it adds no parser, cryptographic verifier or custom
+XML probe. The broader namespace/ID/backend equivalence review remains pending.
+
 The new accessor returns Some(empty) for an assertion without attributes. It
 returns None when a complete scalar projection is unavailable, including a legacy
 manually constructed raw FlowResult, XML-valued or nil data. Partial projection

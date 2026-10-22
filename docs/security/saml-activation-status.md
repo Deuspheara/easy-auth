@@ -1,6 +1,6 @@
 # SAML activation status
 
-Updated 2026-10-22 for the maintained six-patch saml-rs source. This is an internal
+Updated 2026-10-22 for the maintained seven-patch saml-rs source. This is an internal
 engineering evidence record, not an independent audit or approval to deploy.
 
 ## Implemented and component-tested
@@ -25,7 +25,7 @@ engineering evidence record, not an independent audit or approval to deploy.
 - Selected-graph library/core qualification passes 1,115 tests with zero failures or
   ignores across 46 result groups. Existing vectors/tests and original patches are
   retained. The scoped source, compiler, lock/features and count evidence is in
-  [the six-patch receipt](../../tests/provider/saml/rust-policy/results/2026-10-22-attribute-authentication-facts.json).
+  [the current source receipt](../../tests/provider/saml/rust-policy/results/2026-10-22-consumed-field-policy.json).
   These counts are regression evidence, not 1,115 independent security experiments.
 - Previous hosted Keycloak 26.8.1 evidence covers ten rollover/realm cases and eight
   confirmed-deletion cases, including retained-SSO reauthentication. Local new-source formatting, strict default/all-feature all-target Clippy,
@@ -34,6 +34,12 @@ engineering evidence record, not an independent audit or approval to deploy.
   scheduling. Eleven source/runner checks and exact incremental reconstruction
   also pass. Hosted new-source application/provider/CI receipt is still required; an earlier green
   build is not silently attributed to these patches.
+
+The final static review also added NameFormat and the consumed NameID qualifiers
+to the existing unqualified-attribute validator (patch0007), before local-name
+projection. This corrects field metadata wiring; it is not a demonstrated bypass
+or independent namespace/security approval. Historical six-patch receipts remain
+unchanged and are not silently attributed to the new source.
 
 ## Mandatory blockers to production activation
 

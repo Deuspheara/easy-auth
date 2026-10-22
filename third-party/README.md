@@ -42,7 +42,7 @@ then `git apply`, and run:
 cargo package --locked --allow-dirty --no-verify --no-default-features --features crypto-aws-lc
 ```
 
-After unpacking that original import archive, apply maintenance patches 0004/0005/0006 in order with
+After unpacking that original import archive, apply maintenance patches 0004/0005/0006/0007 in order with
 `git apply --check` then `git apply` from the package root. This preserves typed
 NameID qualifiers through the built-in IdP response renderer; it changes no
 cryptographic verifier. Qualified successful responses refuse legacy custom
@@ -51,7 +51,9 @@ scalar attribute accessor without changing the legacy aggregate view; patch 0006
 adds caller-established authentication time distinct from response issuance.
 Both use the existing producer writer/signer and bounded extraction, never a new
 XML cryptographic verifier. See ADR 0028 for unavailable projection and template
-restrictions. PAOS qualification is not added.
+restrictions. Patch0007 extends the existing unqualified consumed-field list to
+NameFormat and the consumed NameID qualifiers before DOM projection. No new
+XML/security probe is introduced. PAOS qualification is not added.
 
 The package's normalized Cargo manifest and `.cargo_vcs_info.json` intentionally
 retain version 0.6.1 and `dirty=true`; this is distinct from registry 0.6.1. The

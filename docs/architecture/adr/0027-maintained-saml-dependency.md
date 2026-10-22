@@ -41,6 +41,10 @@ time independent of issuance. [ADR 0028](0028-saml-attribute-and-authentication-
 records these additive contracts and ordinary integration coverage. Neither
 changes the cryptographic verifier or completes independent approval.
 
+Patch0007 also declares every consumed qualifier/NameFormat field in the
+existing unqualified-attribute validator. It closes a static field-list omission,
+without changing signature verification or claiming a bypass experiment.
+
 ## Maintenance and release obligations
 
 Easy-auth maintainers review each proposed source/patch change, retain the previous

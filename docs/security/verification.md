@@ -4996,3 +4996,25 @@ reference in a new test helper was corrected for strict Clippy. Final checks pas
 [activation status](saml-activation-status.md) state exact scope and remaining
 mandatory review/resource/independent-decision/production-composition requirements.
 No PR or external contact; normal SAML stays disabled.
+
+
+## AUTH-35 consumed-field declaration follow-up — 2026-10-22
+
+Static source review found NameFormat and the already-consumed Response NameID
+qualifiers missing from the existing unqualified-attribute field list. Incremental
+patch0007 declares those fields before local-name DOM projection, using the
+existing namespace validator. No new parser, signature/trust/canonicalization
+change, custom XML/namespace probe or cryptographic fixture is introduced. This
+is a static correctness finding, not a demonstrated bypass claim.
+
+The unchanged selected-graph upstream/core suite passes1115/0failed/0ignored
+across46groups on the new source. Standard formatting, strict default/all-feature
+all-target Clippy, warning-free all-feature workspace docs and full locked workspace
+tests pass under normal scheduling:111 default/788 all-feature result counts,
+including462 real-PG lifecycle tests. Eleven source/runner checks,242-file/seven-
+patch integrity, rustfmt/diff and exact incremental reconstruction pass. Previous
+six-patch receipts remain unchanged; the new
+[source receipt](../../tests/provider/saml/rust-policy/results/2026-10-22-consumed-field-policy.json)
+identifies this source. Independent QName/parser/reference/backend/resource
+assurance and explicit security approval remain pending; production composition
+is disabled. No PR or external contact.

@@ -489,7 +489,7 @@
     },
     {
       "path": "src/xml/profile.rs",
-      "sha256": "7e26d07f0602d09bea3813232bd27ae546ed2d481ef0276fec6364e8d08e5cd4"
+      "sha256": "69ec1de066ebb62911c3abda0112cbd061a53a1765d475589361f2a11b6eb805"
     },
     {
       "path": "src/xml/write.rs",
@@ -980,7 +980,8 @@
   "maintenance_patches": {
     "0004-preserve-nameid-qualifiers.patch": "3e73b2643fc95c31ca585fb57a07a2cfc9143570d417bd722075f8554e83a2ff",
     "0005-ordered-attribute-projection.patch": "402097b516612819aa91cdba62e44abecdef7fbc4226418f713e6344a04a5900",
-    "0006-established-authentication-time.patch": "2d8e2fd674c9d5d288002a098ab0f7706ba1396adb78f9131152044e091ca1c6"
+    "0006-established-authentication-time.patch": "2d8e2fd674c9d5d288002a098ab0f7706ba1396adb78f9131152044e091ca1c6",
+    "0007-validate-consumed-attribute-namespaces.patch": "6eae38f64ed620339df964028e62d89373713b25548bdf5789925dc6fe2b5c84"
   },
   "package_version": "0.6.1",
   "revision": "3b289001a7a84d5a7ff7af2671991ab7098090bd",

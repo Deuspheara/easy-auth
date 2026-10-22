@@ -20,6 +20,7 @@ PATCHES = (
     "0004-preserve-nameid-qualifiers.patch",
     "0005-ordered-attribute-projection.patch",
     "0006-established-authentication-time.patch",
+    "0007-validate-consumed-attribute-namespaces.patch",
 )
 
 

@@ -9,7 +9,7 @@ change is part of this review.
 ## Source and evidence scope
 
 The maintained source is saml-rs 0.6.1 at upstream revision
-`3b289001a7a84d5a7ff7af2671991ab7098090bd`, with three retained qualification patches plus maintenance patches 0004–0006
+`3b289001a7a84d5a7ff7af2671991ab7098090bd`, with three retained qualification patches plus maintenance patches 0004–0007
 and a 242-file inventory. The application selects only `crypto-aws-lc`. Its lock
 contains Bergshamra 0.9.2, uppsala 0.10.1, kryptering 0.6.0, aws-lc-rs 1.18.2
 and aws-lc-sys 0.46.0. Earlier standalone tests used different AWS-LC versions;
@@ -192,3 +192,18 @@ all-feature/no-deps workspace documentation, and locked workspace tests (111
 default; 788 all-feature result counts, including 462 real-PG lifecycle tests).
 Eleven source/runner checks and source integrity/reconstruction also pass. These
 checks add no package, dependency, migration or production activation path.
+
+
+## Consumed-field namespace declarations
+
+Static source review found the existing `xml/profile.rs` unqualified-attribute
+validator declared Attribute Name but not newly consumed NameFormat, and the
+Response NameID list omitted the qualifiers already consumed by typed extraction.
+Patch0007 extends that existing metadata list before the local-name DOM lookup.
+It changes no signature engine, trust policy or canonicalization code. No custom
+XML/namespace probe, bypass experiment or new cryptographic fixture is created.
+The previously existing namespace validation and ordinary qualified/attribute
+round trips are rerun; independent namespace/ID/reference equivalence assurance
+remains explicitly open. The six-patch reports above retain their original scope;
+[the new receipt](../../tests/provider/saml/rust-policy/results/2026-10-22-consumed-field-policy.json)
+identifies the seven-patch source.
