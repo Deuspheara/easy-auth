@@ -295,6 +295,29 @@ retain the resulting bound. The pinned ordinary IdP producer does not emit the
 optional statement expiry. The owned actual Keycloak acceptance below now covers
 that wire case for its recorded profile; other provider profiles remain separate.
 
+## Deletion-purpose preparation only
+
+The opt-in `saml-identities` feature exposes `SamlDeletionRequests` with a
+separate `SamlDeletionRequestRepository`. Construct it with the trusted exact
+registration and PostgreSQL adapter; `start` requires the actual current SAML
+session bearer. It generates a ForceAuthn request through the established library
+and commits a distinct deletion purpose bound to that owner, session and identity.
+This requests reauthentication; it does not prove recent authentication.
+
+`prepare_response` and `cancel` require that same active initiating session plus
+the original request ID, private browser proof and RelayState. Wrong purpose,
+realm, source, revision, owner or session rejects without consuming another
+operation. The noncloneable redacted `SamlPreparedDeletion` retains the original
+earliest request/parent-session cap and cannot be passed to the sign-in verifier.
+It is not a verified deletion proof or authority to erase anything. Revoked-session
+pending state may remain until its bounded original expiry/cleanup.
+
+Migration 0025 preserves existing sign-in rows and adds closed composite bindings.
+The existing sign-in repository contract remains unchanged. Concrete verified
+deletion, atomic erasure, full invalidation cleanup, HTTP confirmation and actual
+IdP reauthentication-to-deletion remain pending. No server flag or deletion route
+is activated. See [ADR 0025](../architecture/adr/0025-saml-account-deletion.md).
+
 ## Gated browser engineering composition
 
 The explicit Axum `saml-web` feature exposes `SamlWebServices`,

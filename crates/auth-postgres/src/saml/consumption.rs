@@ -15,7 +15,7 @@ pub(super) async fn take(
         r#"
         DELETE FROM auth_saml_requests
         WHERE realm_id=$1 AND connection_id=$2 AND client_id=$3 AND revision=$4 AND request_id=$5
-          AND relay_hash=$6 AND browser_hash=$7 AND expires_at>clock_timestamp()
+          AND relay_hash=$6 AND browser_hash=$7 AND purpose='sign_in' AND expires_at>clock_timestamp()
         RETURNING (extract(epoch FROM expires_at)*1000000)::bigint,
           (extract(epoch FROM clock_timestamp())*1000000)::bigint
     "#,

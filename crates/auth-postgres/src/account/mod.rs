@@ -31,3 +31,6 @@ impl Postgres {
         .ok_or(Error::Unauthorized)
     }
 }
+
+#[cfg(feature = "saml-identities")]
+mod saml_deletion;

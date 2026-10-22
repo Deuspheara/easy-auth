@@ -40,7 +40,7 @@ impl Postgres {
 }
 
 /// Exact current definition under the caller's source/configuration transaction.
-pub(super) async fn load(
+pub(crate) async fn load(
     tx: &mut Transaction<'_, Pg>,
     reg: &SamlRegistration,
 ) -> Result<SamlIdentityPolicy> {

@@ -4616,3 +4616,46 @@ Final source/report Gitleaks also passed with the existing exact public-fixture
 allowlists. The parsed CI workflow now requires this actual-Keycloak suite after
 the existing owned SAML POST browser check; hosted results remain separate from
 local acceptance. No source/patch/algorithm/trust exception was added.
+
+
+## 2026-10-22: Purpose-bound SAML deletion preparation
+
+ADR0025 adds opt-in preparation only: distinct persisted deletion purpose,
+initiating SAML bearer/owner/session/identity binding, ordinary library-generated
+ForceAuthn intent, opaque redacted one-use preparation and retained earliest
+request/parent-session caps. Sign-in cannot consume or cancel deletion purpose.
+Migration0025 preserves all original sign-in fields and defaults the new binding
+to sign-in/no initiating IDs. No cryptographic verifier, trust/algorithm/time
+policy, published migration, dependency or ordinary provider activation changes.
+
+Fourteen added real-PostgreSQL cases cover exact upgrade preservation/defaults,
+purpose/private-proof/owner/session/realm rejection, closed composite foreign keys,
+ordinary reauthentication intent, DB-only prepare/cancel ordering, storage-fault
+rollback and observed owner/write waits. The final DELETE wait crosses the original
+cap and proves consumption rolls back; earlier parent activity cannot extend a
+persisted cap. Actual initiating signatures use the existing library IdP producer
+and upstream public fixture before any database-only ordering. No new adversarial
+XML/crypto fixture, fuzz/stress or signature-concurrency campaign is added. Existing
+security tests and the user's separate unfinished research remain unchanged.
+
+Default workspace tests passed111 cases. All-feature tests passed737 parent-suite
+cases plus the child redaction control, including424 PostgreSQL lifecycle cases;
+there were zero failed or ignored cases. The focused SAML PG suite passed66/66.
+Default/all-feature strict all-target Clippy, fmt/diff/YAML parse, warning-free
+documentation,234-file/three-patch source integrity and four checker tests passed.
+Compiled advisory and all-feature cargo-deny checks passed without new exceptions;
+inactive SQLx/MySQL RSA remains visible. Source secret scanning passed using the
+existing exact-fixture allowlists. New modules remain below300 lines; the longer
+ordered authorization/preparation functions retain explicit lock order, original
+caps and final checks as reviewed maintainability exceptions.
+
+Hosted CI for the prior actual-Keycloak/timing-observer commit da93c418d18e7e528783b9166e556a098d4b90fc
+passed both jobs: https://github.com/Deuspheara/easy-auth/actions/runs/39688484567 .
+Hosted results for subsequent commits remain separate from these local results.
+
+This slice is implemented, ordinarily tested and internally reviewed. It is not
+verified deletion, atomic erasure, full invalidation cleanup, HTTP confirmation or
+actual IdP reauthentication-to-deletion acceptance. Those engineering requirements
+remain pending alongside qualified identity/attribute support, maintained source/
+patch/dependency/native/XML review and independent approval. Internal review is
+not an independent audit. Normal SAML remains disabled.

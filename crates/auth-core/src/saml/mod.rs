@@ -38,3 +38,11 @@ mod preparation_tests;
 pub use identities::{
     SamlIdentityPolicy, SamlIdentityRepository, SamlJitPolicy, SamlMappedIdentity, SamlSignIn,
 };
+
+#[cfg(feature = "saml-identities")]
+mod deletion;
+#[cfg(feature = "saml-identities")]
+pub use deletion::{
+    SamlDeletionBinding, SamlDeletionRequestContext, SamlDeletionRequestRepository,
+    SamlDeletionRequests, SamlPreparedDeletion,
+};

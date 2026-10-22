@@ -48,6 +48,14 @@ attribute extraction. The authenticated attribute NameFormat limitation in
 [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) stays open; attributes
 cannot choose ownership, contact, roles or account linking.
 
+Purpose-bound deletion preparation is implemented separately, with an actual
+initiating SAML session and retained original caps. It does not yet verify a
+deletion assertion, erase an account or supply browser confirmation. ForceAuthn
+intent alone establishes no freshness. See
+[ADR 0025](../architecture/adr/0025-saml-account-deletion.md) for the implemented
+boundary and required completion work; the ten Keycloak cases above do not cover
+self-service deletion.
+
 ## Microsoft Entra: documentation only, lifetime incompatibility
 
 For a future registered enterprise application, the Identifier must equal the

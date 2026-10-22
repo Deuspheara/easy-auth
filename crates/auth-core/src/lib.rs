@@ -101,3 +101,9 @@ pub use oidc::{
     OidcTokenRequest, OidcTokenResponse, OidcTokenVerifier, OidcVerificationPolicy,
     VerifiedOidcIdentity,
 };
+
+#[cfg(feature = "saml-identities")]
+pub use saml::{
+    SamlDeletionBinding, SamlDeletionRequestContext, SamlDeletionRequestRepository,
+    SamlDeletionRequests, SamlPreparedDeletion,
+};

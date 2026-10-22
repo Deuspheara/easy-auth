@@ -114,6 +114,14 @@ Rust permits one implementation of a trait for a type. PostgreSQL's `repository.
 
 ## Reviewed size exceptions
 
+SAML deletion preparation uses separate core operation/port/opaque preparation
+modules and PostgreSQL `account/saml_deletion/` authorization, preparation and
+consumption modules. Longer ordered authorization/preparation bodies keep source,
+optional email, owner, session and identity locks, original caps, writes and final
+checks visible. Tests group binding, migration, schema, storage rollback, isolation
+and observed waits by responsibility. All added files remain below 300 lines;
+verified erasure and HTTP confirmation are explicitly pending in ADR 0025.
+
 Provider deletion now has a separate core use-case/port and PostgreSQL
 `account/provider_deletion/completion.rs` transaction. It reuses the full identity
 policy guard and owning active-provider authorization operation; only crate-private
