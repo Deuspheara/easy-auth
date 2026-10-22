@@ -636,6 +636,8 @@ It shares the existing audit/verified-contact notice/cooldown tail; no callback,
 ForceAuthn intent, token issuance, email attribute or weaker method can erase an
 account. Compiled SAML logout/revocation cancels only bound deletion state in that
 same transaction, with no later source-lock acquisition and retained final expiry
-checks. HTTP confirmation and actual IdP reauthentication-to-deletion remain open.
+checks. Explicit same-origin HTTP confirmation is implemented with separate private
+proof cookies and a non-authoritative common ACS/operation selector. Actual IdP
+reauthentication-to-deletion browser acceptance remains open.
 See [ADR0025](../architecture/adr/0025-saml-account-deletion.md); dependency/XML/
 backend and independent approval still gate normal activation.

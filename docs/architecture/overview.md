@@ -62,7 +62,9 @@ ForceAuthn through the established library and retains the earliest original
 request/session cap. Its opaque preparation grants no authentication or erasure.
 `SamlDeletionVerifier` and `SamlAccountDeletion` now compose unchanged signature
 verification and the atomic source/owner/subject/freshness/replay-gated erasure
-transaction. HTTP confirmation and actual provider deletion acceptance remain pending.
+transaction. An explicit same-policy HTTP extension now supplies separate private proof
+cookies and confirmation at start/finish; actual provider deletion/browser
+acceptance remains pending.
 [ADR 0025](adr/0025-saml-account-deletion.md) records this staged boundary.
 
 The optional `oidc-egress` feature keeps URL/address/cache/metadata policy in core,

@@ -1,7 +1,9 @@
 # ADR 0025: Purpose-bound SAML account deletion
 
 Date: 2026-10-22. Status: core/PostgreSQL preparation, verification orchestration and erasure
-implemented for opt-in engineering; HTTP/browser delivery and production approval remain pending.
+implemented for opt-in engineering, including explicit HTTPS confirmation routes
+and reference client. Actual provider deletion/browser acceptance and production
+approval remain pending.
 
 ## Decision
 
@@ -82,8 +84,8 @@ scenarios; no production proof constructor or dependency is added.
 The core/PostgreSQL slice now implements concrete verification orchestration and
 final erasure as well as preparation. Revocation or source change rejects its use;
 the compiled SAML component now atomically cancels bound pending state on
-logout and individual/all-session revocation. HTTP confirmation and actual IdP
-reauthentication-to-deletion still need implementation and evidence. Backend
+logout and individual/all-session revocation. The explicit HTTP confirmation implementation now has component evidence; actual
+IdP reauthentication-to-deletion still needs browser acceptance. Backend
 acceptance alone does not establish that usable browser ceremony.
 
 Real PostgreSQL tests cover original-row preservation, purpose/realm/owner/session/
@@ -151,3 +153,37 @@ and parent cascades. It is unfiltered so FK-generated queries can use it too.
 An actual upgrade test preserves complete user/session/identity/request rows and
 original caps, checks the index definition and completes the original operation.
 Published migrations are unchanged. No performance/stress claim is made.
+
+
+## Explicit HTTP confirmation and non-authoritative delivery
+
+`SamlAccountDeletionWebServices` constructs the concrete preparation, verifier and
+final-erasure services from one full policy. `SamlWebServices::with_account_deletion`
+rejects mismatched or repeated selection; the existing constructor keeps deletion
+absent and its original logout-cookie behavior. Only the selected router adds the
+destructive start/finish/cancel/reference paths. Closed inputs require exact Origin,
+current initiating SAML session, separate three-cookie proofs and the same explicit
+confirmation phrase at start and completion. No source/owner/realm/return selector
+is accepted. Successful erasure clears current authentication/proof cookies only
+after commit; errors preserve the ambient session. A stale returned nonce does not
+clear another operation's cookies. Cancellation grants/erases nothing.
+
+The common cross-site POST ACS remains non-authoritative and cookie/storage-free.
+The fixed protected script removes its hidden form, then sends only returned
+RelayState to same-origin operation selection. A unique complete private-cookie
+match selects fixed sign-in versus deletion UI; ambiguity or an unavailable
+profile rejects without consumption, signature work, SQL or grant. Existing-session
+rejection remains in actual sign-in finish. Deletion waits for a second typed
+confirmation and has no automatic destructive submission. Payload stays in memory,
+not URLs/storage, and is discarded on navigation/restoration. Full cookie/origin,
+source, purpose, owner, signature, time and atomic-commit checks still gate finish.
+
+Ordinary signed/real-PG component cases cover selected-route/contract separation,
+confirmation/Origin/session/closed-input rejection, non-authority before commit,
+wrong subject/session, stale nonce preservation, disabled source, cancellation and
+storage-fault rollback. Existing sign-in cases pass unchanged. The owned eight-case
+Chromium sign-in regression also passes through the new selector, including actual
+cross-site Lax-cookie absence, same-origin private proof presence, ambient-session
+protection and cleanup. That regression does not establish the new deletion UI or
+actual provider deletion ceremony. Both generated contracts are checked against
+live publication; normal SAML configuration remains disabled.

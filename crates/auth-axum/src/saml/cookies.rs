@@ -10,7 +10,17 @@ pub(super) const SIGN_IN: ProofCookies = ProofCookies::new([
     "__Host-auth-saml-relay",
     "__Host-auth-saml-browser",
 ]);
+pub(super) const ACCOUNT_DELETION: ProofCookies = ProofCookies::new([
+    "__Host-auth-saml-delete-request",
+    "__Host-auth-saml-delete-relay",
+    "__Host-auth-saml-delete-browser",
+]);
 const LIFETIME_SECONDS: u32 = 300;
+
+pub(super) fn require_no_pending(headers: &HeaderMap) -> Result<()> {
+    SIGN_IN.require_absent(headers)?;
+    ACCOUNT_DELETION.require_absent(headers)
+}
 
 pub(super) struct Transaction {
     pub request: String,
@@ -78,7 +88,7 @@ impl ProofCookies {
     }
 }
 
-pub(super) fn clear_if_logged_out(response: &mut Response, config: &BrowserConfig) {
+pub(super) fn clear_if_logged_out(response: &mut Response, config: &BrowserConfig, deletion: bool) {
     let prefix = format!("{}=;", config.session_name());
     if response
         .headers()
@@ -87,5 +97,8 @@ pub(super) fn clear_if_logged_out(response: &mut Response, config: &BrowserConfi
         .any(|v| v.to_str().is_ok_and(|v| v.starts_with(&prefix)))
     {
         SIGN_IN.clear(response, config);
+        if deletion {
+            ACCOUNT_DELETION.clear(response, config);
+        }
     }
 }

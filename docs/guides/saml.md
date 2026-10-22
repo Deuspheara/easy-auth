@@ -323,8 +323,8 @@ exact signed subject, actual signed five-minute freshness, durable replay, atomi
 erasure/audit/optional stored-contact notice/cooldown and final earliest-cap check.
 The borrowed `validate_authentication_at` policy check uses trusted DB time and
 grants nothing by itself. Migration0026 indexes realm/owner/session invalidation
-without changing existing rows. HTTP confirmation and actual IdP
-reauthentication-to-deletion remain pending. No server flag or deletion route
+without changing existing rows. The explicit HTTP/reference-client extension below supplies confirmation; actual
+IdP reauthentication-to-deletion/browser acceptance remains pending. No normal server flag or default deletion route
 is activated. See [ADR 0025](../architecture/adr/0025-saml-account-deletion.md).
 
 ## Gated browser engineering composition
@@ -371,3 +371,38 @@ Keycloak26.8.1 browser/rollover/realm cases, with source and cleanup evidence.
 It also distinguishes documentation-only Entra/Okta integration from tested
 support; Entra's documented lifetime minimum conflicts with the existing strict
 five-minute signed-validity profile. No verifier restriction was relaxed.
+
+
+## Explicit gated account-deletion HTTP extension
+
+Construct `SamlAccountDeletionWebServices` with the identical persisted policy,
+request/verification/final-deletion ports and select it with
+`SamlWebServices::with_account_deletion`. The original constructor exposes no
+account-deletion route. The selected extension adds:
+
+- `POST /v1/saml/account-delete/start`: JSON `confirmation` must equal
+  `delete my account`; requires the current SAML session and returns the provider
+  URL only after its bound forced-reauthentication request is committed.
+- `POST /v1/saml/account-delete/finish`: closed form `SAMLResponse`, `RelayState`
+  and that same confirmation phrase; requires current session and separate private
+  deletion proof cookies, actual verification and final atomic erasure.
+- `POST /v1/saml/account-delete/cancel`: closed empty JSON; cancels only the bound
+  operation and clears its local proofs, preserving the account/session.
+- `GET /saml/account-delete`: fixed reference page with confirmation before IdP
+  navigation. The returned ACS page requires a second explicit confirmation.
+
+The shared ACS remains non-authoritative. Its same-origin script uses only a
+cookie-bound, non-consuming `POST /v1/saml/operation` to choose fixed sign-in versus
+deletion UI, then the selected completion enforces every original invariant.
+Deletion never auto-submits, returns a session or falls back to another method.
+Secure/HttpOnly/host-only/Lax cookies stay in force; no response or private proof is
+put in URLs or browser storage. Stale deletion replies cannot clear newer cookies.
+Lost/expired proof, expired original session, source change or provider unavailability
+can prevent completion; no fresh request/token rewrites old authority or deadlines.
+
+The [full gated contract](../architecture/openapi-saml-account-deletion.json)
+separates these selected routes from the sign-in-only document and normal API.
+Component tests use ordinary library-produced signatures and real PostgreSQL;
+existing owned-browser sign-in checks establish compatibility only. Actual provider
+reauthentication-to-deletion and independent approval are still pending. Normal
+SAML remains disabled.

@@ -1,5 +1,6 @@
+use super::deletion::SamlAccountDeletionWebServices;
 use auth_core::{
-    Result, SamlIdentityPolicy, SamlIdentityRepository, SamlRequestRepository,
+    Error, Result, SamlIdentityPolicy, SamlIdentityRepository, SamlRequestRepository,
     SamlResponseVerifier, SamlSignIn, SamlTransactions, SamlVerificationRepository,
 };
 use std::sync::Arc;
@@ -10,6 +11,7 @@ pub struct SamlWebServices {
     pub(super) transactions: Arc<SamlTransactions>,
     pub(super) verifier: Arc<SamlResponseVerifier>,
     pub(super) sign_in: Arc<SamlSignIn>,
+    pub(super) deletion: Option<Arc<SamlAccountDeletionWebServices>>,
 }
 impl SamlWebServices {
     /// Trusted exact policy; component source snapshots cannot drift apart.
@@ -25,6 +27,19 @@ impl SamlWebServices {
             transactions: Arc::new(SamlTransactions::new(reg.clone(), requests)),
             verifier: Arc::new(SamlResponseVerifier::new(reg, verification)?),
             sign_in: Arc::new(SamlSignIn::new(identities)),
+            deletion: None,
         })
+    }
+    /// Add the explicit destructive operation for the identical full policy.
+    /// The existing constructor and ordinary server expose no deletion routes.
+    pub fn with_account_deletion(
+        mut self,
+        services: SamlAccountDeletionWebServices,
+    ) -> Result<Self> {
+        if self.deletion.is_some() || services.policy != self.policy {
+            return Err(Error::InvalidInput);
+        }
+        self.deletion = Some(Arc::new(services));
+        Ok(self)
     }
 }

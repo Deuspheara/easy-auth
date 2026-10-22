@@ -1375,6 +1375,68 @@
         }
       }
     },
+    "/v1/saml/operation": {
+      "post": {
+        "tags": [],
+        "summary": "Cookie-only same-origin selection. No storage, consumption, verification,\nownership or grant occurs; the selected finish must still enforce all checks.",
+        "operationId": "selectSamlOperation",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SamlOperationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SamlOperationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "413": {
+            "description": ""
+          },
+          "415": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/v1/saml/sign-in/cancel": {
       "post": {
         "tags": [],
@@ -2089,6 +2151,38 @@
       "SamlEmptyInput": {
         "type": "object",
         "additionalProperties": false
+      },
+      "SamlOperationInput": {
+        "type": "object",
+        "required": [
+          "RelayState"
+        ],
+        "properties": {
+          "RelayState": {
+            "type": "string",
+            "maxLength": 43,
+            "minLength": 43
+          }
+        },
+        "additionalProperties": false
+      },
+      "SamlOperationKind": {
+        "type": "string",
+        "enum": [
+          "sign_in",
+          "delete_account"
+        ]
+      },
+      "SamlOperationResponse": {
+        "type": "object",
+        "required": [
+          "operation"
+        ],
+        "properties": {
+          "operation": {
+            "$ref": "#/components/schemas/SamlOperationKind"
+          }
+        }
       },
       "SamlPostDelivery": {
         "type": "object",

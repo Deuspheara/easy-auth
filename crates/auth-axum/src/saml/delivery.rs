@@ -23,7 +23,7 @@ pub(super) async fn bridge(
     SamlPostResponse::parse(input.response.clone())?;
     Secret::parse(input.relay.clone())?;
     Ok(Html(format!(
-        "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Sign in</title><body><p id=\"status\" role=\"status\">Completing sign-in…</p><form id=\"delivery\"><input type=\"hidden\" name=\"SAMLResponse\" value=\"{}\"><input type=\"hidden\" name=\"RelayState\" value=\"{}\"></form><script src=\"/saml/delivery.js\" defer></script></body></html>",
+        "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Authentication</title><body><p id=\"status\" role=\"status\">Continuing authentication…</p><form id=\"delivery\"><input type=\"hidden\" name=\"SAMLResponse\" value=\"{}\"><input type=\"hidden\" name=\"RelayState\" value=\"{}\"></form><script src=\"/saml/delivery.js\" defer></script></body></html>",
         attribute(&input.response),
         attribute(&input.relay)
     )))

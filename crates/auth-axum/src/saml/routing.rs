@@ -1,4 +1,7 @@
-use super::{cookies, delivery, handlers, pages, saml_web_openapi, services::SamlWebServices};
+use super::{
+    cookies, deletion, delivery, handlers, operation, pages, saml_account_deletion_web_openapi,
+    saml_web_openapi, services::SamlWebServices,
+};
 use crate::{
     Auth, BrowserConfig,
     browser::{boundary, post_delivery_boundary},
@@ -41,18 +44,24 @@ pub fn experimental_saml_web_router(
         auth: auth.clone(),
         browser: browser.clone(),
     };
+    let deletion_enabled = services.deletion.is_some();
     let state = WebState {
         base: base.clone(),
         services,
     };
-    let protected = Router::new()
+    let mut protected = Router::new()
+        .route("/v1/saml/operation", post(operation::select))
         .route("/v1/saml/sign-in/start", post(handlers::start))
         .route("/v1/saml/sign-in/finish", post(handlers::finish))
         .route("/v1/saml/sign-in/cancel", post(handlers::cancel))
         .route("/saml/sign-in", get(pages::sign_in))
         .route("/saml/sign-in.js", get(pages::sign_in_script))
         .route("/saml/delivery.js", get(pages::delivery_script))
-        .route("/saml/metadata", get(handlers::metadata))
+        .route("/saml/metadata", get(handlers::metadata));
+    if deletion_enabled {
+        protected = protected.merge(deletion::routes());
+    }
+    let protected = protected
         .layer(DefaultBodyLimit::max(MAX_DELIVERY_BODY_BYTES))
         .layer(middleware::from_fn_with_state(base.clone(), boundary));
     let delivery = Router::new()
@@ -62,16 +71,24 @@ pub fn experimental_saml_web_router(
             base.clone(),
             post_delivery_boundary,
         ));
-    Ok(configured_router(auth, browser, saml_web_openapi())
+    let api = if deletion_enabled {
+        saml_account_deletion_web_openapi()
+    } else {
+        saml_web_openapi()
+    };
+    Ok(configured_router(auth, browser, api)
         .merge(protected.merge(delivery).with_state(state))
-        .layer(middleware::from_fn_with_state(base, clear_revoked_proofs)))
+        .layer(middleware::from_fn_with_state(
+            (base.browser, deletion_enabled),
+            clear_revoked_proofs,
+        )))
 }
 async fn clear_revoked_proofs(
-    State(state): State<AppState>,
+    State((browser, deletion)): State<(BrowserConfig, bool)>,
     request: Request,
     next: Next,
 ) -> Response {
     let mut response = next.run(request).await;
-    cookies::clear_if_logged_out(&mut response, &state.browser);
+    cookies::clear_if_logged_out(&mut response, &browser, deletion);
     response
 }

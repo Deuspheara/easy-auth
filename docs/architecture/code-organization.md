@@ -121,7 +121,7 @@ optional email, owner, session and identity locks, original caps, writes and fin
 checks visible. Tests group binding, migration, schema, storage rollback, isolation
 and observed waits by responsibility. All added files remain below 300 lines;
 the longer final erasure transaction keeps authorization, replay, shared erasure
-and original/signed/freshness caps visible together. HTTP confirmation remains
+and original/signed/freshness caps visible together. Actual provider deletion/browser acceptance remains
 pending in ADR 0025. Session invalidation delegates to focused crate-private
 SAML pending-state operations without taking source locks after owner locks.
 The coherent logout transaction keeps owner-before-session locking, revocation,
@@ -865,3 +865,13 @@ original proof/verifier unchanged and records scalar/hash facts after a successf
 production commit. Its separate aggregate read compares retained signed caps and
 stored session values. It adds no XML access, authentication policy or alternative
 verification implementation, and cannot create authority directly.
+
+
+The explicit SAML HTTP deletion extension owns its service construction, closed
+transport types, thin handlers and fixed pages/scripts under `saml/deletion/`.
+Cookie-only operation selection is a separate non-authoritative module; shared
+ACS delivery retains its sole cross-site exception. Router composition selects
+optional routes/contracts and cookie hygiene without copying core/SQL policy.
+Feature tests separate confirmation/Origin/session/state boundaries, lifecycle/
+rollback and contract publication. All added source/test files stay below300lines;
+generated OpenAPI and source-hash evidence are intentional generated-size exceptions.

@@ -32,7 +32,10 @@ pub use passkeys::{experimental_passkey_router, passkey_authentication_openapi};
 pub use passkeys::{experimental_passkey_signup_router, passkey_signup_openapi};
 pub use router::router;
 #[cfg(feature = "saml-web")]
-pub use saml::{SamlWebServices, experimental_saml_web_router, saml_web_openapi};
+pub use saml::{
+    SamlAccountDeletionWebServices, SamlWebServices, experimental_saml_web_router,
+    saml_account_deletion_web_openapi, saml_web_openapi,
+};
 
 #[cfg(feature = "passkey-management")]
 pub use passkeys::{experimental_passkey_management_router, passkey_management_openapi};

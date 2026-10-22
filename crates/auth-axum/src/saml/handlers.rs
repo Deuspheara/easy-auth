@@ -23,7 +23,7 @@ pub(super) async fn start(
     query.map_err(|_| ApiError::Body(StatusCode::BAD_REQUEST))?;
     let Json(_) = body?;
     require_anonymous(&state.base.browser, &headers)?;
-    cookies::SIGN_IN.require_absent(&headers)?;
+    cookies::require_no_pending(&headers)?;
     let start = state.services.transactions.start().await?;
     let mut response = Json(SamlStartResponse {
         authorization_url: start.authorization_url().to_owned(),

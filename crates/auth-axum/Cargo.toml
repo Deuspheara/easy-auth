@@ -101,6 +101,10 @@ name = "export_saml_web_openapi"
 required-features = ["saml-web"]
 
 [[example]]
+name = "export_saml_account_deletion_web_openapi"
+required-features = ["saml-web"]
+
+[[example]]
 name = "saml-keycloak-browser"
 path = "examples/saml-keycloak-browser/main.rs"
 required-features = ["saml-web"]

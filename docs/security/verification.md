@@ -4710,3 +4710,56 @@ dependency/native/XML and independent approval remain distinct production gates.
 Normal SAML stays disabled. The separate unfinished user research was neither
 modified nor run. Hosted CI status must be checked for each exact subsequent head;
 local suite success does not establish a hosted pass.
+
+
+## 2026-10-22: Explicit SAML deletion HTTP component and browser compatibility
+
+The `saml-web` extension now optionally composes same-policy
+SamlAccountDeletionWebServices; its existing constructor keeps deletion absent.
+Selected HTTPS/same-origin start and final form require explicit `delete my account`
+confirmation, current SAML session and separate protected request/RelayState/browser
+cookies. Only real concrete verification and the final atomic PG transaction can
+erase. Success clears authentication/proofs after commit; wrong subject/session,
+stale nonce, disabled source or storage failure cannot erase or mint a session.
+New stale nonces do not clear newer cookies, and failed erasure preserves the
+ambient session. Old constructor/logout-cookie behavior remains intact.
+
+The common ACS still reads no cookie/SQL and grants nothing. A fixed script removes
+its hidden fields, makes a cookie-only non-consuming same-origin operation choice,
+and auto-completes only sign-in. Deletion instead asks for another typed phrase.
+Payload stays in memory and is discarded on navigation/restoration; no source or
+return URL can be selected. The shared page starts with a neutral authentication
+label and identifies the fixed operation only after selection.
+
+All14 SAML real-PG HTTP cases pass, including the six existing cases unchanged and
+eight new closed-input/confirmation/Origin/current-session/nonce/operation/policy/
+contract cases, genuine signed erasure, cancellation and unavailable-tail rollback.
+The first test build found a wrong shared-producer import path (E0432); fixing that
+test import required no verifier or policy change. Both generated contracts match
+live publication and the normal API remains separate.
+
+Full default workspace111 and all-feature765 parent cases plus child redaction
+control passed with0failed/ignored; this includes130 HTTP and444 PG cases. Those
+full runs preceded only the final neutral display-label correction, subsequently
+covered by all14 HTTP cases and the owned eight-case Chromium regression. Strict
+default/all-feature all-target lint, final strict all-feature lint, formatting/diff,
+warning-free docs,234-file/three-patch inventory +4checker tests and compiled
+advisory/all-feature deny checks passed without new exceptions. Inactive MySQL/RSA
+remains visible. No dependency, cryptographic verifier, algorithm, certificate trust
+or normal provider-activation setting changed; existing user research remains
+untouched/unrun.
+
+The [owned regression record](../../tests/browser/saml-web/results/2026-10-22-operation-selection.json)
+contains exact workspace/fixture hashes and the final binary hash at its recorded
+working-tree base. All8 cases passed on Chromium156/macOS arm64 with actual
+cross-site Lax-cookie absence and same-origin private proofs, real signatures,
+ambient-session rejection and ordinary cleanup. Its owned database/private files
+were removed without emergency cleanup or diagnostics. It establishes compatibility
+of the existing sign-in branch through operation selection, not acceptance of the
+new deletion UI or an actual IdP deletion ceremony. Actual Keycloak
+reauthentication-to-deletion remains the next engineering acceptance task.
+
+Implementation, ordinary tests and internal review do not establish independent
+approval. Maintained source/patch/dependency/native/XML review, qualified profile/
+attribute limitations and independent approval still gate production SAML. Normal
+SAML stays disabled; subsequent exact-head hosted CI is tracked separately.
