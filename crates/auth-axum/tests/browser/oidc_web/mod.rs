@@ -6,3 +6,6 @@ mod completion;
 mod contract;
 mod failures;
 mod setup;
+
+#[cfg(feature = "saml-web")]
+mod federation;

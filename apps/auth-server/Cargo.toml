@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+saml-web = ["auth-core/saml-identities", "auth-postgres/saml-identities", "auth-axum/saml-web"]
 google-desktop-launch = ["google-desktop", "tokio/process", "dep:open"]
 google-desktop = ["oidc-verification", "auth-core/google", "dep:hyper", "dep:hyper-util"]
 oidc-web = ["oidc-identities", "auth-axum/oidc-web"]

@@ -221,3 +221,9 @@ inbound federation. It adds no HTTP/issuer startup route, authentication grant o
 user-consent completion. [ADR0026](adr/0026-outbound-client-registration.md) records
 exact redirects, fixed explicit-consent policy and stored random subject decisions.
 M07 and AUTH-32 release prerequisites remain open; this is gated engineering only.
+
+Normal server SAML configuration and single/combined OIDC/SAML route selection are
+prepared under [ADR 0029](adr/0029-gated-saml-server-composition.md). The source
+activation check remains closed before database loading, and disabled normal
+startup mounts no SAML routes. Trusted startup loading is read-only and cannot
+re-enable or reconfigure an existing provider. Security approval remains separate.

@@ -2,6 +2,12 @@
 #[path = "application/oidc.rs"]
 mod oidc;
 
+#[path = "application/routing.rs"]
+mod routing;
+#[cfg(feature = "saml-web")]
+#[path = "application/saml.rs"]
+mod saml;
+
 use crate::configuration;
 use auth_axum::BrowserConfig;
 use auth_core::Auth;
@@ -18,36 +24,46 @@ pub struct ConfiguredApplication {
 }
 
 pub async fn configured_application() -> Result<ConfiguredApplication, Box<dyn std::error::Error>> {
-    let settings = configuration::oidc::read()?;
+    let oidc_settings = configuration::oidc::read()?;
     let parameters = configuration::parameters()?;
     #[cfg(feature = "oidc-web")]
-    let prepared = match settings {
+    let oidc_prepared = match oidc_settings {
         configuration::oidc::Configuration::Disabled => None,
         configuration::oidc::Configuration::Enabled(settings) => {
             Some(settings.prepare(parameters.realm, &parameters.browser)?)
         }
     };
     #[cfg(not(feature = "oidc-web"))]
-    let _ = settings;
+    let _ = oidc_settings;
+    let saml_settings = configuration::saml::read()?;
+    #[cfg(feature = "saml-web")]
+    let saml_prepared = saml_settings.prepare(parameters.realm, &parameters.browser)?;
+    #[cfg(feature = "saml-web")]
+    if let Some(prepared) = &saml_prepared {
+        prepared.authorize_activation()?;
+    }
+    #[cfg(not(feature = "saml-web"))]
+    saml_settings.require_disabled()?;
     let (auth, repository) = configuration::load(&parameters).await?;
     #[cfg(feature = "oidc-web")]
-    let router = match prepared {
-        Some(prepared) => {
-            oidc::router(
-                auth.clone(),
-                parameters.browser.clone(),
-                repository,
-                prepared,
-            )
-            .await?
-        }
-        None => auth_axum::router(auth.clone(), parameters.browser.clone()),
+    let oidc_services = match oidc_prepared {
+        Some(prepared) => Some(oidc::services(repository.clone(), prepared).await?),
+        None => None,
     };
-    #[cfg(not(feature = "oidc-web"))]
-    let router = {
-        drop(repository);
-        auth_axum::router(auth.clone(), parameters.browser.clone())
+    #[cfg(feature = "saml-web")]
+    let saml_services = match saml_prepared {
+        Some(prepared) => Some(saml::services(repository.clone(), prepared).await?),
+        None => None,
     };
+    drop(repository);
+    let router = routing::router(
+        auth.clone(),
+        parameters.browser.clone(),
+        #[cfg(feature = "oidc-web")]
+        oidc_services,
+        #[cfg(feature = "saml-web")]
+        saml_services,
+    )?;
     Ok(ConfiguredApplication {
         auth,
         browser: parameters.browser,

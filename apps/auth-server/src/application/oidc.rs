@@ -1,18 +1,15 @@
 use crate::{OidcHttps, configuration::oidc::Prepared};
-use auth_axum::{BrowserConfig, OidcWebServices, oidc_web_router};
+use auth_axum::OidcWebServices;
 use auth_core::{
-    Auth, OAuthTransactions, OidcAccountDeletion, OidcCodeExchange, OidcDocuments, OidcSignIn,
+    OAuthTransactions, OidcAccountDeletion, OidcCodeExchange, OidcDocuments, OidcSignIn,
 };
 use auth_postgres::Postgres;
-use axum::Router;
 use std::sync::Arc;
 
-pub(super) async fn router(
-    auth: Auth,
-    browser: BrowserConfig,
+pub(super) async fn services(
     repository: Arc<Postgres>,
     prepared: Prepared,
-) -> Result<Router, Box<dyn std::error::Error>> {
+) -> Result<OidcWebServices, Box<dyn std::error::Error>> {
     // Only unchanged loading or genuinely absent initial provisioning; explicit
     // administrative reconfiguration owns rotation/cancellation and re-enabling.
     let policy = repository
@@ -44,5 +41,5 @@ pub(super) async fn router(
         Arc::new(OidcSignIn::new(repository.clone())),
         Arc::new(OidcAccountDeletion::new(repository)),
     )?;
-    Ok(oidc_web_router(auth, browser, services)?)
+    Ok(services)
 }

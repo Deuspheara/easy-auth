@@ -454,3 +454,48 @@ Patch0007 wires NameFormat and consumed NameID qualifiers through the existing
 unqualified-attribute validator before local-name DOM projection. This is a static
 consumed-field completeness fix; no custom namespace/crypto probe or new verifier
 was introduced, and independent namespace/binding review is still pending.
+
+## Normal server configuration (activation locked)
+
+The optional server `saml-web` feature compiles the normal configuration and route
+composition. The standalone binary and embedded example both use
+`configured_application`; `configured_auth` cannot silently drop SAML settings.
+Unset all `AUTH_SAML_*` settings, or set only `AUTH_SAML_ENABLED=false`, to retain the
+normal disabled server. SAML routes and schemas are absent in these modes, even
+with `--all-features`. Mixing disabled with populated settings is a startup error.
+
+For the prepared configuration contract, the complete set is:
+
+| Setting | Meaning |
+| --- | --- |
+| `AUTH_SAML_ENABLED` | Exact `true` requests activation; currently always rejected by the AUTH-32 gate. |
+| `AUTH_SAML_CONNECTION_ID` | Already provisioned non-nil connection UUID in `AUTH_REALM_ID`. |
+| `AUTH_SAML_LOCAL_CLIENT_ID` | Already provisioned non-nil local client UUID. |
+| `AUTH_SAML_SP_ENTITY` | Exact trusted SP entity identifier. |
+| `AUTH_SAML_IDP_ENTITY` | Exact trusted IdP entity identifier. |
+| `AUTH_SAML_SSO_URL` | Exact HTTPS Redirect endpoint without query or fragment. |
+| `AUTH_SAML_JIT` | Optional `deny` (default) or explicit `allow`; must match stored policy. |
+
+The ACS is derived from the validated HTTPS `AUTH_PUBLIC_URL` origin as `/saml/acs`;
+no browser or environment callback override is accepted. Certificates are loaded
+only from the exact operator-provisioned PostgreSQL registration revision, with
+existing leaf-pin validity and activation windows. There is no environment
+certificate, remote metadata import, system-root fallback or approval override.
+Trusted administration uses the existing `configure_saml_identity_policy` operation
+for full registration/pins/JIT and explicit enable/disable operations. Startup only
+loads a matching enabled policy and active pins; it cannot provision, rotate or
+re-enable it. Pending requests and stored revisions survive an unchanged restart.
+
+After the required security approval and a separately reviewed source change opens
+the gate, the prepared router selects the shared base, sign-in, metadata, ACS and
+confirmed-deletion services; optional OIDC coexists in the same router/contract.
+This paragraph describes prepared wiring, not currently available activation.
+See [ADR 0029](../architecture/adr/0029-gated-saml-server-composition.md) and the
+[activation status](../security/saml-activation-status.md).
+
+Run the ordinary startup checks with a freshly built default binary copied to
+`EASY_AUTH_SAML_UNSUPPORTED_TEST_BINARY`, then build the normal binary and embedded
+example with `--features saml-web,oidc-web` and run
+`python3 scripts/smoke_saml_startup.py`. The documented PostgreSQL development
+container or `EASY_AUTH_SMOKE_POSTGRES_CONTAINER` must be available. The runner owns
+and removes its disposable database and never activates SAML or exchanges assertions.

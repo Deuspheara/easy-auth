@@ -1,5 +1,4 @@
-#[path = "../../../../../tests/support/saml/provider.rs"]
-pub(super) mod provider;
+pub(super) use crate::support::saml_provider as provider;
 
 use crate::support::{Mail, post};
 use auth_core::{Auth, SamlIdentityPolicy, SamlJitPolicy, SamlRegistration};

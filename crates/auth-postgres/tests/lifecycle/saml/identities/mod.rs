@@ -18,4 +18,5 @@ mod rollback;
 mod sessions;
 mod setup;
 mod signin;
+mod startup;
 mod waits;

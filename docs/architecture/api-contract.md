@@ -576,3 +576,13 @@ from response issuance; ordinary new-response/old-authentication cases retain
 all admission,24-hour session-age and five-minute deletion caps.
 See [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md). Normal production
 SAML routes/configuration remain disabled pending the documented approval gates.
+
+Normal SAML server preparation uses the optional `saml-web` feature and the shared
+standalone/embedded `configured_application` factory. Its production activation
+gate remains closed in source, before database loading: disabled startup exposes
+no SAML paths/schemas, and a complete enable request fails explicitly. The additive
+`experimental_oidc_saml_web_router` composes the existing OIDC and SAML components
+with one base and combined contract for engineering tests. It preserves their
+exact HTTPS callbacks, realm checks, Origin boundaries and private proof cookies.
+[ADR 0029](adr/0029-gated-saml-server-composition.md) records trusted provisioning,
+read-only restart semantics and the separate approval requirement.

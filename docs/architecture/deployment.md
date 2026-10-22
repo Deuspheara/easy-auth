@@ -92,3 +92,16 @@ or release-readiness evidence. AUTH-56's separate [owned public-flow suite](../g
 now records sign-in/lifecycle acceptance through both composition modes with explicit
 private-TLS/source-copy limits. Final exact-head hosted CI and broader release gates
 remain explicit.
+
+## Prepared SAML composition — activation remains closed
+
+The server's optional `saml-web` feature shares normal standalone/embedded
+configuration and route composition. Keep `AUTH_SAML_*` unset or set only
+`AUTH_SAML_ENABLED=false`. Compiled support does not mount an ACS: a complete enable
+request is rejected by the source-locked AUTH-32 gate before database loading.
+No environment flag bypasses the gate. After the mandatory security approval and
+an explicit reviewed source change, prepared composition loads only already
+operator-provisioned enabled registration/pins/JIT, preserving revisions and
+operator disable. Startup is read-only for SAML; it performs no automatic trust
+import, provisioning or certificate rotation. The [configuration guide](../guides/saml.md#normal-server-configuration-activation-locked)
+and [ADR 0029](adr/0029-gated-saml-server-composition.md) define this contract.

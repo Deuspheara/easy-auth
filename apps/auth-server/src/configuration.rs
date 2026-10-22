@@ -8,6 +8,8 @@ mod mail;
 pub(crate) mod oidc;
 #[path = "configuration/passwords.rs"]
 mod passwords;
+#[path = "configuration/saml/mod.rs"]
+pub(crate) mod saml;
 
 use auth_axum::BrowserConfig;
 use auth_core::Auth;
@@ -25,9 +27,10 @@ pub(crate) struct Parameters {
     development: bool,
 }
 
-/// Auth-only compatibility API. Explicit OIDC browser settings require the shared
-/// application factory so they cannot be silently dropped by an older consumer.
+/// Auth-only compatibility API. Explicit provider browser settings require the
+/// shared application factory so older consumers cannot silently drop them.
 pub async fn configured_auth() -> StartupResult<(Auth, BrowserConfig, SocketAddr)> {
+    saml::read()?.require_disabled()?;
     if oidc::read()?.enabled() {
         return Err("OIDC browser settings require configured_application".into());
     }

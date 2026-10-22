@@ -26,7 +26,7 @@ pub(super) struct WebState {
     pub base: AppState,
     pub services: SamlWebServices,
 }
-/// Gated engineering composition only; not wired into ordinary server startup.
+/// Gated engineering composition; normal server activation remains source-locked.
 /// The cross-site ACS renders a handoff page; only same-origin finish grants authority.
 pub fn experimental_saml_web_router(
     auth: Auth,
@@ -105,4 +105,13 @@ async fn clear_revoked_proofs(
     let mut response = next.run(request).await;
     cookies::clear_if_logged_out(&mut response, &browser, deletion);
     response
+}
+
+#[cfg(feature = "oidc-web")]
+pub(crate) fn web_contract(services: &SamlWebServices) -> utoipa::openapi::OpenApi {
+    if services.deletion.is_some() {
+        saml_account_deletion_web_openapi()
+    } else {
+        saml_web_openapi()
+    }
 }

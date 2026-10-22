@@ -158,6 +158,14 @@ jobs:
         env:
           EASY_AUTH_OIDC_UNSUPPORTED_TEST_BINARY: ${{ runner.temp }}/easy-auth-oidc-disabled
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      - name: Verify closed SAML production startup gate
+        run: |
+          cargo build --locked -p easy-auth-server --bin easy-auth --example embedded --features saml-web,oidc-web
+          python3 scripts/smoke_saml_startup.py
+          cargo check --locked -p easy-auth-server --all-targets --features saml-web
+        env:
+          EASY_AUTH_SAML_UNSUPPORTED_TEST_BINARY: ${{ runner.temp }}/easy-auth-oidc-disabled
+          EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
       - run: cargo check --locked -p easy-auth-server --example oidc-keycloak --features oidc-verification
       - run: cargo build --locked -p easy-auth-server --example oidc-keycloak --features oidc-identities
       - run: node tests/browser/oidc/run.cjs

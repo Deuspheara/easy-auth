@@ -32,8 +32,10 @@ engineering evidence record, not an independent audit or approval to deploy.
   warning-free workspace docs and full workspace suites pass:111 default and 788
   all-feature result counts, including 462 real-PG lifecycle tests under normal
   scheduling. Eleven source/runner checks and exact incremental reconstruction
-  also pass. Hosted new-source application/provider/CI receipt is still required; an earlier green
-  build is not silently attributed to these patches.
+  also pass. Hosted exact seven-patch application/provider CI
+  [39813011610](https://github.com/Deuspheara/easy-auth/actions/runs/39813011610)
+  subsequently passed at e9efd8672a22928ba8a9df1adaf66530207c5bbc; that receipt
+  predates the separate normal configuration/composition work.
 
 The final static review also added NameFormat and the consumed NameID qualifiers
 to the existing unqualified-attribute validator (patch0007), before local-name
@@ -59,13 +61,14 @@ unchanged and are not silently attributed to the new source.
    AUTH-32 requires those records. Agent review, maintainership, CI and owned IdP
    interoperability are separate evidence, not an independent audit. No reviewer
    was contacted and no PR/request was sent.
-4. **Normal production composition remains intentionally absent.**
-   `apps/auth-server/src/application.rs` and `crates/auth-axum/src/router.rs` do not
-   compose SAML. Existing explicit experimental components/examples are available;
-   approval alone does not add trusted production configuration or mount an ACS.
-   After approval, production composition must select only the approved
-   registration/trust/profile and retain TLS, fail-closed configuration, private
-   browser binding, current-source and lifecycle policy before activation.
+4. **Normal production activation is deliberately locked in source.**
+   The normal configuration and router composition are now prepared under
+   [ADR 0029](../architecture/adr/0029-gated-saml-server-composition.md), including
+   trusted read-only policy/pin loading and combined OIDC/SAML routing. Complete
+   `AUTH_SAML_ENABLED=true` configuration still fails before database loading;
+   compiled features, persisted enable and environment flags cannot clear the
+   approval gate. Opening it requires the mandatory security records above and an
+   explicit reviewed source change selecting their exact approved profile.
 
 ## Limits rather than implied support
 

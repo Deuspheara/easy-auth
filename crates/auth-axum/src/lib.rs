@@ -2,6 +2,10 @@
 mod browser;
 mod contract;
 mod error;
+#[cfg(all(feature = "oidc-web", feature = "saml-web"))]
+mod federation;
+#[cfg(all(feature = "oidc-web", feature = "saml-web"))]
+pub use federation::experimental_oidc_saml_web_router;
 mod handlers;
 #[cfg(feature = "oidc-account-deletion")]
 mod oidc;

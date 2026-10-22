@@ -932,3 +932,17 @@ exact patch review, rather than an unrelated vendored restructure. New modules
 remain under 300 lines and functions under 50 lines; complete finite graph receipts
 are deliberate generated-file exceptions. No SQL/migration, generic framework,
 public proof constructor or cryptographic implementation is added.
+
+AUTH-34's normal SAML preparation keeps bounded environment parsing and trusted
+settings under server `configuration/saml/`, with source-gate and provider service
+construction separate from route selection in `application/`. PostgreSQL
+`saml/identity_startup.rs` owns read-only exact source loading; no handler copies
+its policy. Axum single-provider route attachment is extracted without behavioral
+change, and `federation.rs` composes one base router and contract for both sources.
+The reusable ordinary IdP fixture is declared once under HTTP `tests/support/`.
+New modules remain below300lines. The shared application factory keeps configuration,
+closed approval gate, database loading and route construction in one visible order
+as a cohesive composition-size exception. The longer ordered combined-router/startup cases
+keep both providers' boundaries and no-authority observations together as reviewed
+function-size exceptions. No schema, cryptographic verifier, generic provider
+framework or unrelated cleanup is introduced. Normal activation stays locked.

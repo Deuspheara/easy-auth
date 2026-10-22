@@ -90,3 +90,7 @@ pub(crate) async fn sign_in(app: &Router, mail: &Mail, email: &str) -> String {
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
     cookie(&response, "__Host-auth-session=")
 }
+
+#[cfg(feature = "saml-web")]
+#[path = "../../../../tests/support/saml/provider.rs"]
+pub(crate) mod saml_provider;

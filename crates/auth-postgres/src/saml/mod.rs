@@ -15,3 +15,6 @@ mod identities;
 
 #[cfg(feature = "saml-identities")]
 pub(crate) mod replay;
+
+#[cfg(feature = "saml-identities")]
+mod identity_startup;

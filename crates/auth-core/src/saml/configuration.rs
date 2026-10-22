@@ -60,6 +60,16 @@ impl SamlRegistration {
         next
     }
 
+    /// Restore a stored revision during trusted configuration loading. This value
+    /// grants no authority: repositories still check the entire current definition.
+    pub fn with_persisted_revision(mut self, revision: Uuid) -> Result<Self> {
+        if revision.is_nil() {
+            return Err(Error::InvalidInput);
+        }
+        self.revision = revision;
+        Ok(self)
+    }
+
     pub fn realm(&self) -> Uuid {
         self.realm
     }

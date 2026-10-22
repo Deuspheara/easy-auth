@@ -13,3 +13,6 @@ pub use contract::{saml_account_deletion_web_openapi, saml_web_openapi};
 pub use deletion::SamlAccountDeletionWebServices;
 pub use routing::experimental_saml_web_router;
 pub use services::SamlWebServices;
+
+#[cfg(feature = "oidc-web")]
+pub(crate) use routing::{attach, web_contract};
