@@ -1,5 +1,6 @@
 //! XML parsing and field extraction over quick-xml.
 
+pub(crate) mod attribute_records;
 mod date_time;
 pub mod dom;
 pub mod extract;

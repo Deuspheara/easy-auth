@@ -1,4 +1,4 @@
-use super::replay::SamlReplayRecord;
+use super::{attributes::SamlAttribute, replay::SamlReplayRecord};
 use crate::SamlRegistration;
 use std::fmt;
 use zeroize::Zeroizing;
@@ -9,6 +9,7 @@ use zeroize::Zeroizing;
 pub struct VerifiedSamlAssertion {
     pub(super) registration: SamlRegistration,
     pub(super) subject: Zeroizing<String>,
+    pub(super) attributes: Vec<SamlAttribute>,
     pub(super) authn_at_us: i64,
     pub(super) expires_at_us: i64,
     pub(super) session_expires_at_us: i64,
@@ -21,6 +22,11 @@ impl VerifiedSamlAssertion {
     }
     pub fn subject(&self) -> &str {
         &self.subject
+    }
+    /// Ordered scalar records, retaining exact Name/NameFormat and value groups.
+    /// Duplicate names are not merged. They grant no identity or authorization.
+    pub fn attributes(&self) -> &[SamlAttribute] {
+        &self.attributes
     }
     pub fn authenticated_at_us(&self) -> i64 {
         self.authn_at_us

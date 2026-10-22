@@ -85,15 +85,15 @@
     },
     {
       "path": "src/api/idp.rs",
-      "sha256": "bbcfb96a7845a7faa37c40dacb4f7ea5197aed637a4f9bad70101616670b2065"
+      "sha256": "efb811255e1c8b2eb964b7d1e9896f60193de1c3e3e69bad09ec6a16a198de49"
     },
     {
       "path": "src/api/mod.rs",
-      "sha256": "600e4a3473408942835cf9ba7fa62b4ddfa86b40c0aa335ef73f98810102ecef"
+      "sha256": "387f3cfe95f9e5bcd8884e043311a21e4be807a4d19c45907b3dd075c4a910c5"
     },
     {
       "path": "src/api/options.rs",
-      "sha256": "4910b60779ceebde76a6b90896c8317ee145b3797e7d067c29be429d66e48745"
+      "sha256": "32ed26675ea6e45f5fd3c00a3cf245a257c500f98ee7858114bf3ba34d757335"
     },
     {
       "path": "src/api/paos/mod.rs",
@@ -106,6 +106,10 @@
     {
       "path": "src/api/raw_mapping.rs",
       "sha256": "e0dee3cb2d654c6db1ecb0cf730921215fe9009c6ffa405c3e89d315b12deace"
+    },
+    {
+      "path": "src/api/response_claims.rs",
+      "sha256": "c7a12365c2abdbc87f5f2d49193f6b2867f685a7c12a303628780617a2930229"
     },
     {
       "path": "src/api/slo.rs",
@@ -273,19 +277,27 @@
     },
     {
       "path": "src/flow.rs",
-      "sha256": "edc4b64f6b5100eba860cdc593cd703bd6e69aa846a4d64f13275ea6e82ee5f6"
+      "sha256": "63be3bc1bd8abf44f1c6cbfbafbdec67f25387dd49214d20203d7710475b3101"
+    },
+    {
+      "path": "src/idp/attributes.rs",
+      "sha256": "025acca9860bfeeb34f190da6b45207c9f7a34b788251b324db76a90297db546"
+    },
+    {
+      "path": "src/idp/authentication.rs",
+      "sha256": "84581d28224d896b517634e9de80383e02b8cbea39dce68ee002d54a4a45d806"
     },
     {
       "path": "src/idp/login_response.rs",
-      "sha256": "5eee09a1691f132c3c9f00b21a52ba8677f11df85652e7d59501f5e1d986c2de"
+      "sha256": "10c8ed4b5acbd4f12415999a990b45a7b2dcf3b84cfa6b151d26fefdd778ef7c"
     },
     {
       "path": "src/idp/paos.rs",
-      "sha256": "0082ba1692d85a8a711d7fdad893d62cde162e4bd5f31e9eaeb4c5c89e954580"
+      "sha256": "ce9badce56dfa220611de940f3021794b45547de8057feb007b8b9db4b50cda8"
     },
     {
       "path": "src/idp.rs",
-      "sha256": "650578204f77ef9f6b881f4b7d1bc29009dc779af66fca706215ea1792017681"
+      "sha256": "541827ca833199e68b3ce0e1f87127c437b3fe04b6d0c692b40594a8eecc224b"
     },
     {
       "path": "src/lib.rs",
@@ -344,6 +356,10 @@
       "sha256": "c685d2f459dc5286e8ce5b284a5dabfb3a32fcf6fedd6ce9385986ea4be54b63"
     },
     {
+      "path": "src/model/attribute_projection.rs",
+      "sha256": "f5cf1f231abfe698dffd5148f5fb62ad1eeb2499dfcbc83ae55d2d12a4668b4c"
+    },
+    {
       "path": "src/model/attributes.rs",
       "sha256": "20d38995ddc71cfcba32b40b8cbbf01bf8babd2708064ccabbc3954f81ccadaf"
     },
@@ -369,7 +385,7 @@
     },
     {
       "path": "src/model/mod.rs",
-      "sha256": "7b7748ae08fe7a9af18c77aa92e3497235193644eb25c4e82c919adf1fbdb342"
+      "sha256": "da849fb255903d655e1ba48c7c65b3b4a61748bc2dce5c3745e817309420b27b"
     },
     {
       "path": "src/model/outstanding_logout.rs",
@@ -389,7 +405,7 @@
     },
     {
       "path": "src/model/sso.rs",
-      "sha256": "e53f437dd661697081f99537b89571f4960590cdcecf5c7e171b3cc228393660"
+      "sha256": "94c4d4a7e069c5545bbfd0d7b5029923e2478f84e07d796a8dadcb5e1b91d111"
     },
     {
       "path": "src/model/status.rs",
@@ -432,6 +448,10 @@
       "sha256": "142cb1159570f41ccc37bd8d2f4e0695f41d7007c98828ccbf4852bfb33ca1cf"
     },
     {
+      "path": "src/xml/attribute_records.rs",
+      "sha256": "fdbfd762e1187674053864e61b8390c899b9cf77b861a77de733c952894f6311"
+    },
+    {
       "path": "src/xml/date_time.rs",
       "sha256": "7155a543470c303a91eb00ffe983ae385f832652eabb4e92d9c165fde87e306d"
     },
@@ -453,7 +473,7 @@
     },
     {
       "path": "src/xml/mod.rs",
-      "sha256": "928ef9894471955c07420a0fcf007095f67fd2431627689ff184c31d572e574a"
+      "sha256": "4edc0a2f1cf18c266098711e3b6235d7d2d31b90ffbecdac8a90397993854a57"
     },
     {
       "path": "src/xml/profile/outbound_logout/tests.rs",
@@ -928,12 +948,20 @@
       "sha256": "6002f153d11c3229e66b7dc6c0827b63fb6990549c0d4ad5bd724ccdf48f8f78"
     },
     {
+      "path": "tests/web_browser_sso_generation/attributes.rs",
+      "sha256": "e762aff32b74aeaad16f4be522ab742f85f8d61b280de7da776ea2836fd07191"
+    },
+    {
+      "path": "tests/web_browser_sso_generation/authentication.rs",
+      "sha256": "76cc917b0e67ad0c7f20917b701a185c0209fae663a2134fda89b323f6cf9490"
+    },
+    {
       "path": "tests/web_browser_sso_generation/qualifiers.rs",
       "sha256": "4b1bb8e787e773a55bca04010b4663b98cb5486077bd350f0d5fbca1df9fe5f8"
     },
     {
       "path": "tests/web_browser_sso_generation.rs",
-      "sha256": "ab021faa6d758d35ef148479417826ec2b5fc2e9b1c399d154639faa1539a8e7"
+      "sha256": "e62d48174e462abd04d34bf122b1d06ce560617b12d3aa2de7fe42fef4b7fb32"
     },
     {
       "path": "tests/xml_document.rs",
@@ -950,7 +978,9 @@
   ],
   "format_version": 1,
   "maintenance_patches": {
-    "0004-preserve-nameid-qualifiers.patch": "3e73b2643fc95c31ca585fb57a07a2cfc9143570d417bd722075f8554e83a2ff"
+    "0004-preserve-nameid-qualifiers.patch": "3e73b2643fc95c31ca585fb57a07a2cfc9143570d417bd722075f8554e83a2ff",
+    "0005-ordered-attribute-projection.patch": "402097b516612819aa91cdba62e44abecdef7fbc4226418f713e6344a04a5900",
+    "0006-established-authentication-time.patch": "2d8e2fd674c9d5d288002a098ab0f7706ba1396adb78f9131152044e091ca1c6"
   },
   "package_version": "0.6.1",
   "revision": "3b289001a7a84d5a7ff7af2671991ab7098090bd",

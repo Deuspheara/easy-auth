@@ -1,0 +1,252 @@
+diff --git a/src/api/idp.rs b/src/api/idp.rs
+--- a/src/api/idp.rs
++++ b/src/api/idp.rs
+@@ -238,6 +238,7 @@
+                     name_id_format: name_id_format.as_deref(),
+                     qualified_name_id: Some(&qualified_name_id),
+                     typed_attributes: options.attributes.as_ref(),
++                    authentication_instant: options.authentication_instant.as_ref(),
+                     issuance_lifetime: Some(self.0.issuance_lifetime),
+                     web_browser_sso_producer: options.web_browser_sso_producer,
+                     status: options.status.as_ref(),
+diff --git a/src/api/options.rs b/src/api/options.rs
+--- a/src/api/options.rs
++++ b/src/api/options.rs
+@@ -83,6 +83,7 @@
+ #[derive(Debug, Clone)]
+ pub struct RespondSso {
+     pub(super) attributes: Option<crate::model::Attributes>,
++    pub(super) authentication_instant: Option<crate::model::SamlInstant>,
+     pub(super) binding: SsoResponseBinding,
+     pub(super) relay_state: Option<RelayStateParam>,
+     response_signing: ResponseSigning,
+@@ -111,6 +112,7 @@
+     fn new(binding: SsoResponseBinding) -> Self {
+         Self {
+             attributes: None,
++            authentication_instant: None,
+             binding,
+             relay_state: None,
+             response_signing: ResponseSigning::FollowEncryptedCbcRecommendation,
+@@ -153,7 +155,8 @@
+     ///
+     /// [`Self::post`] and [`Self::simple_sign`] leave this off. When enabled, a
+     /// successful response carries an authentication statement whose
+-    /// `AuthnInstant` is the assertion `IssueInstant` and whose
++    /// `AuthnInstant` defaults to the assertion `IssueInstant` (or the explicitly
++    /// supplied established [`Self::authentication_instant`]) and whose
+     /// `AuthnContextClassRef` is
+     /// `urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified`. That class means
+     /// the authentication mechanism was not recorded. It is not evidence of a
+diff --git a/src/api/response_claims.rs b/src/api/response_claims.rs
+--- a/src/api/response_claims.rs
++++ b/src/api/response_claims.rs
+@@ -3,6 +3,16 @@
+ use crate::model::Attributes;
+ 
+ impl RespondSso {
++    /// Carry the actual established authentication event separately from new
++    /// Response/Assertion issuance, for example when serving an existing SSO
++    /// session. The caller must authenticate that event. Requires built-in Web
++    /// Browser SSO generation; invalid UTC or future instants fail on issuance.
++    /// Omitting this option preserves the producer's existing issuance-time default.
++    pub fn authentication_instant(mut self, instant: crate::model::SamlInstant) -> Self {
++        self.authentication_instant = Some(instant);
++        self
++    }
++
+     /// Emit exact scalar attributes using the built-in XML writer and signer.
+     /// Order, duplicate names, optional NameFormat and value groups are retained.
+     /// Cannot be combined with template-configured attributes or custom rendering.
+diff --git a/src/idp.rs b/src/idp.rs
+--- a/src/idp.rs
++++ b/src/idp.rs
+@@ -17,6 +17,7 @@
+ };
+ 
+ mod attributes;
++mod authentication;
+ mod login_response;
+ mod paos;
+ 
+@@ -49,6 +50,7 @@
+     pub(crate) name_id_format: Option<&'a str>,
+     pub(crate) qualified_name_id: Option<&'a NameId>,
+     pub(crate) typed_attributes: Option<&'a Attributes>,
++    pub(crate) authentication_instant: Option<&'a crate::model::SamlInstant>,
+     pub(crate) issuance_lifetime: Option<time::Duration>,
+     pub(crate) web_browser_sso_producer: WebBrowserSsoProducer,
+     pub(crate) status: Option<&'a Status>,
+@@ -59,6 +61,7 @@
+     name_id_format: Option<&'a str>,
+     qualified_name_id: Option<&'a NameId>,
+     typed_attributes: Option<&'a Attributes>,
++    authentication_instant: Option<&'a crate::model::SamlInstant>,
+     custom: Option<CustomTagReplacement<'a>>,
+     issuance_lifetime: time::Duration,
+     web_browser_sso_producer: WebBrowserSsoProducer,
+@@ -185,6 +188,14 @@
+                 in_response_to: emitted_in_response_to,
+             })?;
+             return Ok((id, xml));
++        }
++        if rendering.authentication_instant.is_some()
++            && (uses_template || !rendering.web_browser_sso_producer.follows())
++        {
++            return Err(SamlError::Invalid(
++                "established authentication time requires built-in Web Browser SSO generation"
++                    .into(),
++            ));
+         }
+         if rendering.typed_attributes.is_some() && (uses_template || !attributes.is_empty()) {
+             return Err(SamlError::Invalid(
+@@ -238,7 +249,10 @@
+                 in_response_to: emitted_in_response_to,
+                 authn_statement: rendering.web_browser_sso_producer.follows().then_some(
+                     login_response::AuthnStatementXml {
+-                        authn_instant: &window.issue_instant,
++                        authn_instant: authentication::instant(
++                            rendering.authentication_instant,
++                            &window.issue_instant,
++                        )?,
+                         session_index,
+                     },
+                 ),
+@@ -386,6 +400,7 @@
+                 name_id_format: overrides.name_id_format,
+                 qualified_name_id: overrides.qualified_name_id,
+                 typed_attributes: overrides.typed_attributes,
++                authentication_instant: overrides.authentication_instant,
+                 custom: options.custom,
+                 issuance_lifetime: overrides
+                     .issuance_lifetime
+diff --git a/src/idp/authentication.rs b/src/idp/authentication.rs
+new file mode 100644
+--- /dev/null
++++ b/src/idp/authentication.rs
+@@ -0,0 +1,43 @@
++use crate::{error::SamlError, model::SamlInstant, xml::parse_generated_saml_utc_date_time};
++use time::{format_description::well_known::Rfc3339, OffsetDateTime};
++
++pub(super) fn instant<'a>(
++    requested: Option<&'a SamlInstant>,
++    issued: &'a str,
++) -> Result<&'a str, SamlError> {
++    let Some(requested) = requested else {
++        return Ok(issued);
++    };
++    let value = parse_generated_saml_utc_date_time(requested.as_str()).ok_or_else(invalid)?;
++    let authenticated = OffsetDateTime::parse(value, &Rfc3339).map_err(|_| invalid())?;
++    let issuance = OffsetDateTime::parse(issued, &Rfc3339).map_err(|_| invalid())?;
++    if authenticated > issuance {
++        return Err(invalid());
++    }
++    Ok(value)
++}
++
++fn invalid() -> SamlError {
++    SamlError::Invalid("authentication instant must be valid UTC and no later than issuance".into())
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn established_authentication_is_not_replaced_by_new_issuance() {
++        let previous = SamlInstant::try_new("2026-10-21T10:00:00Z").unwrap();
++        let issued = "2026-10-21T11:00:00Z";
++        assert_eq!(instant(Some(&previous), issued).unwrap(), previous.as_str());
++        assert_eq!(instant(None, issued).unwrap(), issued);
++    }
++
++    #[test]
++    fn malformed_or_future_producer_authentication_is_rejected() {
++        for value in ["not-a-date", "2026-10-21T12:00:00Z"] {
++            let value = SamlInstant::try_new(value).unwrap();
++            assert!(instant(Some(&value), "2026-10-21T11:00:00Z").is_err());
++        }
++    }
++}
+diff --git a/src/idp/paos.rs b/src/idp/paos.rs
+--- a/src/idp/paos.rs
++++ b/src/idp/paos.rs
+@@ -42,6 +42,7 @@
+                 name_id_format: input.name_id_format,
+                 qualified_name_id: None,
+                 typed_attributes: None,
++                authentication_instant: None,
+                 issuance_lifetime: Some(input.issuance_lifetime),
+                 web_browser_sso_producer: WebBrowserSsoProducer::Follow,
+                 status: input.status,
+diff --git a/tests/web_browser_sso_generation.rs b/tests/web_browser_sso_generation.rs
+--- a/tests/web_browser_sso_generation.rs
++++ b/tests/web_browser_sso_generation.rs
+@@ -8,6 +8,8 @@
+ 
+ #[path = "web_browser_sso_generation/attributes.rs"]
+ mod attribute_records;
++#[path = "web_browser_sso_generation/authentication.rs"]
++mod authentication_time;
+ #[path = "web_browser_sso_generation/qualifiers.rs"]
+ mod nameid_qualifiers;
+ 
+diff --git a/tests/web_browser_sso_generation/authentication.rs b/tests/web_browser_sso_generation/authentication.rs
+new file mode 100644
+--- /dev/null
++++ b/tests/web_browser_sso_generation/authentication.rs
+@@ -0,0 +1,54 @@
++use super::*;
++use saml_rs::SamlInstant;
++
++#[test]
++fn signed_new_sso_response_retains_established_authentication_time(
++) -> Result<(), Box<dyn std::error::Error>> {
++    let sp = sp_with(signing_sp_validation())?;
++    let idp = idp_with(signed_authn_request_idp_validation(), false)?;
++    let (sp_descriptor, idp_descriptor) = descriptors(&sp, &idp)?;
++    let previous = SamlInstant::try_new(saml_rs::entity::iso8601_offset(-600))?;
++    let started = sp.start_sso(&idp_descriptor, StartSso::post())?;
++    let received = idp.receive_sso(
++        &sp_descriptor,
++        BrowserInput::<AuthnRequest>::post(started.outbound.post_form()?.fields().to_vec()),
++        validation(),
++    )?;
++    let response = idp.respond_sso(
++        &sp_descriptor,
++        &received,
++        subject(),
++        RespondSso::post()
++            .sign_response()
++            .apply_web_browser_sso_generation_rules()
++            .authentication_instant(previous.clone()),
++    )?;
++    let session = sp.finish_sso(
++        &idp_descriptor,
++        &started.pending,
++        BrowserInput::<SsoResponse>::post(response.post_form()?.fields().to_vec()),
++        validation(),
++    )?;
++    assert_eq!(session.authn_session().authn_instant(), Some(&previous));
++    assert_ne!(session.assertion_issue_instant(), &previous);
++    assert_ne!(session.response_issue_instant(), &previous);
++    Ok(())
++}
++
++#[test]
++fn established_authentication_cannot_silently_disappear_in_legacy_rendering(
++) -> Result<(), Box<dyn std::error::Error>> {
++    let sp = sp_with(signing_sp_validation())?;
++    let idp = idp_with(signed_authn_request_idp_validation(), false)?;
++    let (sp_descriptor, _) = descriptors(&sp, &idp)?;
++    let previous = SamlInstant::try_new(saml_rs::entity::iso8601_offset(-600))?;
++    assert!(matches!(
++        idp.initiate_sso(
++            &sp_descriptor,
++            subject(),
++            RespondSso::post().authentication_instant(previous)
++        ),
++        Err(SamlError::Invalid(_))
++    ));
++    Ok(())
++}

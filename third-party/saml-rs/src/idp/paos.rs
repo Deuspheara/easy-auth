@@ -41,6 +41,8 @@ impl IdentityProvider {
                 acs: Some(input.acs),
                 name_id_format: input.name_id_format,
                 qualified_name_id: None,
+                typed_attributes: None,
+                authentication_instant: None,
                 issuance_lifetime: Some(input.issuance_lifetime),
                 web_browser_sso_producer: WebBrowserSsoProducer::Follow,
                 status: input.status,

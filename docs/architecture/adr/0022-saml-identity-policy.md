@@ -41,23 +41,28 @@ JIT defaults do not change existing provider-required lifecycle restrictions.
 
 ## Attribute dependency limitation
 
-The pinned saml-rs `model/extract.rs::attributes_from_extract` creates typed
-attributes from a name-keyed aggregate and sets NameFormat to `None`. The typed
-IdP producer previously dropped supplied NameID qualifier attributes. Maintained
-patch 0004 now preserves those fields through the built-in renderer and existing
-signer; ordinary library round trips and real-PG verifier scenarios cover exact
-configured qualifiers, absent qualifiers, mismatches and unsupported SPProvidedID.
-Custom rendering with qualified successful subjects is refused. This closes the
-local producer/wire gap, not lossless attributes or broader actual IdP acceptance.
-Do not add a custom XML parser, raw-DOM bridge, custom signer or verifier change
-to conceal the remaining gaps.
+The legacy saml-rs name-keyed view remains unchanged for compatibility. Maintained
+patch 0005 adds complete ordered scalar records through
+`SsoSession::attribute_records()`, preserving NameFormat, duplicates and value
+groups from the verifier-selected Assertion. The core verifier requires this
+projection, retains zeroizing/debug-redacted `SamlAttribute` records and never
+falls back to the legacy aggregate. Absent attributes are a complete empty
+projection; unavailable XML-valued/nil projection rejects the application profile.
+No application XML parser, raw-DOM bridge or verifier replacement is introduced.
+[ADR 0028](0028-saml-attribute-and-authentication-facts.md) records the contract.
 
-Accordingly this initial mapping exposes no attribute-selected metadata, roles,
-email/contact assignment, attribute fallback or automatic linking. Broader attribute
-policy remains an explicit AUTH-35 dependency/acceptance requirement: require a
-suitable maintained authenticated projection contract and established-vector/actual
-IdP evidence before implementing it. This does not relax issuer/audience/recipient/
-correlation/signature/algorithm/certificate checks or activate SAML.
+Maintained patch 0004 preserves typed NameID qualifiers through the built-in
+producer; ordinary signed round trips and real-PG verifier scenarios cover exact,
+absent, mismatched and unsupported alias cases. Broader actual IdP qualified
+profile acceptance remains separate.
+
+The current identity policy still exposes no attribute-selected metadata, roles,
+email/contact assignment, fallback or automatic linking. Attribute projection is
+now available, but it is not permission to interpret provider email as mailbox
+ownership or to use attributes as identity keys. Real-PG cases prove default-deny,
+exact subject stability, distinct subjects despite equal email, and foreign-realm
+mapping rejection. Optional future attribute-selected presentation policy needs
+its own explicit administrative contract; it is not part of this projection API.
 
 ## Persistence and migration
 
@@ -95,7 +100,8 @@ identity/session transaction and source-bound validation/inventory/revocation as
 recorded in ADR 0023. Purpose-bound deletion and HTTP/browser delivery are now
 implemented experimentally under ADRs 0024/0025, with the documented scoped
 Keycloak rollover/realm and deletion acceptance. Older-authentication-time wire
-assurance remains open. AUTH-35 retains lossless attribute policy and broader
-qualified IdP/profile acceptance; Entra/Okta remain documentation-only. Dependency security approval,
+component assurance now includes newly issued signed responses with old
+authentication; see ADR 0028. AUTH-35 retains broader qualified IdP/profile acceptance
+and any future attribute-selected policy; Entra/Okta remain documentation-only. Dependency security approval,
 XML/signature/backend review and separate named independent approval remain gates
 under [ADR 0021](0021-saml-verification-and-approval.md). Normal SAML stays disabled.

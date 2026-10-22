@@ -1,3 +1,4 @@
+mod authentication_time;
 mod completion;
 mod denial;
 mod faults;

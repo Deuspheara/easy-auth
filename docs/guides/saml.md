@@ -17,7 +17,7 @@ The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registrat
 metadata, request persistence, cancellation and response preparation. It selects
 the [packaged qualification source](../../third-party/README.md) of saml-rs
 **0.6.1** at `3b289001a7a84d5a7ff7af2671991ab7098090bd`, with the three retained
-qualification patches and ordinary NameID producer patch 0004, defaults disabled and **no cryptographic provider enabled**.
+qualification patches plus ordinary producer/projection patches 0004–0006, defaults disabled and **no cryptographic provider enabled**.
 Source/patch hashes and existing upstream vectors are retained. This is a gated
 engineering dependency, not an upstream release or production verifier approval.
 The earlier registry producer at `6b414db010235f6c2d1121944b42919a82325b06`
@@ -272,9 +272,17 @@ registration, pin and pending-request values and grants no default mapping autho
 Mapping and configuration alone grant no authority. `SamlSignIn` now consumes
 the mapped proof in the final PostgreSQL replay/identity/session/audit transaction;
 see [ADR 0023](../architecture/adr/0023-saml-identity-session-commit.md). Attribute-selected mapping remains
-unsupported because the pinned typed extraction does not preserve NameFormat.
-Broader actual IdP qualified NameID acceptance, lossless attribute projection and additional IdP profiles
-and independent approval remain open. The owned Keycloak browser evidence below
+unsupported by the current administrative policy; it no longer depends on a
+lossy projection. `VerifiedSamlAssertion::attributes()` exposes complete ordered
+scalar records with exact Name/optional NameFormat/value groups. Names and formats
+are not normalized or merged; debug output is redacted and stored strings zeroize.
+The verifier requires the maintained library's complete-record view, never its
+legacy aggregate. XML-valued/nil attributes are outside this scalar profile and
+reject verification, rather than returning partial facts. Empty attributes remain
+a complete empty collection. Email/role/displayName data grants no owner, contact
+or permission, and cannot override default-deny JIT or exact registration.
+Broader actual IdP qualified NameID acceptance, additional profiles and independent
+approval remain open. The owned Keycloak browser evidence below
 covers only its documented persistent-subject profile. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the boundary.
 
 ```sh
@@ -337,8 +345,12 @@ grants nothing by itself. Migration0026 indexes realm/owner/session invalidation
 without changing existing rows. The explicit HTTP/reference-client extension below
 supplies confirmation. Eight owned Keycloak/Chromium deletion cases pass, including
 a retained-SSO password challenge and newer signed AuthnInstant. A newly issued
-response carrying older-than-five-minute authentication remains untested;
-independent approval is also pending. No normal server flag or default deletion route
+response carrying ten-minute-old authentication is now tested with the normal
+maintained IdP producer and real PostgreSQL: it passes signature verification but
+cannot authorize erasure. A recent signed two-minute authentication succeeds.
+A separate sign-in case preserves ten-minute-old authentication and its original
+24-hour upper bound, and rejects authentication beyond 24 hours. This is local
+component evidence; independent approval remains pending. No normal server flag or default deletion route
 is activated. See [ADR 0025](../architecture/adr/0025-saml-account-deletion.md).
 
 ## Gated browser engineering composition
@@ -381,7 +393,7 @@ HTTP contract suite. It does not change the ordinary API document.
 
 
 The [provider acceptance guide](saml-providers.md) records ten owned actual
-Keycloak26.8.1 browser/rollover/realm cases, with source and cleanup evidence.
+Keycloak 26.8.1 browser/rollover/realm cases, with source and cleanup evidence.
 It also distinguishes documentation-only Entra/Okta integration from tested
 support; Entra's documented lifetime minimum conflicts with the existing strict
 five-minute signed-validity profile. No verifier restriction was relaxed.
@@ -422,7 +434,18 @@ cases, alongside ten rollover/realm cases. Its retained-SSO case requires a pass
 challenge and observes newer signed AuthnInstant after the existing erasure
 transaction commits.
 The [provider guide](saml-providers.md) and [ADR 0025](../architecture/adr/0025-saml-account-deletion.md)
-record the source, results and limits. Newly issued responses carrying
-older-than-five-minute authentication, qualified identity/attribute profiles,
-additional IdPs and independent approval remain unverified. Normal SAML remains
+record the source, results and limits. New ordinary producer/real-PG scenarios
+cover old authentication in newly issued responses and exact scalar attribute
+records under [ADR 0028](../architecture/adr/0028-saml-attribute-and-authentication-facts.md).
+Broader actual IdP qualified/attribute profiles, additional IdPs and independent
+approval remain unverified. Normal SAML remains
 disabled.
+
+
+The maintained typed IdP `RespondSso::attributes` option uses the existing writer
+and signer for exact scalar records, and refuses mixing with lossy custom/template
+attribute rendering. `authentication_instant` carries a caller-established UTC
+event separately from issuance, requires built-in Web Browser SSO generation, and
+rejects invalid/future dates. It authenticates no event itself. The unchanged
+application verifier and database still enforce actual signed age and every cap.
+See the [activation status](../security/saml-activation-status.md) for exact remaining gates.

@@ -1,0 +1,530 @@
+diff --git a/src/api/idp.rs b/src/api/idp.rs
+index 5291f43..1c192ce 100644
+--- a/src/api/idp.rs
++++ b/src/api/idp.rs
+@@ -237,6 +237,7 @@ impl Saml<Idp> {
+                     acs: explicit_acs.as_deref(),
+                     name_id_format: name_id_format.as_deref(),
+                     qualified_name_id: Some(&qualified_name_id),
++                    typed_attributes: options.attributes.as_ref(),
+                     issuance_lifetime: Some(self.0.issuance_lifetime),
+                     web_browser_sso_producer: options.web_browser_sso_producer,
+                     status: options.status.as_ref(),
+diff --git a/src/api/mod.rs b/src/api/mod.rs
+index 41a8f6f..8021af6 100644
+--- a/src/api/mod.rs
++++ b/src/api/mod.rs
+@@ -44,6 +44,7 @@ mod idp;
+ mod options;
+ mod paos;
+ mod raw_mapping;
++mod response_claims;
+ mod slo;
+ mod sp;
+ 
+diff --git a/src/api/options.rs b/src/api/options.rs
+index fee2a6d..51da17e 100644
+--- a/src/api/options.rs
++++ b/src/api/options.rs
+@@ -82,6 +82,7 @@ impl StartSso {
+ /// Options for issuing SAML Responses from an IdP.
+ #[derive(Debug, Clone)]
+ pub struct RespondSso {
++    pub(super) attributes: Option<crate::model::Attributes>,
+     pub(super) binding: SsoResponseBinding,
+     pub(super) relay_state: Option<RelayStateParam>,
+     response_signing: ResponseSigning,
+@@ -109,6 +110,7 @@ impl RespondSso {
+ 
+     fn new(binding: SsoResponseBinding) -> Self {
+         Self {
++            attributes: None,
+             binding,
+             relay_state: None,
+             response_signing: ResponseSigning::FollowEncryptedCbcRecommendation,
+diff --git a/src/flow.rs b/src/flow.rs
+index 74f5ee3..7634f76 100644
+--- a/src/flow.rs
++++ b/src/flow.rs
+@@ -1058,7 +1058,8 @@ fn flow_inner(
+         };
+ 
+     let fields = default_fields(parser_type, assertion.as_deref())?;
+-    let extracted = extract_with_limits(&saml_content, &fields, opts.xml_limits)?;
++    let mut extracted = extract_with_limits(&saml_content, &fields, opts.xml_limits)?;
++    crate::xml::attribute_records::append(&mut extracted, assertion.as_deref(), opts.xml_limits)?;
+     validate_context(
+         parser_type,
+         &saml_content,
+diff --git a/src/idp.rs b/src/idp.rs
+index 652294e..6a30ba6 100644
+--- a/src/idp.rs
++++ b/src/idp.rs
+@@ -8,7 +8,7 @@ use crate::entity::{
+ use crate::error::SamlError;
+ use crate::flow::{FlowOptions, FlowResult, HttpRequest};
+ use crate::metadata::{try_generate_idp_metadata, IdpMetadata, IdpMetadataConfig};
+-use crate::model::{NameId, Status, TopLevelStatusCode};
++use crate::model::{Attributes, NameId, Status, TopLevelStatusCode};
+ use crate::sp::{ServiceProvider, WebBrowserSsoProducer};
+ use crate::template::{
+     apply_tag_prefixes, attr_tag, attribute_statement_builder, replace_tags_by_optional_value,
+@@ -16,6 +16,7 @@ use crate::template::{
+     LOGIN_RESPONSE_TEMPLATE,
+ };
+ 
++mod attributes;
+ mod login_response;
+ mod paos;
+ 
+@@ -47,6 +48,7 @@ pub(crate) struct LoginResponseOverrides<'a> {
+     pub(crate) acs: Option<&'a str>,
+     pub(crate) name_id_format: Option<&'a str>,
+     pub(crate) qualified_name_id: Option<&'a NameId>,
++    pub(crate) typed_attributes: Option<&'a Attributes>,
+     pub(crate) issuance_lifetime: Option<time::Duration>,
+     pub(crate) web_browser_sso_producer: WebBrowserSsoProducer,
+     pub(crate) status: Option<&'a Status>,
+@@ -56,6 +58,7 @@ pub(crate) struct LoginResponseOverrides<'a> {
+ struct LoginResponseRendering<'a> {
+     name_id_format: Option<&'a str>,
+     qualified_name_id: Option<&'a NameId>,
++    typed_attributes: Option<&'a Attributes>,
+     custom: Option<CustomTagReplacement<'a>>,
+     issuance_lifetime: time::Duration,
+     web_browser_sso_producer: WebBrowserSsoProducer,
+@@ -183,6 +186,11 @@ impl IdentityProvider {
+             })?;
+             return Ok((id, xml));
+         }
++        if rendering.typed_attributes.is_some() && (uses_template || !attributes.is_empty()) {
++            return Err(SamlError::Invalid(
++                "typed attributes require the built-in renderer without template attributes".into(),
++            ));
++        }
+         if uses_template
+             && rendering.qualified_name_id.is_some_and(|name_id| {
+                 name_id.name_qualifier().is_some()
+@@ -225,6 +233,7 @@ impl IdentityProvider {
+                 audience: &audience,
+                 name_id_format,
+                 qualified_name_id: rendering.qualified_name_id,
++                typed_attributes: rendering.typed_attributes,
+                 name_id: &user.name_id,
+                 in_response_to: emitted_in_response_to,
+                 authn_statement: rendering.web_browser_sso_producer.follows().then_some(
+@@ -376,6 +385,7 @@ impl IdentityProvider {
+             LoginResponseRendering {
+                 name_id_format: overrides.name_id_format,
+                 qualified_name_id: overrides.qualified_name_id,
++                typed_attributes: overrides.typed_attributes,
+                 custom: options.custom,
+                 issuance_lifetime: overrides
+                     .issuance_lifetime
+diff --git a/src/idp/login_response.rs b/src/idp/login_response.rs
+index 10ca5fb..6251eee 100644
+--- a/src/idp/login_response.rs
++++ b/src/idp/login_response.rs
+@@ -1,6 +1,6 @@
+ use crate::constants::namespace;
+ use crate::error::SamlError;
+-use crate::model::{NameId, Status};
++use crate::model::{Attributes, NameId, Status};
+ use crate::template::{write_login_response_attribute_statement, LoginResponseAttribute};
+ use crate::xml::write::XmlWriter;
+ 
+@@ -32,6 +32,7 @@ pub(super) struct LoginResponseXml<'a> {
+     /// `<NameID>` `Format`. `None` omits the attribute.
+     pub(super) name_id_format: Option<&'a str>,
+     pub(super) qualified_name_id: Option<&'a NameId>,
++    pub(super) typed_attributes: Option<&'a Attributes>,
+     pub(super) name_id: &'a str,
+     pub(super) in_response_to: Option<&'a str>,
+     pub(super) authn_statement: Option<AuthnStatementXml<'a>>,
+@@ -118,12 +119,16 @@ pub(super) fn render_default_login_response(
+     if let Some(statement) = input.authn_statement.as_ref() {
+         write_authn_statement(&mut writer, input.assertion_prefix, statement);
+     }
+-    write_login_response_attribute_statement(
+-        &mut writer,
+-        input.attributes,
+-        input.user_attributes,
+-        input.assertion_prefix,
+-    )?;
++    if let Some(attributes) = input.typed_attributes {
++        super::attributes::write(&mut writer, input.assertion_prefix, attributes)?;
++    } else {
++        write_login_response_attribute_statement(
++            &mut writer,
++            input.attributes,
++            input.user_attributes,
++            input.assertion_prefix,
++        )?;
++    }
+     writer.end(&assertion_name);
+     writer.end(&response_name);
+     Ok(writer.finish())
+diff --git a/src/idp/paos.rs b/src/idp/paos.rs
+index 2b4c077..3a50cb4 100644
+--- a/src/idp/paos.rs
++++ b/src/idp/paos.rs
+@@ -41,6 +41,7 @@ impl IdentityProvider {
+                 acs: Some(input.acs),
+                 name_id_format: input.name_id_format,
+                 qualified_name_id: None,
++                typed_attributes: None,
+                 issuance_lifetime: Some(input.issuance_lifetime),
+                 web_browser_sso_producer: WebBrowserSsoProducer::Follow,
+                 status: input.status,
+diff --git a/src/model/mod.rs b/src/model/mod.rs
+index 2303f4c..90889d0 100644
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -20,6 +20,7 @@ mod validation;
+ pub(crate) use extract::authn_statement_not_on_or_after_values;
+ pub(crate) use session::earliest_authn_session_expiration;
+ 
++mod attribute_projection;
+ pub use attributes::{Attribute, AttributeValue, Attributes};
+ pub use authn::{AuthnRequest, ForceAuthn, IsPassive};
+ pub use endpoint::EndpointUrl;
+diff --git a/src/model/sso.rs b/src/model/sso.rs
+index 57d8a6c..bc7072d 100644
+--- a/src/model/sso.rs
++++ b/src/model/sso.rs
+@@ -175,6 +175,7 @@ pub struct SsoSession {
+     in_response_to: Option<MessageId>,
+     subject: Subject,
+     attributes: Attributes,
++    attribute_records: Option<Attributes>,
+     authn_sessions: Vec<AuthnSession>,
+     audience: Vec<EntityId>,
+     not_before: Option<SamlInstant>,
+@@ -230,6 +231,16 @@ impl SsoSession {
+         &self.attributes
+     }
+ 
++    /// Complete document-order scalar records from the same Assertion used for
++    /// verified extraction. Retains NameFormat, duplicate names and value groups.
++    /// Some(empty) means no attributes; None means unavailable (legacy manually
++    /// built FlowResult, XML-valued or nil data). Never fall back to the lossy
++    /// legacy `attributes()` view when exact projection is required. Signature
++    /// authority still depends on this session's configured validation/evidence.
++    pub fn attribute_records(&self) -> Option<&Attributes> {
++        self.attribute_records.as_ref()
++    }
++
+     /// Legacy singular view of `AuthnStatement` session data.
+     ///
+     /// This compatibility accessor returns the first statement in document
+@@ -556,6 +567,10 @@ impl SsoSession {
+             subject_confirmations_from_extract(&raw_flow.extract),
+         );
+         let attributes = attributes_from_extract(&raw_flow.extract);
++        let attribute_records = raw_flow
++            .extract
++            .get("attributeRecords")
++            .and_then(|records| super::attribute_projection::project(records).ok());
+         let authn_sessions = authn_sessions_from_extract(&raw_flow.extract)?;
+         let audience = entity_ids_from_value(raw_flow.extract.get("audience"))?;
+         let (not_before, not_on_or_after) = conditions_instants(&raw_flow.extract)?;
+@@ -569,6 +584,7 @@ impl SsoSession {
+             in_response_to,
+             subject,
+             attributes,
++            attribute_records,
+             authn_sessions,
+             audience,
+             not_before,
+diff --git a/src/xml/mod.rs b/src/xml/mod.rs
+index 476a57e..9c52e52 100644
+--- a/src/xml/mod.rs
++++ b/src/xml/mod.rs
+@@ -1,5 +1,6 @@
+ //! XML parsing and field extraction over quick-xml.
+ 
++pub(crate) mod attribute_records;
+ mod date_time;
+ pub mod dom;
+ pub mod extract;
+diff --git a/tests/web_browser_sso_generation.rs b/tests/web_browser_sso_generation.rs
+index 9e43d3c..181177c 100644
+--- a/tests/web_browser_sso_generation.rs
++++ b/tests/web_browser_sso_generation.rs
+@@ -6,6 +6,8 @@
+     feature = "crypto-fips"
+ ))]
+ 
++#[path = "web_browser_sso_generation/attributes.rs"]
++mod attribute_records;
+ #[path = "web_browser_sso_generation/qualifiers.rs"]
+ mod nameid_qualifiers;
+ 
+diff --git a/src/api/response_claims.rs b/src/api/response_claims.rs
+new file mode 100644
+index 0000000..c1909e9
+--- /dev/null
++++ b/src/api/response_claims.rs
+@@ -0,0 +1,14 @@
++//! Trusted assertion data for the built-in IdP producer.
++use super::RespondSso;
++use crate::model::Attributes;
++
++impl RespondSso {
++    /// Emit exact scalar attributes using the built-in XML writer and signer.
++    /// Order, duplicate names, optional NameFormat and value groups are retained.
++    /// Cannot be combined with template-configured attributes or custom rendering.
++    /// These attributes do not establish authentication or authorization policy.
++    pub fn attributes(mut self, attributes: Attributes) -> Self {
++        self.attributes = Some(attributes);
++        self
++    }
++}
+diff --git a/src/idp/attributes.rs b/src/idp/attributes.rs
+new file mode 100644
+index 0000000..a363b69
+--- /dev/null
++++ b/src/idp/attributes.rs
+@@ -0,0 +1,33 @@
++use crate::{error::SamlError, model::Attributes, xml::write::XmlWriter};
++
++pub(super) fn write(
++    writer: &mut XmlWriter,
++    prefix: &str,
++    attributes: &Attributes,
++) -> Result<(), SamlError> {
++    if attributes.as_slice().is_empty() {
++        return Ok(());
++    }
++    let statement = format!("{prefix}:AttributeStatement");
++    let attribute_name = format!("{prefix}:Attribute");
++    let value_name = format!("{prefix}:AttributeValue");
++    writer.start(&statement, &[]);
++    for attribute in attributes.as_slice() {
++        if attribute.name().is_empty() {
++            return Err(SamlError::Invalid(
++                "attribute Name must not be empty".into(),
++            ));
++        }
++        let mut fields = vec![("Name", attribute.name())];
++        if let Some(format) = attribute.name_format() {
++            fields.push(("NameFormat", format));
++        }
++        writer.start(&attribute_name, &fields);
++        for value in attribute.values() {
++            writer.text_element(&value_name, &[], value.as_str());
++        }
++        writer.end(&attribute_name);
++    }
++    writer.end(&statement);
++    Ok(())
++}
+diff --git a/src/model/attribute_projection.rs b/src/model/attribute_projection.rs
+new file mode 100644
+index 0000000..60a8d30
+--- /dev/null
++++ b/src/model/attribute_projection.rs
+@@ -0,0 +1,68 @@
++use super::attributes::{Attribute, AttributeValue, Attributes};
++use crate::{error::SamlError, util::Value};
++
++pub(super) fn project(records: &Value) -> Result<Attributes, SamlError> {
++    let Value::Array(records) = records else {
++        return Err(invalid());
++    };
++    records
++        .iter()
++        .map(attribute)
++        .collect::<Result<Vec<_>, _>>()
++        .map(Attributes::new)
++}
++
++fn attribute(record: &Value) -> Result<Attribute, SamlError> {
++    let name = record
++        .get_str("Name")
++        .filter(|name| !name.is_empty())
++        .ok_or_else(invalid)?;
++    let format = match record.get("NameFormat") {
++        None => None,
++        Some(Value::Str(value)) => Some(value.clone()),
++        _ => return Err(invalid()),
++    };
++    let Some(Value::Array(values)) = record.get("values") else {
++        return Err(invalid());
++    };
++    let values = values
++        .iter()
++        .map(|value| match value {
++            Value::Str(value) => Ok(AttributeValue::new(value.clone())),
++            _ => Err(invalid()),
++        })
++        .collect::<Result<Vec<_>, _>>()?;
++    Ok(Attribute::new(name, format, values))
++}
++
++fn invalid() -> SamlError {
++    SamlError::Invalid("typed attributes require named records with scalar non-nil values".into())
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn empty_records_are_a_complete_empty_projection() {
++        assert!(project(&Value::Array(Vec::new()))
++            .unwrap()
++            .as_slice()
++            .is_empty());
++    }
++
++    #[test]
++    fn unavailable_values_never_become_partial_or_empty_string_records() {
++        let record = |value| {
++            Value::Object(vec![
++                ("Name".into(), Value::Str("department".into())),
++                ("values".into(), Value::Array(vec![value])),
++            ])
++        };
++        assert!(project(&Value::Array(vec![
++            record(Value::Str("Engineering".into())),
++            record(Value::Null)
++        ]))
++        .is_err());
++    }
++}
+diff --git a/src/xml/attribute_records.rs b/src/xml/attribute_records.rs
+new file mode 100644
+index 0000000..ff17209
+--- /dev/null
++++ b/src/xml/attribute_records.rs
+@@ -0,0 +1,60 @@
++//! Ordered attribute records from the same verified Assertion shortcut as the
++//! other assertion fields. The legacy name-keyed raw extraction stays intact.
++use super::dom::{self, Node, XmlLimits};
++use crate::{error::SamlError, util::Value};
++
++pub(crate) fn append(
++    extracted: &mut Value,
++    assertion: Option<&str>,
++    limits: XmlLimits,
++) -> Result<(), SamlError> {
++    let Some(assertion) = assertion else {
++        return Ok(());
++    };
++    let document = dom::parse_with_limits(assertion, limits)?;
++    if document.root.local_name != "Assertion" {
++        return Err(SamlError::Invalid(
++            "attribute projection requires an Assertion".into(),
++        ));
++    }
++    let rows = document
++        .root
++        .children
++        .iter()
++        .filter(|node| node.local_name == "AttributeStatement")
++        .flat_map(|node| &node.children)
++        .filter(|node| node.local_name == "Attribute")
++        .map(record)
++        .collect();
++    let Value::Object(fields) = extracted else {
++        return Err(SamlError::Invalid("expected extracted field object".into()));
++    };
++    fields.push(("attributeRecords".into(), Value::Array(rows)));
++    Ok(())
++}
++
++fn record(node: &Node) -> Value {
++    let mut fields: Vec<_> = ["Name", "NameFormat"]
++        .into_iter()
++        .filter_map(|name| {
++            node.attr(name)
++                .map(|value| (name.into(), Value::Str(value.into())))
++        })
++        .collect();
++    let values = node
++        .children
++        .iter()
++        .filter(|node| node.local_name == "AttributeValue")
++        .map(|value| {
++            // The typed scalar contract cannot silently flatten XML-valued or nil
++            // data into an ordinary string. Preserve its unsupported shape.
++            if !value.children.is_empty() || value.attr("nil").is_some() {
++                Value::Null
++            } else {
++                Value::Str(value.text.clone())
++            }
++        })
++        .collect();
++    fields.push(("values".into(), Value::Array(values)));
++    Value::Object(fields)
++}
+diff --git a/tests/web_browser_sso_generation/attributes.rs b/tests/web_browser_sso_generation/attributes.rs
+new file mode 100644
+index 0000000..238e954
+--- /dev/null
++++ b/tests/web_browser_sso_generation/attributes.rs
+@@ -0,0 +1,63 @@
++use super::*;
++use saml_rs::{Attribute, AttributeValue, Attributes};
++
++fn attributes() -> Attributes {
++    Attributes::new(vec![
++        Attribute::new(
++            "department",
++            Some("urn:example:format:one".into()),
++            vec![
++                AttributeValue::new("Engineering"),
++                AttributeValue::new("Operations"),
++                AttributeValue::new("Engineering"),
++            ],
++        ),
++        Attribute::new(
++            "department",
++            Some("urn:example:format:two".into()),
++            vec![AttributeValue::new("ordinary-value")],
++        ),
++        Attribute::new("department", None, vec![AttributeValue::new("")]),
++        Attribute::new("department", Some(String::new()), Vec::new()),
++        Attribute::new(
++            "department",
++            Some("urn:example:format:one".into()),
++            vec![AttributeValue::new("last record")],
++        ),
++    ])
++}
++
++#[test]
++fn signed_scalar_attribute_records_keep_format_order_and_duplicate_value_groups(
++) -> Result<(), Box<dyn std::error::Error>> {
++    let sp = sp_with(signing_sp_validation())?;
++    let idp = idp_with(signed_authn_request_idp_validation(), false)?;
++    let (sp_descriptor, idp_descriptor) = descriptors(&sp, &idp)?;
++    for options in [
++        RespondSso::post().sign_response(),
++        RespondSso::post()
++            .sign_response()
++            .apply_web_browser_sso_generation_rules(),
++    ] {
++        let started = sp.start_sso(&idp_descriptor, StartSso::post())?;
++        let received = idp.receive_sso(
++            &sp_descriptor,
++            BrowserInput::<AuthnRequest>::post(started.outbound.post_form()?.fields().to_vec()),
++            validation(),
++        )?;
++        let response = idp.respond_sso(
++            &sp_descriptor,
++            &received,
++            subject(),
++            options.attributes(attributes()),
++        )?;
++        let session = sp.finish_sso(
++            &idp_descriptor,
++            &started.pending,
++            BrowserInput::<SsoResponse>::post(response.post_form()?.fields().to_vec()),
++            validation(),
++        )?;
++        assert_eq!(session.attribute_records(), Some(&attributes()));
++    }
++    Ok(())
++}

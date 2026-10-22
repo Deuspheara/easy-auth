@@ -52,6 +52,7 @@ pub(super) fn project(
         return Err(Error::Unauthorized);
     }
     Ok(VerifiedSamlAssertion {
+        attributes: super::attributes::project(&session)?,
         registration: prepared.registration().clone(),
         subject: Zeroizing::new(subject),
         authn_at_us,

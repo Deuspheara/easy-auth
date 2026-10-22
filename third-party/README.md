@@ -2,8 +2,8 @@
 
 `saml-rs/` is the Cargo package-layout source of upstream saml-rs at
 [`3b289001a7a84d5a7ff7af2671991ab7098090bd`](https://github.com/salasebas/saml-rs/tree/3b289001a7a84d5a7ff7af2671991ab7098090bd),
-with the three retained qualification patches and ordinary NameID producer
-maintenance patch recorded in
+with the three retained qualification patches and ordinary NameID, attribute
+projection and authentication-time maintenance patches recorded in
 `tests/provider/saml/rust-policy/patches/`. It is **a project-maintained engineering snapshot,
 not an upstream release or independently approved production dependency**.
 [ADR 0021](../docs/architecture/adr/0021-saml-verification-and-approval.md) retains
@@ -42,11 +42,16 @@ then `git apply`, and run:
 cargo package --locked --allow-dirty --no-verify --no-default-features --features crypto-aws-lc
 ```
 
-After unpacking that original import archive, apply maintenance patch 0004 with
+After unpacking that original import archive, apply maintenance patches 0004/0005/0006 in order with
 `git apply --check` then `git apply` from the package root. This preserves typed
 NameID qualifiers through the built-in IdP response renderer; it changes no
 cryptographic verifier. Qualified successful responses refuse legacy custom
-rendering, which cannot preserve those fields. PAOS qualification is not added.
+rendering, which cannot preserve those fields. Patch 0005 adds a complete ordered
+scalar attribute accessor without changing the legacy aggregate view; patch 0006
+adds caller-established authentication time distinct from response issuance.
+Both use the existing producer writer/signer and bounded extraction, never a new
+XML cryptographic verifier. See ADR 0028 for unavailable projection and template
+restrictions. PAOS qualification is not added.
 
 The package's normalized Cargo manifest and `.cargo_vcs_info.json` intentionally
 retain version 0.6.1 and `dirty=true`; this is distinct from registry 0.6.1. The

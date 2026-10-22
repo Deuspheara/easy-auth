@@ -175,6 +175,7 @@ pub struct SsoSession {
     in_response_to: Option<MessageId>,
     subject: Subject,
     attributes: Attributes,
+    attribute_records: Option<Attributes>,
     authn_sessions: Vec<AuthnSession>,
     audience: Vec<EntityId>,
     not_before: Option<SamlInstant>,
@@ -228,6 +229,16 @@ impl SsoSession {
     /// Attributes.
     pub fn attributes(&self) -> &Attributes {
         &self.attributes
+    }
+
+    /// Complete document-order scalar records from the same Assertion used for
+    /// verified extraction. Retains NameFormat, duplicate names and value groups.
+    /// Some(empty) means no attributes; None means unavailable (legacy manually
+    /// built FlowResult, XML-valued or nil data). Never fall back to the lossy
+    /// legacy `attributes()` view when exact projection is required. Signature
+    /// authority still depends on this session's configured validation/evidence.
+    pub fn attribute_records(&self) -> Option<&Attributes> {
+        self.attribute_records.as_ref()
     }
 
     /// Legacy singular view of `AuthnStatement` session data.
@@ -556,6 +567,10 @@ impl SsoSession {
             subject_confirmations_from_extract(&raw_flow.extract),
         );
         let attributes = attributes_from_extract(&raw_flow.extract);
+        let attribute_records = raw_flow
+            .extract
+            .get("attributeRecords")
+            .and_then(|records| super::attribute_projection::project(records).ok());
         let authn_sessions = authn_sessions_from_extract(&raw_flow.extract)?;
         let audience = entity_ids_from_value(raw_flow.extract.get("audience"))?;
         let (not_before, not_on_or_after) = conditions_instants(&raw_flow.extract)?;
@@ -569,6 +584,7 @@ impl SsoSession {
             in_response_to,
             subject,
             attributes,
+            attribute_records,
             authn_sessions,
             audience,
             not_before,

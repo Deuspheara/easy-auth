@@ -1,6 +1,6 @@
 use crate::constants::namespace;
 use crate::error::SamlError;
-use crate::model::{NameId, Status};
+use crate::model::{Attributes, NameId, Status};
 use crate::template::{write_login_response_attribute_statement, LoginResponseAttribute};
 use crate::xml::write::XmlWriter;
 
@@ -32,6 +32,7 @@ pub(super) struct LoginResponseXml<'a> {
     /// `<NameID>` `Format`. `None` omits the attribute.
     pub(super) name_id_format: Option<&'a str>,
     pub(super) qualified_name_id: Option<&'a NameId>,
+    pub(super) typed_attributes: Option<&'a Attributes>,
     pub(super) name_id: &'a str,
     pub(super) in_response_to: Option<&'a str>,
     pub(super) authn_statement: Option<AuthnStatementXml<'a>>,
@@ -118,12 +119,16 @@ pub(super) fn render_default_login_response(
     if let Some(statement) = input.authn_statement.as_ref() {
         write_authn_statement(&mut writer, input.assertion_prefix, statement);
     }
-    write_login_response_attribute_statement(
-        &mut writer,
-        input.attributes,
-        input.user_attributes,
-        input.assertion_prefix,
-    )?;
+    if let Some(attributes) = input.typed_attributes {
+        super::attributes::write(&mut writer, input.assertion_prefix, attributes)?;
+    } else {
+        write_login_response_attribute_statement(
+            &mut writer,
+            input.attributes,
+            input.user_attributes,
+            input.assertion_prefix,
+        )?;
+    }
     writer.end(&assertion_name);
     writer.end(&response_name);
     Ok(writer.finish())

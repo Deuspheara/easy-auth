@@ -202,3 +202,14 @@ consent/pairwise policy plus realm-scoped random sector/owner subjects. A metada
 mapping grants no consent, session or token authority; account erasure cascades it.
 [ADR0026](adr/0026-outbound-client-registration.md) and the
 [component guide](../guides/issuer-clients.md) describe limits. M07 remains gated.
+
+
+`SamlAttribute` is optional verified provider data inside the opaque SAML proof,
+with exact scalar Name/NameFormat/value records, bounded by input/XML limits,
+zeroizing strings and redacted Debug. Absent and empty format, duplicate names,
+record/value order and empty values remain distinct. No database contact,
+identity key, role or permission is inferred from it. NameID and full trusted
+registration remain ownership authority. AuthnInstant is the established event,
+not new Response/Assertion issuance; stored sessions and deletion freshness use
+that original signed time. [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md)
+records these gated contracts and the unchanged verifier/clock boundary.

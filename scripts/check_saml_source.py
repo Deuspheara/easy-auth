@@ -18,6 +18,8 @@ PATCHES = (
     "0002-exact-sha256-profile.patch",
     "0003-reject-unclosed-document.patch",
     "0004-preserve-nameid-qualifiers.patch",
+    "0005-ordered-attribute-projection.patch",
+    "0006-established-authentication-time.patch",
 )
 
 

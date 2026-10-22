@@ -44,6 +44,7 @@ mod idp;
 mod options;
 mod paos;
 mod raw_mapping;
+mod response_claims;
 mod slo;
 mod sp;
 

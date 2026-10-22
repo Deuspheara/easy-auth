@@ -35,6 +35,12 @@ archive hash remains historical; a separate maintenance patch inventory and the
 complete current file inventory identify the extended source. Existing vectors
 and the original three patches remain unchanged.
 
+Subsequent patches 0005/0006 add a complete ordered scalar attribute projection
+without changing the legacy aggregate API, plus trusted producer authentication
+time independent of issuance. [ADR 0028](0028-saml-attribute-and-authentication-facts.md)
+records these additive contracts and ordinary integration coverage. Neither
+changes the cryptographic verifier or completes independent approval.
+
 ## Maintenance and release obligations
 
 Easy-auth maintainers review each proposed source/patch change, retain the previous

@@ -82,6 +82,8 @@ impl StartSso {
 /// Options for issuing SAML Responses from an IdP.
 #[derive(Debug, Clone)]
 pub struct RespondSso {
+    pub(super) attributes: Option<crate::model::Attributes>,
+    pub(super) authentication_instant: Option<crate::model::SamlInstant>,
     pub(super) binding: SsoResponseBinding,
     pub(super) relay_state: Option<RelayStateParam>,
     response_signing: ResponseSigning,
@@ -109,6 +111,8 @@ impl RespondSso {
 
     fn new(binding: SsoResponseBinding) -> Self {
         Self {
+            attributes: None,
+            authentication_instant: None,
             binding,
             relay_state: None,
             response_signing: ResponseSigning::FollowEncryptedCbcRecommendation,
@@ -151,7 +155,8 @@ impl RespondSso {
     ///
     /// [`Self::post`] and [`Self::simple_sign`] leave this off. When enabled, a
     /// successful response carries an authentication statement whose
-    /// `AuthnInstant` is the assertion `IssueInstant` and whose
+    /// `AuthnInstant` defaults to the assertion `IssueInstant` (or the explicitly
+    /// supplied established [`Self::authentication_instant`]) and whose
     /// `AuthnContextClassRef` is
     /// `urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified`. That class means
     /// the authentication mechanism was not recorded. It is not evidence of a

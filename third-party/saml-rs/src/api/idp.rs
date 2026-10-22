@@ -237,6 +237,8 @@ impl Saml<Idp> {
                     acs: explicit_acs.as_deref(),
                     name_id_format: name_id_format.as_deref(),
                     qualified_name_id: Some(&qualified_name_id),
+                    typed_attributes: options.attributes.as_ref(),
+                    authentication_instant: options.authentication_instant.as_ref(),
                     issuance_lifetime: Some(self.0.issuance_lifetime),
                     web_browser_sso_producer: options.web_browser_sso_producer,
                     status: options.status.as_ref(),

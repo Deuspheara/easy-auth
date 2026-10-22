@@ -8,7 +8,7 @@ use crate::entity::{
 use crate::error::SamlError;
 use crate::flow::{FlowOptions, FlowResult, HttpRequest};
 use crate::metadata::{try_generate_idp_metadata, IdpMetadata, IdpMetadataConfig};
-use crate::model::{NameId, Status, TopLevelStatusCode};
+use crate::model::{Attributes, NameId, Status, TopLevelStatusCode};
 use crate::sp::{ServiceProvider, WebBrowserSsoProducer};
 use crate::template::{
     apply_tag_prefixes, attr_tag, attribute_statement_builder, replace_tags_by_optional_value,
@@ -16,6 +16,8 @@ use crate::template::{
     LOGIN_RESPONSE_TEMPLATE,
 };
 
+mod attributes;
+mod authentication;
 mod login_response;
 mod paos;
 
@@ -47,6 +49,8 @@ pub(crate) struct LoginResponseOverrides<'a> {
     pub(crate) acs: Option<&'a str>,
     pub(crate) name_id_format: Option<&'a str>,
     pub(crate) qualified_name_id: Option<&'a NameId>,
+    pub(crate) typed_attributes: Option<&'a Attributes>,
+    pub(crate) authentication_instant: Option<&'a crate::model::SamlInstant>,
     pub(crate) issuance_lifetime: Option<time::Duration>,
     pub(crate) web_browser_sso_producer: WebBrowserSsoProducer,
     pub(crate) status: Option<&'a Status>,
@@ -56,6 +60,8 @@ pub(crate) struct LoginResponseOverrides<'a> {
 struct LoginResponseRendering<'a> {
     name_id_format: Option<&'a str>,
     qualified_name_id: Option<&'a NameId>,
+    typed_attributes: Option<&'a Attributes>,
+    authentication_instant: Option<&'a crate::model::SamlInstant>,
     custom: Option<CustomTagReplacement<'a>>,
     issuance_lifetime: time::Duration,
     web_browser_sso_producer: WebBrowserSsoProducer,
@@ -183,6 +189,19 @@ impl IdentityProvider {
             })?;
             return Ok((id, xml));
         }
+        if rendering.authentication_instant.is_some()
+            && (uses_template || !rendering.web_browser_sso_producer.follows())
+        {
+            return Err(SamlError::Invalid(
+                "established authentication time requires built-in Web Browser SSO generation"
+                    .into(),
+            ));
+        }
+        if rendering.typed_attributes.is_some() && (uses_template || !attributes.is_empty()) {
+            return Err(SamlError::Invalid(
+                "typed attributes require the built-in renderer without template attributes".into(),
+            ));
+        }
         if uses_template
             && rendering.qualified_name_id.is_some_and(|name_id| {
                 name_id.name_qualifier().is_some()
@@ -225,11 +244,15 @@ impl IdentityProvider {
                 audience: &audience,
                 name_id_format,
                 qualified_name_id: rendering.qualified_name_id,
+                typed_attributes: rendering.typed_attributes,
                 name_id: &user.name_id,
                 in_response_to: emitted_in_response_to,
                 authn_statement: rendering.web_browser_sso_producer.follows().then_some(
                     login_response::AuthnStatementXml {
-                        authn_instant: &window.issue_instant,
+                        authn_instant: authentication::instant(
+                            rendering.authentication_instant,
+                            &window.issue_instant,
+                        )?,
                         session_index,
                     },
                 ),
@@ -376,6 +399,8 @@ impl IdentityProvider {
             LoginResponseRendering {
                 name_id_format: overrides.name_id_format,
                 qualified_name_id: overrides.qualified_name_id,
+                typed_attributes: overrides.typed_attributes,
+                authentication_instant: overrides.authentication_instant,
                 custom: options.custom,
                 issuance_lifetime: overrides
                     .issuance_lifetime

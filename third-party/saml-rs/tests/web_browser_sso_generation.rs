@@ -6,6 +6,10 @@
     feature = "crypto-fips"
 ))]
 
+#[path = "web_browser_sso_generation/attributes.rs"]
+mod attribute_records;
+#[path = "web_browser_sso_generation/authentication.rs"]
+mod authentication_time;
 #[path = "web_browser_sso_generation/qualifiers.rs"]
 mod nameid_qualifiers;
 

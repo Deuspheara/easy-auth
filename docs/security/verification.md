@@ -4959,3 +4959,40 @@ and private; minimal upstream propagation remains a reviewed size exception for
 patch comparison. AUTH-35 remains open for lossless attribute projection, broader
 profiles and older-authentication-time wire assurance; AUTH-32 independent security
 approval remains pending. Production SAML stays disabled. No PR or external contact.
+
+
+## AUTH-35 complete scalar attributes and established authentication — 2026-10-22
+
+Maintained patches 0005/0006 add an ordered complete-record attribute accessor
+without changing the legacy aggregate API, and trusted IdP authentication time
+separate from issuance. Core retains exact redacted/zeroizing scalar facts,
+requires complete projection and preserves NameID/current-source/JIT authority.
+Two new actual-signature real-PG cases cover format/value groups, no grant before
+commit, default deny, stable subject, distinct subjects with equal email and
+foreign-realm rejection. Three real-PG wire cases preserve old authentication and
+the original 24-hour session limit, reject authentication beyond 24 hours, deny
+deletions with ten-minute-old authentication despite new response issuance, and
+accept the recent signed two-minute positive control. No crypto verifier,
+DB clock, fixture key, XML vector, trust/algorithm policy or existing assertion
+is replaced or weakened.
+
+The unchanged selected-graph dependency/core suite plus new ordinary cases passes
+1,115 passed/0 failed/0 ignored across 46 groups; immutable source-specific receipts retain
+this six-patch source and the preceding 1,111-test attribute-only source. Formatting,
+strict default/all-feature all-target Clippy, warning-free all-feature docs and
+locked full workspace tests pass under normal scheduling: 111 default/788
+all-feature result counts, including 462 real-PG lifecycle tests. Source integrity
+242 files/six patches, 11 source/runner regressions and exact incremental source
+reconstruction pass. The original four patches and import archive identity are
+unchanged. Final secret scan and exact-head hosted CI are recorded separately.
+
+An initial changed legacy aggregation broke one unchanged upstream multi-value
+test; the additive complete-record API preserves that test without rewriting its
+assertions. Test compilation briefly referenced unavailable chrono; existing
+PostgreSQL timestamp conversion avoids a new dependency. A redundant borrowed
+reference in a new test helper was corrected for strict Clippy. Final checks pass.
+[ADR0028](../architecture/adr/0028-saml-attribute-and-authentication-facts.md),
+[the evidence review](saml-evidence-review.md) and
+[activation status](saml-activation-status.md) state exact scope and remaining
+mandatory review/resource/independent-decision/production-composition requirements.
+No PR or external contact; normal SAML stays disabled.

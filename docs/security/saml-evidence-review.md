@@ -9,8 +9,8 @@ change is part of this review.
 ## Source and evidence scope
 
 The maintained source is saml-rs 0.6.1 at upstream revision
-`3b289001a7a84d5a7ff7af2671991ab7098090bd`, with three retained patches plus ordinary producer patch 0004
-and a 235-file inventory. The application selects only `crypto-aws-lc`. Its lock
+`3b289001a7a84d5a7ff7af2671991ab7098090bd`, with three retained qualification patches plus maintenance patches 0004–0006
+and a 242-file inventory. The application selects only `crypto-aws-lc`. Its lock
 contains Bergshamra 0.9.2, uppsala 0.10.1, kryptering 0.6.0, aws-lc-rs 1.18.2
 and aws-lc-sys 0.46.0. Earlier standalone tests used different AWS-LC versions;
 those results cannot silently qualify the application's newer native graph.
@@ -81,7 +81,7 @@ remain unchanged and do not claim to qualify the new source. This ordinary produ
 fix establishes local qualifier delivery to the unchanged verifier; it does not
 establish broader IdP interoperability or independent security approval.
 
-Local application verification for patch0004 passes `cargo fmt --all -- --check`,
+Local application verification for patch 0004 passes `cargo fmt --all -- --check`,
 strict default/all-feature all-target Clippy, 111 default and 783 all-feature
 workspace result counts, including 457 real PostgreSQL lifecycle tests. Both
 workspace runs use `RUST_TEST_THREADS=1`; CI retains normal scheduling. The
@@ -105,10 +105,10 @@ canonicalization correctness.
 | Consumed payload | `crypto/verify.rs::verified_content` selects covered content. `flow.rs::verify_and_prepare` carries it into extraction; `api/sp.rs::session_from_verified_flow` preserves coverage in the typed session. | Application consumes this typed session, not a signature boolean followed by its own XML parser. The two-parser boundary remains an explicit focused-review item. |
 | Identity and presentation | `verification/subject.rs` enforces persistent NameID, exact qualifiers when present, byte/character bounds and no SPProvidedID. `projection.rs` retains exact trusted registration. | Core policy and actual unqualified persistent-profile tests pass. Maintained producer patch 0004 has ordinary signed library round trips and seven real-PG verifier qualifier cases; broader actual IdP qualified-profile acceptance remains open. No email/attribute/role ownership fallback exists. |
 | Conditions and correlation | `flow.rs::validate_context` checks response correlation/destination and delegates bearer recipient, audience and time checks to `assertion_acceptance.rs`. Core `verification/flow.rs` supplies trusted pending context and zero skew. | Existing correlation/profile tests and actual provider flow pass. These checks use the required authenticated message path. |
-| Signed times and final authority | `verification/timing.rs` keeps admission and signed session/authentication caps separate. PostgreSQL completion/deletion rechecks original/current-source/final DB-clock caps. | Real-PG deadline/rollback/order tests and actual signed timing pass. Newly issued deletion responses carrying older-than-five-minute AuthnInstant remain without wire acceptance evidence. |
+| Signed times and final authority | `verification/timing.rs` keeps admission and signed session/authentication caps separate. PostgreSQL completion/deletion rechecks original/current-source/final DB-clock caps. | Existing real-PG deadline/order tests and actual Keycloak timing remain. New normal-producer wire cases preserve 600-second-old sign-in authentication/24-hour cap, reject 90,000-second-old authentication, deny deletion with 600-second-old authentication and accept 120-second-old authentication. This is component evidence, not broader IdP acceptance. |
 | Durable replay and tenant scope | `crates/auth-postgres/src/saml/replay.rs` reserves two hash keys in stable order within the authority transaction, scoped by realm/connection and retained across revisions. Identity/session writes remain in the same transaction. | Existing real-PG replay, rollback and DB-only ordering/realm tests pass. No signature-concurrency experiment is added. |
 | XML completeness/resource admission | `third-party/saml-rs/src/xml/dom.rs` retains bounded parsing, DTD rejection and the complete-document patch. Core input and worker admission stay bounded. | Existing regressions pass. The review does not establish a native CPU/memory budget or qualify every namespace/ID construction. No stress/resource probe is run. |
-| Attribute projection | `model/extract.rs::attributes_from_extract` reconstructs name-keyed values with NameFormat=None. | Confirmed limitation. Attribute-selected policy remains unavailable; ordinary tests cannot repair missing authenticated data. Any extension needs a lossless maintained-library contract and its own review/tests, without a raw-XML bridge. |
+| Attribute projection | Maintained `xml/attribute_records.rs` reads ordered records from the same verifier-selected Assertion with existing DOM/limits. `SsoSession::attribute_records` is separate from the compatible legacy aggregate; core `verification/attributes.rs` requires completeness and zeroizes/redacts facts. | Exact NameFormat/duplicate/value-group signed round trips and real-PG identity-policy cases pass. Unavailable XML-valued/nil data cannot fall back to the legacy aggregate. Attribute-selected business/identity/role policy is not introduced. Independent signed-field/binding review remains mandatory. |
 | Production composition | `apps/auth-server/src/application.rs` and `crates/auth-axum/src/router.rs` do not compose SAML. | Experimental components remain explicit; this work adds no normal ACS or startup switch. |
 
 ### Pinned leaves and the backend's insecure flag
@@ -142,10 +142,53 @@ handling; the name of a flag alone is neither approval nor a demonstrated bypass
   resolution and the explicit decision. Internal agent review cannot fill this row.
 - Resource-budget/concurrent native-path assurance remains separately pending
   under the current restriction on custom stress/probe experiments.
-- Lossless attributes, broader actual IdP qualified-profile acceptance and the older
-  authentication-time wire case remain open under AUTH-35. They are not silently
-  claimed supported by the working Keycloak profile or the maintenance decision.
+- The scalar attribute projection and older-authentication-time component wire
+  gaps are addressed by patches 0005/0006 and their scoped receipts. Broader actual
+  IdP qualified/attribute profile acceptance remains open under AUTH-35; no
+  additional IdP or attribute-selected policy support is implied.
 
 Production SAML remains disabled. With external contact prohibited and no
 independent report provided, this session can prepare review evidence and finish
 ordinary engineering but cannot truthfully manufacture independent approval.
+
+
+## Exact attribute and established-authentication follow-up
+
+[ADR 0028](../architecture/adr/0028-saml-attribute-and-authentication-facts.md) records
+the additive complete-record contract and ordinary producer options. The original
+legacy aggregate API remains unchanged: an early draft replaced it, and the
+unchanged upstream multi-value regression failed. Keeping the legacy API and
+adding a separate exact accessor repaired compatibility without modifying the
+upstream test/assertion or weakening verification. The new complete projection
+never returns partial facts or infers a missing format. Core has no raw XML bridge.
+
+The [attribute-only receipt](../../tests/provider/saml/rust-policy/results/2026-10-22-attribute-records.json)
+records 1,111 passed/0 failed/0 ignored for the five-patch source. The
+[complete six-patch receipt](../../tests/provider/saml/rust-policy/results/2026-10-22-attribute-authentication-facts.json)
+records 1,115 passed/0 failed/0 ignored across 46 result groups on the selected application
+graph. These include existing upstream security/vector tests, not 1,115 independently
+designed security experiments. Historical three/four-patch reports are preserved.
+The full 242-file source is reconstructed exactly by applying incremental patches
+0005/0006 to the previous committed source; the original four patches/import
+archive identity remain unchanged.
+
+Two signed real-PG attribute scenarios prove exact format records and unchanged
+default-deny/no-email-role-linking/subject/realm policy. Three signed real-PG
+authentication-time scenarios prove old sign-in authentication survives new
+issuance, the 24-hour cap remains original, expired authentication rejects, stale
+authentication cannot erase, and recent signed authentication can. Initial test
+compilation used an unavailable chrono dependency; expected instants now use
+existing PostgreSQL timestamp conversion instead of adding a dependency. Clippy
+then caught one redundant borrow in a test helper; it was corrected. No verifier,
+DB clock, signature policy or existing security assertion was changed.
+
+The [activation status](saml-activation-status.md) separates these implemented and
+component-tested facts from the remaining mandatory assurance and production
+composition requirements. No source-scoped independent approval is established.
+
+Final local application checks pass under normal scheduling: `cargo fmt --all --
+--check`, strict default and all-feature all-target workspace Clippy, warning-free
+all-feature/no-deps workspace documentation, and locked workspace tests (111
+default; 788 all-feature result counts, including 462 real-PG lifecycle tests).
+Eleven source/runner checks and source integrity/reconstruction also pass. These
+checks add no package, dependency, migration or production activation path.

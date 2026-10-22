@@ -70,14 +70,14 @@ pub use saml::{
 };
 #[cfg(feature = "saml-certificates")]
 pub use saml::{MAX_SAML_PINNED_CERTIFICATES, SamlCertificateTrust, SamlPinnedCertificate};
+#[cfg(feature = "saml-verification")]
+pub use saml::{
+    SamlAttribute, SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
+    SamlVerificationMaterial, SamlVerificationRepository, VerifiedSamlAssertion,
+};
 #[cfg(feature = "saml-identities")]
 pub use saml::{
     SamlIdentityPolicy, SamlIdentityRepository, SamlJitPolicy, SamlMappedIdentity, SamlSignIn,
-};
-#[cfg(feature = "saml-verification")]
-pub use saml::{
-    SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
-    SamlVerificationMaterial, SamlVerificationRepository, VerifiedSamlAssertion,
 };
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};

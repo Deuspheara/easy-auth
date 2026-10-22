@@ -473,7 +473,7 @@ private transactions module, protocol construction in a shared factory, identity
 command adaptation under the fixture, and state/evidence in named identity modules.
 The original Node verifier cases remain separate from the new identity scenarios.
 No production verifier constructor, database internals or HTTP hook is exposed.
-New files remain under300lines; longer ordered setup/command/case functions retain
+New files remain under 300 lines; longer ordered setup/command/case functions retain
 resource ownership, original proof handling, finite diagnostics and cleanup as
 reviewed size exceptions. No unrelated structural cleanup is deferred.
 
@@ -916,5 +916,19 @@ only declare these modules. A private attribute-rendering function belongs besid
 the existing built-in login response renderer; qualifier policy remains in core.
 The upstream facade/producer receive only the small private data propagation and
 explicit lossy-template rejection. Their pre-existing size is retained to keep
-upstream/patch comparisons reviewable, as ADR0027 requires. No cryptographic module,
+upstream/patch comparisons reviewable, as ADR 0027 requires. No cryptographic module,
 public API, persistence rule or migration is duplicated or restructured.
+
+
+AUTH-35 exact attribute facts stay in core `saml/verification/attributes.rs`; the
+proof exposes read-only typed data and existing identity policy is unchanged.
+Attribute and authentication-time PG scenarios have named feature modules and
+reuse only the existing ordinary IdP fixture. The fixture separates trusted IdP
+construction from message exchange. Maintained-library projection and producer
+options live in private `xml/attribute_records`, `model/attribute_projection`,
+`api/response_claims` and `idp/attributes`/`authentication` modules. Existing large
+upstream entry/facade/flow files retain minimal propagation/composition deltas for
+exact patch review, rather than an unrelated vendored restructure. New modules
+remain under 300 lines and functions under 50 lines; complete finite graph receipts
+are deliberate generated-file exceptions. No SQL/migration, generic framework,
+public proof constructor or cryptographic implementation is added.

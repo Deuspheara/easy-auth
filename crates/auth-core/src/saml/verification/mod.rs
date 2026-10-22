@@ -1,3 +1,4 @@
+mod attributes;
 mod configuration;
 mod flow;
 mod input;
@@ -8,6 +9,7 @@ mod subject;
 mod timing;
 mod verified;
 
+pub use attributes::SamlAttribute;
 pub use flow::SamlResponseVerifier;
 pub use input::SamlPostResponse;
 pub use replay::{SamlReplayKind, SamlReplayRecord};

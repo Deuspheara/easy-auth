@@ -24,7 +24,7 @@ pub use requests::{
 
 #[cfg(feature = "saml-verification")]
 pub use verification::{
-    SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
+    SamlAttribute, SamlPostResponse, SamlReplayKind, SamlReplayRecord, SamlResponseVerifier,
     SamlVerificationMaterial, SamlVerificationRepository, VerifiedSamlAssertion,
 };
 

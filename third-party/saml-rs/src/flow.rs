@@ -1058,7 +1058,8 @@ fn flow_inner(
         };
 
     let fields = default_fields(parser_type, assertion.as_deref())?;
-    let extracted = extract_with_limits(&saml_content, &fields, opts.xml_limits)?;
+    let mut extracted = extract_with_limits(&saml_content, &fields, opts.xml_limits)?;
+    crate::xml::attribute_records::append(&mut extracted, assertion.as_deref(), opts.xml_limits)?;
     validate_context(
         parser_type,
         &saml_content,

@@ -561,3 +561,18 @@ sector owner subjects are metadata boundaries, not client authentication, consen
 or authorization. Existing session/inbound federation contracts are unchanged.
 See [the guide](../guides/issuer-clients.md); actual authorize/token/consent and
 interoperability remain required before an outbound issuer can be enabled.
+
+
+## Gated SAML verified attribute facts
+
+`VerifiedSamlAssertion::attributes()` returns ordered, debug-redacted, zeroizing
+`SamlAttribute` records with exact Name, optional NameFormat and scalar value
+groups. This adds no HTTP/OpenAPI field, user contact, owner key, role or session
+grant. Missing attributes are empty; incomplete XML-valued/nil projection rejects
+the current profile. Core consumes the maintained typed complete-record view,
+never raw XML or the legacy name-keyed aggregate. Public constructors cannot
+fabricate this verified proof. Signed authentication time also remains separate
+from response issuance; ordinary new-response/old-authentication cases retain
+all admission,24-hour session-age and five-minute deletion caps.
+See [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md). Normal production
+SAML routes/configuration remain disabled pending the documented approval gates.

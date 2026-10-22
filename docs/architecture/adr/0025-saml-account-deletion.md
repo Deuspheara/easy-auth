@@ -191,7 +191,7 @@ live publication; normal SAML configuration remains disabled.
 
 ## Actual Keycloak deletion acceptance
 
-Seven ordinary browser/PostgreSQL cases now pass through actual Keycloak26.8.1
+Seven ordinary browser/PostgreSQL cases now pass through actual Keycloak 26.8.1
 and the production verifier, mapping, private operation selector and deletion
 transaction. Real sign-in establishes the initiating session. A genuine signed
 reauthentication return creates no authority before the second typed confirmation;
@@ -234,3 +234,17 @@ new authority/policy, assertion extraction or production observer is added. Orig
 account-switch/cancellation/remote-account/replay controls remain. This supplies
 retained-SSO reauthentication evidence, not older-than-five-minute assertion wire
 rejection, qualified identity/attribute acceptance or independent approval.
+
+
+## Established authentication wire follow-up
+
+Maintained patch 0006 now lets the normal typed IdP carry a caller-established
+AuthnInstant separately from issuance. New ordinary library-signed real-PG cases
+retain ten-minute-old authentication in sign-in and its original 24-hour cap, reject
+authentication older than 24 hours, deny erasure from a newly issued response with
+ten-minute-old authentication, and accept the corresponding recent signed
+two-minute control. The concrete verifier and DB clock are unchanged. Historical
+policy-only and Keycloak retained-SSO results above keep their original scope.
+These new component cases close the older-authentication wire gap; they do not
+establish other IdPs, authentication strength or independent security approval.
+See [ADR 0028](0028-saml-attribute-and-authentication-facts.md).

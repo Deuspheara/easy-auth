@@ -73,3 +73,21 @@ pub(super) fn alternate_pin() -> SamlPinnedCertificate {
         .unwrap();
     SamlPinnedCertificate::from_der(&der, 1_609_459_200, 1_893_456_000).unwrap()
 }
+
+#[cfg(feature = "saml-identities")]
+pub(super) fn response_with(
+    f: &Fixture,
+    start: &SamlStart,
+    subject: &str,
+    options: saml_rs::RespondSso,
+) -> SamlPostResponse {
+    SamlPostResponse::parse(provider::response_field_with(
+        &f.registration,
+        start.authorization_url(),
+        NameId::new(subject, Some(NameIdFormat::Persistent)),
+        f.registration.idp_entity(),
+        Duration::from_secs(180),
+        options,
+    ))
+    .unwrap()
+}
