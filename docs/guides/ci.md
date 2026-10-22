@@ -55,3 +55,21 @@ The first hosted run must establish cold verification and successful save; a lat
 natural run must establish warm restore and all checks before reporting a measured
 improvement. AUTH-58 remains open until that evidence exists. No SAML or outbound
 issuer release/independent-review requirement is cleared by caching.
+
+A real same-host restored-tool-root check also passed: copied only the existing
+cargo-audit/cargo-deny executables and Cargo's two installed-package metadata files
+into an owned temporary root, then ran both normal `cargo install ... --locked
+--root` commands. Both checked the crates.io index, selected current versions
+0.22.2/0.20.2 and reused the installed binaries without compiling. The temporary
+root was removed and original tools were unchanged. This proves that relocation/
+metadata reuse path locally; it is not Linux hosted cache-restore or speed evidence.
+
+
+The first hosted cache run, [CI 39773799129](https://github.com/Deuspheara/easy-auth/actions/runs/39773799129),
+passed at commit `491aa4beee0ceb11443cb9730150154285116840`.
+The Rust cache lookup missed as expected; after all checks passed, workspace pruning
+removed 1,331 files (14.6 GiB), and the post-action log confirmed the new `rust-v1`
+cache was saved. Cold Clippy took 110 seconds; cargo-audit installation took 178
+seconds and cargo-deny installation took 121 seconds. These are this run's observed
+cold durations; runner variability prevents treating earlier durations as a controlled
+comparison. A later successful restore and complete verification remain required.

@@ -4902,3 +4902,34 @@ Python/bash checks, full previous-step sequence comparison, key-segregation and
 cold-fallback checks pass. This is workflow-only; Rust/source/DB baselines retain
 their exact original commit scope. Cold save and subsequent warm hosted verification
 are pending; no speedup or production/security approval is claimed yet.
+
+The full hosted [retained-SSO CI39771675708](https://github.com/Deuspheara/easy-auth/actions/runs/39771675708)
+subsequently completed successfully at exact commit
+`a2a89a96c61e1aa8f18a6dd2564417ad5e73fb7b`:
+both Rust and secret jobs, complete workspace/real-PG/isolated-feature checks,
+eight Keycloak deletion cases, ten rollover cases and the other provider, browser,
+startup and advisory checks.
+This provides a full hosted receipt for the fixture addition; it does not upgrade
+its bounded profile evidence to XML/backend/independent approval.
+
+A real local relocation check cloned only current security-tool binaries and their
+Cargo installed-package metadata into a private temporary install root. Normal
+installers both checked crates.io and reused current cargo-audit 0.22.2 and
+cargo-deny 0.20.2
+without compiling. The temporary copy was removed; original tooling/app dependencies
+were unchanged. This is actual local tool-root reuse evidence, distinct from the
+still-required hosted cold-save/warm-restore acceptance in AUTH-58.
+
+
+The first cache-enabled hosted [CI 39773799129](https://github.com/Deuspheara/easy-auth/actions/runs/39773799129)
+completed successfully at `491aa4beee0ceb11443cb9730150154285116840`, including Rust
+and secret jobs, complete workspace/real-PostgreSQL/isolated-feature checks, actual
+Keycloak rollover and confirmed-deletion browser scenarios, other provider/browser
+and startup checks, and advisory/license policy. The Rust cache lookup missed;
+workspace-only pruning then removed 1,331 files (14.6 GiB), and the post-action log
+explicitly confirmed saving the commit's `rust-v1` key. Cold step durations were
+110 seconds for Clippy, 178 seconds for cargo-audit installation, 121 seconds for
+cargo-deny installation and 23 seconds for cache save. These are observed cold
+measurements, not a warm-cache improvement claim. AUTH-58 remains open for a later
+natural restore and full successful verification. SAML dependency ownership,
+XML/backend review and independent security approval remain separate open gates.
