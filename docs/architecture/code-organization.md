@@ -908,3 +908,13 @@ retained-SSO credential challenge/newer-authentication evidence; no generic scen
 framework or production policy is added. Multiple possible initiating grants leave
 measurement unavailable. Existing transaction/session/verification modules and
 assertions are unchanged.
+
+AUTH-35 qualifier maintenance keeps ordinary signed wire scenarios in a named
+`verification/qualifiers.rs` module and maintained-library round trips in a
+`web_browser_sso_generation/qualifiers.rs` module. The existing test entry files
+only declare these modules. A private attribute-rendering function belongs beside
+the existing built-in login response renderer; qualifier policy remains in core.
+The upstream facade/producer receive only the small private data propagation and
+explicit lossy-template rejection. Their pre-existing size is retained to keep
+upstream/patch comparisons reviewable, as ADR0027 requires. No cryptographic module,
+public API, persistence rule or migration is duplicated or restructured.

@@ -1,6 +1,6 @@
 use crate::constants::namespace;
 use crate::error::SamlError;
-use crate::model::Status;
+use crate::model::{NameId, Status};
 use crate::template::{write_login_response_attribute_statement, LoginResponseAttribute};
 use crate::xml::write::XmlWriter;
 
@@ -31,6 +31,7 @@ pub(super) struct LoginResponseXml<'a> {
     pub(super) audience: &'a str,
     /// `<NameID>` `Format`. `None` omits the attribute.
     pub(super) name_id_format: Option<&'a str>,
+    pub(super) qualified_name_id: Option<&'a NameId>,
     pub(super) name_id: &'a str,
     pub(super) in_response_to: Option<&'a str>,
     pub(super) authn_statement: Option<AuthnStatementXml<'a>>,
@@ -76,11 +77,7 @@ pub(super) fn render_default_login_response(
     );
     writer.text_element(&qname(input.assertion_prefix, "Issuer"), &[], input.issuer);
     writer.start(&qname(input.assertion_prefix, "Subject"), &[]);
-    let name_id_attrs: Vec<(&str, &str)> = input
-        .name_id_format
-        .map(|format| ("Format", format))
-        .into_iter()
-        .collect();
+    let name_id_attrs = name_id_attributes(input);
     writer.text_element(
         &qname(input.assertion_prefix, "NameID"),
         &name_id_attrs,
@@ -130,6 +127,26 @@ pub(super) fn render_default_login_response(
     writer.end(&assertion_name);
     writer.end(&response_name);
     Ok(writer.finish())
+}
+
+fn name_id_attributes<'a>(input: &LoginResponseXml<'a>) -> Vec<(&'static str, &'a str)> {
+    let mut attributes: Vec<_> = input
+        .name_id_format
+        .map(|value| ("Format", value))
+        .into_iter()
+        .collect();
+    if let Some(name_id) = input.qualified_name_id {
+        for (name, value) in [
+            ("NameQualifier", name_id.name_qualifier()),
+            ("SPNameQualifier", name_id.sp_name_qualifier()),
+            ("SPProvidedID", name_id.sp_provided_id()),
+        ] {
+            if let Some(value) = value {
+                attributes.push((name, value));
+            }
+        }
+    }
+    attributes
 }
 
 pub(super) struct ErrorLoginResponseXml<'a> {

@@ -43,10 +43,14 @@ JIT defaults do not change existing provider-required lifecycle restrictions.
 
 The pinned saml-rs `model/extract.rs::attributes_from_extract` creates typed
 attributes from a name-keyed aggregate and sets NameFormat to `None`. The typed
-IdP producer also does not render supplied NameID qualifier attributes. Source
-review and pure typed policy tests do not establish unambiguous qualified attribute
-or qualifier extraction over the wire. Do not add a custom XML parser, raw-DOM
-bridge, custom signer or verifier change to conceal these gaps.
+IdP producer previously dropped supplied NameID qualifier attributes. Maintained
+patch 0004 now preserves those fields through the built-in renderer and existing
+signer; ordinary library round trips and real-PG verifier scenarios cover exact
+configured qualifiers, absent qualifiers, mismatches and unsupported SPProvidedID.
+Custom rendering with qualified successful subjects is refused. This closes the
+local producer/wire gap, not lossless attributes or broader actual IdP acceptance.
+Do not add a custom XML parser, raw-DOM bridge, custom signer or verifier change
+to conceal the remaining gaps.
 
 Accordingly this initial mapping exposes no attribute-selected metadata, roles,
 email/contact assignment, attribute fallback or automatic linking. Broader attribute
@@ -88,9 +92,10 @@ review; they are not an independent security audit or actual IdP interoperabilit
 
 AUTH-34 now implements durable response/Assertion replay, the final atomic
 identity/session transaction and source-bound validation/inventory/revocation as
-recorded in ADR 0023. Purpose-bound deletion and HTTP/browser handling still need
-implementation and complete acceptance.
-AUTH-35 retains actual Keycloak rollover, supported attribute policy, cross-tenant
-final identity behavior and Entra/Okta documentation. Maintained dependency approval,
+recorded in ADR 0023. Purpose-bound deletion and HTTP/browser delivery are now
+implemented experimentally under ADRs 0024/0025, with the documented scoped
+Keycloak rollover/realm and deletion acceptance. Older-authentication-time wire
+assurance remains open. AUTH-35 retains lossless attribute policy and broader
+qualified IdP/profile acceptance; Entra/Okta remain documentation-only. Dependency security approval,
 XML/signature/backend review and separate named independent approval remain gates
 under [ADR 0021](0021-saml-verification-and-approval.md). Normal SAML stays disabled.

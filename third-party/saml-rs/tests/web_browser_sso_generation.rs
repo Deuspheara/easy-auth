@@ -6,6 +6,9 @@
     feature = "crypto-fips"
 ))]
 
+#[path = "web_browser_sso_generation/qualifiers.rs"]
+mod nameid_qualifiers;
+
 use std::time::SystemTime;
 
 use saml_rs::binding::{base64_decode, deflate_raw_decode};

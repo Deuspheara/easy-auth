@@ -2,7 +2,8 @@
 
 `saml-rs/` is the Cargo package-layout source of upstream saml-rs at
 [`3b289001a7a84d5a7ff7af2671991ab7098090bd`](https://github.com/salasebas/saml-rs/tree/3b289001a7a84d5a7ff7af2671991ab7098090bd),
-with only the three existing qualification patches recorded in
+with the three retained qualification patches and ordinary NameID producer
+maintenance patch recorded in
 `tests/provider/saml/rust-policy/patches/`. It is **a project-maintained engineering snapshot,
 not an upstream release or independently approved production dependency**.
 [ADR 0021](../docs/architecture/adr/0021-saml-verification-and-approval.md) retains
@@ -16,14 +17,17 @@ packaged source/tests. Existing upstream public test keys are intentional vector
 never deployment credentials. No key, adversarial XML or cryptographic test fixture
 was generated for this import. No cryptographic engine was replaced or invented;
 canonicalization, reference resolution and actual signatures remain upstream code.
-Do not edit vendored files by hand or refactor them to satisfy application module
-size guidelines: exact upstream/patch comparison is the review boundary.
+Record every maintained source change as a reproducible incremental patch. Do not
+refactor vendored files solely to satisfy application module size guidelines:
+exact upstream/patch comparison is the review boundary.
 Git attributes preserve upstream bytes, including existing CRLF in vectors,
 instead of normalizing or rewriting signed/test material for a style check.
 
 `saml-rs-source.json` records every packaged file hash, exact patch hashes, upstream
-revision and the local package archive hash. `python3 scripts/check_saml_source.py`
-checks the complete source inventory before compilation/secret-scan exceptions.
+revision and the original three-patch import archive hash. The archive hash does
+not describe subsequent maintenance; the complete file inventory does.
+`python3 scripts/check_saml_source.py` checks the complete source inventory before
+compilation/secret-scan exceptions.
 It is an integrity check, not an audit.
 Secret scanning exempts only the exact public vector match at its exact source
 path; a different existing public key mounted at an allowed path is still
@@ -37,6 +41,12 @@ then `git apply`, and run:
 ```sh
 cargo package --locked --allow-dirty --no-verify --no-default-features --features crypto-aws-lc
 ```
+
+After unpacking that original import archive, apply maintenance patch 0004 with
+`git apply --check` then `git apply` from the package root. This preserves typed
+NameID qualifiers through the built-in IdP response renderer; it changes no
+cryptographic verifier. Qualified successful responses refuse legacy custom
+rendering, which cannot preserve those fields. PAOS qualification is not added.
 
 The package's normalized Cargo manifest and `.cargo_vcs_info.json` intentionally
 retain version 0.6.1 and `dirty=true`; this is distinct from registry 0.6.1. The

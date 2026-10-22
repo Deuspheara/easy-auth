@@ -4933,3 +4933,29 @@ cargo-deny installation and 23 seconds for cache save. These are observed cold
 measurements, not a warm-cache improvement claim. AUTH-58 remains open for a later
 natural restore and full successful verification. SAML dependency ownership,
 XML/backend review and independent security approval remain separate open gates.
+
+
+## AUTH-35 ordinary NameID producer maintenance — 2026-10-22
+
+Maintained patch0004 preserves typed IdP NameID qualifiers through the built-in
+renderer and existing signer, refusing lossy custom rendering for successful
+qualified subjects. The unchanged application verifier accepts absent/exact
+configured qualifiers and rejects mismatches/SPProvidedID in seven ordinary
+real-PG wire scenarios. The regression failed before the producer fix and passes
+after it. No custom XML, signature construction, bypass, stress or signature
+concurrency experiment is added; cryptographic verification and all existing
+security checks/tests remain unchanged. PAOS and broader actual IdP acceptance
+are not established.
+
+The [source-scoped evidence review](saml-evidence-review.md) and its new four-patch
+receipt record1108 passing library/core tests on the application's selected graph,
+0failed/0ignored across46groups. Formatting, strict default/all-feature all-target
+Clippy,111 default/783 all-feature workspace result counts including457 real-PG
+lifecycle tests pass. Workspace runs use one test worker; hosted CI retains its
+normal scheduling. Eleven source/runner checks, exact incremental reconstruction,
+235-file/four-patch inventory and changed-source secret scanning pass. Original
+three-patch reports remain historical. The new scenario/helper modules are small
+and private; minimal upstream propagation remains a reviewed size exception for
+patch comparison. AUTH-35 remains open for lossless attribute projection, broader
+profiles and older-authentication-time wire assurance; AUTH-32 independent security
+approval remains pending. Production SAML stays disabled. No PR or external contact.

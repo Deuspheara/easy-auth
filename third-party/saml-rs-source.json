@@ -1,4 +1,5 @@
 {
+  "archive_scope": "Original three-patch import archive; maintenance patches are applied afterwards and the files inventory describes the complete maintained source.",
   "archive_sha256": "275ce1bc43e32c025b0821281baf558480f3d5ecc902c4d13dc1b1c34604f551",
   "existing_qualification_patches": {
     "0001-extract-verified-profile.patch": "e783b62efb6e05bbe49a4900dec5eea755880dbc7034d2e6b87413a2c1cc31c4",
@@ -84,7 +85,7 @@
     },
     {
       "path": "src/api/idp.rs",
-      "sha256": "2f909b82c066a8501505f80c6064d1b49b861095da7a15d3a6684523dc034a21"
+      "sha256": "bbcfb96a7845a7faa37c40dacb4f7ea5197aed637a4f9bad70101616670b2065"
     },
     {
       "path": "src/api/mod.rs",
@@ -243,16 +244,16 @@
       "sha256": "67a4f11dda5d2d7db4d4f7498688b219d0df6caae0a09b0bb862f5af7579c93a"
     },
     {
-      "path": "src/crypto/verify.rs",
-      "sha256": "0d4029d3dd6b761f8ca7d8b739d3ffa57bfd545e92c4388e0553cefacdcc3653"
-    },
-    {
       "path": "src/crypto/verify/profile.rs",
       "sha256": "e236709e04420e2df1ec3ad3320fa577ae63907d7bcee5ec2b475382536e321d"
     },
     {
       "path": "src/crypto/verify/tests/exact.rs",
       "sha256": "16e9a657bacc28e99dc2261ae073503a2af9895f73798e5a7a17882b1b52025a"
+    },
+    {
+      "path": "src/crypto/verify.rs",
+      "sha256": "0d4029d3dd6b761f8ca7d8b739d3ffa57bfd545e92c4388e0553cefacdcc3653"
     },
     {
       "path": "src/crypto/xml_syntax.rs",
@@ -275,16 +276,16 @@
       "sha256": "edc4b64f6b5100eba860cdc593cd703bd6e69aa846a4d64f13275ea6e82ee5f6"
     },
     {
-      "path": "src/idp.rs",
-      "sha256": "ccc970f97504e81cd53f4a8fc6ea9b6fd2fe12790974668fc1b8430a2fda6d8a"
-    },
-    {
       "path": "src/idp/login_response.rs",
-      "sha256": "63cf284e8b93f4573fa6c6af0ad48ffefd5e85ce6284617355d4b8a95db0c0f5"
+      "sha256": "5eee09a1691f132c3c9f00b21a52ba8677f11df85652e7d59501f5e1d986c2de"
     },
     {
       "path": "src/idp/paos.rs",
-      "sha256": "a446fdbf4be6ab6dc198d063172e08658fa7e33f04389d213e9d648c8bfd2f6f"
+      "sha256": "0082ba1692d85a8a711d7fdad893d62cde162e4bd5f31e9eaeb4c5c89e954580"
+    },
+    {
+      "path": "src/idp.rs",
+      "sha256": "650578204f77ef9f6b881f4b7d1bc29009dc779af66fca706215ea1792017681"
     },
     {
       "path": "src/lib.rs",
@@ -411,12 +412,12 @@
       "sha256": "add0e1c97c6e235e6d50108d189fc932226fd6b0a323087e62a1cb66e6d3b7b1"
     },
     {
-      "path": "src/sp.rs",
-      "sha256": "ae4d92a2ddfa4de39e48f992fadc6b264f4e86c54eaf72b0013319f8a0615b6b"
-    },
-    {
       "path": "src/sp/paos.rs",
       "sha256": "d6ad9efa1ad568861fe4825b2e304e3c760bb0ec8e3bb935bcd485b9f304f656"
+    },
+    {
+      "path": "src/sp.rs",
+      "sha256": "ae4d92a2ddfa4de39e48f992fadc6b264f4e86c54eaf72b0013319f8a0615b6b"
     },
     {
       "path": "src/template.rs",
@@ -455,20 +456,20 @@
       "sha256": "928ef9894471955c07420a0fcf007095f67fd2431627689ff184c31d572e574a"
     },
     {
-      "path": "src/xml/profile.rs",
-      "sha256": "7e26d07f0602d09bea3813232bd27ae546ed2d481ef0276fec6364e8d08e5cd4"
+      "path": "src/xml/profile/outbound_logout/tests.rs",
+      "sha256": "548730362f99ac88c08e0b8c349043c3d09b2e9c09766ae9e9ba5ef38fc0b5c4"
     },
     {
       "path": "src/xml/profile/outbound_logout.rs",
       "sha256": "2c9cd6d893051c88c406ff76da2eb66aa4f317f1b32a3ab53494b62dbc184a0b"
     },
     {
-      "path": "src/xml/profile/outbound_logout/tests.rs",
-      "sha256": "548730362f99ac88c08e0b8c349043c3d09b2e9c09766ae9e9ba5ef38fc0b5c4"
-    },
-    {
       "path": "src/xml/profile/outbound_logout_request.rs",
       "sha256": "0ac77223e63e01111af4cf3fe4d318cb0574fbb2060175d3eabf26f8fdbe97fd"
+    },
+    {
+      "path": "src/xml/profile.rs",
+      "sha256": "7e26d07f0602d09bea3813232bd27ae546ed2d481ef0276fec6364e8d08e5cd4"
     },
     {
       "path": "src/xml/write.rs",
@@ -915,20 +916,24 @@
       "sha256": "b06c2f2654c139666f81817d3d63788445f8bf0ccc01827010f40200259da423"
     },
     {
-      "path": "tests/typed_sso.rs",
-      "sha256": "4c509651b69a25908e05f8fe4a2732531fe49a191687f96ad7bba740c4b68d6e"
-    },
-    {
       "path": "tests/typed_sso/exact_profile.rs",
       "sha256": "6292895b7fd2e4caba79bb8e3d216022d735ec95b6a47ce52a96a41d7d822f1c"
+    },
+    {
+      "path": "tests/typed_sso.rs",
+      "sha256": "4c509651b69a25908e05f8fe4a2732531fe49a191687f96ad7bba740c4b68d6e"
     },
     {
       "path": "tests/typed_validation_context.rs",
       "sha256": "6002f153d11c3229e66b7dc6c0827b63fb6990549c0d4ad5bd724ccdf48f8f78"
     },
     {
+      "path": "tests/web_browser_sso_generation/qualifiers.rs",
+      "sha256": "4b1bb8e787e773a55bca04010b4663b98cb5486077bd350f0d5fbca1df9fe5f8"
+    },
+    {
       "path": "tests/web_browser_sso_generation.rs",
-      "sha256": "8f7b2f1d6d905cb48c77b3c63d13c0fd60f40ee1e5b91de55009d248a071a0f0"
+      "sha256": "ab021faa6d758d35ef148479417826ec2b5fc2e9b1c399d154639faa1539a8e7"
     },
     {
       "path": "tests/xml_document.rs",
@@ -944,6 +949,9 @@
     }
   ],
   "format_version": 1,
+  "maintenance_patches": {
+    "0004-preserve-nameid-qualifiers.patch": "3e73b2643fc95c31ca585fb57a07a2cfc9143570d417bd722075f8554e83a2ff"
+  },
   "package_version": "0.6.1",
   "revision": "3b289001a7a84d5a7ff7af2671991ab7098090bd",
   "status": "gated engineering candidate; production approval pending",

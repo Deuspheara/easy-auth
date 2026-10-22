@@ -17,6 +17,7 @@ PATCHES = (
     "0001-extract-verified-profile.patch",
     "0002-exact-sha256-profile.patch",
     "0003-reject-unclosed-document.patch",
+    "0004-preserve-nameid-qualifiers.patch",
 )
 
 
@@ -32,7 +33,11 @@ def check():
             or manifest["revision"] != REVISION
             or manifest["package_version"] != "0.6.1"):
         raise ValueError("unexpected source revision/version")
-    patches = manifest["existing_qualification_patches"]
+    original = manifest["existing_qualification_patches"]
+    maintained = manifest.get("maintenance_patches", {})
+    if set(original) & set(maintained):
+        raise ValueError("duplicate patch inventory path")
+    patches = {**original, **maintained}
     if set(patches) != set(PATCHES):
         raise ValueError("unexpected qualification patch set")
     for name in PATCHES:
@@ -62,7 +67,7 @@ def check():
     provenance = json.loads((SOURCE / ".cargo_vcs_info.json").read_text())
     if provenance["git"] != {"sha1": REVISION, "dirty": True}:
         raise ValueError("unexpected packaged source provenance")
-    print(f"SAML candidate source integrity: PASS ({len(actual)} files, three recorded patches)")
+    print(f"SAML candidate source integrity: PASS ({len(actual)} files, {len(PATCHES)} recorded patches)")
     print("Production dependency/security approval remains pending.")
 
 

@@ -1,0 +1,244 @@
+diff --git a/src/api/idp.rs b/src/api/idp.rs
+index 13210a3..5291f43 100644
+--- a/src/api/idp.rs
++++ b/src/api/idp.rs
+@@ -218,6 +218,7 @@ impl Saml<Idp> {
+             .name_id()
+             .format()
+             .map(|format| format.as_uri().to_string());
++        let qualified_name_id = subject.name_id().clone();
+         let user = user_from_subject(subject);
+         let raw_options = LoginResponseOptions {
+             in_response_to: request.map(|request| request.message().id().as_str()),
+@@ -235,6 +236,7 @@ impl Saml<Idp> {
+                 LoginResponseOverrides {
+                     acs: explicit_acs.as_deref(),
+                     name_id_format: name_id_format.as_deref(),
++                    qualified_name_id: Some(&qualified_name_id),
+                     issuance_lifetime: Some(self.0.issuance_lifetime),
+                     web_browser_sso_producer: options.web_browser_sso_producer,
+                     status: options.status.as_ref(),
+diff --git a/src/idp.rs b/src/idp.rs
+index 3273604..652294e 100644
+--- a/src/idp.rs
++++ b/src/idp.rs
+@@ -8,7 +8,7 @@ use crate::entity::{
+ use crate::error::SamlError;
+ use crate::flow::{FlowOptions, FlowResult, HttpRequest};
+ use crate::metadata::{try_generate_idp_metadata, IdpMetadata, IdpMetadataConfig};
+-use crate::model::{Status, TopLevelStatusCode};
++use crate::model::{NameId, Status, TopLevelStatusCode};
+ use crate::sp::{ServiceProvider, WebBrowserSsoProducer};
+ use crate::template::{
+     apply_tag_prefixes, attr_tag, attribute_statement_builder, replace_tags_by_optional_value,
+@@ -46,6 +46,7 @@ pub struct LoginResponseOptions<'a> {
+ pub(crate) struct LoginResponseOverrides<'a> {
+     pub(crate) acs: Option<&'a str>,
+     pub(crate) name_id_format: Option<&'a str>,
++    pub(crate) qualified_name_id: Option<&'a NameId>,
+     pub(crate) issuance_lifetime: Option<time::Duration>,
+     pub(crate) web_browser_sso_producer: WebBrowserSsoProducer,
+     pub(crate) status: Option<&'a Status>,
+@@ -54,6 +55,7 @@ pub(crate) struct LoginResponseOverrides<'a> {
+ #[derive(Clone, Copy)]
+ struct LoginResponseRendering<'a> {
+     name_id_format: Option<&'a str>,
++    qualified_name_id: Option<&'a NameId>,
+     custom: Option<CustomTagReplacement<'a>>,
+     issuance_lifetime: time::Duration,
+     web_browser_sso_producer: WebBrowserSsoProducer,
+@@ -181,6 +183,17 @@ impl IdentityProvider {
+             })?;
+             return Ok((id, xml));
+         }
++        if uses_template
++            && rendering.qualified_name_id.is_some_and(|name_id| {
++                name_id.name_qualifier().is_some()
++                    || name_id.sp_name_qualifier().is_some()
++                    || name_id.sp_provided_id().is_some()
++            })
++        {
++            return Err(SamlError::Invalid(
++                "qualified NameID requires the built-in login response renderer".into(),
++            ));
++        }
+         if rendering.custom.is_none() && !has_custom_context {
+             let window = capture_idp_issuance_window(rendering.issuance_lifetime)?;
+             let name_id_format = rendering
+@@ -211,6 +224,7 @@ impl IdentityProvider {
+                 conditions_not_on_or_after: &window.expiration,
+                 audience: &audience,
+                 name_id_format,
++                qualified_name_id: rendering.qualified_name_id,
+                 name_id: &user.name_id,
+                 in_response_to: emitted_in_response_to,
+                 authn_statement: rendering.web_browser_sso_producer.follows().then_some(
+@@ -361,6 +375,7 @@ impl IdentityProvider {
+             &acs,
+             LoginResponseRendering {
+                 name_id_format: overrides.name_id_format,
++                qualified_name_id: overrides.qualified_name_id,
+                 custom: options.custom,
+                 issuance_lifetime: overrides
+                     .issuance_lifetime
+diff --git a/src/idp/login_response.rs b/src/idp/login_response.rs
+index caaada9..10ca5fb 100644
+--- a/src/idp/login_response.rs
++++ b/src/idp/login_response.rs
+@@ -1,6 +1,6 @@
+ use crate::constants::namespace;
+ use crate::error::SamlError;
+-use crate::model::Status;
++use crate::model::{NameId, Status};
+ use crate::template::{write_login_response_attribute_statement, LoginResponseAttribute};
+ use crate::xml::write::XmlWriter;
+ 
+@@ -31,6 +31,7 @@ pub(super) struct LoginResponseXml<'a> {
+     pub(super) audience: &'a str,
+     /// `<NameID>` `Format`. `None` omits the attribute.
+     pub(super) name_id_format: Option<&'a str>,
++    pub(super) qualified_name_id: Option<&'a NameId>,
+     pub(super) name_id: &'a str,
+     pub(super) in_response_to: Option<&'a str>,
+     pub(super) authn_statement: Option<AuthnStatementXml<'a>>,
+@@ -76,11 +77,7 @@ pub(super) fn render_default_login_response(
+     );
+     writer.text_element(&qname(input.assertion_prefix, "Issuer"), &[], input.issuer);
+     writer.start(&qname(input.assertion_prefix, "Subject"), &[]);
+-    let name_id_attrs: Vec<(&str, &str)> = input
+-        .name_id_format
+-        .map(|format| ("Format", format))
+-        .into_iter()
+-        .collect();
++    let name_id_attrs = name_id_attributes(input);
+     writer.text_element(
+         &qname(input.assertion_prefix, "NameID"),
+         &name_id_attrs,
+@@ -132,6 +129,26 @@ pub(super) fn render_default_login_response(
+     Ok(writer.finish())
+ }
+ 
++fn name_id_attributes<'a>(input: &LoginResponseXml<'a>) -> Vec<(&'static str, &'a str)> {
++    let mut attributes: Vec<_> = input
++        .name_id_format
++        .map(|value| ("Format", value))
++        .into_iter()
++        .collect();
++    if let Some(name_id) = input.qualified_name_id {
++        for (name, value) in [
++            ("NameQualifier", name_id.name_qualifier()),
++            ("SPNameQualifier", name_id.sp_name_qualifier()),
++            ("SPProvidedID", name_id.sp_provided_id()),
++        ] {
++            if let Some(value) = value {
++                attributes.push((name, value));
++            }
++        }
++    }
++    attributes
++}
++
+ pub(super) struct ErrorLoginResponseXml<'a> {
+     pub(super) protocol_prefix: &'a str,
+     pub(super) assertion_prefix: &'a str,
+diff --git a/src/idp/paos.rs b/src/idp/paos.rs
+index 1b4c638..2b4c077 100644
+--- a/src/idp/paos.rs
++++ b/src/idp/paos.rs
+@@ -40,6 +40,7 @@ impl IdentityProvider {
+             LoginResponseOverrides {
+                 acs: Some(input.acs),
+                 name_id_format: input.name_id_format,
++                qualified_name_id: None,
+                 issuance_lifetime: Some(input.issuance_lifetime),
+                 web_browser_sso_producer: WebBrowserSsoProducer::Follow,
+                 status: input.status,
+diff --git a/tests/web_browser_sso_generation.rs b/tests/web_browser_sso_generation.rs
+index 9ea8025..9e43d3c 100644
+--- a/tests/web_browser_sso_generation.rs
++++ b/tests/web_browser_sso_generation.rs
+@@ -6,6 +6,9 @@
+     feature = "crypto-fips"
+ ))]
+ 
++#[path = "web_browser_sso_generation/qualifiers.rs"]
++mod nameid_qualifiers;
++
+ use std::time::SystemTime;
+ 
+ use saml_rs::binding::{base64_decode, deflate_raw_decode};
+diff --git a/tests/web_browser_sso_generation/qualifiers.rs b/tests/web_browser_sso_generation/qualifiers.rs
+new file mode 100644
+index 0000000..626d512
+--- /dev/null
++++ b/tests/web_browser_sso_generation/qualifiers.rs
+@@ -0,0 +1,69 @@
++use super::*;
++
++fn qualified_subject() -> Subject {
++    Subject::new(
++        NameId::with_qualifiers(
++            "ordinary-subject",
++            Some(NameIdFormat::Persistent),
++            Some(IDP_ENTITY_ID.to_owned()),
++            Some(SP_ENTITY_ID.to_owned()),
++            Some("ordinary-alias".to_owned()),
++        ),
++        Vec::new(),
++    )
++}
++
++#[test]
++fn typed_signed_sso_preserves_all_nameid_qualifiers() -> Result<(), Box<dyn std::error::Error>> {
++    let sp = sp_with(signing_sp_validation())?;
++    let idp = idp_with(signed_authn_request_idp_validation(), false)?;
++    let (sp_descriptor, idp_descriptor) = descriptors(&sp, &idp)?;
++    for options in [
++        RespondSso::post().sign_response(),
++        RespondSso::post()
++            .sign_response()
++            .apply_web_browser_sso_generation_rules(),
++    ] {
++        let started = sp.start_sso(&idp_descriptor, StartSso::post())?;
++        let received = idp.receive_sso(
++            &sp_descriptor,
++            BrowserInput::<AuthnRequest>::post(started.outbound.post_form()?.fields().to_vec()),
++            validation(),
++        )?;
++        let response = idp.respond_sso(&sp_descriptor, &received, qualified_subject(), options)?;
++        let session = sp.finish_sso(
++            &idp_descriptor,
++            &started.pending,
++            BrowserInput::<SsoResponse>::post(response.post_form()?.fields().to_vec()),
++            validation(),
++        )?;
++        assert_eq!(session.name_id().value(), "ordinary-subject");
++        assert_eq!(session.name_id().format(), Some(&NameIdFormat::Persistent));
++        assert_eq!(session.name_id().name_qualifier(), Some(IDP_ENTITY_ID));
++        assert_eq!(session.name_id().sp_name_qualifier(), Some(SP_ENTITY_ID));
++        assert_eq!(session.name_id().sp_provided_id(), Some("ordinary-alias"));
++    }
++    Ok(())
++}
++
++#[test]
++fn typed_qualified_nameid_refuses_legacy_custom_rendering() -> Result<(), Box<dyn std::error::Error>>
++{
++    let sp = sp_with(signing_sp_validation())?;
++    let mut config = IdpConfig::builder(EntityId::try_new(IDP_ENTITY_ID)?)
++        .sso_endpoint(SsoEndpoint::post(IDP_SSO_POST)?)
++        .credentials(credentials())
++        .validation(signed_authn_request_idp_validation())
++        .build()?;
++    config.templates.login_response_template = Some(LoginResponseTemplate {
++        context: Some(LOGIN_RESPONSE_TEMPLATE.to_owned()),
++        attributes: Vec::new(),
++    });
++    let idp = Saml::idp(config)?;
++    let (sp_descriptor, _) = descriptors(&sp, &idp)?;
++    assert!(matches!(
++        idp.initiate_sso(&sp_descriptor, qualified_subject(), RespondSso::post()),
++        Err(SamlError::Invalid(message)) if message.contains("qualified NameID requires")
++    ));
++    Ok(())
++}

@@ -16,8 +16,8 @@ Maintenance ownership does not activate the provider or establish independent ap
 The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registration,
 metadata, request persistence, cancellation and response preparation. It selects
 the [packaged qualification source](../../third-party/README.md) of saml-rs
-**0.6.1** at `3b289001a7a84d5a7ff7af2671991ab7098090bd`, with the three existing
-qualification patches, defaults disabled and **no cryptographic provider enabled**.
+**0.6.1** at `3b289001a7a84d5a7ff7af2671991ab7098090bd`, with the three retained
+qualification patches and ordinary NameID producer patch 0004, defaults disabled and **no cryptographic provider enabled**.
 Source/patch hashes and existing upstream vectors are retained. This is a gated
 engineering dependency, not an upstream release or production verifier approval.
 The earlier registry producer at `6b414db010235f6c2d1121944b42919a82325b06`
@@ -237,11 +237,14 @@ remain acceptance work alongside independent security review.
 Additional ordinary checks cover library-generated nonpersistent NameID formats
 and a different IdP entity using the same configured signing key; both must fail,
 and persistent/correct-issuer controls must succeed. Typed Rust policy tests cover
-exact qualifiers, aliases, unchanged subject values and UTF-8 byte limits. They do
-not establish qualifier extraction over the wire: the pinned upstream typed IdP
-producer forwards NameID value/format but does not render supplied qualifier
-attributes. Qualifier interoperability therefore remains open for actual IdP or
-established-vector acceptance. No custom XML/signer is introduced to fill that gap.
+exact qualifiers, aliases, unchanged subject values and UTF-8 byte limits. Maintained
+patch 0004 also preserves qualifiers through the built-in typed IdP producer and
+existing signer. Library signed round trips preserve all three qualifier fields;
+seven ordinary real-PG verifier scenarios accept absent/exact IdP/SP qualifiers
+and reject mismatches or SPProvidedID through unchanged core policy. Successful
+qualified subjects cannot use legacy custom rendering, which would omit fields.
+This is local component evidence; broader actual IdP qualifier interoperability
+and PAOS support are not established. No custom XML/signer is introduced.
 
 
 ## Gated identity policy and mapping
@@ -270,7 +273,7 @@ Mapping and configuration alone grant no authority. `SamlSignIn` now consumes
 the mapped proof in the final PostgreSQL replay/identity/session/audit transaction;
 see [ADR 0023](../architecture/adr/0023-saml-identity-session-commit.md). Attribute-selected mapping remains
 unsupported because the pinned typed extraction does not preserve NameFormat.
-Explicit qualified NameID and lossless attribute projection, additional IdP profiles
+Broader actual IdP qualified NameID acceptance, lossless attribute projection and additional IdP profiles
 and independent approval remain open. The owned Keycloak browser evidence below
 covers only its documented persistent-subject profile. [ADR 0022](../architecture/adr/0022-saml-identity-policy.md) records the boundary.
 

@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+import json
 from unittest.mock import patch
 
 from scripts import check_saml_source as source
@@ -44,6 +45,20 @@ class SourceIntegrity(unittest.TestCase):
         path = self.root / "tests/provider/saml/rust-policy/patches" / source.PATCHES[0]
         path.write_text("ordinary source-integrity fixture\n")
         with self.assertRaisesRegex(ValueError, "patch hash mismatch"):
+            source.check()
+
+    def test_changed_maintenance_patch_fails(self):
+        path = self.root / "tests/provider/saml/rust-policy/patches" / source.PATCHES[-1]
+        path.write_text("ordinary source-integrity fixture\n")
+        with self.assertRaisesRegex(ValueError, "patch hash mismatch"):
+            source.check()
+
+    def test_duplicate_patch_scope_fails(self):
+        manifest = json.loads(source.MANIFEST.read_text())
+        name = source.PATCHES[0]
+        manifest["maintenance_patches"][name] = manifest["existing_qualification_patches"][name]
+        source.MANIFEST.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, "duplicate patch inventory path"):
             source.check()
 
 

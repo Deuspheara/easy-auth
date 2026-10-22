@@ -218,6 +218,7 @@ impl Saml<Idp> {
             .name_id()
             .format()
             .map(|format| format.as_uri().to_string());
+        let qualified_name_id = subject.name_id().clone();
         let user = user_from_subject(subject);
         let raw_options = LoginResponseOptions {
             in_response_to: request.map(|request| request.message().id().as_str()),
@@ -235,6 +236,7 @@ impl Saml<Idp> {
                 LoginResponseOverrides {
                     acs: explicit_acs.as_deref(),
                     name_id_format: name_id_format.as_deref(),
+                    qualified_name_id: Some(&qualified_name_id),
                     issuance_lifetime: Some(self.0.issuance_lifetime),
                     web_browser_sso_producer: options.web_browser_sso_producer,
                     status: options.status.as_ref(),

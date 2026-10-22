@@ -8,7 +8,7 @@ use crate::entity::{
 use crate::error::SamlError;
 use crate::flow::{FlowOptions, FlowResult, HttpRequest};
 use crate::metadata::{try_generate_idp_metadata, IdpMetadata, IdpMetadataConfig};
-use crate::model::{Status, TopLevelStatusCode};
+use crate::model::{NameId, Status, TopLevelStatusCode};
 use crate::sp::{ServiceProvider, WebBrowserSsoProducer};
 use crate::template::{
     apply_tag_prefixes, attr_tag, attribute_statement_builder, replace_tags_by_optional_value,
@@ -46,6 +46,7 @@ pub struct LoginResponseOptions<'a> {
 pub(crate) struct LoginResponseOverrides<'a> {
     pub(crate) acs: Option<&'a str>,
     pub(crate) name_id_format: Option<&'a str>,
+    pub(crate) qualified_name_id: Option<&'a NameId>,
     pub(crate) issuance_lifetime: Option<time::Duration>,
     pub(crate) web_browser_sso_producer: WebBrowserSsoProducer,
     pub(crate) status: Option<&'a Status>,
@@ -54,6 +55,7 @@ pub(crate) struct LoginResponseOverrides<'a> {
 #[derive(Clone, Copy)]
 struct LoginResponseRendering<'a> {
     name_id_format: Option<&'a str>,
+    qualified_name_id: Option<&'a NameId>,
     custom: Option<CustomTagReplacement<'a>>,
     issuance_lifetime: time::Duration,
     web_browser_sso_producer: WebBrowserSsoProducer,
@@ -181,6 +183,17 @@ impl IdentityProvider {
             })?;
             return Ok((id, xml));
         }
+        if uses_template
+            && rendering.qualified_name_id.is_some_and(|name_id| {
+                name_id.name_qualifier().is_some()
+                    || name_id.sp_name_qualifier().is_some()
+                    || name_id.sp_provided_id().is_some()
+            })
+        {
+            return Err(SamlError::Invalid(
+                "qualified NameID requires the built-in login response renderer".into(),
+            ));
+        }
         if rendering.custom.is_none() && !has_custom_context {
             let window = capture_idp_issuance_window(rendering.issuance_lifetime)?;
             let name_id_format = rendering
@@ -211,6 +224,7 @@ impl IdentityProvider {
                 conditions_not_on_or_after: &window.expiration,
                 audience: &audience,
                 name_id_format,
+                qualified_name_id: rendering.qualified_name_id,
                 name_id: &user.name_id,
                 in_response_to: emitted_in_response_to,
                 authn_statement: rendering.web_browser_sso_producer.follows().then_some(
@@ -361,6 +375,7 @@ impl IdentityProvider {
             &acs,
             LoginResponseRendering {
                 name_id_format: overrides.name_id_format,
+                qualified_name_id: overrides.qualified_name_id,
                 custom: options.custom,
                 issuance_lifetime: overrides
                     .issuance_lifetime

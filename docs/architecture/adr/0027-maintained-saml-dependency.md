@@ -27,6 +27,14 @@ checked by `scripts/check_saml_source.py`. The three existing patches remain
 unchanged: verified-profile extraction, exact RSA-SHA256/SHA-256 policy and complete
 XML-document consumption. This decision changes none of their implementation.
 
+The first ordinary maintenance patch, 0004, preserves the typed IdP NameID
+qualifiers in the built-in Web Browser SSO producer. It does not modify signature
+verification or application identity policy. Successful qualified responses reject
+custom templates/hooks rather than silently omit qualifiers. The original import
+archive hash remains historical; a separate maintenance patch inventory and the
+complete current file inventory identify the extended source. Existing vectors
+and the original three patches remain unchanged.
+
 ## Maintenance and release obligations
 
 Easy-auth maintainers review each proposed source/patch change, retain the previous
