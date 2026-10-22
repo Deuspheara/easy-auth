@@ -1,4 +1,4 @@
-use super::setup::Fixture;
+use super::super::deletion_setup::Fixture;
 use sqlx::PgPool;
 
 #[sqlx::test(migrations = "./migrations")]

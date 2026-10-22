@@ -1,5 +1,5 @@
-use super::super::super::setup::Fixture as Source;
-use super::super::setup::{allow_jit, fixture, verify};
+use super::super::setup::Fixture as Source;
+use super::setup::{allow_jit, fixture, verify};
 use auth_core::{SamlDeletionRequests, SamlIdentityPolicy, SamlSignIn, Secret, User};
 use sqlx::PgPool;
 

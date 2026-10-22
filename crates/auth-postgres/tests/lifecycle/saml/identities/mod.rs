@@ -4,6 +4,7 @@ mod configuration;
 mod constraints;
 mod deletion;
 mod deletion_requests;
+mod deletion_setup;
 mod delivery;
 mod delivery_setup;
 mod isolation;

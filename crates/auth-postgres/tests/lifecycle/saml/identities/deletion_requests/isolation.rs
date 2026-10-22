@@ -1,5 +1,5 @@
 use super::super::super::{setup::registration, signed_idp};
-use super::setup::Fixture;
+use super::super::deletion_setup::Fixture;
 use auth_core::{Error, SamlDeletionRequests, SamlIdentityPolicy, SamlJitPolicy};
 use sqlx::PgPool;
 use std::sync::Arc;

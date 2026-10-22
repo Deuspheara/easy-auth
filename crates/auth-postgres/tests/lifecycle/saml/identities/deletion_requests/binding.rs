@@ -1,4 +1,4 @@
-use super::setup::Fixture;
+use super::super::deletion_setup::Fixture;
 use auth_core::{Error, Repository, SamlBrowserProof, Secret};
 use sqlx::PgPool;
 
