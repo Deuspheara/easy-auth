@@ -829,3 +829,15 @@ realm/issuer/client; public client IDs remain insufficient for introspection.
 Audit/storage failures return errors and roll back, never a false successful
 grant/revocation. HTTP human confirmation and owned native/browser/storage
 integration remain unverified.
+
+## Native confirmation HTTP boundary
+
+The optional native consent transport retains actual Origin, session and private
+browser/handle/selector checks; query/prompt/DOM markers cannot grant authority. GET
+creates no state and fixed pages scrub queries; shared JS retains correlation only in
+memory, uses textContent and navigates only to the server-validated return. The
+displayed fixed offline expiry/idle is never recomputed from request data.
+Native/online share a private cookie slot, cannot overwrite an active operation, and
+cannot approve each other’s row kinds. Current source/owner/freshness/policy and
+final DB clock remain mandatory. No token/refresh HTTP authority or native
+interoperability is inferred from consent tests.

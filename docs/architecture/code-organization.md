@@ -1087,3 +1087,17 @@ moved separately to `tests/support/issuer_tokens.rs`; family cases are
 feature/invariant modules. No new dependency, generic signer, public proof
 constructor or unrelated cleanup. Longer visible transactions and ordered scenarios
 are function-size exceptions; modules stay below300lines.
+
+## Native confirmation transport
+
+Native consent owns closed wire types, thin handlers, fixed page, contract and
+explicit composition under issuer_native_consent/. It reuses the existing private
+cookie transport and finite browser consent mechanics rather than duplicating them.
+No source/account/expiry/SQL policy moves into HTTP. Existing cookie
+binding/page/root composition and unchanged ordinary HTTP issuer fixture were
+extracted in a separate structural commit; fixture imports are local to each feature
+so isolated builds remain warning-free. New tests separate lifecycle,
+protocol/body/cookie boundaries, contract/composition, real realm isolation and audit
+rollback. Modules remain below300lines; ordered negative/positive scenarios retain
+their invariant sequence as function-size exceptions. No unrelated cleanup or generic
+framework.

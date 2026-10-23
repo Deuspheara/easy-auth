@@ -55,3 +55,7 @@ mod issuer_consent;
 #[cfg(feature = "issuer-web")]
 #[path = "browser/issuer_web/mod.rs"]
 mod issuer_web;
+
+#[cfg(all(feature = "issuer-native-consent-web", feature = "issuer-web"))]
+#[path = "browser/issuer_native_consent/mod.rs"]
+mod issuer_native_consent;

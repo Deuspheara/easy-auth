@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-native-consent-web = ["issuer-consent-web", "auth-core/issuer-native-refresh", "auth-postgres/issuer-native-refresh"]
 issuer-token-management-web = ["issuer-web", "auth-core/issuer-token-management", "auth-postgres/issuer-token-management"]
 issuer-web = ["issuer-consent-web", "auth-core/issuer-signing", "auth-postgres/issuer-signing", "dep:base64", "dep:zeroize"]
 issuer-consent-web = ["auth-core/issuer-codes", "auth-postgres/issuer-codes"]

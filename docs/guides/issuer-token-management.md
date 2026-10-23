@@ -1,8 +1,8 @@
 # Optional access revocation and introspection
 
 This is the access-lifecycle and native consent-library work of AUTH-40. Native
-family issuance/rotation/revocation are available as library operations; offline
-confirmation UI and owned native browser acceptance remain unfinished.
+family issuance/rotation/revocation are available as library operations; native token/refresh HTTP
+and owned native browser acceptance remain unfinished.
 Use [ADR0038](../architecture/adr/0038-native-token-lifecycle.md) for authority and
 remaining scope. Normal standalone activation and production approval remain gated.
 
@@ -71,11 +71,11 @@ acceptance requirements or establish independent security approval.
 ## Explicit native policy configuration
 
 Optional core/PostgreSQL `issuer-native-refresh` adds configuration and separate
-explicit native consent-library operations. Existing HTTP routes still do not
+explicit native consent-library operations. Default issuer HTTP routes do not
 accept `offline_access`, issue/rotate refresh credentials or add native routes.
 The new offline-capable profile also refuses the existing online-only authorization
 flow, even with an enabled policy. Existing ordinary web/native profiles retain
-their openid flow. Native offline confirmation UI and HTTP token delivery remain work.
+their openid flow. Native HTTP token delivery and owned browser acceptance remain work.
 Provision `IssuerClientRegistration::public_native_refresh_loopback` through the
 existing trusted client API, then construct `IssuerNativeRefreshPolicy::new` with
 the exact saved client, trusted `IssuerAuthority`, absolute seconds and idle seconds.
@@ -117,7 +117,7 @@ handle and authorization selector; it commits a subject, short-lived one-use cod
 fixed native consent and the existing typed owner-session authorization audit before
 returning code/state/iss. `cancel` removes only pending consent and still works after
 policy disable. Consent itself issues no refresh token; the old online signer cannot redeem
-that native code. Dedicated confirmation HTTP/routes remain unfinished; do not treat
+that native code. Dedicated confirmation HTTP/routes are described below; do not treat
 the input prompt string as proof that a human reviewed a page.
 
 The proposed grant expires at its original preparation time plus the saved lifetime,
@@ -166,3 +166,41 @@ scoped family, including after logout/policy disable. Unknown/repeated input is
 indistinguishable success; storage/audit failures remain errors. No cookie session,
 application permission, authenticated public introspection consumer or immediate
 offline JWT erasure follows. Existing HTTP routes do not expose these native methods.
+
+## Explicit native confirmation HTTP/UI
+
+Enable `issuer-native-consent-web` and construct
+`experimental_issuer_native_consent_router(auth, browser, online, native)` with
+`Arc<IssuerAuthorization>` and `Arc<IssuerNativeAuthorization>` for the exact same
+HTTPS root issuer/realm. Provision the native profile/policy through the trusted
+library first. The component retains ordinary consent pages/POSTs and adds:
+
+| Route | Purpose |
+| --- | --- |
+| GET `/oidc/native/authorize` | Fixed native confirmation page; query is scrubbed and GET allocates nothing |
+| POST `/v1/oidc/native/consent/prepare` | Closed usual authorization fields plus exact prompt=consent and openid offline_access |
+| POST `/v1/oidc/native/consent/resume` | Empty closed object; recover only the privately bound pending preview |
+| POST `/v1/oidc/native/consent/approve` | Explicit displayed authorization UUID plus the genuine initiating session/browser/handle |
+| POST `/v1/oidc/native/consent/cancel` | Same private bindings; deny without creating authority |
+
+All POSTs require the same trusted Origin, real session and16KiB closed JSON bounds.
+There is no bearer/header/current-session body fallback. Online/native requests share
+one private cookie operation slot; a second preparation cannot overwrite it. The
+native preview adds immutable proposed grant expiry and idle seconds. The UI displays
+both before Allow offline access; only the authenticated server result selects the
+return address. No query/localStorage/sessionStorage value becomes a proof. Reload
+can resume the original fixed preview; restoration stops further actions. Shared
+browser mechanics use a fixed server HTML marker to choose the display/transport
+variant, never core authorization policy. Old default HTML/query behavior is unchanged.
+
+Success clears private operation transport; failures preserve retry state, except
+unusable resume clears only selected transport. Actual local session replacement
+clears that shared slot. Current source/owner/freshness/client/native-policy/code/
+consent and final clock remain core/PostgreSQL rules. Cancellation after policy
+disable remains possible. Cross-kind/realm/session/operation proofs cannot approve.
+
+`issuer_native_consent_openapi` describes these closed shapes with distinct native
+operation IDs. This consent-only composition mounts no token, refresh, revocation
+or discovery endpoint; native token HTTP and actual owned native client/browser
+acceptance remain AUTH-40 work. A code can currently be exchanged through the
+separate concrete native library. Normal standalone outbound-issuer activation stays gated.

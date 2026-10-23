@@ -3,8 +3,8 @@
 Date: 2026-10-23. Status: in progress for AUTH-40. Stateful access revocation and
 authenticated introspection are implemented. Explicit native policy persistence is
 implemented, with separate explicit native consent library operations. Native signed issuance, bounded families, one-use rotation and reuse revocation
-are implemented in core/PostgreSQL. Consent HTTP delivery and owned native browser
-acceptance remain work. These increments alone do not complete AUTH-40 or M07.
+are implemented in core/PostgreSQL. Explicit native consent HTTP/UI is implemented separately; native token/refresh
+HTTP and owned native browser acceptance remain work. These increments alone do not complete AUTH-40 or M07.
 
 ## Existing access authority
 
@@ -143,7 +143,8 @@ upgrade evidence reconnects after DDL, avoiding pre-upgrade SELECT * prepared-re
 reuse, and proves existing online code redemption and new native consent after
 restart. No live in-place DDL/old-query concurrency guarantee is claimed.
 
-Native consent HTTP/confirmation UI is not mounted or advertised yet. The core
+Native consent HTTP/confirmation UI now has the separate explicit component below;
+default composition still mounts none of its routes. The core
 approval API requires a trusted application to implement explicit owner confirmation;
 an input prompt string alone is not evidence that a human reviewed a page. Actual
 browser delivery and owned native acceptance remain mandatory full-ticket work.
@@ -198,7 +199,7 @@ a local actor session. Public native client IDs remain insufficient for introspe
 
 ## Remaining full-ticket work
 
-Actual owner-confirmation HTTP/UI, native token/refresh/revocation transport,
+Owned browser acceptance of owner-confirmation UI, native token/refresh/revocation transport,
 secure platform storage integration and owned system-browser/PKCE acceptance remain
 required. Library tests and prompt input do not prove human confirmation or native
 client interoperability. Default HTTP/startup/discovery remain unchanged. Source
@@ -210,3 +211,22 @@ or normal outbound activation follows. Production operations remain supervised.
 ADR0032's SAML independent-review prerequisite was waived, not performed; every
 existing SAML protocol/trust/lifecycle check remains required. No new adversarial
 XML/cryptographic producer or custom signature-concurrency experiment is authorized.
+
+## Native confirmation transport increment
+
+`issuer-native-consent-web` explicitly extends consent-only composition with a
+separate native page and closed prepare/resume/approve/cancel POSTs. Both services
+must have the same trusted realm/HTTPS root authority. The native preview displays
+original proposed expiry and idle bound before an explicit owner decision. The UI
+uses shared finite browser mechanics; only fixed server HTML chooses its variant.
+That marker/prompt is no proof. Existing core private owner/session/browser/handle/
+selector checks and SQL policy/caps/final clock remain mandatory.
+
+Ordinary/native pages share one private operation cookie slot. Existing local
+session-change middleware clears it; an existing operation cannot be overwritten.
+Native approval failures cannot claim success or clear retry proofs. Default online
+APIs remain incapable of approving/redeeming native rows. Closed OpenAPI shapes and
+native operation IDs stay distinct. No SQL, source-policy copy, new dependency,
+crypto producer or normal activation is added. This component delivers confirmation
+UI but does not mount token/refresh/revocation/discovery routes. Owned native browser
+and complete wire/client acceptance remain required, not inferred from HTTP tests.

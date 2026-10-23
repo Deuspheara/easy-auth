@@ -6,7 +6,8 @@ bounded lifetimes and ordered full-definition checks create no consent or token.
 Separate native consent-library operations now retain fixed proposed/source caps
 and genuine fresh-owner/private bindings through code/audit commit. Native
 family issuance/rotation/reuse revocation are implemented in the library. Native
-confirmation HTTP/UI and actual browser acceptance remain unfinished.
+confirmation transport is implemented separately below; native token/refresh HTTP
+and actual native browser acceptance remain unfinished.
 See [ADR0038](adr/0038-native-token-lifecycle.md).
 
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured

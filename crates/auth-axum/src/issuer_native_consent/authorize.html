@@ -1,0 +1,5 @@
+<!doctype html><html lang="en" data-native-consent="true"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Authorize offline access</title><script src="/oidc/native/authorize.js" defer></script><body>
+<main><h1>Authorize offline access</h1><p id="status" role="status">Review this request before continuing.</p>
+<section id="preview" hidden><p>Application: <span id="client"></span></p><p>Return address: <span id="destination"></span></p><p>Share a separate account identifier with this application. Your local session stays on this service.</p><p>Offline access may continue until <span id="grant-expiry"></span>. Access expires after <span id="idle"></span> seconds without renewal. Signing out or revoking sessions stops further renewal.</p></section>
+<button id="prepare" type="button">Review request</button><button id="resume" type="button">Resume pending request</button><button id="approve" type="button" hidden>Allow offline access</button><button id="cancel" type="button" hidden>Deny</button>
+</main></body></html>
