@@ -1,4 +1,4 @@
-//! Outbound issuer configuration only; no token, consent or authentication grant.
+//! Outbound issuer features, separate from inbound federation and local sessions.
 mod authentication;
 #[cfg(feature = "issuer-codes")]
 mod codes;
@@ -9,6 +9,8 @@ mod redirects;
 mod registration;
 #[cfg(test)]
 mod tests;
+#[cfg(feature = "issuer-token-management")]
+mod tokens;
 
 pub use authentication::IssuerClientAuthentication;
 #[cfg(feature = "issuer-codes")]
@@ -23,6 +25,11 @@ pub use codes::{
 };
 pub use redirects::{MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS};
 pub use registration::{IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile};
+#[cfg(feature = "issuer-token-management")]
+pub use tokens::{
+    IssuerAccessData, IssuerActiveAccess, IssuerPresentedToken, IssuerTokenManagement,
+    IssuerTokenStatusRepository, IssuerTokenStatusRequest,
+};
 
 #[cfg(feature = "issuer-signing")]
 mod signing;

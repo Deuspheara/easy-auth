@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-token-management = ["issuer-signing", "auth-core/issuer-token-management"]
 issuer-signing = ["issuer-codes", "auth-core/issuer-signing", "dep:serde_json", "sqlx/json"]
 issuer-codes = ["issuer-clients", "auth-core/issuer-codes"]
 issuer-clients = ["auth-core/issuer-clients"]

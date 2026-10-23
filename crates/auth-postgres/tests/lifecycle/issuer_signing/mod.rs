@@ -64,4 +64,6 @@ mod final_policy;
 mod ledger_migration;
 mod rollover;
 mod token_setup;
+#[cfg(feature = "issuer-token-management")]
+mod token_status;
 mod tokens;

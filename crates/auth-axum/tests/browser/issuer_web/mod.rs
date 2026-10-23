@@ -1,5 +1,7 @@
 mod boundary;
 mod lifecycle;
+#[cfg(feature = "issuer-token-management-web")]
+mod management;
 mod metadata;
 #[cfg(feature = "oidc-web")]
 mod rp;

@@ -74,3 +74,7 @@ healthy browser-issued token separately. Neither is external RP certification or
 independent security review. Native owned-listener/storage, broader conformance and
 production supervision remain separate work. [ADR0037](../architecture/adr/0037-issuer-signing-and-final-issuance.md)
 records the current implementation and evidence limits.
+
+The separate optional [access management component](issuer-token-management.md)
+adds authenticated introspection and possession-bound revocation. It preserves
+this component's original caps and does not create refresh/offline authority.

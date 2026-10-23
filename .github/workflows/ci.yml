@@ -91,6 +91,11 @@ jobs:
           cargo test --locked -p easy-auth-postgres --features issuer-signing --test lifecycle issuer_signing
           cargo test --locked -p easy-auth-axum --features issuer-web --test browser issuer_web
           cargo test --locked -p easy-auth-server --features issuer-signing issuer_key::
+      - name: Verify isolated access revocation and authenticated introspection
+        run: |
+          cargo test --locked -p easy-auth-core --features issuer-token-management issuer::tokens
+          cargo test --locked -p easy-auth-postgres --features issuer-token-management --test lifecycle token_status
+          cargo test --locked -p easy-auth-axum --features issuer-token-management-web --test browser issuer_web
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping

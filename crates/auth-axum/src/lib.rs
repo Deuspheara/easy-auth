@@ -61,3 +61,7 @@ pub use issuer_consent::{experimental_issuer_consent_router, issuer_consent_open
 
 #[cfg(feature = "issuer-web")]
 pub use issuer_web::{IssuerWebServices, experimental_issuer_web_router, issuer_web_openapi};
+#[cfg(feature = "issuer-token-management-web")]
+pub use issuer_web::{
+    experimental_issuer_token_management_web_router, issuer_token_management_openapi,
+};

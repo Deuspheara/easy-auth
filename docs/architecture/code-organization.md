@@ -86,6 +86,20 @@ The approximate 300-line file and 50-line function thresholds in AGENTS.md trigg
 
 ## Implemented layout
 
+Access management extends core `issuer/tokens/` with presented-input, validated
+projection, port and use case; PostgreSQL `issuer/tokens/` owns candidate/state,
+revocation and the visible introspection transaction. Retained verification-key
+locking remains in `issuer/signing/verification.rs`. Axum `issuer_web/management/`
+owns closed form/wire types, thin handlers and explicit route/contract composition.
+Shared strict form decoding and base contract composition are extracted separately
+from behavior, as is the existing token client admission name. Feature tests split
+credential/namespace, lifecycle, policy, observed database ordering and migration
+responsibilities. No generic token/provider framework or public proof constructor
+is introduced. New modules stay below300lines. Longer visible transactions and
+ordered negative/healthy scenarios retain lock/cap/rollback evidence together.
+Native refresh families remain unfinished; do not append their different authority
+model to these access-only transaction entry points.
+
 Issuer signing keeps key/publication/metadata and concrete staged issuance in core
 `issuer/signing/`; PostgreSQL registry/metadata and final preparation/completion live
 in the corresponding owning folder. Shared code redemption state retains source/

@@ -687,3 +687,29 @@ invalid_request (400/413/415), invalid_client (401 with Basic challenge), invali
 (400), unsupported_grant_type (400), or temporarily_unavailable (429/503/504).
 See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md) and
 [the component guide](../guides/issuer-signing.md) for trust and evidence limits.
+
+### Optional token status and revocation
+
+`issuer-token-management-web` and `experimental_issuer_token_management_web_router`
+explicitly add POST `/oidc/introspect` and `/oidc/revoke` to the same trusted HTTPS
+root issuer/realm. `issuer_token_management_openapi` merges their concrete schemas.
+Default issuer/server routes remain unchanged; refresh families are not implemented
+or advertised by this access-only increment.
+
+Closed4096byte form bodies accept token and optional client_id/token_type_hint,
+with the same strict percent/media/duplicate/query rules as token issuance. Presented
+opaque input is bounded to1024printable ASCII bytes; unknown valid formats still
+require actual current-client authentication before an inactive result. Hints are
+ignored and confer no type/namespace authority. Actual socket ConnectInfo is required;
+no Cookie/Origin/forwarded-header authority is accepted. Public possession can revoke
+its matching token, but introspection requires current confidential Basic and the
+exact same audience. Header/body client IDs must agree; client_secret_post rejects.
+
+Introspection200 is either only active=false or active=true with iss/aud/client_id/
+pairwise-sub/iat/exp/token_type/scope. It contains no owner/session/nonce/raw credential
+or hash. Unknown/foreign/revoked/inactive tokens disclose no claims; client failure401
+and infrastructure failure503 remain errors. Revocation200 has no body and reveals
+no existence/replay distinction. Shared no-store/no-cache,401Basic challenge and
+400/413/415/429/503/504 finite failures apply. Neither operation grants a local session
+or application permissions. See [ADR0038](adr/0038-native-token-lifecycle.md) and
+[the guide](../guides/issuer-token-management.md) for exact lifecycle and pending scope.

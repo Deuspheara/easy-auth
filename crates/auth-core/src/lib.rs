@@ -127,6 +127,12 @@ pub use issuer::{
     MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
 };
 
+#[cfg(feature = "issuer-token-management")]
+pub use issuer::{
+    IssuerAccessData, IssuerActiveAccess, IssuerPresentedToken, IssuerTokenManagement,
+    IssuerTokenStatusRepository, IssuerTokenStatusRequest,
+};
+
 #[cfg(feature = "issuer-signing")]
 pub use issuer::{
     ISSUER_ID_TOKEN_LIFETIME_SECONDS, ISSUER_KEY_PROPAGATION_SECONDS, IssuerDiscoveryDocument,

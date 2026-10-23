@@ -253,3 +253,14 @@ to the full authorization/client/owner/session/pairwise-subject tuple and public
 owner erasure cascades these rows. Access credentials and ID tokens are neither
 local sessions nor application permissions. Original authentication time and all
 earliest original caps survive signing. See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md).
+
+Optional `IssuerTokenManagement` inspects/revokes the existing access ledger without
+creating a local session or extending any grant. `IssuerPresentedToken` retains only
+the existing SHA-256 credential verifier for bounded opaque input. An active result
+projects only the consuming confidential client's pairwise/issuer/audience/time
+metadata after current source/owner/session/key/client and original-cap checks.
+Migration0032 adds permanent nullable access revoked_at_us; repeated/foreign/unknown
+revocation cannot restore or widen authority. Public possession can reduce only its
+matching credential, but does not authenticate an introspection consumer. Refresh
+families/delegation remain separate unfinished authority in
+[ADR0038](adr/0038-native-token-lifecycle.md).

@@ -38,6 +38,13 @@ actual return in the future code flow. No issuer endpoint or token grant follows
 
 See domain-model, auth-flows, api-contract, deployment and the threat model. Authentication release is blocked on the six method categories, issuer interoperability and security review, even if alpha email works.
 
+The explicit crate-only issuer now has signed issuance, discovery/JWKS and key
+rotation under [ADR0037](adr/0037-issuer-signing-and-final-issuance.md). Separate optional
+access revocation/authenticated introspection extends that existing short-lived
+ledger under [ADR0038](adr/0038-native-token-lifecycle.md). Native refresh families,
+independent SDK/standalone acceptance and normal outbound activation remain gated;
+metadata, local sessions and application permissions stay distinct.
+
 [ADR 0021](adr/0021-saml-verification-and-approval.md) records the SAML verifier
 recommendation and separate implementation, test, review and independent-approval
 gates. Gated integration work may progress; normal SAML activation remains closed.

@@ -764,3 +764,21 @@ RP conformance, native secure storage or production approval. The owned healthy 
 browser/client runner is separate evidence. No adversarial cryptographic/XML
 producer or custom signature-concurrency experiment is part of this increment.
 See [ADR0037](../architecture/adr/0037-issuer-signing-and-final-issuance.md).
+
+Optional access management authenticates the current exact confidential Basic client
+before returning introspection metadata and binds all storage to realm/issuer/client.
+Public identity/cookies never authenticate introspection. Unknown/foreign/inactive
+input discloses no claims; wrong credentials/storage faults are not inactive success.
+Retained key/namespace/source/owner/session/code/original-cap checks and a final clock
+after waits prevent stale or extended active results. Inspection does not touch idle
+time. Explicit possession revocation can only reduce matching token authority and
+cannot clear an earlier revocation timestamp. It can run after logout/source expiry
+without inventing owner authority, altering local sessions or revoking another audience.
+
+The HTTP extension retains the bounded strict client form/Basic/no-store boundary,
+requires actual socket peer admission, ignores forwarding headers and accepts no
+ambient-cookie authority. Local cookie endpoints keep Origin enforcement. A presented
+token retains only the existing standard credential hash, with no new cryptographic
+scheme. This access-only increment creates no refresh/offline authority, remotely
+erases no ID token/app session and does not complete native/M07/production gates.
+See [ADR0038](../architecture/adr/0038-native-token-lifecycle.md).
