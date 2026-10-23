@@ -7,13 +7,14 @@ fn values(items: &[(&str, &str)]) -> Vec<(OsString, OsString)> {
 }
 #[test]
 fn absent_or_explicitly_disabled_settings_are_inactive() {
-    assert!(parse(Vec::new()).unwrap().require_disabled().is_ok());
-    assert!(
-        parse(values(&[("AUTH_SAML_ENABLED", "false")]))
-            .unwrap()
-            .require_disabled()
-            .is_ok()
-    );
+    assert!(matches!(
+        parse(Vec::new()).unwrap(),
+        Configuration::Disabled
+    ));
+    assert!(matches!(
+        parse(values(&[("AUTH_SAML_ENABLED", "false")])).unwrap(),
+        Configuration::Disabled
+    ));
 }
 #[test]
 fn partial_unknown_duplicate_and_populated_disabled_settings_reject() {
@@ -39,7 +40,7 @@ fn partial_unknown_duplicate_and_populated_disabled_settings_reject() {
 }
 #[cfg(not(feature = "saml-web"))]
 #[test]
-fn compiled_support_is_required_but_not_approval() {
+fn compiled_support_is_required() {
     let error = parse(values(&[("AUTH_SAML_ENABLED", "true")]))
         .err()
         .unwrap();
@@ -68,11 +69,11 @@ fn complete() -> Vec<(OsString, OsString)> {
 }
 #[cfg(feature = "saml-web")]
 #[test]
-fn complete_configuration_keeps_default_deny_and_closed_gate() {
+fn complete_configuration_preserves_default_deny_and_trusted_registration() {
     let configuration = parse(complete()).unwrap();
     assert_eq!(
         configuration.require_disabled().unwrap_err().to_string(),
-        APPROVAL_REQUIRED
+        "SAML browser settings require configured_application"
     );
     let prepared = configuration
         .prepare(
@@ -85,10 +86,6 @@ fn complete_configuration_keeps_default_deny_and_closed_gate() {
     assert_eq!(
         prepared.policy.registration().acs(),
         "https://app.example/saml/acs"
-    );
-    assert_eq!(
-        prepared.authorize_activation().unwrap_err().to_string(),
-        APPROVAL_REQUIRED
     );
 }
 #[cfg(feature = "saml-web")]

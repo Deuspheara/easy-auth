@@ -105,7 +105,7 @@ def record():
         source_inventory_sha256=report["source_inventory_sha256"],
         application_lock_sha256=report["application_lock_sha256"],
         qualification_report_sha256=digest(report_path),
-        saml_activation_guard_sha256=digest(ROOT / "apps/auth-server/src/configuration/saml/settings.rs"),
+        saml_activation_configuration_sha256=digest(ROOT / "apps/auth-server/src/configuration/saml/settings.rs"),
         reproducer_sha256=digest(Path(__file__)),
         system=platform.system(), release=platform.release(), machine=platform.machine(),
         rustc=command(["rustc", "-vV"]),

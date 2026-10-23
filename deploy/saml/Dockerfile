@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Build SAML support without opening the source-locked production gate.
+# Build explicit opt-in SAML with mandatory configured IdP trust.
 FROM rust:1.95.0-slim-trixie@sha256:e14e87345b4d5964ddcc3491d27ee046a0f23820f340c3c1e24da6880141f7c0 AS build
 WORKDIR /src
 RUN apt-get update && apt-get install -y --no-install-recommends cmake libssl-dev pkg-config python3 \
@@ -37,8 +37,8 @@ FROM gcr.io/distroless/cc-debian13:nonroot@sha256:83b9b50586253821cf63ffcec87d3d
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.source="https://github.com/Deuspheara/easy-auth" \
       org.opencontainers.image.revision="$SOURCE_REVISION" \
-      org.opencontainers.image.title="easy-auth gated SAML reference release" \
-      io.easy-auth.saml-activation="source-disabled"
+      org.opencontainers.image.title="easy-auth opt-in SAML release" \
+      io.easy-auth.saml-activation="configuration-required"
 COPY --from=build /out/easy-auth /usr/local/bin/easy-auth
 COPY --from=build /out/build.txt /usr/share/doc/easy-auth/build.txt
 COPY --from=build /out/qualification.json /usr/share/doc/easy-auth/qualification.json

@@ -11,10 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 def check(image):
     fixtures = ROOT / "third-party/saml-rs/tests/fixtures/key"
     configuration = (ROOT / "deploy/saml/nginx.conf").read_text()
-    for blocked in ("location ^~ /saml/ { return 404; }",
-                    "location ^~ /v1/saml/ { return 404; }"):
-        if blocked not in configuration:
-            raise ValueError("reference proxy SAML route block missing")
+    if "location ^~ /saml/ { return 404; }" in configuration \
+            or "location ^~ /v1/saml/ { return 404; }" in configuration:
+        raise ValueError("proxy must forward configured SAML routes")
     with tempfile.TemporaryDirectory(prefix="easy-auth-proxy-") as directory:
         folder = Path(directory)
         # Linux bind mounts retain the host directory's ownership/mode. Only
@@ -35,4 +34,4 @@ def check(image):
                     f"type=bind,src={ROOT / 'deploy/saml/nginx.conf'},dst=/etc/nginx/nginx.conf,readonly",
                     "--entrypoint", "nginx", image, "-t"])
     return dict(image=image, configuration_valid=True, public_existing_fixtures=True,
-                traffic_performed=False, saml_route_blocks_configured=True)
+                traffic_performed=False, saml_routes_forwarded=True)

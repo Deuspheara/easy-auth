@@ -95,3 +95,8 @@ required-features = ["google-desktop-launch", "oidc-identities"]
 name = "oidc-web-native"
 path = "examples/oidc-web-native/main.rs"
 required-features = ["oidc-web"]
+
+[[example]]
+name = "saml-startup-provision"
+path = "examples/saml-startup-provision.rs"
+required-features = ["saml-web"]

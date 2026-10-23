@@ -13,7 +13,7 @@ COPY --from=packages /usr/share/doc/libpcre2-8-0/copyright /usr/share/doc/libpcr
 COPY deploy/saml/nginx.conf /etc/nginx/nginx.conf
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.revision="$SOURCE_REVISION" \
-      io.easy-auth.saml-activation="source-disabled"
+      io.easy-auth.saml-activation="configuration-required"
 USER 65532:65532
 EXPOSE 8443
 ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]

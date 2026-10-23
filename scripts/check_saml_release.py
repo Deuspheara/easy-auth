@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the disabled release artifact using ordinary startup and metadata only."""
+"""Verify the opt-in release artifact using ordinary startup and metadata only."""
 import argparse
 from datetime import datetime, timezone
 import json
@@ -23,14 +23,14 @@ def main():
         if "easy-auth" not in output:
             raise ValueError("release CLI check failed")
     record.update(recorded_at=datetime.now(timezone.utc).isoformat(),
-                  cli_checks_passed=2, activation_refused=runtime.activation_refused(image),
+                  cli_checks_passed=2, incomplete_configuration_refused=runtime.incomplete_configuration_refused(image),
                   startup=runtime.compose_check(image, proxy_image["image_id"]),
                   proxy={**proxy_image, **proxy.check(proxy_image["image_id"])},
                   production_security_approval=False)
     arguments.output.parent.mkdir(parents=True, exist_ok=True)
     arguments.output.write_text(json.dumps(record, indent=2) + "\n")
     print(json.dumps({key: record[key] for key in ("image_id", "architecture", "source_revision",
-          "binary_sha256", "cli_checks_passed", "activation_refused", "startup",
+          "binary_sha256", "cli_checks_passed", "incomplete_configuration_refused", "startup",
           "production_security_approval")}))
 
 

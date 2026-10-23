@@ -93,15 +93,14 @@ now records sign-in/lifecycle acceptance through both composition modes with exp
 private-TLS/source-copy limits. Final exact-head hosted CI and broader release gates
 remain explicit.
 
-## Prepared SAML composition — activation remains closed
+## Opt-in SAML composition
 
-The server's optional `saml-web` feature shares normal standalone/embedded
-configuration and route composition. Keep `AUTH_SAML_*` unset or set only
-`AUTH_SAML_ENABLED=false`. Compiled support does not mount an ACS: a complete enable
-request is rejected by the source-locked AUTH-32 gate before database loading.
-No environment flag bypasses the gate. After the mandatory security approval and
-an explicit reviewed source change, prepared composition loads only already
-operator-provisioned enabled registration/pins/JIT, preserving revisions and
-operator disable. Startup is read-only for SAML; it performs no automatic trust
-import, provisioning or certificate rotation. The [configuration guide](../guides/saml.md#normal-server-configuration-activation-locked)
-and [ADR 0029](adr/0029-gated-saml-server-composition.md) define this contract.
+Compile `saml-web` and use `configured_application` for standalone/embedded routing.
+Unset SAML settings or only `AUTH_SAML_ENABLED=false` keep routes absent. Explicit
+true requires complete HTTPS configuration and matching already-provisioned enabled
+registration/JIT with active certificate pins. Startup is read-only for SAML;
+there is no automatic trust import, rotation, provisioning or re-enable.
+The [configuration guide](../guides/saml.md#normal-server-configuration) and
+[release guide](../guides/saml-release.md) document operator inputs and resource
+limits. [ADR0032](adr/0032-saml-maintainer-directed-activation.md) records the
+maintainer's independent-review waiver and unresolved assurance limitations.

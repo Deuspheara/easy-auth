@@ -1,5 +1,12 @@
 # Threat model — alpha design, before credential flows
 
+Current SAML activation policy: [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
+normal SAML by maintainer direction, waiving independent review. Default-off,
+trusted persisted configuration and every protocol/security check remain required.
+Earlier source-disabled stage descriptions below are superseded only as to
+activation policy; their assurance gaps remain unverified, not independently approved.
+
+
 AUTH-55's implemented preparation purpose binds a current provider-required
 owner/session and exact configuration/policy revision under source-before-owner
 locks. Old/unknown authentication time may initiate reauthentication but grants

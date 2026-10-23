@@ -8,8 +8,7 @@ pub(super) async fn services(
     repository: Arc<Postgres>,
     prepared: Prepared,
 ) -> Result<SamlWebServices, Box<dyn std::error::Error>> {
-    // Defense in depth: no direct caller can mount this provider before approval.
-    prepared.authorize_activation()?;
+    // Startup is read-only: require the exact enabled policy and active trusted pins.
     let policy = repository
         .load_saml_identity_policy(&prepared.policy)
         .await?;

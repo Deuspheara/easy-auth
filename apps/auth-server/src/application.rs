@@ -38,10 +38,6 @@ pub async fn configured_application() -> Result<ConfiguredApplication, Box<dyn s
     let saml_settings = configuration::saml::read()?;
     #[cfg(feature = "saml-web")]
     let saml_prepared = saml_settings.prepare(parameters.realm, &parameters.browser)?;
-    #[cfg(feature = "saml-web")]
-    if let Some(prepared) = &saml_prepared {
-        prepared.authorize_activation()?;
-    }
     #[cfg(not(feature = "saml-web"))]
     saml_settings.require_disabled()?;
     let (auth, repository) = configuration::load(&parameters).await?;

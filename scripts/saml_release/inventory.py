@@ -61,8 +61,8 @@ def identity(image):
     details = docker.inspect(image)
     configuration = details["Config"]
     if configuration["User"] != "65532:65532" \
-            or configuration["Labels"].get("io.easy-auth.saml-activation") != "source-disabled":
-        raise ValueError("release image identity/disabled policy mismatch")
+            or configuration["Labels"].get("io.easy-auth.saml-activation") != "configuration-required":
+        raise ValueError("release image identity/opt-in policy mismatch")
     return dict(image_id=details["Id"], repo_digests=details.get("RepoDigests", []),
                 os=details["Os"], architecture=details["Architecture"],
                 source_revision=configuration["Labels"].get("org.opencontainers.image.revision"))
@@ -103,8 +103,8 @@ def record(image):
                   native_build_openssl_sha256=files[native_hashes].decode(),
                   source_inventory_sha256=digest(ROOT / "third-party/saml-rs-source.json"),
                   lock_sha256=digest(ROOT / "Cargo.lock"),
-                  activation_guard_sha256=digest(ROOT / "apps/auth-server/src/configuration/saml/settings.rs"),
-                  scope="Actual disabled reference artifact/package inventory; libraries are packaged, not a claim each is loaded; no independent approval")
+                  activation_configuration_sha256=digest(ROOT / "apps/auth-server/src/configuration/saml/settings.rs"),
+                  scope="Actual opt-in release artifact/package inventory; libraries are packaged, not a claim each is loaded; no independent approval")
     return record
 
 

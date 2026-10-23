@@ -1,5 +1,11 @@
 # ADR 0031: Finalize the gated SAML profile and reference release deployment
 
+Current activation policy: [ADR0032](0032-saml-maintainer-directed-activation.md)
+supersedes this document's independent-review prerequisite and source/proxy lock
+by explicit maintainer waiver. Its earlier source/evidence and unverified assurance
+limits remain historical facts; no independent audit or approval is claimed.
+
+
 Date: 2026-10-23. Status: accepted project engineering contract; independent
 security approval and production activation remain pending under ADR 0021.
 

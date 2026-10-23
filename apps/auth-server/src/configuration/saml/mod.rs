@@ -1,4 +1,4 @@
-//! Closed production activation gate. No environment value is an approval token.
+//! Explicit opt-in SAML configuration; trusted persisted pins/policy are loaded separately.
 #[cfg(feature = "saml-web")]
 mod settings;
 #[cfg(feature = "saml-web")]
@@ -15,9 +15,6 @@ const ALLOWED: &[&str] = &[
     "AUTH_SAML_SSO_URL",
     "AUTH_SAML_JIT",
 ];
-#[cfg(feature = "saml-web")]
-const APPROVAL_REQUIRED: &str =
-    "SAML production activation is blocked by the AUTH-32 security approval gates";
 
 pub(crate) enum Configuration {
     Disabled,
@@ -29,7 +26,9 @@ impl Configuration {
         match self {
             Self::Disabled => Ok(()),
             #[cfg(feature = "saml-web")]
-            Self::Configured(_) => Err(APPROVAL_REQUIRED.into()),
+            Self::Configured(_) => {
+                Err("SAML browser settings require configured_application".into())
+            }
         }
     }
     #[cfg(feature = "saml-web")]
@@ -90,7 +89,7 @@ fn parse(
     }
     #[cfg(not(feature = "saml-web"))]
     {
-        Err("SAML configuration requires the saml-web server feature; security approval is also required".into())
+        Err("SAML configuration requires the saml-web server feature".into())
     }
 }
 

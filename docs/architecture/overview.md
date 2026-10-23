@@ -1,5 +1,12 @@
 # Architecture
 
+Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
+normal SAML by maintainer direction, waiving independent review. Default-off,
+trusted persisted configuration and every protocol/security check remain required.
+Earlier source-disabled stage descriptions below are superseded only as to
+activation policy; their assurance gaps remain unverified, not independently approved.
+
+
 Project name: easy-auth (selected by the project owner). Rust stable, Tokio, Axum, SQLx/PostgreSQL. One binary and PostgreSQL; SMTP is a configurable delivery dependency. No mandatory JavaScript runtime or cache.
 
 The first workspace has auth-core (use cases, repository/email ports and domain DTOs), auth-postgres (SQL transactions/migrations), auth-axum (HTTP/cookie boundary) and auth-server (composition/config). Protocol modules are added only as implemented; no empty protocol crates. An SDK is introduced with a real remote use case. Domain authorization remains in the consuming application.

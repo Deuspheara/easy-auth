@@ -1,4 +1,4 @@
-use super::{APPROVAL_REQUIRED, StartupResult};
+use super::StartupResult;
 use auth_axum::BrowserConfig;
 use auth_core::{SamlIdentityPolicy, SamlJitPolicy, SamlRegistration};
 use std::collections::BTreeMap;
@@ -63,12 +63,5 @@ impl Settings {
         Ok(Prepared {
             policy: SamlIdentityPolicy::new(registration).with_jit(self.jit),
         })
-    }
-}
-impl Prepared {
-    /// Deliberately closed in source. Features, environment and persisted enable
-    /// flags cannot substitute for the exact-profile review/approval record.
-    pub fn authorize_activation(&self) -> StartupResult<()> {
-        Err(APPROVAL_REQUIRED.into())
     }
 }

@@ -1,9 +1,10 @@
-# Disabled SAML reference release
+# Opt-in SAML release
 
-This is a prepared release artifact and candidate operational profile, not
-production SAML approval. [ADR0031](../architecture/adr/0031-saml-reference-release-profile.md)
-fixes the supported contract. Normal SAML remains disabled in source, image,
-Compose and proxy. No approval token or runtime switch can open it.
+Normal SAML activation is available by maintainer direction under
+[ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md). Independent review was waived; no audit or independent security
+approval is established. The profile and residual limits in ADR0031 remain.
+Unset/false keeps SAML inactive; true requires complete validated configuration
+and exact enabled persisted trust. No production deployment is started here.
 
 ## Build and identify
 
@@ -28,7 +29,7 @@ python3 scripts/scan_saml_release.py --image easy-auth-saml-release:review --pro
 Use the existing owned PostgreSQL setup and `DATABASE_URL`; set
 `EASY_AUTH_SMOKE_POSTGRES_CONTAINER` when using the existing container. The checker
 creates/drops only its random database and Compose project, records native/package
-and resource metadata, checks CLI and closed activation, verifies ordinary database
+and resource metadata, checks CLI and incomplete-configuration refusal, verifies ordinary database
 readiness/absent SAML routes/zero authority creation, and validates nginx syntax
 with existing public fixture files. It creates no XML/key fixture, performs no
 signature/resource experiment and does not start a public deployment.
@@ -84,9 +85,17 @@ destinations with their infrastructure controls, protect runtime files/ACLs and
 complete backup/restore, cleanup, least-privilege database roles and incident
 procedures in [deployment requirements](../architecture/deployment.md).
 
-Keep both explicit SAML proxy route blocks. Keep `AUTH_SAML_ENABLED=false` and the
-source approval guard unchanged. A deployment hostname, secret file, persisted
-provider enable, compiled feature or CLI setting is not security approval.
+After trusted administration provisions `SamlIdentityPolicy` and
+`SamlCertificateTrust` through `Postgres::configure_saml_identity_policy`, put the
+complete settings from the SAML guide in the protected runtime file. Approval
+windows refer to certificate trust, not independent release approval. Provide the
+real operator-approved IdP certificate, never a repository fixture certificate.
+Set `AUTH_SAML_ENABLED=true` in the Compose invocation environment as well:
+Compose's explicit provider switch overrides an env-file value and defaults false.
+Build with `saml-web` (already selected in this release). The proxy forwards SAML
+through its same bounded TLS upstream; the app mounts it only after validating
+persisted configuration. No `AUTH_SAML_SECURITY_APPROVED` bypass exists.
+
 `restart: no` makes recovery deliberate. Monitor readiness and sanitized errors;
 if native work becomes stuck, an operator may restart the whole bounded process
 under the incident procedure. Its durable replay/current-policy/original deadlines
@@ -103,7 +112,6 @@ are separately recorded; none supplies FIPS certification or independent approva
 
 The final review packet must link exact source, platform-specific artifact IDs,
 native regression receipts, full scan results/dispositions and enforced limits.
-An updated package/base/source/configuration changes that scope. Independent
-review/report/findings resolution and explicit approval are still required before
-the separate activation change. This preparation creates no PR, publishes no
+An updated package/base/source/configuration changes that scope. Independent review/report remains absent under the documented maintainer waiver.
+Keep unresolved assurance limits and new findings visible for subsequent review. This preparation creates no PR, publishes no
 registry image and contacts no reviewer or upstream maintainer.

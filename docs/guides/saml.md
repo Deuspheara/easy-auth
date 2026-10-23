@@ -1,17 +1,13 @@
-# Gated SAML integration
+# SAML integration
 
-SAML is not enabled in normal embedded or standalone composition. There is no
-ordinary ACS route or SAML local-session grant. [ADR 0021](../architecture/adr/0021-saml-verification-and-approval.md)
-records the verifier recommendation and distinct approval requirements. An
-internal assessment and green tests do not constitute independent approval.
+Normal standalone/embedded SAML is available as explicit opt-in under
+[ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md). The maintainer waived the independent-review prerequisite;
+no independent audit or security approval is claimed. Missing trusted settings,
+active certificate pins or exact persisted policy still refuse startup.
+Earlier component-stage descriptions below retain their historical assurance
+scope; this decision supersedes their statements that normal activation is locked.
 
-The patched source is now maintained and distributed by easy-auth under
-[ADR 0027](../architecture/adr/0027-maintained-saml-dependency.md); an upstream
-merge is not required. The [current evidence review](../security/saml-evidence-review.md)
-records shipped-graph regression testing and the remaining security requirements.
-Maintenance ownership does not activate the provider or establish independent approval.
-
-The finalized project profile and disabled reference release are described in
+The finalized project profile and opt-in release are described in
 [ADR0031](../architecture/adr/0031-saml-reference-release-profile.md) and the
 [release guide](saml-release.md). Patch0011 requires both Response and Assertion
 issuers to match the configured IdP. The current source inventory, rather than
@@ -461,7 +457,7 @@ unqualified-attribute validator before local-name DOM projection. This is a stat
 consumed-field completeness fix; no custom namespace/crypto probe or new verifier
 was introduced, and independent namespace/binding review is still pending.
 
-## Normal server configuration (activation locked)
+## Normal server configuration
 
 The optional server `saml-web` feature compiles the normal configuration and route
 composition. The standalone binary and embedded example both use
@@ -474,7 +470,7 @@ For the prepared configuration contract, the complete set is:
 
 | Setting | Meaning |
 | --- | --- |
-| `AUTH_SAML_ENABLED` | Exact `true` requests activation; currently always rejected by the AUTH-32 gate. |
+| `AUTH_SAML_ENABLED` | Exact `true` enables the configured provider after persisted policy/trust validation. |
 | `AUTH_SAML_CONNECTION_ID` | Already provisioned non-nil connection UUID in `AUTH_REALM_ID`. |
 | `AUTH_SAML_LOCAL_CLIENT_ID` | Already provisioned non-nil local client UUID. |
 | `AUTH_SAML_SP_ENTITY` | Exact trusted SP entity identifier. |
@@ -492,19 +488,19 @@ for full registration/pins/JIT and explicit enable/disable operations. Startup o
 loads a matching enabled policy and active pins; it cannot provision, rotate or
 re-enable it. Pending requests and stored revisions survive an unchanged restart.
 
-After the required security approval and a separately reviewed source change opens
-the gate, the prepared router selects the shared base, sign-in, metadata, ACS and
-confirmed-deletion services; optional OIDC coexists in the same router/contract.
-This paragraph describes prepared wiring, not currently available activation.
-See [ADR 0029](../architecture/adr/0029-gated-saml-server-composition.md) and the
-[activation status](../security/saml-activation-status.md).
+With complete configuration and matching enabled persisted trust, the shared router
+mounts sign-in, metadata, ACS and confirmed-deletion services. Optional OIDC shares
+one base router/contract. See ADR0032 for the maintainer waiver and residual limits.
 
 Run the ordinary startup checks with a freshly built default binary copied to
 `EASY_AUTH_SAML_UNSUPPORTED_TEST_BINARY`, then build the normal binary and embedded
-example with `--features saml-web,oidc-web` and run
+example plus `--example saml-startup-provision` with `--features saml-web,oidc-web` and run
 `python3 scripts/smoke_saml_startup.py`. The documented PostgreSQL development
 container or `EASY_AUTH_SMOKE_POSTGRES_CONTAINER` must be available. The runner owns
-and removes its disposable database and never activates SAML or exchanges assertions.
+and removes its disposable database, verifies configured/disabled routes and trust
+refusals in both modes, and exchanges no assertions. Its provisioning example
+accepts only a loopback database with the owned startup-test name prefix; never
+use its public fixture certificate as a deployed IdP.
 
 ### Verification admission scope
 

@@ -1,5 +1,12 @@
 # Code organization
 
+Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
+normal SAML by maintainer direction, waiving independent review. Default-off,
+trusted persisted configuration and every protocol/security check remain required.
+Earlier source-disabled stage descriptions below are superseded only as to
+activation policy; their assurance gaps remain unverified, not independently approved.
+
+
 The gated SAML release keeps protocol issuer policy in private maintained
 `flow/issuer.rs`; patch0010 is structural and patch0011 adds the explicit envelope
 issuer contract. Existing verifier primitives and public proof boundaries stay
@@ -952,11 +959,11 @@ its policy. Axum single-provider route attachment is extracted without behaviora
 change, and `federation.rs` composes one base router and contract for both sources.
 The reusable ordinary IdP fixture is declared once under HTTP `tests/support/`.
 New modules remain below300lines. The shared application factory keeps configuration,
-closed approval gate, database loading and route construction in one visible order
+database loading, trusted-policy validation and route construction in one visible order
 as a cohesive composition-size exception. The longer ordered combined-router/startup cases
 keep both providers' boundaries and no-authority observations together as reviewed
 function-size exceptions. No schema, cryptographic verifier, generic provider
-framework or unrelated cleanup is introduced. Normal activation stays locked.
+framework or unrelated cleanup is introduced. Normal activation is explicit opt-in under ADR0032.
 
 AUTH-32's backend-processing correction adds a private, focused maintained
 `crypto/verify/execution.rs` module. The existing profile module owns the shared

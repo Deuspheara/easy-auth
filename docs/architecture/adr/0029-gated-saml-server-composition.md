@@ -1,5 +1,11 @@
 # ADR 0029: Prepare normal SAML composition behind a closed approval gate
 
+Current activation policy: [ADR0032](0032-saml-maintainer-directed-activation.md)
+supersedes this document's independent-review prerequisite and source/proxy lock
+by explicit maintainer waiver. Its earlier source/evidence and unverified assurance
+limits remain historical facts; no independent audit or approval is claimed.
+
+
 Date: 2026-10-22. Status: accepted engineering composition; activation remains
 blocked by the mandatory security gates in ADR 0021.
 

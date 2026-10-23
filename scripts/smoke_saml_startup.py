@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ordinary startup gate checks using owned disposable PostgreSQL databases.
 
-No IdP, assertions, cryptographic fixtures or activation override are involved.
+No IdP exchange, assertions, generated cryptographic fixtures or validation overrides.
 Build the default binary and copy it to EASY_AUTH_SAML_UNSUPPORTED_TEST_BINARY,
 then build the normal binary and embedded example with saml-web (optionally oidc-web).
 """
@@ -13,6 +13,7 @@ import urllib.error
 import urllib.request
 import uuid
 
+import saml_startup
 import smoke_oidc_startup as startup
 import smoke_recovery_notice as support
 
@@ -23,7 +24,13 @@ PHASE = "setup"
 def environment(database):
     values = support.server_environment(database, str(uuid.uuid4()), startup.port())
     values = {k: v for k, v in values.items() if not k.startswith(("AUTH_OIDC_", "AUTH_SAML_"))}
-    values["AUTH_PUBLIC_URL"] = "https://app.example"
+    # This fixture exercises SAML, not the separate password service. The shared
+    # development environment's small blocklist is invalid for production mode.
+    values.pop("AUTH_PASSWORD_BLOCKLIST_FILE", None)
+    values.update(AUTH_PUBLIC_URL="https://app.example", AUTH_DEVELOPMENT="false",
+                  SMTP_HOST="smtp.example.invalid", SMTP_PORT="465",
+                  SMTP_USERNAME="owned-startup", SMTP_PASSWORD=uuid.uuid4().hex,
+                  SMTP_FROM="auth@app.example")
     return values
 
 
@@ -71,8 +78,8 @@ def main():
             for explicit in [False, True]:
                 disabled = dict(values, AUTH_SAML_ENABLED="false") if explicit else values
                 absent_routes(binary, disabled, name + ("-explicit-disabled" if explicit else "-unset"))
-            PHASE = name + "-activation-refused"
-            reason = b"requires the saml-web server feature" if name == "default" else b"AUTH-32 security approval gates"
+            PHASE = name + "-unprovisioned-refused"
+            reason = b"requires the saml-web server feature" if name == "default" else b"Unauthorized"
             startup.rejected(binary, enabled(values), reason, PHASE)
             startup.rejected(binary, dict(values, AUTH_SAML_ENABLED="false", AUTH_SAML_JIT="allow"),
                              b"complete configuration", name + "-populated-disabled-refused")
@@ -83,11 +90,20 @@ def main():
             "SELECT (SELECT count(*) FROM auth_saml_registrations)+(SELECT count(*) FROM auth_saml_certificates)+(SELECT count(*) FROM auth_saml_identity_policies)+(SELECT count(*) FROM auth_saml_requests)+(SELECT count(*) FROM auth_users)+(SELECT count(*) FROM auth_sessions)+(SELECT count(*) FROM auth_audit)"], cwd=ROOT, stderr=subprocess.DEVNULL)
         assert output.strip() == b"0"
         print(json.dumps({"case": PHASE, "status": "passed"}), flush=True)
+        PHASE = "configured-saml-startup"
+        configured = enabled(values)
+        baseline = saml_startup.configured_modes(configured, database)
+        for name, binary in [("standalone", ROOT / "target/debug/easy-auth"),
+                             ("embedded", ROOT / "target/debug/examples/embedded")]:
+            absent_routes(binary, values, name + "-persisted-source-does-not-auto-enable")
+            assert saml_startup.observe(database) == baseline
+        PHASE = "configured-saml-policy-refusals"
+        saml_startup.rejected_policy(configured, database)
     finally:
         if created:
             support.sql(f'DROP DATABASE "{database}" WITH (FORCE)')
     print(json.dumps({"suite": "saml-startup", "status": "passed", "database_removed": True,
-                      "saml_activated": False}), flush=True)
+                      "configured_startup_verified": True}), flush=True)
 
 
 if __name__ == "__main__":

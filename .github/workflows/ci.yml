@@ -158,9 +158,9 @@ jobs:
         env:
           EASY_AUTH_OIDC_UNSUPPORTED_TEST_BINARY: ${{ runner.temp }}/easy-auth-oidc-disabled
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-      - name: Verify closed SAML production startup gate
+      - name: Verify opt-in SAML startup, trusted configuration and isolation
         run: |
-          cargo build --locked -p easy-auth-server --bin easy-auth --example embedded --features saml-web,oidc-web
+          cargo build --locked -p easy-auth-server --bin easy-auth --example embedded --example saml-startup-provision --features saml-web,oidc-web
           python3 scripts/smoke_saml_startup.py
           cargo check --locked -p easy-auth-server --all-targets --features saml-web
         env:
@@ -209,9 +209,9 @@ jobs:
       DATABASE_URL: postgres://auth:ci-only-password@localhost:5432/auth
     steps:
       - uses: actions/checkout@v4
-      - name: Build disabled native SAML reference release
+      - name: Build opt-in native SAML release
         run: docker build --progress=plain -f deploy/saml/Dockerfile --build-arg "SOURCE_REVISION=$GITHUB_SHA" -t easy-auth-saml-release:ci .
-      - name: Build minimal TLS proxy with SAML blocked
+      - name: Build bounded TLS proxy with SAML forwarding
         run: docker build --progress=plain -f deploy/saml/proxy.Dockerfile --build-arg "SOURCE_REVISION=$GITHUB_SHA" -t easy-auth-saml-proxy:ci .
       - name: Verify private build-context exclusion with owned non-secret markers
         run: python3 scripts/check_saml_build_context.py

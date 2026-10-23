@@ -10,7 +10,7 @@ services:
     environment:
       AUTH_BIND: 0.0.0.0:8080
       AUTH_DEVELOPMENT: "false"
-      AUTH_SAML_ENABLED: "false"
+      AUTH_SAML_ENABLED: ${AUTH_SAML_ENABLED:-false}
       AUTH_OIDC_ENABLED: "false"
     user: "65532:65532"
     init: true

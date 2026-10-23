@@ -75,7 +75,7 @@ def check():
     if provenance["git"] != {"sha1": REVISION, "dirty": True}:
         raise ValueError("unexpected packaged source provenance")
     print(f"SAML candidate source integrity: PASS ({len(actual)} files, {len(PATCHES)} recorded patches)")
-    print("Production dependency/security approval remains pending.")
+    print("Source integrity is not independent security approval.")
 
 
 if __name__ == "__main__":

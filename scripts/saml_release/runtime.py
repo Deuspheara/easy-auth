@@ -97,6 +97,7 @@ def compose_check(image, proxy_image):
             "ports": [{"target": 8080, "published": "0", "host_ip": "127.0.0.1"}],
             "extra_hosts": ["host.docker.internal:host-gateway"]}}}))
         env = dict(os.environ, EASY_AUTH_IMAGE=image, EASY_AUTH_PROXY_IMAGE=proxy_image,
+                   AUTH_SAML_ENABLED="false",
                    AUTH_RUNTIME_ENV_FILE=str(private),
                    AUTH_TLS_CERT_FILE="/dev/null", AUTH_TLS_KEY_FILE="/dev/null")
         arguments = ["compose", "--project-name", project, "-f", str(ROOT / "deploy/saml/compose.yaml"),
@@ -135,17 +136,14 @@ def compose_check(image, proxy_image):
                     support.sql(f'DROP DATABASE "{database}" WITH (FORCE)')
 
 
-def activation_refused(image):
-    # Complete ordinary configuration must reach the source approval guard before DB I/O.
-    values = dict(AUTH_PUBLIC_URL="https://app.example", AUTH_REALM_ID=str(uuid.uuid4()),
-                  AUTH_SAML_ENABLED="true", AUTH_SAML_CONNECTION_ID=str(uuid.uuid4()),
-                  AUTH_SAML_LOCAL_CLIENT_ID=str(uuid.uuid4()), AUTH_SAML_SP_ENTITY="urn:release:sp",
-                  AUTH_SAML_IDP_ENTITY="urn:release:idp", AUTH_SAML_SSO_URL="https://idp.example/sso")
+def incomplete_configuration_refused(image):
+    # Opt-in alone never starts an unconfigured provider; refuse before database I/O.
     import subprocess
-    args = ["docker", "run", "--rm", "--network", "none", "--read-only", "--cap-drop", "ALL"]
-    for key, value in values.items():
-        args.extend(["-e", key + "=" + value])
-    result = subprocess.run([*args, image], capture_output=True, timeout=30)
-    if result.returncode == 0 or b"AUTH-32 security approval gates" not in result.stderr:
-        raise ValueError("release activation guard did not reject complete configuration")
+    result = subprocess.run(["docker", "run", "--rm", "--network", "none", "--read-only",
+                             "--cap-drop", "ALL", "-e", "AUTH_PUBLIC_URL=https://app.example",
+                             "-e", "AUTH_REALM_ID=" + str(uuid.uuid4()),
+                             "-e", "AUTH_SAML_ENABLED=true", image],
+                            capture_output=True, timeout=30)
+    if result.returncode == 0 or b"missing required SAML setting" not in result.stderr:
+        raise ValueError("release accepted incomplete SAML configuration")
     return True

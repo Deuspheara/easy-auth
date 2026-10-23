@@ -1,5 +1,12 @@
 # HTTP contract v1
 
+Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
+normal SAML by maintainer direction, waiving independent review. Default-off,
+trusted persisted configuration and every protocol/security check remain required.
+Earlier source-disabled stage descriptions below are superseded only as to
+activation policy; their assurance gaps remain unverified, not independently approved.
+
+
 The opt-in core/PostgreSQL `saml-requests` Rust component adds no HTTP route or
 OpenAPI operation. `SamlRegistration::unsigned_redirect` selects the explicit
 outgoing profile; `SamlTransactions::start` persists browser-bound request state
@@ -574,15 +581,15 @@ never raw XML or the legacy name-keyed aggregate. Public constructors cannot
 fabricate this verified proof. Signed authentication time also remains separate
 from response issuance; ordinary new-response/old-authentication cases retain
 all admission,24-hour session-age and five-minute deletion caps.
-See [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md). Normal production
-SAML routes/configuration remain disabled pending the documented approval gates.
+See [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md). Normal SAML is now explicit opt-in under ADR0032; independent review is waived,
+not completed.
 
 Normal SAML server preparation uses the optional `saml-web` feature and the shared
-standalone/embedded `configured_application` factory. Its production activation
-gate remains closed in source, before database loading: disabled startup exposes
-no SAML paths/schemas, and a complete enable request fails explicitly. The additive
+standalone/embedded `configured_application` factory. Disabled startup exposes
+no SAML paths/schemas. Complete opt-in startup loads only a matching enabled
+persisted policy and active trusted pins; missing/mismatched trust fails closed. The additive
 `experimental_oidc_saml_web_router` composes the existing OIDC and SAML components
 with one base and combined contract for engineering tests. It preserves their
 exact HTTPS callbacks, realm checks, Origin boundaries and private proof cookies.
-[ADR 0029](adr/0029-gated-saml-server-composition.md) records trusted provisioning,
-read-only restart semantics and the separate approval requirement.
+[ADR 0029](adr/0029-gated-saml-server-composition.md) records trusted provisioning and
+read-only restart semantics; ADR0032 supersedes its separate approval requirement.
