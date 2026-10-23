@@ -1,0 +1,28 @@
+---
+import { Code } from "@astrojs/starlight/components";
+import { git, revision } from "../../scripts/public-docs.mjs";
+const examples = {
+  embedded: "apps/auth-server/examples/embedded.rs",
+  application: "apps/auth-server/examples/embedded/application.rs",
+} as const;
+interface Props {
+  example: keyof typeof examples;
+}
+const source = examples[Astro.props.example];
+if (
+  !source ||
+  !git("ls-tree", revision, "--", source).startsWith("100644 blob ")
+) {
+  throw new Error("Example must be an allowlisted committed regular file");
+}
+const code = git("show", `${revision}:${source}`);
+---
+
+<Code code={code} lang="rust" title={source} />
+<p class="example-source">
+  <a
+    href={`https://github.com/Deuspheara/easy-auth/blob/${revision}/${source}`}
+  >
+    View this exact example on GitHub
+  </a>
+</p>

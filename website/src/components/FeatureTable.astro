@@ -1,4 +1,5 @@
 ---
+import { sitePath } from "../../scripts/site-path.mjs";
 import { features } from "../data/features";
 ---
 
@@ -15,7 +16,7 @@ import { features } from "../data/features";
       {features.map((feature) => (
         <tr>
           <td>
-            <a href={feature.href}>{feature.name}</a>
+            <a href={sitePath(feature.href)}>{feature.name}</a>
           </td>
           <td>
             <strong>{feature.status}</strong>

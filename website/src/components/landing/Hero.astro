@@ -1,12 +1,18 @@
 ---
+import Icon from "../Icon.astro";
+import {
+  ArrowRight01Icon,
+  ArrowUpRight01Icon,
+} from "@hugeicons/core-free-icons";
+import { sitePath } from "../../../scripts/site-path.mjs";
 import CodePanel from "./CodePanel.astro";
 ---
 
 <section class="hero section-shell" aria-labelledby="hero-title">
   <div class="hero-meta">
     <span>RUST / AXUM / POSTGRESQL</span>
-    <a href="/docs/features/">
-      Pre-release <span aria-hidden="true">↗</span>
+    <a href={sitePath("/docs/features/")}>
+      Pre-release <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </div>
   <h1 id="hero-title">
@@ -20,14 +26,14 @@ import CodePanel from "./CodePanel.astro";
     service.
   </p>
   <div class="hero-actions">
-    <a class="button button-primary" href="/docs/getting-started/">
-      Get started <span aria-hidden="true">→</span>
+    <a class="button button-primary" href={sitePath("/docs/getting-started/")}>
+      Get started <Icon icon={ArrowRight01Icon} size={14} />
     </a>
     <a
       class="button button-quiet"
       href="https://github.com/Deuspheara/easy-auth"
     >
-      View source <span aria-hidden="true">↗</span>
+      View source <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </div>
   <div class="hero-license">Open source. MIT OR Apache-2.0.</div>
@@ -40,8 +46,8 @@ import CodePanel from "./CodePanel.astro";
       Mount the configured router in Axum. The same authentication core and
       PostgreSQL transactions also power the standalone server.
     </p>
-    <a class="text-link" href="/docs/embedding/">
-      Read the integration guide <span aria-hidden="true">↗</span>
+    <a class="text-link" href={sitePath("/docs/embedding/")}>
+      Read the integration guide <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
     <div class="source-note">
       <span aria-hidden="true">⌥</span>

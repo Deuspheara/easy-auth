@@ -1,4 +1,23 @@
 ---
+import Icon from "../Icon.astro";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { sitePath } from "../../../scripts/site-path.mjs";
+import {
+  Mail01Icon,
+  LockPasswordIcon,
+  UserMultiple02Icon,
+  Key01Icon,
+  ShieldKeyIcon,
+  FingerprintScanIcon,
+} from "@hugeicons/core-free-icons";
+const icons: Record<string, typeof ShieldKeyIcon> = {
+  "Email links": Mail01Icon,
+  Passwords: LockPasswordIcon,
+  "Session control": UserMultiple02Icon,
+  "OpenID Connect": Key01Icon,
+  SAML: ShieldKeyIcon,
+  Passkeys: FingerprintScanIcon,
+};
 import { features } from "../../data/features";
 ---
 
@@ -12,24 +31,20 @@ import { features } from "../../data/features";
       <p class="eyebrow">02 / AUTHENTICATION</p>
       <h2 id="features-title">Choose a sign-in method.</h2>
     </div>
-    <a class="text-link" href="/docs/features/">
-      Feature status <span aria-hidden="true">↗</span>
+    <a class="text-link" href={sitePath("/docs/features/")}>
+      Feature status <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </div>
   <div class="feature-list">
     {features
       .filter((f) => f.featured)
-      .map((feature, index) => (
-        <a href={feature.href} class="feature-row">
-          <span class="feature-number" aria-hidden="true">
-            {String(index + 1).padStart(2, "0")}
-          </span>
+      .map((feature) => (
+        <a href={sitePath(feature.href)} class="feature-row">
+          <Icon icon={icons[feature.name]} size={18} class="feature-symbol" />
           <h3>{feature.name}</h3>
           <p>{feature.description}</p>
           <span class="status-label">{feature.status}</span>
-          <span class="row-arrow" aria-hidden="true">
-            ↗
-          </span>
+          <Icon icon={ArrowUpRight01Icon} size={14} class="row-arrow" />
         </a>
       ))}
   </div>

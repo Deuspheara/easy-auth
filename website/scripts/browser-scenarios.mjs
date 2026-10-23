@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 
 export async function checkInteractions(page, origin) {
-  await page.goto(origin);
+  await page.goto(origin + "/");
   await page.getByRole("tab", { name: "Run the service" }).click();
   assert.equal(await page.locator("#panel-standalone").isVisible(), true);
   await page.getByRole("button", { name: "Copy example" }).click();
@@ -73,12 +73,22 @@ export async function checkRoutes(page, origin) {
       .evaluateAll((nodes) => nodes.map((n) => n.href));
     for (const href of links) {
       const target = new URL(href);
-      if (target.origin !== origin || !target.pathname.endsWith("/")) continue;
-      if (!visited.has(target.pathname)) queue.push(target.pathname);
+      if (
+        target.origin !== new URL(origin).origin ||
+        !target.pathname.endsWith("/")
+      )
+        continue;
+      const routePath =
+        target.pathname.slice(new URL(origin).pathname.length) || "/";
+      assert.ok(
+        target.pathname.startsWith(new URL(origin).pathname + "/"),
+        `Link escaped project base: ${href}`,
+      );
+      if (!visited.has(routePath)) queue.push(routePath);
       if (target.hash)
         anchors.push({
           from: route,
-          path: target.pathname,
+          path: routePath,
           hash: decodeURIComponent(target.hash.slice(1)),
         });
     }

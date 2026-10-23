@@ -28,3 +28,7 @@
 .feature-table-wrap td:last-child {
   min-width: 270px;
 }
+
+.example-source {
+  font-size: 0.8rem;
+}

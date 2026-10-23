@@ -38,11 +38,16 @@ provider availability or production-readiness claims without evidence.
 
 ## Hosting
 
-Serve `dist/` at the root of a static HTTPS origin, honoring directory index pages
-and `404.html`. No domain or hosting account is selected and no deployment is
-performed by the build workflow. Configure Astro's `site` with the real canonical
-origin before publishing; until then the sitemap warning is expected. Publishing
-under a path prefix requires updating the deliberately root-relative navigation.
+The public target is `https://deuspheara.github.io/easy-auth/`. Astro's canonical
+origin and `/easy-auth` base are defined in `scripts/site-path.mjs`. Both Astro
+markup and Markdown links use that base; the browser suite runs under it too.
+
+The Website workflow validates builds for branches/PRs. Only a successful build
+on `main` can upload `website/dist` and deploy with GitHub Pages. Deployment uses
+job-scoped `pages: write` and `id-token: write`, not a personal access token.
+Enable **Settings → Pages → Build and deployment → Source: GitHub Actions** once
+as a repository administrator. No authentication backend runs on Pages.
+The workflow can also be dispatched manually from `main` after configuration.
 
 Astro/Starlight/Pagefind provide documentation rendering, themes and local search.
 No analytics, remote fonts, backend login demo or third-party runtime API is used.
@@ -62,3 +67,10 @@ preserving those packages' own notices and applicable source obligations.
 Keep bundled browser-code notices when transforming/minifying output and recheck
 advisories/licenses when updating the lockfile. Do not describe the entire npm
 dependency graph as solely MIT/Apache licensed.
+
+Hugeicons Free `@hugeicons/core-free-icons` is MIT-licensed. The Astro icon
+component emits only selected SVG shapes at build time, without a client icon
+runtime. Its copyright/license notice is shipped in `public/hugeicons-license.txt`
+and linked in the footer. No Pro icons are included. Complete Axum code examples
+are read from two explicitly allowlisted committed source files; they never read
+an arbitrary path or local research.

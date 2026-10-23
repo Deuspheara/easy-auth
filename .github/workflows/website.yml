@@ -1,9 +1,20 @@
 name: Website
 on:
   push:
-    paths: ['website/**', 'docs/guides/**', '.github/workflows/website.yml']
+    paths:
+      - 'website/**'
+      - 'docs/guides/**'
+      - 'apps/auth-server/examples/embedded.rs'
+      - 'apps/auth-server/examples/embedded/**'
+      - '.github/workflows/website.yml'
   pull_request:
-    paths: ['website/**', 'docs/guides/**', '.github/workflows/website.yml']
+    paths:
+      - 'website/**'
+      - 'docs/guides/**'
+      - 'apps/auth-server/examples/embedded.rs'
+      - 'apps/auth-server/examples/embedded/**'
+      - '.github/workflows/website.yml'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -30,3 +41,27 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - name: Upload verified static site
+        if: github.repository == 'Deuspheara/easy-auth' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: website/dist
+  deploy:
+    if: github.repository == 'Deuspheara/easy-auth' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: website
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Deploy verified artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

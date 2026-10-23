@@ -1,6 +1,18 @@
+---
+import Icon from "../Icon.astro";
+import {
+  ArrowUpRight01Icon,
+  GithubIcon,
+  Menu01Icon,
+  ShieldKeyIcon,
+  Sun03Icon,
+} from "@hugeicons/core-free-icons";
+import { sitePath } from "../../../scripts/site-path.mjs";
+---
+
 <header class="site-header">
-  <a class="wordmark" href="/" aria-label="easy-auth home">
-    <img src="/logo.svg" width="32" height="32" alt="" />
+  <a class="wordmark" href={sitePath("/")} aria-label="easy-auth home">
+    <Icon icon={ShieldKeyIcon} size={28} />
     <span>easy-auth</span>
   </a>
   <button
@@ -9,34 +21,23 @@
     aria-expanded="false"
     aria-label="Open navigation"
   >
-    <span></span>
-    <span></span>
+    <Icon icon={Menu01Icon} size={20} />
   </button>
   <nav id="site-navigation" aria-label="Main navigation">
-    <a href="/#features">Features</a>
-    <a href="/docs/">Documentation</a>
-    <a href="/docs/features/">Status</a>
+    <a href={sitePath("/#features")}>Features</a>
+    <a href={sitePath("/docs/")}>Documentation</a>
+    <a href={sitePath("/docs/features/")}>Status</a>
     <span class="nav-divider" aria-hidden="true"></span>
     <button
       class="theme-toggle"
       aria-label="Toggle color theme"
       title="Toggle color theme"
     >
-      <svg
-        viewBox="0 0 24 24"
-        width="18"
-        height="18"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
-      </svg>
+      <Icon icon={Sun03Icon} size={18} />
     </button>
     <a class="github-link" href="https://github.com/Deuspheara/easy-auth">
-      GitHub <span aria-hidden="true">↗</span>
+      <Icon icon={GithubIcon} size={16} /> GitHub{" "}
+      <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </nav>
 </header>

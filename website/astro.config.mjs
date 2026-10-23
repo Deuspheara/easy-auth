@@ -1,12 +1,15 @@
 import { defineConfig } from "astro/config";
 import { unified } from "@astrojs/markdown-remark";
 import starlight from "@astrojs/starlight";
+import { site, base, baseLinks } from "./scripts/site-path.mjs";
 import sourceLinks from "./scripts/source-links.mjs";
 
 export default defineConfig({
   output: "static",
+  site,
+  base,
   trailingSlash: "always",
-  markdown: { processor: unified({ remarkPlugins: [sourceLinks] }) },
+  markdown: { processor: unified({ remarkPlugins: [sourceLinks, baseLinks] }) },
   integrations: [
     starlight({
       title: "easy-auth",
@@ -25,17 +28,27 @@ export default defineConfig({
       customCss: ["./src/styles/docs.css"],
       sidebar: [
         {
-          label: "Start here",
+          label: "Get started",
           items: [
             { label: "Introduction", slug: "docs" },
-            { label: "Getting started", slug: "docs/getting-started" },
-            { label: "Embed in Axum", slug: "docs/embedding" },
+            { label: "Quickstart", slug: "docs/getting-started" },
+            { label: "Protect an Axum route", slug: "docs/embedding" },
+            { label: "Browser integration", slug: "docs/browser-integration" },
+            { label: "Use in your project", slug: "docs/your-project" },
             { label: "Feature status", slug: "docs/features" },
           ],
         },
         {
           label: "Authentication",
           items: [{ autogenerate: { directory: "docs/guides" } }],
+        },
+        {
+          label: "Understand & deploy",
+          items: [
+            { label: "Users, realms & sessions", slug: "docs/concepts" },
+            { label: "Deployment checklist", slug: "docs/deployment" },
+            { label: "Troubleshooting", slug: "docs/troubleshooting" },
+          ],
         },
       ],
     }),

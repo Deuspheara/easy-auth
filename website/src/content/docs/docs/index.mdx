@@ -1,0 +1,61 @@
+---
+title: Introduction
+description: What easy-auth does, how it fits into an Axum application, and where to begin.
+---
+
+import { LinkCard, CardGrid, Aside } from "@astrojs/starlight/components";
+import { sitePath } from "../../../../scripts/site-path.mjs";
+
+easy-auth is a Rust authentication library and server built with **Axum and PostgreSQL**. It handles sign-in, user identities and server-side sessions. Your application defines what an authenticated user can do.
+
+You can run it as a standalone process for a same-origin browser app, or embed its router into an existing Axum service. Both use the same authentication core and database transactions.
+
+<Aside type="note" title="Project status">
+  This is pre-release software. Use the repository source while crate names and
+  APIs are unpublished. Check the feature status before choosing a provider.
+  SAML's maintainer-directed activation is not an independent security approval.
+</Aside>
+
+## Start here
+
+<CardGrid>
+  <LinkCard
+    title="Run your first sign-in"
+    description="Start the local stack, receive an email in Mailpit, and inspect your session."
+    href={sitePath("/docs/getting-started/")}
+  />
+  <LinkCard
+    title="Protect an Axum route"
+    description="Run the existing embedded example, then see how its /private endpoint authenticates requests."
+    href={sitePath("/docs/embedding/")}
+  />
+</CardGrid>
+
+## What you can build
+
+| Requirement                                 | Where to go                                            |
+| ------------------------------------------- | ------------------------------------------------------ |
+| Sign in with an email link                  | [Quickstart](/docs/getting-started/)                   |
+| Add password enrollment and login           | [Passwords](/docs/guides/passwords/)                   |
+| Read a session and sign out from JavaScript | [Browser integration](/docs/browser-integration/)      |
+| List or revoke a user's sessions            | [Session management](/docs/guides/sessions/)           |
+| Connect a trusted OIDC provider             | [OIDC guide](/docs/guides/oidc/)                       |
+| Configure an IdP-backed SAML sign-in        | [SAML guide](/docs/guides/saml/)                       |
+| Understand experimental passkey components  | [Passkey enrollment](/docs/guides/passkey-enrollment/) |
+
+[Feature status](/docs/features/) distinguishes available, opt-in, experimental and planned capabilities. There is no released outbound OIDC authorization server. Authentication does not supply application roles, permissions or organization policy.
+
+## Choose how to run it
+
+|                         | Standalone server                               | Embedded Axum                                      |
+| ----------------------- | ----------------------------------------------- | -------------------------------------------------- |
+| Start command           | `cargo run -p easy-auth-server --bin easy-auth` | `cargo run -p easy-auth-server --example embedded` |
+| HTTP process            | The included server                             | Your application                                   |
+| Core policy and storage | Shared Rust core and PostgreSQL                 | The same core and PostgreSQL                       |
+| Best starting point     | Try the reference browser flow                  | Add authentication beside application routes       |
+
+Standalone mode is intended for same-origin browser applications. Do not share its cookies across unrelated applications or treat an external provider token as an easy-auth session.
+
+## Learn the model
+
+The main concepts are [realms, users, provider identities, credentials and sessions](/docs/concepts/). If a setup command or sign-in behaves differently from this guide, start with [troubleshooting](/docs/troubleshooting/).

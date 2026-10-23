@@ -1,0 +1,72 @@
+---
+title: Protect an Axum route
+description: Run a complete existing example and follow the router, shared state and authenticated handler.
+---
+
+import RepositoryCode from "../../../components/RepositoryCode.astro";
+
+This walkthrough uses the repository's **actual compiled example**, including its protected route. You do not need to invent a provider, custom repository or password service to follow it.
+
+## 1. Run the embedded example
+
+Complete [quickstart steps 1–3](/docs/getting-started/) first. Stop the standalone server if it is still listening on port 58417. From the repository root, export the same development settings and run:
+
+```sh
+set -a
+. ./.env
+set +a
+cargo run --locked -p easy-auth-server --example embedded
+```
+
+Both server modes default to the same configured bind address, so only one can listen there at a time.
+
+## 2. Check the protected endpoint
+
+Before signing in, open `http://127.0.0.1:58417/private`. Expect **401 Unauthorized**.
+
+Complete the email sign-in at `http://127.0.0.1:58417`, using Mailpit in the same browser profile. Then open `/private` again. Expect **200 OK** and the public user object. If a session from the quickstart is still valid, you may already be signed in; log out first to check the unauthenticated case.
+
+A terminal `curl` request has no browser session cookie and will still receive 401. That is expected.
+
+## 3. Understand the composition
+
+The example has two source files:
+
+```text
+apps/auth-server/examples/
+├── embedded.rs
+└── embedded/
+    └── application.rs
+```
+
+The entry point loads the trusted environment configuration, starts the email notification worker, merges application routes with the auth router, and owns the listener:
+
+<RepositoryCode example="embedded" />
+
+`configured_application()` returns `auth`, `browser`, `router` and `bind`. Keep the same `Auth` and `BrowserConfig` snapshot for application routes and the auth router. Keep the notification worker running for email delivery. An application embedding the library owns its shutdown lifecycle; the included standalone server also demonstrates graceful shutdown.
+
+## 4. Authenticate an application-owned handler
+
+The application module has one private state type and one handler. Authentication is delegated to the library, and responses disable caching:
+
+<RepositoryCode example="application" />
+
+The handler maps unavailable authentication storage to **503**, and other authentication failures to **401**. It does not read or return the raw session secret. Once `authenticate` returns a user, check your application's own permission policy before reading or mutating business data.
+
+## 5. Adapt it to your workspace
+
+Follow [Use it in your project](/docs/your-project/) for complete `Cargo.toml` path dependencies, file placement and run commands for a separate Axum application. It copies these exact working source files and adjusts the development configuration for the new working directory.
+
+Keep the shared configuration, notification delivery and connection information shown above when adding application routes.
+
+## Verify your changes
+
+From the repository root:
+
+```sh
+cargo check --locked -p easy-auth-server --example embedded
+```
+
+Then repeat both `/private` checks above. Successful compilation does not replace checking the signed-in and signed-out browser behavior.
+
+Continue with [browser integration](/docs/browser-integration/) and [sessions](/docs/guides/sessions/). For provider activation use the dedicated guide, not a custom authentication branch inside this handler.

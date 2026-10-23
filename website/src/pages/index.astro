@@ -1,4 +1,7 @@
 ---
+import Icon from "../components/Icon.astro";
+import { ShieldKeyIcon } from "@hugeicons/core-free-icons";
+import { sitePath } from "../../scripts/site-path.mjs";
 import Header from "../components/landing/Header.astro";
 import Hero from "../components/landing/Hero.astro";
 import Features from "../components/landing/Features.astro";
@@ -24,7 +27,7 @@ import "../styles/landing.css";
       content="Authentication that belongs in your Rust stack. Open source, self-hosted, built around Axum and PostgreSQL."
     />
     <title>easy-auth — Authentication for Rust.</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={sitePath("/favicon.svg")} />
     <script is:inline>
       try {
         const saved = localStorage.getItem("starlight-theme");
@@ -52,18 +55,21 @@ import "../styles/landing.css";
         <Resources />
       </main>
       <footer class="site-footer section-shell">
-        <a class="wordmark" href="/">
-          <img src="/logo.svg" width="26" height="26" alt="" />
+        <a class="wordmark" href={sitePath("/")}>
+          <Icon icon={ShieldKeyIcon} size={28} />
           easy-auth
         </a>
         <p>Rust authentication. Open source.</p>
         <nav aria-label="Footer">
-          <a href="/docs/">Docs</a>
-          <a href="/docs/features/">Feature status</a>
-          <a href="https://github.com/Deuspheara/easy-auth">Source ↗</a>
+          <a href={sitePath("/docs/")}>Docs</a>
+          <a href={sitePath("/docs/features/")}>Feature status</a>
+          <a href="https://github.com/Deuspheara/easy-auth">Source</a>
         </nav>
         <small>
-          Original code: MIT OR Apache-2.0. Third-party terms apply.
+          Original code: MIT OR Apache-2.0.{" "}
+          <a href={sitePath("/hugeicons-license.txt")}>
+            Icons: Hugeicons Free (MIT).
+          </a>
         </small>
       </footer>
     </div>

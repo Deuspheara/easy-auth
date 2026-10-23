@@ -130,5 +130,6 @@ Committed lifecycle operations produce [typed, owned audit facts](docs/guides/au
 
 The original landing page and searchable developer guides live in
 [website/](website/README.md). Run `npm ci --ignore-scripts`, `npm run build` and
-`npm run preview` from that directory for a local preview. Hosting and a public
-canonical domain are not configured.
+`npm run preview` from that directory for a local preview. The GitHub Pages target is
+[deuspheara.github.io/easy-auth](https://deuspheara.github.io/easy-auth/); the
+Website workflow deploys verified builds from `main` after Pages is enabled.

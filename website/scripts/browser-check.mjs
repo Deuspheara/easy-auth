@@ -4,12 +4,13 @@ import {
   checkMobileAndSearch,
   checkRoutes,
 } from "./browser-scenarios.mjs";
+import { base } from "./site-path.mjs";
 import { preview } from "astro";
 import { chromium } from "playwright";
 
 // Use the programmatic API so this check owns and closes the exact server.
 const server = await preview({ server: { host: "127.0.0.1", port: 0 } });
-const origin = `http://127.0.0.1:${server.port}`;
+const origin = `http://127.0.0.1:${server.port}${base}`;
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
@@ -21,6 +22,13 @@ try {
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("response", (response) => {
+    if (response.url().startsWith(origin + "/") && response.status() >= 400) {
+      errors.push(
+        `HTTP ${response.status()} ${new URL(response.url()).pathname}`,
+      );
+    }
+  });
   await checkInteractions(page, origin);
   await checkMobileAndSearch(page, origin);
   const counts = await checkRoutes(page, origin);

@@ -1,0 +1,41 @@
+---
+// Hugeicons Free (MIT). Build-time SVG rendering; no framework or icon runtime.
+import type { ShieldKeyIcon } from "@hugeicons/core-free-icons";
+interface Props {
+  icon: typeof ShieldKeyIcon;
+  size?: number;
+  class?: string;
+}
+const { icon, size = 18, class: className } = Astro.props;
+const attributeNames: Record<string, string> = {
+  strokeWidth: "stroke-width",
+  strokeLinecap: "stroke-linecap",
+  strokeLinejoin: "stroke-linejoin",
+  fillRule: "fill-rule",
+  clipRule: "clip-rule",
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  class={className}
+>
+  {icon.map(([Tag, attributes]) => (
+    <Tag
+      {...Object.fromEntries(
+        Object.entries(attributes)
+          .filter(([key]) => key !== "key")
+          .map(([key, value]) => [attributeNames[key] ?? key, value]),
+      )}
+    />
+  ))}
+</svg>

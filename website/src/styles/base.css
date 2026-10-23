@@ -84,12 +84,6 @@ button:focus-visible,
   font-weight: 600;
   letter-spacing: -0.8px;
 }
-.wordmark img {
-  filter: invert(1);
-}
-html[data-theme="light"] .wordmark img {
-  filter: none;
-}
 .site-header nav {
   display: flex;
   align-items: center;

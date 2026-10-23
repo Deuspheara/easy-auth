@@ -37,3 +37,7 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+.feature-symbol {
+  color: var(--muted);
+}

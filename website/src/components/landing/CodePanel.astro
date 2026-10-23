@@ -1,4 +1,7 @@
 ---
+import Icon from "../Icon.astro";
+import { ArrowUpRight01Icon, Copy01Icon } from "@hugeicons/core-free-icons";
+import { sitePath } from "../../../scripts/site-path.mjs";
 import { Code } from "astro:components";
 
 const embedded = `use std::net::SocketAddr;
@@ -47,18 +50,7 @@ cargo run -p easy-auth-server --bin easy-auth`;
       </button>
     </div>
     <button class="copy-button" aria-label="Copy example" title="Copy example">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.6"
-        aria-hidden="true"
-      >
-        <rect x="8" y="8" width="12" height="12" rx="2" />
-        <path d="M16 8V4H4v12h4" />
-      </svg>
+      <Icon icon={Copy01Icon} size={16} />
       <span class="sr-only" aria-live="polite"></span>
     </button>
   </div>
@@ -87,8 +79,8 @@ cargo run -p easy-auth-server --bin easy-auth`;
   </div>
   <div class="code-bottom">
     <span>Configuration from your trusted environment.</span>
-    <a href="/docs/embedding/">
-      Full example <span aria-hidden="true">↗</span>
+    <a href={sitePath("/docs/embedding/")}>
+      Full example <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </div>
 </div>

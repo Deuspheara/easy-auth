@@ -1,3 +1,9 @@
+---
+import Icon from "../Icon.astro";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { sitePath } from "../../../scripts/site-path.mjs";
+---
+
 <section class="ownership section-shell" aria-labelledby="ownership-title">
   <div class="ownership-copy">
     <p class="eyebrow">03 / ARCHITECTURE</p>
@@ -6,8 +12,8 @@
       Use easy-auth for identity and sessions. Keep roles, permissions and
       business rules in your application.
     </p>
-    <a class="text-link" href="/docs/">
-      Architecture overview <span aria-hidden="true">↗</span>
+    <a class="text-link" href={sitePath("/docs/")}>
+      Architecture overview <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </div>
   <dl class="boundary-list">

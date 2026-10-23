@@ -1,29 +1,35 @@
+---
+import Icon from "../Icon.astro";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { sitePath } from "../../../scripts/site-path.mjs";
+---
+
 <section class="resources section-shell" aria-labelledby="resources-title">
   <div class="section-heading">
     <div>
       <p class="eyebrow">04 / DOCUMENTATION</p>
       <h2 id="resources-title">Documentation.</h2>
     </div>
-    <a href="/docs/" class="text-link">
-      All documentation <span aria-hidden="true">↗</span>
+    <a href={sitePath("/docs/")} class="text-link">
+      All documentation <Icon icon={ArrowUpRight01Icon} size={14} />
     </a>
   </div>
   <div class="resource-grid">
-    <a href="/docs/getting-started/">
+    <a href={sitePath("/docs/getting-started/")}>
       <h3>
-        Local development <span aria-hidden="true">↗</span>
+        Local development <Icon icon={ArrowUpRight01Icon} size={14} />
       </h3>
       <p>Run PostgreSQL, Mailpit and your first sign-in.</p>
     </a>
-    <a href="/docs/embedding/">
+    <a href={sitePath("/docs/embedding/")}>
       <h3>
-        Axum integration <span aria-hidden="true">↗</span>
+        Axum integration <Icon icon={ArrowUpRight01Icon} size={14} />
       </h3>
       <p>Compose the router and notification worker.</p>
     </a>
-    <a href="/docs/guides/server-configuration/">
+    <a href={sitePath("/docs/guides/server-configuration/")}>
       <h3>
-        Configuration <span aria-hidden="true">↗</span>
+        Configuration <Icon icon={ArrowUpRight01Icon} size={14} />
       </h3>
       <p>Set up HTTPS, SMTP and trusted providers.</p>
     </a>
