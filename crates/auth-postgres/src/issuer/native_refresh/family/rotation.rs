@@ -89,7 +89,7 @@ pub(super) async fn rotate(
             Outcome::InvalidGrant
         });
     }
-    let saved_policy = snapshot.policy(credential)?;
+    let saved_policy = snapshot.policy(credential.authority, credential.client)?;
     policy::lock(&mut tx, &saved_policy, true).await?;
     let key = signing::lock_current(&mut tx, credential.authority).await?;
     let owner = owner_snapshot.ok_or(IssuerTokenError::InvalidGrant)??;

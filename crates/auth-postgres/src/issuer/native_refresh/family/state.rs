@@ -1,5 +1,8 @@
 use crate::{Postgres, unavailable};
-use auth_core::{Error, IssuerNativeCredentialRequest, IssuerNativeRefreshPolicy, Result};
+use auth_core::{
+    Error, IssuerAuthority, IssuerClientRegistration, IssuerNativeCredentialRequest,
+    IssuerNativeRefreshPolicy, Result,
+};
 use sqlx::{Postgres as Pg, Transaction};
 use uuid::Uuid;
 
@@ -70,18 +73,19 @@ impl Family {
     }
     pub(super) fn policy(
         &self,
-        request: &IssuerNativeCredentialRequest<'_>,
+        authority: &IssuerAuthority,
+        client: &IssuerClientRegistration,
     ) -> Result<IssuerNativeRefreshPolicy> {
-        if self.origin.client_revision != request.client.revision()
-            || self.origin.realm_id != request.authority.realm()
-            || self.origin.issuer != request.authority.issuer()
-            || self.origin.client_id != request.client.client()
+        if self.origin.client_revision != client.revision()
+            || self.origin.realm_id != authority.realm()
+            || self.origin.issuer != authority.issuer()
+            || self.origin.client_id != client.client()
         {
             return Err(Error::Unauthorized);
         }
         IssuerNativeRefreshPolicy::new(
-            request.authority.clone(),
-            request.client.clone(),
+            authority.clone(),
+            client.clone(),
             self.origin
                 .lifetime_seconds
                 .try_into()
