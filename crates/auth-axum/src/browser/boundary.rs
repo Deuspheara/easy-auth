@@ -15,7 +15,14 @@ pub(crate) async fn boundary(
     request: Request,
     next: Next,
 ) -> Response {
-    serve(state, request, next, true).await
+    serve(
+        state,
+        request,
+        next,
+        true,
+        json!({"code":"temporarily_unavailable"}),
+    )
+    .await
 }
 
 /// Cross-site POST delivery may render only a non-authoritative handoff page.
@@ -26,10 +33,23 @@ pub(crate) async fn post_delivery_boundary(
     request: Request,
     next: Next,
 ) -> Response {
-    serve(state, request, next, false).await
+    serve(
+        state,
+        request,
+        next,
+        false,
+        json!({"code":"temporarily_unavailable"}),
+    )
+    .await
 }
 
-async fn serve(state: AppState, request: Request, next: Next, same_origin: bool) -> Response {
+async fn serve(
+    state: AppState,
+    request: Request,
+    next: Next,
+    same_origin: bool,
+    timeout_body: serde_json::Value,
+) -> Response {
     let request_id = Uuid::new_v4().to_string();
     let mut response = if same_origin
         && request.method() == Method::POST
@@ -48,11 +68,7 @@ async fn serve(state: AppState, request: Request, next: Next, same_origin: bool)
     } else {
         match tokio::time::timeout(Duration::from_secs(15), next.run(request)).await {
             Ok(response) => response,
-            Err(_) => (
-                StatusCode::GATEWAY_TIMEOUT,
-                Json(json!({"code":"temporarily_unavailable"})),
-            )
-                .into_response(),
+            Err(_) => (StatusCode::GATEWAY_TIMEOUT, Json(timeout_body)).into_response(),
         }
     };
     let headers = response.headers_mut();

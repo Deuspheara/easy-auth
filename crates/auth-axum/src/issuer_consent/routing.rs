@@ -27,6 +27,20 @@ pub fn experimental_issuer_consent_router(
     browser: BrowserConfig,
     authorization: Arc<IssuerAuthorization>,
 ) -> Result<Router> {
+    attach(
+        configured_router(auth.clone(), browser.clone(), issuer_consent_openapi()),
+        auth,
+        browser,
+        authorization,
+    )
+}
+
+pub(crate) fn attach(
+    router: Router,
+    auth: Auth,
+    browser: BrowserConfig,
+    authorization: Arc<IssuerAuthorization>,
+) -> Result<Router> {
     let authority = authorization.authority();
     if auth.realm() != authority.realm()
         || !browser.origin().starts_with("https://")
@@ -55,14 +69,10 @@ pub fn experimental_issuer_consent_router(
             base,
             authorization,
         });
-    Ok(
-        configured_router(auth, browser.clone(), issuer_consent_openapi())
-            .merge(routes)
-            .layer(middleware::from_fn_with_state(
-                browser,
-                clear_changed_session,
-            )),
-    )
+    Ok(router.merge(routes).layer(middleware::from_fn_with_state(
+        browser,
+        clear_changed_session,
+    )))
 }
 async fn clear_changed_session(
     State(browser): State<BrowserConfig>,
