@@ -63,16 +63,24 @@ impl IssuerTokenManagement {
                 .authorization
                 .client_for_token_operation(authentication, source)
                 .await?;
-            self.repository
-                .revoke_issuer_access(&IssuerTokenStatusRequest {
-                    authority: self.authority(),
-                    client: &client,
-                    authentication,
-                    token: token.verifier(),
-                })
-                .await
+            self.revoke_admitted(&client, authentication, token).await
         })
         .await
         .map_err(|_| IssuerTokenError::Unavailable)?
+    }
+    pub(in crate::issuer::tokens) async fn revoke_admitted(
+        &self,
+        client: &crate::IssuerClientRegistration,
+        authentication: &IssuerClientAuthentication,
+        token: &IssuerPresentedToken,
+    ) -> IssuerTokenResult<()> {
+        self.repository
+            .revoke_issuer_access(&IssuerTokenStatusRequest {
+                authority: self.authority(),
+                client,
+                authentication,
+                token: token.verifier(),
+            })
+            .await
     }
 }

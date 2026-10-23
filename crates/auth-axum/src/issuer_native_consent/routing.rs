@@ -46,13 +46,36 @@ pub(crate) fn attach(
     online: Arc<IssuerAuthorization>,
     native: Arc<IssuerNativeAuthorization>,
 ) -> Result<Router> {
+    attach_with_pages(
+        router,
+        auth,
+        browser,
+        online,
+        native,
+        crate::issuer_consent::page_routes(),
+    )
+}
+pub(crate) fn attach_with_pages(
+    router: Router,
+    auth: Auth,
+    browser: BrowserConfig,
+    online: Arc<IssuerAuthorization>,
+    native: Arc<IssuerNativeAuthorization>,
+    pages: Router,
+) -> Result<Router> {
     if online.authority() != native.authority() {
         return Err(Error::InvalidInput);
     }
     // Shared attachment validates realm/HTTPS root and clears the same private
     // operation transport whenever a local session is replaced. Only one consent
     // (online or native) may own these cookies; core independently checks its kind.
-    let router = crate::issuer_consent::attach(router, auth.clone(), browser.clone(), online)?;
+    let router = crate::issuer_consent::attach_with_pages(
+        router,
+        auth.clone(),
+        browser.clone(),
+        online,
+        pages,
+    )?;
     let base = AppState { auth, browser };
     let routes = Router::new()
         .route("/oidc/native/authorize", get(pages::authorize))

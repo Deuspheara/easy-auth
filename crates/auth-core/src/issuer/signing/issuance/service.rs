@@ -57,9 +57,21 @@ impl IssuerTokenIssuer {
             .authorization
             .client_for_token_operation(authentication, source)
             .await?;
+        self.issue_admitted(&client, authentication, code, redirect_uri, pkce, lease)
+            .await
+    }
+    pub(in crate::issuer::signing::issuance) async fn issue_admitted(
+        &self,
+        client: &crate::IssuerClientRegistration,
+        authentication: &IssuerClientAuthentication,
+        code: &Secret,
+        redirect_uri: &str,
+        pkce: &IssuerPkceVerifier,
+        lease: Arc<tokio::sync::OwnedSemaphorePermit>,
+    ) -> IssuerTokenResult<IssuerTokens> {
         let request = IssuerCodeRedemption {
             authority: self.authority(),
-            client: &client,
+            client,
             authentication,
             code: code.verifier(),
             redirect_uri,
@@ -68,10 +80,10 @@ impl IssuerTokenIssuer {
         let staged = StagedData {
             data: self.repository.prepare_issuer_token(&request).await?,
         };
-        staged.data.grant.validate(self.authority(), &client)?;
+        staged.data.grant.validate(self.authority(), client)?;
         let signature = self
             .engine
-            .prepare(self.authority(), &staged.data, &client)?;
+            .prepare(self.authority(), &staged.data, client)?;
         let access = Secret::generate()?;
         let (id_token, expiry) = signature.sign(lease.clone()).await?;
         let signed = IssuerSignedCode {

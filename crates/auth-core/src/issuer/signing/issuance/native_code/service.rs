@@ -63,12 +63,24 @@ impl IssuerNativeTokenIssuer {
             .authorization
             .client_for_token_operation(authentication, source)
             .await?;
+        self.issue_admitted(&client, authentication, code, redirect_uri, pkce, lease)
+            .await
+    }
+    pub(super) async fn issue_admitted(
+        &self,
+        client: &crate::IssuerClientRegistration,
+        authentication: &IssuerClientAuthentication,
+        code: &Secret,
+        redirect_uri: &str,
+        pkce: &IssuerPkceVerifier,
+        lease: Arc<OwnedSemaphorePermit>,
+    ) -> IssuerTokenResult<IssuerNativeTokens> {
         if client.redirect_profile() != IssuerRedirectProfile::NativeRefreshLoopback {
             return Err(IssuerTokenError::InvalidClient);
         }
         let request = IssuerCodeRedemption {
             authority: self.authority(),
-            client: &client,
+            client,
             authentication,
             code: code.verifier(),
             redirect_uri,
@@ -81,13 +93,11 @@ impl IssuerNativeTokenIssuer {
                 .await?,
         };
         let data = &staged.data;
-        data.token
-            .grant
-            .validate_common(self.authority(), &client)?;
+        data.token.grant.validate_common(self.authority(), client)?;
         data.consent
             .validate(
                 self.authority(),
-                &client,
+                client,
                 data.token.grant.expires_at_us,
                 true,
             )
@@ -103,9 +113,7 @@ impl IssuerNativeTokenIssuer {
         {
             return Err(IssuerTokenError::Unavailable);
         }
-        let signature = self
-            .engine
-            .prepare(self.authority(), &data.token, &client)?;
+        let signature = self.engine.prepare(self.authority(), &data.token, client)?;
         let access = Secret::generate()?;
         let refresh = Secret::generate()?;
         let (id_token, expires) = signature.sign(lease.clone()).await?;

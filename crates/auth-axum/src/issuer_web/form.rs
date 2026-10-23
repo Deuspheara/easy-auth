@@ -5,7 +5,11 @@ use std::collections::BTreeMap;
 pub(super) use super::types::TokenFormSchema as TokenForm;
 impl TokenForm {
     pub fn parse(headers: &HeaderMap, body: &[u8]) -> Result<Self, TokenHttpError> {
-        let mut fields = fields(headers, body)?;
+        Self::from_fields(fields(headers, body)?)
+    }
+    pub(super) fn from_fields(
+        mut fields: BTreeMap<String, String>,
+    ) -> Result<Self, TokenHttpError> {
         if fields.keys().any(|name| {
             ![
                 "grant_type",

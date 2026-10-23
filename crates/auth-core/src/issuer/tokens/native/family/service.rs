@@ -82,16 +82,24 @@ impl IssuerNativeRefresh {
                 .authorization
                 .client_for_token_operation(authentication, source)
                 .await?;
-            let request = IssuerNativeCredentialRequest {
-                authority: self.authority(),
-                client: &client,
-                authentication,
-                token: token.verifier(),
-            };
-            request.validate_client()?;
-            self.repository.revoke_issuer_native_family(&request).await
+            self.revoke_admitted(&client, authentication, token).await
         })
         .await
         .map_err(|_| IssuerTokenError::Unavailable)?
+    }
+    pub(super) async fn revoke_admitted(
+        &self,
+        client: &crate::IssuerClientRegistration,
+        authentication: &IssuerClientAuthentication,
+        token: &IssuerPresentedToken,
+    ) -> IssuerTokenResult<()> {
+        let request = IssuerNativeCredentialRequest {
+            authority: self.authority(),
+            client,
+            authentication,
+            token: token.verifier(),
+        };
+        request.validate_client()?;
+        self.repository.revoke_issuer_native_family(&request).await
     }
 }

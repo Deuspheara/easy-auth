@@ -41,10 +41,14 @@ pub(crate) fn attach(
     browser: BrowserConfig,
     authorization: Arc<IssuerAuthorization>,
 ) -> Result<Router> {
-    let pages = Router::new()
-        .route("/oidc/authorize", get(pages::authorize))
-        .route("/oidc/authorize.js", get(pages::script));
+    let pages = page_routes();
     attach_with_pages(router, auth, browser, authorization, pages)
+}
+
+pub(crate) fn page_routes() -> Router {
+    Router::new()
+        .route("/oidc/authorize", get(pages::authorize))
+        .route("/oidc/authorize.js", get(pages::script))
 }
 
 pub(crate) fn attach_with_pages(
