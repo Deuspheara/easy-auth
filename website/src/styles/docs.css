@@ -1,0 +1,30 @@
+:root {
+  --sl-color-accent-low: #223b23;
+  --sl-color-accent: #9bd37e;
+  --sl-color-accent-high: #c8edb5;
+  --sl-font: Arial, Helvetica, sans-serif;
+  --sl-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+:root[data-theme="light"] {
+  --sl-color-accent-low: #def1d3;
+  --sl-color-accent: #397440;
+  --sl-color-accent-high: #234c28;
+}
+.site-title {
+  letter-spacing: -0.6px;
+}
+.site-title img {
+  height: 2rem;
+}
+.feature-table-wrap {
+  overflow-x: auto;
+}
+.feature-table-wrap table {
+  min-width: 560px;
+}
+.feature-table-wrap td {
+  vertical-align: top;
+}
+.feature-table-wrap td:last-child {
+  min-width: 270px;
+}

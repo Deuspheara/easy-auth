@@ -1,0 +1,61 @@
+---
+import CodePanel from "./CodePanel.astro";
+---
+
+<section class="hero section-shell" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <a class="release-pill" href="/docs/features/">
+      <span></span> OPEN SOURCE · PRE-RELEASE <span aria-hidden="true">↗</span>
+    </a>
+    <h1 id="hero-title">
+      Your users.
+      <br />
+      Your auth.
+      <br />
+      <em>Your Rust.</em>
+    </h1>
+    <p>
+      Authentication that belongs in your stack. Embed it in Axum or self-host
+      the same core, with PostgreSQL underneath and your application in control.
+    </p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="/docs/getting-started/">
+        Start building <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        class="button button-quiet"
+        href="https://github.com/Deuspheara/easy-auth"
+      >
+        Explore the source <span aria-hidden="true">→</span>
+      </a>
+    </div>
+    <div class="hero-note">
+      <span aria-hidden="true">⌁</span> Rust-first. Self-hosted. MIT OR
+      Apache-2.0.
+    </div>
+  </div>
+  <div class="hero-code">
+    <div class="code-caption">
+      <span>YOUR STACK, YOUR CHOICE</span>
+      <span aria-hidden="true">[ 01 / 02 ]</span>
+    </div>
+    <CodePanel />
+    <p class="example-note">
+      Real integration APIs. Start from source while crates and interfaces are
+      pre-release.
+    </p>
+  </div>
+</section>
+<div class="stack-strip section-shell" aria-label="Core technology">
+  <span>AT HOME IN YOUR STACK</span>
+  <div>
+    <b>Rust</b>
+    <span>+</span>
+    <b>Axum</b>
+    <span>+</span>
+    <b>PostgreSQL</b>
+  </div>
+  <a href="/docs/">
+    Meet the architecture <span aria-hidden="true">↗</span>
+  </a>
+</div>

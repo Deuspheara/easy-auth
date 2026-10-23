@@ -1,0 +1,28 @@
+---
+import { features } from "../data/features";
+---
+
+<div class="feature-table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th>Availability</th>
+        <th>Scope</th>
+      </tr>
+    </thead>
+    <tbody>
+      {features.map((feature) => (
+        <tr>
+          <td>
+            <a href={feature.href}>{feature.name}</a>
+          </td>
+          <td>
+            <strong>{feature.status}</strong>
+          </td>
+          <td>{feature.description}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

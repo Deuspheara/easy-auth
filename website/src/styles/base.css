@@ -1,0 +1,122 @@
+:root {
+  color-scheme: dark;
+  --bg: #101918;
+  --panel: #15211f;
+  --ink: #eff4ed;
+  --muted: #a1b3ab;
+  --line: #2b3b35;
+  --accent: #b9ee9a;
+  --accent-ink: #17251a;
+  --grid: #8db39b09;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f7f1;
+  --panel: #fff;
+  --ink: #14251e;
+  --muted: #52675c;
+  --line: #d4ded4;
+  --accent: #b9ee9a;
+  --grid: #365b4507;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 30px;
+}
+body {
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  background: none;
+}
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #80b9ff;
+  outline-offset: 5px;
+}
+button:hover,
+a:hover {
+  filter: brightness(1.08);
+}
+[hidden] {
+  display: none !important;
+}
+::selection {
+  background: #b9ee9a;
+  color: #14251e;
+}
+.page-grid {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.section-shell,
+.site-header {
+  max-width: 1256px;
+  margin: auto;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+.site-header {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+}
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 13px;
+}
+.site-header nav > a:not(.github-link) {
+  color: var(--muted);
+}
+.nav-divider {
+  height: 20px;
+  width: 1px;
+  background: var(--line);
+}
+.theme-toggle {
+  border: 0;
+  padding: 7px;
+  display: flex;
+}
+.github-link {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.menu-toggle {
+  display: none;
+}

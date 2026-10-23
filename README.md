@@ -125,3 +125,10 @@ Architecture: [overview](docs/architecture/overview.md), [API contract](docs/arc
 The [native adoption comparison](docs/research/adoption-comparison.md) provides reproducible RustAuth/lucid-auth integrations and raw measurements. It tests a small session workload; it does not establish a general memory, security or full-server performance advantage.
 
 Committed lifecycle operations produce [typed, owned audit facts](docs/guides/audit-events.md) without free-form secret-bearing payloads. Provider account linking remains a separately gated future flow; matching email never merges accounts.
+
+## Project website
+
+The original landing page and searchable developer guides live in
+[website/](website/README.md). Run `npm ci --ignore-scripts`, `npm run build` and
+`npm run preview` from that directory for a local preview. Hosting and a public
+canonical domain are not configured.

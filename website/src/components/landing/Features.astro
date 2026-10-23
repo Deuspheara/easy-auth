@@ -1,0 +1,52 @@
+---
+import { features } from "../../data/features";
+---
+
+<section
+  id="features"
+  class="features section-shell"
+  aria-labelledby="features-title"
+>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">THE BUILDING BLOCKS</p>
+      <h2 id="features-title">
+        A familiar experience.
+        <br />A foundation you own.
+      </h2>
+    </div>
+    <p>
+      Start with the methods your application needs. Provider support is
+      explicit, and each feature documents its current boundaries.
+    </p>
+  </div>
+  <div class="feature-grid">
+    {features
+      .filter((f) => f.featured)
+      .map((feature) => (
+        <a href={feature.href} class="feature-card">
+          <div class="feature-card-top">
+            <span class="feature-mark" aria-hidden="true">
+              {feature.mark}
+            </span>
+            <span class:list={["status-badge", feature.status.toLowerCase()]}>
+              {feature.status}
+            </span>
+          </div>
+          <h3>{feature.name}</h3>
+          <p>{feature.description}</p>
+          <span class="card-arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+      ))}
+  </div>
+  <div class="features-foot">
+    <span>
+      Pre-release software. Availability is not a production-readiness claim.
+    </span>
+    <a href="/docs/features/">
+      See the full feature status <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>

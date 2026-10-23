@@ -1,0 +1,26 @@
+---
+title: Feature status
+description: Implemented capabilities, opt-in providers and remaining release boundaries.
+---
+
+import FeatureTable from "../../../components/FeatureTable.astro";
+
+All capabilities are part of a **pre-release project**. This page describes implementation scope; it is not an audit, protocol certification or a claim that every provider works with every deployment.
+
+<FeatureTable />
+
+## Reading the labels
+
+**Available** identifies an implemented path with existing tests. **Opt-in** requires explicit configuration and feature flags. **Experimental** and **Component** identify narrower integration building blocks, not complete general-purpose provider flows. **Planned** and **Not released** must not be presented as usable login capabilities.
+
+## SAML activation decision
+
+Normal SAML is available by explicit maintainer direction under [ADR0032](https://github.com/Deuspheara/easy-auth/blob/main/docs/architecture/adr/0032-saml-maintainer-directed-activation.md). Independent review was **waived, not performed or passed**.
+
+Activation requires `saml-web`, `AUTH_SAML_ENABLED=true`, complete HTTPS settings, and the exact enabled persisted registration, JIT policy and active operator-approved certificate pins. Disabled defaults and incomplete settings fail closed. The waiver does not relax protocol, signature, trust, parser, reference, identity, time, correlation, replay, realm or lifecycle checks.
+
+Read the [SAML guide](/docs/guides/saml/) and [release configuration](/docs/guides/saml-release/) for precise deployment requirements. Tested engineering scenarios do not establish independent assurance or interoperability with an untested real IdP.
+
+## Other release boundaries
+
+Outbound OIDC issuer registration groundwork does not constitute a released authorization server. Its release gate remains in place. Apple login is planned. Passkey and native-provider components retain the scope documented in their individual guides.

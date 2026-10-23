@@ -1,0 +1,65 @@
+<section class="ownership section-shell" aria-labelledby="ownership-title">
+  <div class="ownership-copy">
+    <p class="eyebrow">SMALL SURFACE. CLEAR BOUNDARIES.</p>
+    <h2 id="ownership-title">
+      One core.
+      <br />
+      Two ways to ship.
+    </h2>
+    <p>
+      Keep authentication next to your Axum application, or give it a process of
+      its own. The verification, session policy and PostgreSQL transactions stay
+      shared.
+    </p>
+    <a class="text-link" href="/docs/embedding/">
+      Choose your integration <span aria-hidden="true">→</span>
+    </a>
+  </div>
+  <div
+    class="architecture-board"
+    aria-label="Embedded and standalone applications share auth-core and PostgreSQL"
+  >
+    <div class="board-label">
+      <span class="board-dot"></span> SAME POLICY, EITHER WAY
+    </div>
+    <div class="architecture-entry">
+      <div>
+        <span class="node-symbol" aria-hidden="true">
+          &lt;/&gt;
+        </span>
+        <strong>Your Axum app</strong>
+        <small>Embedded library</small>
+      </div>
+      <span class="or">OR</span>
+      <div>
+        <span class="node-symbol" aria-hidden="true">
+          ▤
+        </span>
+        <strong>Auth service</strong>
+        <small>Standalone process</small>
+      </div>
+    </div>
+    <div class="connector" aria-hidden="true">
+      <span></span>
+      <b>↓</b>
+      <span></span>
+    </div>
+    <div class="core-node">
+      <img src="/logo.svg" width="28" height="28" alt="" />
+      <div>
+        <strong>easy-auth core</strong>
+        <small>Identity · sessions · authentication policy</small>
+      </div>
+      <span class="node-check" aria-hidden="true">
+        ✓
+      </span>
+    </div>
+    <div class="board-bottom">
+      <span>↓</span>
+      <div>
+        <strong>PostgreSQL</strong>
+        <small>Realm-scoped state and atomic transactions</small>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,77 @@
+---
+import Header from "../components/landing/Header.astro";
+import Hero from "../components/landing/Hero.astro";
+import Features from "../components/landing/Features.astro";
+import Architecture from "../components/landing/Architecture.astro";
+import Resources from "../components/landing/Resources.astro";
+import "../styles/landing.css";
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Rust-first, self-hosted authentication. Embed in Axum or run a standalone service, with shared policy and PostgreSQL transactions."
+    />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      property="og:title"
+      content="easy-auth — Your users. Your auth. Your Rust."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:description"
+      content="Authentication that belongs in your Rust stack. Open source, self-hosted, built around Axum and PostgreSQL."
+    />
+    <title>easy-auth — Authentication, in your stack.</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem("starlight-theme");
+        document.documentElement.dataset.theme =
+          saved === "light" || saved === "dark"
+            ? saved
+            : matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+      } catch {
+        /* The site remains usable when browser storage is unavailable. */
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <div class="page-grid">
+      <Header />
+      <main id="main">
+        <Hero />
+        <Features />
+        <Architecture />
+        <Resources />
+      </main>
+      <footer class="site-footer section-shell">
+        <a class="wordmark" href="/">
+          <img src="/logo.svg" width="26" height="26" alt="" />
+          easy-auth
+        </a>
+        <p>Built in the open. Yours to host.</p>
+        <nav aria-label="Footer">
+          <a href="/docs/">Docs</a>
+          <a href="/docs/features/">Feature status</a>
+          <a href="https://github.com/Deuspheara/easy-auth">Source ↗</a>
+        </nav>
+        <small>
+          Original code: MIT OR Apache-2.0. Third-party terms apply.
+        </small>
+      </footer>
+    </div>
+    <script>
+      import "../scripts/landing";
+    </script>
+  </body>
+</html>

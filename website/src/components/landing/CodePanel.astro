@@ -1,0 +1,91 @@
+---
+const embedded = `use std::net::SocketAddr;
+use tokio::net::TcpListener;
+
+// Uses your trusted environment configuration.
+let app = easy_auth_server::configured_application().await?;
+let listener = TcpListener::bind(app.bind).await?;
+
+axum::serve(
+    listener,
+    app.router.into_make_service_with_connect_info::<SocketAddr>(),
+).await?;`;
+const standalone = `git clone https://github.com/Deuspheara/easy-auth.git
+cd easy-auth
+
+docker compose up -d --wait
+cp .env.example .env
+set -a; . ./.env; set +a
+
+cargo run -p easy-auth-server --bin easy-auth`;
+---
+
+<div class="code-window" data-code-tabs>
+  <div class="code-toolbar">
+    <div role="tablist" aria-label="Integration example">
+      <button
+        role="tab"
+        id="tab-embedded"
+        aria-controls="panel-embedded"
+        aria-selected="true"
+      >
+        Embed in Axum
+      </button>
+      <button
+        role="tab"
+        id="tab-standalone"
+        aria-controls="panel-standalone"
+        aria-selected="false"
+        tabindex="-1"
+      >
+        Run the service
+      </button>
+    </div>
+    <button class="copy-button" aria-label="Copy example" title="Copy example">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        aria-hidden="true"
+      >
+        <rect x="8" y="8" width="12" height="12" rx="2" />
+        <path d="M16 8V4H4v12h4" />
+      </svg>
+      <span class="sr-only" aria-live="polite"></span>
+    </button>
+  </div>
+  <div
+    id="panel-embedded"
+    role="tabpanel"
+    aria-labelledby="tab-embedded"
+    tabindex="0"
+  >
+    <div class="code-filename">
+      <span class="file-dot"></span> your-app / main.rs <span>RUST</span>
+    </div>
+    <pre><code>{embedded}</code></pre>
+  </div>
+  <div
+    id="panel-standalone"
+    role="tabpanel"
+    aria-labelledby="tab-standalone"
+    tabindex="0"
+    hidden
+  >
+    <div class="code-filename">
+      <span class="file-dot"></span> terminal <span>SHELL · LOCAL DEV</span>
+    </div>
+    <pre><code>{standalone}</code></pre>
+  </div>
+  <div class="code-bottom">
+    <span>
+      <i></i> One core. Both integration modes.
+    </span>
+    <a href="/docs/embedding/">
+      Full example <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</div>

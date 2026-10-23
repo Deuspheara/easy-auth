@@ -1,0 +1,6 @@
+node_modules
+.astro
+dist
+src/content/docs/docs/guides
+public/docs-provenance.json
+package-lock.json
