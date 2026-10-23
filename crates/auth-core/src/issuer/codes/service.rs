@@ -116,7 +116,9 @@ impl IssuerAuthorization {
         pkce: &IssuerPkceVerifier,
         source: &str,
     ) -> IssuerTokenResult<IssuerRedeemedCode> {
-        let client = self.client_for_redemption(authentication, source).await?;
+        let client = self
+            .client_for_token_operation(authentication, source)
+            .await?;
         let facts = self
             .repository
             .redeem_issuer_code(&IssuerCodeRedemption {
@@ -132,7 +134,7 @@ impl IssuerAuthorization {
     }
     /// Shared issuer admission/registered-method selection, not a credential
     /// proof. Every consuming transaction still authenticates the current client.
-    pub(in crate::issuer) async fn client_for_redemption(
+    pub(in crate::issuer) async fn client_for_token_operation(
         &self,
         authentication: &IssuerClientAuthentication,
         source: &str,

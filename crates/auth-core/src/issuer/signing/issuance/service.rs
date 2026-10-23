@@ -77,7 +77,7 @@ impl IssuerTokenIssuer {
     ) -> IssuerTokenResult<IssuerTokens> {
         let client = self
             .authorization
-            .client_for_redemption(authentication, source)
+            .client_for_token_operation(authentication, source)
             .await?;
         let request = IssuerCodeRedemption {
             authority: self.authority(),
