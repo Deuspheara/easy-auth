@@ -1,4 +1,10 @@
+mod authentication;
 mod configuration;
+mod loading;
+mod native;
+mod native_lifecycle;
+mod native_ordering;
+mod native_upgrade;
 mod ordering;
 mod subjects;
 mod upgrade;
@@ -16,4 +22,7 @@ async fn setup(pool: &PgPool) -> (Postgres, Uuid, Uuid) {
 }
 fn public(realm: Uuid, client: Uuid, redirect: &str) -> IssuerClientRegistration {
     IssuerClientRegistration::public(realm, client, &[redirect]).unwrap()
+}
+fn native(realm: Uuid, client: Uuid, redirect: &str) -> IssuerClientRegistration {
+    IssuerClientRegistration::public_native_loopback(realm, client, &[redirect]).unwrap()
 }

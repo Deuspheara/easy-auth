@@ -83,6 +83,18 @@ Baselines: [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700), [RFC 8252](https:
 
 ## Resolved first-slice dependency evidence
 
+AUTH-37's explicit native issuer/client credential extension introduces no new
+dependency, cryptographic primitive or inbound protocol engine. Existing URL
+canonicalization, Secret/SHA-256 and database verifier comparison are reused.
+No secret is retained in registration or request Debug, and no verifier-input
+constructor permits treating a stored hash as a presented credential. Native
+public port admission follows RFC8252's loopback profile while exact actual-return,
+S256, consent and token authority remain obligations of the future code transaction.
+This component is not full native/issuer conformance or production approval;
+[ADR0034](../architecture/adr/0034-issuer-native-registration-and-authentication.md)
+records the explicit profile and limits. Existing advisory/license gates remain
+unsuppressed.
+
 The 2026-10-18 full-lockfile cargo-audit run reports RUSTSEC-2023-0071 in rsa 0.9.10, resolved for SQLx's inactive optional MySQL path. `cargo tree -i rsa --target all` and `cargo tree -i sqlx-mysql --target all` show no compiled dependency. Cargo metadata's resolver nodes include optional inactive packages and must not alone be used as build-reachability evidence. `scripts/audit.py` retains the full-lockfile finding and independently derives all-platform normal/build/dev compiled reachability on every CI run; any compiled advisory is fatal. cargo-deny provides a second graph-based check. No global RSA advisory ignore is configured. Adding an OIDC/JOSE feature must rerun and review this gate.
 
 License policy additionally admits [0BSD](https://spdx.org/licenses/0BSD.html) for quoted_printable and [CDLA-Permissive-2.0](https://cdla.dev/permissive-2-0/) for webpki-roots certificate data. Distributions must include applicable third-party notices/license texts, including the CDLA text for redistributed root data. This does not change original-code MIT OR Apache-2.0 licensing.

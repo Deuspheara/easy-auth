@@ -569,6 +569,18 @@ or authorization. Existing session/inbound federation contracts are unchanged.
 See [the guide](../guides/issuer-clients.md); actual authorize/token/consent and
 interoperability remain required before an outbound issuer can be enabled.
 
+The same feature now adds explicit public native loopback registration through
+`IssuerClientRegistration::public_native_loopback`, a closed `IssuerRedirectProfile`
+and typed `IssuerClientAuthentication` inputs. Web defaults remain exact HTTPS.
+Native port admission fixes literal address/path and grants no listener ownership;
+eventual code redemption must retain the exact actual redirect. The PostgreSQL
+credential-validation method checks current enabled configuration and method/secret
+without issuing authority or an authenticated-client proof. No HTTP/OpenAPI shape
+changes. `load_issuer_client` restores validated enabled metadata and its revision
+without requiring a raw secret or mutating configuration; subsequent authority still
+requires current transactional checks. See
+[ADR0034](adr/0034-issuer-native-registration-and-authentication.md).
+
 
 ## Gated SAML verified attribute facts
 

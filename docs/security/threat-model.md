@@ -663,11 +663,25 @@ backend and independent approval still gate normal activation.
 
 ## Gated outbound issuer metadata
 
-AUTH-37's separate optional registration component accepts only trusted canonical
-HTTPS web-client definitions. Full current realm/client/revision/redirect/sector/
+The explicit native extension keeps web constructors HTTPS-only and admits HTTP
+only for public native clients on canonical literal127.0.0.1/::1 callbacks. Only
+ports vary; exact interface/path remain registered and later code redemption must
+bind the actual complete URI. Admission cannot prove listener ownership, genuine
+app identity or PKCE. Native sectors isolate each realm/client instead of sharing
+loopback IP sectors. Public identification grants nothing. Typed Basic input hashes
+a canonical Secret and PostgreSQL validates the registered method and credential
+under the full exact enabled definition lock; stale/disabled/wrong/cross-realm
+credentials reject without authority or fallback. A successful standalone check
+must never replace checks inside an eventual code transaction. Migration0028
+preserves legacy web trust, disable, credentials, subjects and sessions; actual
+code/consent/token, other native profiles and M07 release evidence remain required.
+See [ADR0034](../architecture/adr/0034-issuer-native-registration-and-authentication.md).
+
+AUTH-37's separate optional registration component accepts trusted canonical HTTPS
+web definitions and the explicit public native profile above. Full current realm/client/revision/redirect/sector/
 authentication/credential policy is locked before an owner key; disable and stale
 snapshots reject even after waits. Only existing realm owners receive stable random
-hostname-sector subjects. Same-host clients intentionally share the OIDC sector;
+sector subjects. Same-host web clients intentionally share the OIDC sector;
 cross-host/realm mappings are distinct. No local UUID/email/provider subject is
 exposed as the outbound subject. Account erasure cascades mappings. Random stored
 UUIDs use existing randomness, with no new cryptographic scheme. A mapping or

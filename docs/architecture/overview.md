@@ -29,6 +29,13 @@ Arrows into core denote compile-time dependency, not a network RPC. Runtime core
 
 Inbound OIDC clients and SAML SPs resolve verified external identities. Outbound OIDC issuer/client registration is a distinct module and release gate; no discovery endpoint is advertised until implemented and tested. Secrets are never part of public user/session DTOs.
 
+The existing opt-in outbound issuer metadata now includes explicit public native
+loopback registration and current registered-method/credential validation. Exact
+HTTPS web defaults and inbound provider policy remain separate. Native sectors
+are per realm/client; accepted port variation never replaces retaining the exact
+actual return in the future code flow. No issuer endpoint or token grant follows.
+[ADR0034](adr/0034-issuer-native-registration-and-authentication.md) records this boundary.
+
 See domain-model, auth-flows, api-contract, deployment and the threat model. Authentication release is blocked on the six method categories, issuer interoperability and security review, even if alpha email works.
 
 [ADR 0021](adr/0021-saml-verification-and-approval.md) records the SAML verifier

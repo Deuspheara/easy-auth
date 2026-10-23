@@ -86,6 +86,17 @@ The approximate 300-line file and 50-line function thresholds in AGENTS.md trigg
 
 ## Implemented layout
 
+Issuer registration keeps native URL admission in core `issuer/native.rs` and
+typed request credentials in `issuer/authentication.rs`, separate from registration
+and unchanged web redirects. PostgreSQL `issuer/authentication.rs` owns only the
+current-client transaction/credential check, with a private transaction-scoped
+comparison for future redemption; `loading.rs` validates persisted definition
+restoration without raw secrets or provisioning. Tests separate native policy, ordinary credentials,
+observed lock waits, actual erasure and historical migration preservation. Every
+new source/test file stays below300lines; ordered negative/positive and migration
+cases retain their invariant sequence as function-size review exceptions. No new
+dependency, generic client framework, HTTP/persistence policy copy or deferred cleanup.
+
 AUTH-52 splits the original accumulating implementation files and test suites into these owning modules:
 
 ```text

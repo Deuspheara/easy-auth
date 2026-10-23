@@ -113,5 +113,6 @@ pub use saml::{
 
 #[cfg(feature = "issuer-clients")]
 pub use issuer::{
-    IssuerClientKind, IssuerClientRegistration, MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
+    IssuerClientAuthentication, IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile,
+    MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
 };

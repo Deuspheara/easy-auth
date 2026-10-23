@@ -2,6 +2,11 @@
 
 Status: engineering implementation; M07 activation and prerequisites remain open.
 
+[ADR0034](0034-issuer-native-registration-and-authentication.md) extends this
+initial web-only component with explicit public native loopback registration and
+current credential validation. Existing web rules and historical evidence below
+remain unchanged; neither component establishes code/token interoperability.
+
 Outbound issuer clients belong to `issuer/`, separate from inbound OAuth/OIDC
 connections. The opt-in `issuer-clients` feature provides trusted administrative
 registration and PostgreSQL metadata only. No dynamic registration, authorization,

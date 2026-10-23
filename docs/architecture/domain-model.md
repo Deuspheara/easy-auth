@@ -203,6 +203,16 @@ mapping grants no consent, session or token authority; account erasure cascades 
 [ADR0026](adr/0026-outbound-client-registration.md) and the
 [component guide](../guides/issuer-clients.md) describe limits. M07 remains gated.
 
+`IssuerRedirectProfile` distinguishes unchanged exact HTTPS web metadata from
+explicit public native loopback metadata. Native sector identifiers are isolated
+per realm/client, not shared by local IP, and request-specific ports do not mutate
+registration. Migration0028 defaults old clients to `web_exact` and closes native
+rows to public authentication and their own sector. `IssuerClientAuthentication`
+is request data, not a proof: its Basic constructor hashes a canonical Secret,
+while current method/credential/configuration checks stay atomic in PostgreSQL.
+No consent, code, token or user authority follows. See
+[ADR0034](adr/0034-issuer-native-registration-and-authentication.md).
+
 
 `SamlAttribute` is optional verified provider data inside the opaque SAML proof,
 with exact scalar Name/NameFormat/value records, bounded by input/XML limits,

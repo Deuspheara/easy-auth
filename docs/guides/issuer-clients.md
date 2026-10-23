@@ -1,7 +1,8 @@
 # Gated outbound issuer client metadata
 
 The `issuer-clients` Cargo feature in core/PostgreSQL implements trusted outbound
-client configuration and opaque sector-subject storage. It does not turn easy-auth
+client configuration, current credential validation and opaque sector-subject
+storage. It does not turn easy-auth
 into an authorization server. There are no authorization, token, consent, discovery,
 JWKS, dynamic registration or standalone activation routes. SAML and M07 release
 prerequisites remain open. See [ADR0026](../architecture/adr/0026-outbound-client-registration.md).
@@ -20,8 +21,8 @@ an authentication credential. Token-endpoint parsing/authentication is future wo
 revision. Retain it instead of the original input. Redirect comparison through
 `permits_redirect` is exact, including fixed query spelling, path, port and case.
 Duplicate redirects, different hostnames, wildcard/userinfo/fragment/noncanonical
-URLs, IP literals, native/custom schemes and HTTP are unsupported. There is no
-wildcard or loopback-port exception in this initial web profile.
+URLs, IP literals, native/custom schemes and HTTP are unsupported by these web
+constructors. There is no wildcard or loopback-port exception in the web profile.
 
 Replacement never implicitly re-enables a disabled client. The explicit
 `disable_issuer_client(realm, client)` rotates its revision; old snapshots remain
@@ -30,13 +31,59 @@ checks the full current snapshot. `check_issuer_client` checks metadata only and
 cannot authenticate a caller. These methods are trusted administrative APIs, never
 browser-selected configuration. No public registration or enable endpoint exists.
 
+After restart, `load_issuer_client(realm, client)` restores the exact enabled stored
+definition and revision without a raw confidential-client secret. It neither
+reconfigures nor enables a client. Invalid stored profile/redirect/sector data fails
+as Unavailable without repair. Missing/disabled keys reject. This is a snapshot,
+so later operations must still check the entire current definition under locks.
+The core verifier/revision restoration methods are trusted configuration APIs,
+never a way to authenticate by presenting a stored verifier.
+
+## Explicit public native loopback registration
+
+`IssuerClientRegistration::public_native_loopback(realm, client, redirects)` selects
+the separate native profile. Register one to eight canonical HTTP loopback callback
+paths using literal `127.0.0.1` and/or `[::1]`; each interface must be explicit.
+For example, `http://127.0.0.1/callback` admits the same literal interface/path on
+an actual ephemeral port. The registration discards only the anchor port. Actual
+returns must keep exact scheme, address and path, with no query, fragment or userinfo.
+DNS localhost, other IPs, root paths, port0, mixed web/native URLs, duplicate anchors
+that differ only by port and noncanonical spellings reject. Native clients have no
+shared secret; no confidential-native fallback exists.
+
+Do not reconfigure per operation to choose a port. `permits_redirect(actual)` checks
+the stable profile, while the future authorization-code transaction must store the
+exact actual URI and compare that entire URI during redemption. Metadata admission
+does not own a socket or authenticate the installed app. Custom URI schemes and
+claimed HTTPS dispatch are separate future profiles. See
+[ADR0034](../architecture/adr/0034-issuer-native-registration-and-authentication.md).
+
+## Current client credential validation
+
+Construct `IssuerClientAuthentication::public(client)` for public identification,
+or `::basic(client, &secret)` for an explicitly registered confidential Basic client.
+The typed input keeps only a verifier and redacts Debug. It cannot be constructed
+from a database verifier. `Postgres::validate_issuer_client_authentication` validates
+client/method and secret against the exact current enabled persisted definition
+under one transaction. Wrong method/client/secret and stale/disabled definitions
+reject; storage failure is Unavailable, never public fallback.
+
+Public identification authenticates no app or user. Successful credential validation
+issues no code, session, consent or token, and cannot be cached as an authorization
+proof. The actual code exchange must compose credential/current-policy checks in
+its own transaction through consumption and final expiry. HTTP Basic decoding,
+the token endpoint and signed cross-client token audience tests remain protocol work.
+
 ## Opaque subject metadata
 
 `Postgres::issuer_subject(&current, user_id)` allocates or reads a stable random UUID
 for the existing realm owner and configured hostname sector. It returns neither
 the local user UUID nor an inbound federation subject. Same-host clients share
 that sector; different hosts and realms have distinct mappings. Paths, ports and
-fixed query values do not change the hostname sector. Trusted operators must
+fixed query values do not change the hostname sector. Native clients instead use
+distinct realm/client sectors, so a shared loopback address never shares subjects
+across apps; one native client's port/interface/path changes retain its sector.
+Trusted operators must
 establish hostname control. Multi-host sector documents are not fetched/supported.
 
 Allocation requires the current enabled full definition and an existing owner
@@ -67,5 +114,12 @@ comparison, closed storage policy, realm/sector/owner boundaries, concurrent sta
 allocation, rollback, account erasure and an actual migration preserving account/
 session rows. Observed database lock cases verify committed disable or owner removal
 cannot be ignored by a waiting lookup. They perform no XML/signature experiments.
-Full client-auth protocol negatives, native profiles, actual consent, token issuance,
+The additive profile migration preserves disabled legacy web registrations,
+credentials, revisions, subject mappings and sessions. Native cases cover stable
+concurrent allocation, real erasure, per-client/realm separation and observed
+credential replacement/operator-disable waits. Method/client/secret/realm failures
+cannot create grants or select weaker methods. No dependency or HTTP route is added.
+Full client-auth protocol negatives, other native profiles, actual consent, token issuance,
 key rotation, conformance and standalone interoperability remain future M07 work.
+Current source-specific local verification is recorded in the
+[issuer client verification record](../security/issuer-client-verification.md).
