@@ -841,3 +841,18 @@ Native/online share a private cookie slot, cannot overwrite an active operation,
 cannot approve each other’s row kinds. Current source/owner/freshness/policy and
 final DB clock remain mandatory. No token/refresh HTTP authority or native
 interoperability is inferred from consent tests.
+
+## Native wire and consumer boundary
+
+An explicit mixed native endpoint uses one core admission before registered-profile
+selection; it cannot fall through after a failed native/online grant. Actual current
+credentials/PKCE, client/native policy/key/source/owner/session/code/consent and
+original caps still bind commit. Refresh carries only opaque one-use credentials, no
+new ID token or cookie time. Strict shared decoding/actual peer remain mandatory;
+hints, browser cookies and public native IDs confer no consumer authentication.
+Bounded owned browser/real TCP callback tests check state/issuer, PKCE, production
+signature, rotation/replay/cleanup and privacy using unchanged producers. Actual
+OIDC/SAML cases preserve authentication provenance and current source denial. Native
+authenticated audience-authorized resource consumption is still missing and cannot be
+replaced with local-session acceptance. Production platform storage and broader
+interoperability remain explicit requirements.

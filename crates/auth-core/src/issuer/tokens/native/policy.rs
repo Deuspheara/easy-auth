@@ -1,3 +1,4 @@
+pub const ISSUER_NATIVE_SCOPE: &str = "openid offline_access";
 use crate::{Error, IssuerAuthority, IssuerClientRegistration, IssuerRedirectProfile, Result};
 use uuid::Uuid;
 

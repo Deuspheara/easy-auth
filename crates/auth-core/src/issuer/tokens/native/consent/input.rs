@@ -17,7 +17,7 @@ impl IssuerNativeAuthorizationRequest {
         policy: IssuerNativeRefreshPolicy,
         input: &IssuerNativeAuthorizationInput<'_>,
     ) -> Result<Self> {
-        if input.prompt != "consent" || input.authorization.scope != "openid offline_access" {
+        if input.prompt != "consent" || input.authorization.scope != crate::ISSUER_NATIVE_SCOPE {
             return Err(Error::InvalidInput);
         }
         let code = IssuerAuthorizationRequest::validated(

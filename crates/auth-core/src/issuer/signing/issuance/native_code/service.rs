@@ -10,13 +10,13 @@ use std::{sync::Arc, time::Duration};
 use tokio::sync::OwnedSemaphorePermit;
 use uuid::Uuid;
 
-const TOKEN_OPERATION_TIMEOUT: Duration = Duration::from_secs(15);
+pub(super) const TOKEN_OPERATION_TIMEOUT: Duration = Duration::from_secs(15);
 const MAX_CONSENT_SNAPSHOT_BYTES: usize = 16 * 1024;
 
 pub struct IssuerNativeTokenIssuer {
-    authorization: IssuerAuthorization,
+    pub(super) authorization: IssuerAuthorization,
     repository: Arc<dyn IssuerNativeTokenRepository>,
-    engine: Arc<SigningEngine>,
+    pub(super) engine: Arc<SigningEngine>,
 }
 impl IssuerNativeTokenIssuer {
     /// Share the existing validated key set and bounded signing capacity.

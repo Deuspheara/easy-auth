@@ -1,5 +1,6 @@
 //! Stateful native refresh/revocation from an explicit stored offline grant.
 mod ports;
+mod registered;
 mod service;
 #[cfg(test)]
 mod tests;

@@ -17,7 +17,7 @@ use utoipa::ToSchema;
 
 #[derive(ToSchema)]
 #[serde(deny_unknown_fields)]
-pub(super) struct TokenStatusInput {
+pub(in crate::issuer_web) struct TokenStatusInput {
     pub token: String,
     pub client_id: Option<String>,
     pub token_type_hint: Option<String>,
@@ -41,12 +41,12 @@ impl TokenStatusInput {
         })
     }
 }
-pub(super) struct StatusRequest {
+pub(in crate::issuer_web) struct StatusRequest {
     pub authentication: IssuerClientAuthentication,
     pub token: IssuerPresentedToken,
     pub source: String,
 }
-pub(super) fn request(
+pub(in crate::issuer_web) fn request(
     RawQuery(query): RawQuery,
     headers: HeaderMap,
     peer: Result<ConnectInfo<SocketAddr>, ExtensionRejection>,

@@ -17,7 +17,8 @@ pub use family::{
     IssuerNativeRotatedTokens, IssuerNativeRotationRequest,
 };
 pub use policy::{
-    IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS, MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
+    ISSUER_NATIVE_SCOPE, IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS,
+    MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
 };
 
 #[cfg(feature = "issuer-native-refresh")]

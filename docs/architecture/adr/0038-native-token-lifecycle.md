@@ -3,8 +3,8 @@
 Date: 2026-10-23. Status: in progress for AUTH-40. Stateful access revocation and
 authenticated introspection are implemented. Explicit native policy persistence is
 implemented, with separate explicit native consent library operations. Native signed issuance, bounded families, one-use rotation and reuse revocation
-are implemented in core/PostgreSQL. Explicit native consent HTTP/UI is implemented separately; native token/refresh
-HTTP and owned native browser acceptance remain work. These increments alone do not complete AUTH-40 or M07.
+are implemented in core/PostgreSQL. Explicit native consent HTTP/UI is implemented separately; native wire and bounded owned browser/loopback acceptance are now implemented.
+Explicit native resource-consumer introspection and broader acceptance remain work. These increments alone do not complete AUTH-40 or M07.
 
 ## Existing access authority
 
@@ -228,5 +228,37 @@ Native approval failures cannot claim success or clear retry proofs. Default onl
 APIs remain incapable of approving/redeeming native rows. Closed OpenAPI shapes and
 native operation IDs stay distinct. No SQL, source-policy copy, new dependency,
 crypto producer or normal activation is added. This component delivers confirmation
-UI but does not mount token/refresh/revocation/discovery routes. Owned native browser
-and complete wire/client acceptance remain required, not inferred from HTTP tests.
+UI but does not mount token/refresh/revocation/discovery routes. The separate wire
+increment below supplies those routes and bounded owned browser/client acceptance;
+consent HTTP tests alone establish neither.
+
+## Explicit mixed native wire composition
+
+`issuer-native-web` derives native/online services from one trusted HTTPS root and
+shares the concrete signer's original capacity. Core registered operations charge
+one source admission before configuration lookup and select exactly one existing
+profile operation. Private admitted-operation helpers retain all original validation,
+actual current-credential comparison, source/owner/code/key/policy locks and final
+commit. No failed operation falls through to another profile. Code/refresh forms
+and response envelopes are closed; legacy five-field responses stay unchanged and
+are now explicitly closed in schema to avoid ambiguous mixed response unions.
+
+Only this composition advertises offline_access/refresh_token. Standard authorization
+selects the fixed local native page; selection neither grants nor chooses an external
+return. Native refresh emits opaque credentials only, preserving original auth_time
+and cookie time. Registered revocation reduces only the matching scoped online
+credential or native family; hint/cookie never supplies authority. Actual peer,
+strict shared decoding, deadlines and finite no-store failures remain unchanged.
+
+Eight real-PG wire cases and six bounded actual browser/TCP-loopback/client cases
+cover lifecycle, separate PKCE/production ID verification, replay, cleanup, legacy
+profiles, committed admission, parser/authentication, DB-only race and audit rollback.
+Normal unchanged OIDC/SAML producer cases cover actual provider-bound delegation,
+original authentication, cookie-idle separation and current source disablement.
+No new crypto/XML producer, custom signature-concurrency experiment or policy bypass.
+
+Authenticated confidential own-audience introspection remains intact. Native access
+still needs explicit authenticated audience-authorized resource consumption; public
+native identification/token possession cannot be promoted into that authority.
+This remaining gap keeps AUTH-40 active. Broader SDK/standalone interoperability and
+production gates are separate; no audit/compliance/readiness claim follows.

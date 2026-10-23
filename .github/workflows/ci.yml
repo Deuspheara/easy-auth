@@ -98,6 +98,7 @@ jobs:
           cargo test --locked -p easy-auth-postgres --features issuer-native-refresh --test lifecycle issuer_native_refresh
           cargo check --locked -p easy-auth-axum --features issuer-native-consent-web
           cargo test --locked -p easy-auth-axum --features issuer-native-consent-web,issuer-web --test browser issuer_native_consent
+          cargo test --locked -p easy-auth-axum --features issuer-native-web --test browser issuer_native_web
       - name: Verify isolated access revocation and authenticated introspection
         run: |
           cargo test --locked -p easy-auth-core --features issuer-token-management issuer::tokens
@@ -161,6 +162,10 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features issuer-web --example issuer-web-browser
           node tests/browser/issuer-web/run.cjs
+      - name: Verify owned native issuer browser, loopback and refresh lifecycle
+        run: |
+          cargo build --locked -p easy-auth-axum --features issuer-native-web --example issuer-web-browser
+          node tests/browser/issuer-native/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs
       - name: Verify owned Google desktop browser return
         run: |

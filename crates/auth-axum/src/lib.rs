@@ -72,3 +72,8 @@ pub use issuer_web::{
 pub use issuer_native_consent::{
     experimental_issuer_native_consent_router, issuer_native_consent_openapi,
 };
+
+#[cfg(feature = "issuer-native-web")]
+pub use issuer_web::{
+    IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_web_openapi,
+};

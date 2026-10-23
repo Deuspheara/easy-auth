@@ -22,3 +22,6 @@ mod setup;
 mod signin;
 mod startup;
 mod waits;
+
+#[cfg(feature = "issuer-native-refresh")]
+mod issuer_native;

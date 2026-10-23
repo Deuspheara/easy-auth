@@ -1,7 +1,9 @@
 //! Concrete signed issuance from explicit native consent, separate from online.
 mod data;
 mod proof;
+mod registered;
 mod service;
+pub use registered::IssuerClientTokens;
 
 pub use data::{
     IssuerNativeTokenCommit, IssuerNativeTokenPreparationData, IssuerNativeTokenRepository,

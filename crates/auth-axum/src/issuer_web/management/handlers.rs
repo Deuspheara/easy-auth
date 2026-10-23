@@ -17,7 +17,7 @@ use axum::{
 use std::net::SocketAddr;
 
 #[utoipa::path(post,path="/oidc/introspect",request_body(content=super::input::TokenStatusInput,content_type="application/x-www-form-urlencoded"),params(("Authorization"=Option<String>,Header)),responses((status=200,body=TokenIntrospectionResponse),(status=400),(status=401),(status=413),(status=415),(status=429),(status=503),(status=504)))]
-pub(super) async fn introspect(
+pub(in crate::issuer_web) async fn introspect(
     State(state): State<ManagementState>,
     query: RawQuery,
     headers: HeaderMap,
@@ -36,7 +36,7 @@ pub(super) async fn introspect(
     .into_response())
 }
 #[utoipa::path(post,path="/oidc/revoke",request_body(content=super::input::TokenStatusInput,content_type="application/x-www-form-urlencoded"),params(("Authorization"=Option<String>,Header)),responses((status=200),(status=400),(status=401),(status=413),(status=415),(status=429),(status=503),(status=504)))]
-pub(super) async fn revoke(
+pub(in crate::issuer_web) async fn revoke(
     State(state): State<ManagementState>,
     query: RawQuery,
     headers: HeaderMap,

@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 const MAX_STATUS_BODY_BYTES: usize = 4096;
 #[derive(Clone)]
-pub(super) struct ManagementState {
+pub(in crate::issuer_web) struct ManagementState {
     pub management: Arc<IssuerTokenManagement>,
 }
 /// Explicit status/revocation extension. Actual socket ConnectInfo remains

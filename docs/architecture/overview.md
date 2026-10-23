@@ -258,3 +258,16 @@ prepared under [ADR 0029](adr/0029-gated-saml-server-composition.md). The source
 activation check remains closed before database loading, and disabled normal
 startup mounts no SAML routes. Trusted startup loading is read-only and cannot
 re-enable or reconfigure an existing provider. Security approval remains separate.
+
+## Native wire profile
+
+Explicit issuer-native-web now composes native/online code, native refresh,
+registered cleanup and current legacy confidential introspection. One core source
+admission selects one current registration profile; all selected operation
+checks/transactions remain. Owned Chromium/real TCP loopback/separate HTTPS PKCE
+acceptance and genuine OIDC/SAML delegation cases are implemented. Explicit
+audience-authorized confidential consumption of native access remains unfinished;
+public native IDs cannot authenticate it. Default standalone/outbound activation and
+broader SDK/standards gates remain. See the
+[native guide](../guides/issuer-native.md) and
+[ADR0038](adr/0038-native-token-lifecycle.md).

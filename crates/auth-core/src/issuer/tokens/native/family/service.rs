@@ -9,9 +9,9 @@ use crate::{
 use std::{sync::Arc, time::Duration};
 use uuid::Uuid;
 
-const NATIVE_OPERATION_TIMEOUT: Duration = Duration::from_secs(15);
+pub(super) const NATIVE_OPERATION_TIMEOUT: Duration = Duration::from_secs(15);
 pub struct IssuerNativeRefresh {
-    authorization: IssuerAuthorization,
+    pub(super) authorization: IssuerAuthorization,
     repository: Arc<dyn IssuerNativeRefreshRepository>,
 }
 impl IssuerNativeRefresh {

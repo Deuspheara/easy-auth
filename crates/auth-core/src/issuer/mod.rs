@@ -25,14 +25,15 @@ pub use codes::{
 };
 pub use redirects::{MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS};
 pub use registration::{IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile};
+#[cfg(feature = "issuer-native-refresh")]
+pub use tokens::{
+    ISSUER_NATIVE_SCOPE, IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS,
+    MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
+};
 #[cfg(feature = "issuer-token-management")]
 pub use tokens::{
     IssuerAccessData, IssuerActiveAccess, IssuerPresentedToken, IssuerTokenManagement,
     IssuerTokenStatusRepository, IssuerTokenStatusRequest,
-};
-#[cfg(feature = "issuer-native-refresh")]
-pub use tokens::{
-    IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS, MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
 };
 
 #[cfg(feature = "issuer-signing")]
@@ -55,7 +56,7 @@ pub use tokens::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use signing::{
-    IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerClientTokens, IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
     IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
     MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
 };

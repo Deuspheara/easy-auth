@@ -11,6 +11,8 @@ pub(super) enum TokenHttpError {
     InvalidRequest(StatusCode),
     InvalidClient,
     UnsupportedGrant,
+    #[cfg(feature = "issuer-native-web")]
+    InvalidScope,
     Core(IssuerTokenError),
 }
 #[derive(Serialize, ToSchema)]
@@ -29,6 +31,8 @@ impl IntoResponse for TokenHttpError {
             Self::InvalidClient | Self::Core(IssuerTokenError::InvalidClient) => {
                 (StatusCode::UNAUTHORIZED, "invalid_client")
             }
+            #[cfg(feature = "issuer-native-web")]
+            Self::InvalidScope => (StatusCode::BAD_REQUEST, "invalid_scope"),
             Self::UnsupportedGrant => (StatusCode::BAD_REQUEST, "unsupported_grant_type"),
             Self::Core(IssuerTokenError::InvalidGrant) => {
                 (StatusCode::BAD_REQUEST, "invalid_grant")

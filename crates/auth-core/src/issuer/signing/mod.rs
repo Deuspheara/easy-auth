@@ -34,7 +34,7 @@ pub use metadata::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use issuance::{
-    IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerClientTokens, IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
     IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
     MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
 };

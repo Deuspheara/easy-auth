@@ -117,8 +117,8 @@ credential/namespace, lifecycle, policy, observed database ordering and migratio
 responsibilities. No generic token/provider framework or public proof constructor
 is introduced. New modules stay below300lines. Longer visible transactions and
 ordered negative/healthy scenarios retain lock/cap/rollback evidence together.
-Native refresh families remain unfinished; do not append their different authority
-model to these access-only transaction entry points.
+Native refresh families have separate owning modules described below; keep their
+different authority model outside these access-only transaction entry points.
 
 Issuer signing keeps key/publication/metadata and concrete staged issuance in core
 `issuer/signing/`; PostgreSQL registry/metadata and final preparation/completion live
@@ -1101,3 +1101,16 @@ protocol/body/cookie boundaries, contract/composition, real realm isolation and 
 rollback. Modules remain below300lines; ordered negative/positive scenarios retain
 their invariant sequence as function-size exceptions. No unrelated cleanup or generic
 framework.
+
+## Native wire ownership
+
+Core native_code/registered.rs and native/family/registered.rs own finite
+registered-operation selection after one committed admission. Private admitted
+helpers preserve concrete signing/reduction checks. Axum issuer_web/native/ separates
+services, routing, strict input, token outputs, metadata/UI selection, revocation and
+contract. It shares existing Basic/form/status/cookie/browser boundaries; no
+persistence or source/account policy moves to HTTP. Genuine test setup and owned
+example composition were extracted in separate structural commits; the existing
+ordinary signer is unchanged. New source/test modules stay below300lines. Longer
+ordered scenarios retain invariants as documented function-size exceptions; no
+generic framework, dependency, new proof/crypto constructor or unrelated cleanup.

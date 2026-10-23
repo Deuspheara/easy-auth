@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 
 // Owned test transport only. Trust the private fixture certificate explicitly;
 // no system trust changes, disabled TLS verification or external destinations.
-function client(origin, certificate) {
+function client(origin, certificate, redirect = 'https://client.example/callback') {
   const expected = new URL(origin);
   assert.equal(expected.hostname,'app.example');
   const verifier = crypto.randomBytes(32).toString('base64url');
@@ -28,14 +28,14 @@ function client(origin, certificate) {
         const chunks=[];let size=0;
         response.on('data',chunk => {size+=chunk.length;if(size>65536)response.destroy(new Error('owned body bound'));else chunks.push(chunk);});
         response.on('error',reject);
-        response.on('end',() => {try {resolve({status:response.statusCode,headers:response.headers,value:JSON.parse(Buffer.concat(chunks))});}catch {reject(new Error('owned response envelope'));}});
+        response.on('end',() => {try {resolve({status:response.statusCode,headers:response.headers,value:chunks.length ? JSON.parse(Buffer.concat(chunks)) : null});}catch {reject(new Error('owned response envelope'));}});
       });
       req.setTimeout(5000,() => req.destroy(new Error('owned client timeout')));
       req.on('error',reject);req.end(body);
     });
   }
   return {nonce,state,challenge:crypto.createHash('sha256').update(verifier).digest('base64url'),request,
-    token(code,id,wrong=false) {return request('/oidc/token',{grant_type:'authorization_code',client_id:id,code,redirect_uri:'https://client.example/callback',code_verifier:wrong?crypto.randomBytes(32).toString('base64url'):verifier});},
+    token(code,id,wrong=false) {return request('/oidc/token',{grant_type:'authorization_code',client_id:id,code,redirect_uri:redirect,code_verifier:wrong?crypto.randomBytes(32).toString('base64url'):verifier});},
     verify(token,jwks,id) {
       const parts=token.split('.');assert.equal(parts.length,3);
       const header=JSON.parse(Buffer.from(parts[0],'base64url'));

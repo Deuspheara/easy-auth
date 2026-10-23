@@ -70,8 +70,24 @@ pub(super) async fn run(pool: &PgPool, origin: String) -> FixtureResult<()> {
     let facts:(i64,i64,i64,i64,i64,i64)=tokio::time::timeout(Duration::from_secs(5),sqlx::query_as(
         "SELECT (SELECT count(*) FROM auth_users WHERE realm_id=$1),(SELECT count(*) FROM auth_sessions WHERE realm_id=$1),(SELECT count(*) FROM auth_issuer_subjects WHERE realm_id=$1),(SELECT count(*) FROM auth_issuer_authorizations WHERE realm_id=$1 AND status='consumed'),(SELECT count(*) FROM auth_issuer_access_tokens WHERE realm_id=$1),(SELECT count(*) FROM auth_audit WHERE realm_id=$1 AND kind='issuer_code_redeemed')"
     ).bind(realm).fetch_one(pool)).await??;
-    send(
-        serde_json::json!({"facts":{"users":facts.0,"sessions":facts.1,"subjects":facts.2,"consumed":facts.3,"access":facts.4,"redeemed_audit":facts.5}}),
-    )?;
+    let report = serde_json::json!({"users":facts.0,"sessions":facts.1,"subjects":facts.2,"consumed":facts.3,"access":facts.4,"redeemed_audit":facts.5});
+    #[cfg(feature = "issuer-native-web")]
+    let report = {
+        let mut report = report;
+        if std::env::var("EASY_AUTH_OWNED_ISSUER_NATIVE").as_deref() == Ok("1") {
+            let native:(i64,i64,i64,i64)=sqlx::query_as("SELECT (SELECT count(*) FROM auth_issuer_native_families WHERE realm_id=$1),(SELECT count(*) FROM auth_issuer_native_refresh_tokens WHERE realm_id=$1),(SELECT count(*) FROM auth_issuer_native_families WHERE realm_id=$1 AND revoked_at_us IS NOT NULL),(SELECT count(*) FROM auth_issuer_access_tokens WHERE realm_id=$1 AND revoked_at_us IS NOT NULL)").bind(realm).fetch_one(pool).await?;
+            report
+                .as_object_mut()
+                .ok_or("owned report shape")?
+                .extend(serde_json::Map::from_iter([
+                    ("families".into(), native.0.into()),
+                    ("refresh".into(), native.1.into()),
+                    ("revoked_families".into(), native.2.into()),
+                    ("revoked_access".into(), native.3.into()),
+                ]));
+        }
+        report
+    };
+    send(serde_json::json!({"facts":report}))?;
     Ok(())
 }

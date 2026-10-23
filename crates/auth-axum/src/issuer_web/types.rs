@@ -14,6 +14,7 @@ pub(super) struct TokenFormSchema {
     pub client_id: Option<String>,
 }
 #[derive(Serialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub(super) struct TokenResponse {
     pub access_token: String,
     pub token_type: &'static str,

@@ -32,7 +32,7 @@ pub(super) struct IssuerConsentReturn {
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(super) struct NoQuery {}
+pub(crate) struct NoQuery {}
 
 #[derive(Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]

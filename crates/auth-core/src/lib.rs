@@ -138,7 +138,8 @@ pub use issuer::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use issuer::{
-    IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS, MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
+    ISSUER_NATIVE_SCOPE, IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS,
+    MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
 };
 
 #[cfg(feature = "issuer-signing")]
@@ -159,7 +160,7 @@ pub use issuer::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use issuer::{
-    IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerClientTokens, IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
     IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
     MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
 };

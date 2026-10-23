@@ -1,8 +1,9 @@
 # Optional access revocation and introspection
 
 This is the access-lifecycle and native consent-library work of AUTH-40. Native
-family issuance/rotation/revocation are available as library operations; native token/refresh HTTP
-and owned native browser acceptance remain unfinished.
+family issuance/rotation/revocation are available as library operations; native wire and bounded owned browser acceptance are available through the
+[explicit native profile](issuer-native.md); native resource-consumer introspection
+and broader acceptance remain unfinished.
 Use [ADR0038](../architecture/adr/0038-native-token-lifecycle.md) for authority and
 remaining scope. Normal standalone activation and production approval remain gated.
 
@@ -201,6 +202,11 @@ disable remains possible. Cross-kind/realm/session/operation proofs cannot appro
 
 `issuer_native_consent_openapi` describes these closed shapes with distinct native
 operation IDs. This consent-only composition mounts no token, refresh, revocation
-or discovery endpoint; native token HTTP and actual owned native client/browser
-acceptance remain AUTH-40 work. A code can currently be exchanged through the
-separate concrete native library. Normal standalone outbound-issuer activation stays gated.
+or discovery endpoint. The separate native wire composition below implements token
+HTTP and bounded owned native client/browser acceptance; native consumer
+introspection remains AUTH-40 work. Normal standalone outbound-issuer activation
+stays gated.
+
+The separate [native wire composition](issuer-native.md) now adds code/refresh and
+registered revocation on an explicit router; the consent-only component above still
+mounts none of those endpoints. Native consumer introspection remains a required gap.

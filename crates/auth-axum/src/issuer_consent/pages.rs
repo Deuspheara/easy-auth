@@ -7,7 +7,7 @@ use axum::{
 };
 
 #[utoipa::path(get,path="/oidc/authorize",responses((status=200,body=String,content_type="text/html"),(status=414)))]
-pub(super) async fn authorize(RawQuery(query): RawQuery) -> Result<Response, ApiError> {
+pub(crate) async fn authorize(RawQuery(query): RawQuery) -> Result<Response, ApiError> {
     if query.as_ref().is_some_and(|q| q.len() > 16 * 1024) {
         return Err(ApiError::Body(StatusCode::URI_TOO_LONG));
     }
@@ -15,7 +15,7 @@ pub(super) async fn authorize(RawQuery(query): RawQuery) -> Result<Response, Api
     // the query and requires explicit protected POST preparation/confirmation.
     Ok(Html(include_str!("authorize.html")).into_response())
 }
-pub(super) async fn script(
+pub(crate) async fn script(
     query: Result<Query<NoQuery>, QueryRejection>,
 ) -> Result<Response, ApiError> {
     query.map_err(|_| ApiError::Body(StatusCode::BAD_REQUEST))?;
