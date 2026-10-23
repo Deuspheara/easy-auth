@@ -41,6 +41,19 @@ pub(crate) fn attach(
     browser: BrowserConfig,
     authorization: Arc<IssuerAuthorization>,
 ) -> Result<Router> {
+    let pages = Router::new()
+        .route("/oidc/authorize", get(pages::authorize))
+        .route("/oidc/authorize.js", get(pages::script));
+    attach_with_pages(router, auth, browser, authorization, pages)
+}
+
+pub(crate) fn attach_with_pages(
+    router: Router,
+    auth: Auth,
+    browser: BrowserConfig,
+    authorization: Arc<IssuerAuthorization>,
+    pages: Router,
+) -> Result<Router> {
     let authority = authorization.authority();
     if auth.realm() != authority.realm()
         || !browser.origin().starts_with("https://")
@@ -57,18 +70,17 @@ pub(crate) fn attach(
         browser: browser.clone(),
     };
     let routes = Router::new()
-        .route("/oidc/authorize", get(pages::authorize))
-        .route("/oidc/authorize.js", get(pages::script))
         .route("/v1/oidc/consent/prepare", post(handlers::prepare))
         .route("/v1/oidc/consent/resume", post(handlers::resume))
         .route("/v1/oidc/consent/approve", post(handlers::approve))
         .route("/v1/oidc/consent/cancel", post(handlers::cancel))
-        .layer(DefaultBodyLimit::max(MAX_CONSENT_BODY_BYTES))
-        .layer(middleware::from_fn_with_state(base.clone(), boundary))
         .with_state(WebState {
-            base,
+            base: base.clone(),
             authorization,
-        });
+        })
+        .merge(pages)
+        .layer(DefaultBodyLimit::max(MAX_CONSENT_BODY_BYTES))
+        .layer(middleware::from_fn_with_state(base, boundary));
     Ok(router.merge(routes).layer(middleware::from_fn_with_state(
         browser,
         clear_changed_session,

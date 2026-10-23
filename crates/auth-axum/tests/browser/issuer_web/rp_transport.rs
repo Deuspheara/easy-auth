@@ -1,6 +1,10 @@
 //! Test-only in-process wire adapter. No live DNS/TLS or independent RP claim.
 use super::*;
 use async_trait::async_trait;
+use axum::Router;
+use axum::response::Response;
+use http_body_util::BodyExt;
+use std::net::SocketAddr;
 
 pub(super) struct OwnedTransport(pub Router);
 #[async_trait]

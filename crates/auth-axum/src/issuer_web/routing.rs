@@ -32,16 +32,11 @@ pub(super) fn compose(
     services: IssuerWebServices,
     contract: utoipa::openapi::OpenApi,
 ) -> Result<Router> {
-    if auth.realm() != services.tokens.authority().realm()
-        || browser.origin() != services.metadata.origin()
-    {
-        return Err(Error::InvalidInput);
-    }
+    let router = root(&auth, &browser, &services, contract)?;
     let base = AppState {
         auth: auth.clone(),
         browser: browser.clone(),
     };
-    let router = configured_router(auth.clone(), browser.clone(), contract);
     let router =
         crate::issuer_consent::attach(router, auth, browser, services.authorization.clone())?;
     let state = WebState { services };
@@ -59,4 +54,18 @@ pub(super) fn compose(
         .layer(middleware::from_fn_with_state(base, client_token_boundary))
         .with_state(state);
     Ok(router.merge(documents).merge(token))
+}
+
+pub(super) fn root(
+    auth: &Auth,
+    browser: &BrowserConfig,
+    services: &IssuerWebServices,
+    contract: utoipa::openapi::OpenApi,
+) -> Result<Router> {
+    if auth.realm() != services.tokens.authority().realm()
+        || browser.origin() != services.metadata.origin()
+    {
+        return Err(Error::InvalidInput);
+    }
+    Ok(configured_router(auth.clone(), browser.clone(), contract))
 }

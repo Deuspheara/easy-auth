@@ -1,4 +1,5 @@
 use super::*;
+use http_body_util::BodyExt;
 
 #[sqlx::test(migrations = "../auth-postgres/migrations")]
 async fn actual_code_issuance_basic_introspection_and_idempotent_revocation_need_no_cookies_or_origin(

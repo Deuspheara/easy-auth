@@ -49,7 +49,13 @@ pub(super) async fn prepare(
         expires_at_us: pending.expires_at_us(),
     })
     .into_response();
-    cookies::set(&mut response, &state.base.browser, &browser, &pending);
+    cookies::set(
+        &mut response,
+        &state.base.browser,
+        &browser,
+        pending.authorization(),
+        pending.handle(),
+    );
     Ok(response)
 }
 

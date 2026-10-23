@@ -2,7 +2,7 @@ use crate::{
     BrowserConfig,
     browser::{read_cookie, read_optional_cookie, read_optional_cookie_value},
 };
-use auth_core::{Error, IssuerAuthorizationStart, Result, Secret};
+use auth_core::{Error, Result, Secret};
 use axum::{
     http::{HeaderMap, header},
     response::Response,
@@ -42,17 +42,18 @@ pub(super) fn set(
     response: &mut Response,
     config: &BrowserConfig,
     browser: &Secret,
-    start: &IssuerAuthorizationStart,
+    authorization: uuid::Uuid,
+    handle: &Secret,
 ) {
     response.headers_mut().append(
         header::SET_COOKIE,
         config.cookie_value(
             OPERATION,
-            Some(&start.authorization().to_string()),
+            Some(&authorization.to_string()),
             LIFETIME_SECONDS,
         ),
     );
-    for (name, value) in [(BROWSER, browser), (HANDLE, start.handle())] {
+    for (name, value) in [(BROWSER, browser), (HANDLE, handle)] {
         response.headers_mut().append(
             header::SET_COOKIE,
             config.cookie(name, Some(value), LIFETIME_SECONDS),

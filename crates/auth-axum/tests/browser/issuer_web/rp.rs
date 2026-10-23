@@ -1,4 +1,5 @@
 use super::{rp_transport::OwnedTransport, *};
+use std::sync::Arc;
 
 async fn connection(f: &mut Fixture, client: Uuid) -> OAuthConnection {
     // The existing inbound RP admits a narrower callback profile without fixed

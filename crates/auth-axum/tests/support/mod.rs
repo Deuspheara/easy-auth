@@ -1,3 +1,5 @@
+#[cfg(feature = "issuer-web")]
+pub(crate) mod issuer_web;
 mod mail;
 #[cfg(feature = "oidc-account-deletion")]
 pub(crate) mod oidc_provider;
