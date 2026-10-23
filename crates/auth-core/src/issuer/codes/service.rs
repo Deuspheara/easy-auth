@@ -47,13 +47,9 @@ impl IssuerAuthorization {
                 handle.verifier(),
             )
             .await?;
-        Ok(IssuerAuthorizationStart {
-            authorization: request.id(),
-            handle,
-            client: input.client,
-            redirect: input.redirect_uri.to_owned(),
-            expires,
-        })
+        Ok(IssuerAuthorizationStart::from_saved(
+            &request, handle, expires,
+        ))
     }
     pub async fn preview(
         &self,

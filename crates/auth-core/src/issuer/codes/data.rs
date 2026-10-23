@@ -19,6 +19,19 @@ pub struct IssuerAuthorizationStart {
     pub(super) expires: i64,
 }
 impl IssuerAuthorizationStart {
+    pub(in crate::issuer) fn from_saved(
+        request: &super::IssuerAuthorizationRequest,
+        handle: Secret,
+        expires: i64,
+    ) -> Self {
+        Self {
+            authorization: request.id(),
+            handle,
+            client: request.client().client(),
+            redirect: request.redirect_uri().to_owned(),
+            expires,
+        }
+    }
     /// Public selector for the preview being confirmed, not an authorization
     /// credential. Both private cookies and the initiating session remain needed.
     pub fn authorization(&self) -> Uuid {
