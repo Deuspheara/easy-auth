@@ -15,6 +15,9 @@ pub(super) async fn save(
     browser: Verifier,
     handle: Verifier,
 ) -> Result<i64> {
+    if !request.client().supports_online_authorization() {
+        return Err(Error::Unauthorized);
+    }
     let realm = request.authority().realm();
     let snapshot = FreshSessionSnapshot::load(&store.pool, realm, current).await?;
     let mut tx = store.pool.begin().await.map_err(unavailable)?;

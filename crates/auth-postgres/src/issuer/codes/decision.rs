@@ -26,7 +26,8 @@ impl DecisionCandidate {
         let client = store
             .load_issuer_client(proof.authority.realm(), original.client_id)
             .await?;
-        if client.revision() != original.client_revision {
+        if !client.supports_online_authorization() || client.revision() != original.client_revision
+        {
             return Err(Error::Unauthorized);
         }
         let owner =

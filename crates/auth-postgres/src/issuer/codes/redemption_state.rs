@@ -20,6 +20,9 @@ impl CodeCandidate {
         store: &Postgres,
         request: &IssuerCodeRedemption<'_>,
     ) -> Result<Option<Self>> {
+        if !request.client.supports_online_authorization() {
+            return Err(Error::Unauthorized);
+        }
         let Some(original) = state::code(store, request).await? else {
             return Ok(None);
         };

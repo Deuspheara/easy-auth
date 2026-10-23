@@ -33,6 +33,7 @@ impl IssuerAuthorizationRequest {
         input: &IssuerAuthorizationInput<'_>,
     ) -> Result<Self> {
         if client.realm() != authority.realm()
+            || !client.supports_online_authorization()
             || client.client() != input.client
             || input.response_type != "code"
             || input.scope != "openid"

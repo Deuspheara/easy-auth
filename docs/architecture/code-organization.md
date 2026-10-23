@@ -86,6 +86,15 @@ The approximate 300-line file and 50-line function thresholds in AGENTS.md trigg
 
 ## Implemented layout
 
+Native offline configuration extends core `issuer/tokens/native/` with bounded
+policy and PostgreSQL `issuer/native_refresh/` with scoped configuration/current
+policy locking. It reuses existing native redirect and full-client policy; no HTTP
+handler, crate entry file or local-session validator gains persistence or offline
+authority. Tests separate configuration, isolation/storage, observed ordering and
+historical migration preservation. All new modules remain below300lines; ordered
+negative/positive and migration scenarios retain their invariants as function-size
+exceptions. Configuration creates no tokens, owner audit or public proof API.
+
 Access management extends core `issuer/tokens/` with presented-input, validated
 projection, port and use case; PostgreSQL `issuer/tokens/` owns candidate/state,
 revocation and the visible introspection transaction. Retained verification-key

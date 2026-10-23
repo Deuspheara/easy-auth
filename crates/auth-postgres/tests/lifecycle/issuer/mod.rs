@@ -4,6 +4,8 @@ mod loading;
 mod native;
 mod native_lifecycle;
 mod native_ordering;
+#[cfg(not(feature = "issuer-native-refresh"))]
+mod native_refresh_unavailable;
 mod native_upgrade;
 mod ordering;
 mod subjects;

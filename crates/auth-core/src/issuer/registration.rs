@@ -13,6 +13,9 @@ pub enum IssuerClientKind {
 pub enum IssuerRedirectProfile {
     WebExact,
     NativeLoopback,
+    /// Recognized marker even in consumers without offline support. Construction
+    /// and authority operations still require the explicit feature.
+    NativeRefreshLoopback,
 }
 
 /// Trusted outbound client metadata. Persist before use; neither this
@@ -29,6 +32,22 @@ pub struct IssuerClientRegistration {
     redirect_profile: IssuerRedirectProfile,
 }
 impl IssuerClientRegistration {
+    /// Explicit native offline-capable configuration. This grants no offline
+    /// authority: persisted enabled policy and a separate owner decision are required.
+    #[cfg(feature = "issuer-native-refresh")]
+    pub fn public_native_refresh_loopback(
+        realm: Uuid,
+        client: Uuid,
+        redirects: &[&str],
+    ) -> Result<Self> {
+        Self::new(
+            realm,
+            client,
+            redirects,
+            None,
+            IssuerRedirectProfile::NativeRefreshLoopback,
+        )
+    }
     pub fn public(realm: Uuid, client: Uuid, redirects: &[&str]) -> Result<Self> {
         Self::new(
             realm,
@@ -92,17 +111,21 @@ impl IssuerClientRegistration {
         if realm.is_nil() || client.is_nil() {
             return Err(Error::InvalidInput);
         }
-        let (redirects, sector) = match redirect_profile {
-            IssuerRedirectProfile::WebExact => redirects::registration(redirects)?,
-            IssuerRedirectProfile::NativeLoopback => {
-                if secret_verifier.is_some() {
-                    return Err(Error::InvalidInput);
-                }
-                (
-                    native::registration(redirects)?,
-                    format!("urn:easy-auth:native-client:{client}"),
-                )
+        let is_native = match redirect_profile {
+            IssuerRedirectProfile::WebExact => false,
+            IssuerRedirectProfile::NativeLoopback => true,
+            IssuerRedirectProfile::NativeRefreshLoopback => true,
+        };
+        let (redirects, sector) = if is_native {
+            if secret_verifier.is_some() {
+                return Err(Error::InvalidInput);
             }
+            (
+                native::registration(redirects)?,
+                format!("urn:easy-auth:native-client:{client}"),
+            )
+        } else {
+            redirects::registration(redirects)?
         };
         Ok(Self {
             realm,
@@ -140,6 +163,14 @@ impl IssuerClientRegistration {
     pub fn redirect_profile(&self) -> IssuerRedirectProfile {
         self.redirect_profile
     }
+    /// Offline-capable registrations require their separate explicit consent/
+    /// issuance flow. Older online components must never downgrade that profile.
+    pub fn supports_online_authorization(&self) -> bool {
+        matches!(
+            self.redirect_profile,
+            IssuerRedirectProfile::WebExact | IssuerRedirectProfile::NativeLoopback
+        )
+    }
     /// Persistence configuration only; never log or treat it as a bearer secret.
     pub fn secret_verifier(&self) -> Option<Verifier> {
         self.secret_verifier
@@ -150,6 +181,9 @@ impl IssuerClientRegistration {
                 self.redirects.iter().any(|registered| registered == actual)
             }
             IssuerRedirectProfile::NativeLoopback => native::permits(&self.redirects, actual),
+            IssuerRedirectProfile::NativeRefreshLoopback => {
+                native::permits(&self.redirects, actual)
+            }
         }
     }
     /// Repository replacement always allocates a new revision, even for stale input.

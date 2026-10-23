@@ -133,6 +133,11 @@ pub use issuer::{
     IssuerTokenStatusRepository, IssuerTokenStatusRequest,
 };
 
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS, MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
+};
+
 #[cfg(feature = "issuer-signing")]
 pub use issuer::{
     ISSUER_ID_TOKEN_LIFETIME_SECONDS, ISSUER_KEY_PROPAGATION_SECONDS, IssuerDiscoveryDocument,

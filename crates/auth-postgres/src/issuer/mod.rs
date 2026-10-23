@@ -4,6 +4,8 @@ mod authentication;
 mod codes;
 mod configuration;
 mod loading;
+#[cfg(feature = "issuer-native-refresh")]
+mod native_refresh;
 mod subjects;
 #[cfg(feature = "issuer-token-management")]
 mod tokens;

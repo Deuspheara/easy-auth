@@ -33,6 +33,10 @@ impl StoredClient {
             ("native_loopback", "none", None) => {
                 IssuerClientRegistration::public_native_loopback(realm, client, &redirects)
             }
+            #[cfg(feature = "issuer-native-refresh")]
+            ("native_refresh_loopback", "none", None) => {
+                IssuerClientRegistration::public_native_refresh_loopback(realm, client, &redirects)
+            }
             _ => return Err(Error::Unavailable),
         }
         .map_err(|_| Error::Unavailable)?;

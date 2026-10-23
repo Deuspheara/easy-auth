@@ -66,3 +66,43 @@ cargo test --locked -p easy-auth-axum --features issuer-token-management-web --t
 Required full workspace, strict Clippy, formatting, security and exact-source hosted
 results are recorded separately; focused passes do not complete the refresh/native
 acceptance requirements or establish independent security approval.
+
+## Explicit native policy configuration
+
+Optional core/PostgreSQL `issuer-native-refresh` currently adds configuration only;
+it does not accept `offline_access`, issue/rotate refresh credentials or add routes.
+The new offline-capable profile also refuses the existing online-only authorization
+flow, even with an enabled policy. Existing ordinary web/native profiles retain
+their openid flow. Native offline consent/issuance requires separate explicit work.
+Provision `IssuerClientRegistration::public_native_refresh_loopback` through the
+existing trusted client API, then construct `IssuerNativeRefreshPolicy::new` with
+the exact saved client, trusted `IssuerAuthority`, absolute seconds and idle seconds.
+Only literal127.0.0.1 or[::1] HTTP callbacks with an exact registered path are allowed;
+only the actual bound port may vary. A shared loopback IP is never a subject sector.
+
+`configure_issuer_native_refresh_policy` returns a new saved revision, initially
+disabled. `enable_issuer_native_refresh_policy` requires that exact definition and
+the current enabled client; `disable_issuer_native_refresh_policy` reduces only the
+selected realm/issuer/client policy and invalidates old snapshots. Replacement
+preserves disable. `load_issuer_native_refresh_policy` restores read-only enabled
+configuration after restart; `check_issuer_native_refresh_policy` performs a locked
+current-definition check. Neither is a user/consent/token proof. Client replacement
+requires a newly configured policy; stale enable cannot restore an old grant.
+
+Absolute lifetime must be1second–7days, idle1second–24hours, idle no greater than
+absolute lifetime. A future explicit consent grant must retain its original source/
+session absolute expiry even if configured lifetime is longer. Cookie freshness,
+cookie idle and the existing short code are separate authority and remain unchanged.
+Migration0033 preserves every existing online row and creates no policy by default.
+Feature-disabled/older loaders refuse the distinct offline client profile.
+The [native policy receipt](../security/issuer-native-policy-verification.md) records
+this configuration increment separately from earlier access-management evidence.
+
+Native clients must keep future refresh credentials in protected per-user platform
+credential storage, never URLs, logs, source files, browser localStorage or shared
+cookies. Serialize refresh operations and atomically replace the stored credential
+only after successful rotation; ambiguous/lost refresh outcomes require explicit
+reauthentication when reuse detection cannot safely recover. Do not implement a
+parallel retry/grace fallback. Local deletion cannot remotely erase a stolen token;
+server family revocation and downstream session policy remain necessary. These are
+client requirements for the unfinished family flow, not completed integration evidence.

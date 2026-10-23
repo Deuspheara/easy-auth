@@ -91,6 +91,7 @@ impl IssuerGrantData {
         client: &IssuerClientRegistration,
     ) -> IssuerTokenResult<()> {
         if client.realm() != authority.realm()
+            || !client.supports_online_authorization()
             || self.authorization.is_nil()
             || self.owner.is_nil()
             || self.session.is_nil()

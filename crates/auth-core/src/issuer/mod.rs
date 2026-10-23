@@ -30,6 +30,10 @@ pub use tokens::{
     IssuerAccessData, IssuerActiveAccess, IssuerPresentedToken, IssuerTokenManagement,
     IssuerTokenStatusRepository, IssuerTokenStatusRequest,
 };
+#[cfg(feature = "issuer-native-refresh")]
+pub use tokens::{
+    IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS, MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
+};
 
 #[cfg(feature = "issuer-signing")]
 mod signing;

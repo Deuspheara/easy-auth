@@ -1,9 +1,9 @@
 # ADR 0038: Native token lifecycle
 
 Date: 2026-10-23. Status: in progress for AUTH-40. Stateful access revocation and
-authenticated introspection are implemented; full verification is running. Native
-refresh consent/families, reuse detection, storage guidance and owned native browser
-acceptance remain work. This increment alone does not complete AUTH-40 or M07.
+authenticated introspection are implemented. Explicit native policy persistence is
+implemented; owner consent/families, reuse detection and owned native browser
+acceptance remain work. These increments alone do not complete AUTH-40 or M07.
 
 ## Existing access authority
 
@@ -74,16 +74,50 @@ and ignored by this access-only profile. OpenAPI describes active and inactive
 envelopes separately; inactive output contains only active=false. Revocation200 has
 an empty body. Default issuer/server composition mounts none of these extra routes.
 
+## Explicit native offline configuration
+
+The optional core/PostgreSQL `issuer-native-refresh` feature now supplies trusted
+configuration only. `public_native_refresh_loopback` has a distinct persisted
+`native_refresh_loopback` profile: identical literal-interface/path/variable-port
+and per-client pairwise-sector rules, but older/feature-disabled loaders reject it
+instead of interpreting future offline consent as an older online profile.
+Existing web/native profiles, registrations and revisions are unchanged.
+The configuration-aware build also rejects this profile from existing online
+request, SQL preparation/decision/redemption and core grant-validation paths.
+An older online-only component must not process future offline consent merely
+because it understands that client's configuration. Separate explicit native
+consent/issuance operations are still required; no old guard may be removed to
+make the new profile enter an online path.
+
+`IssuerNativeRefreshPolicy` binds an exact HTTPS issuer/realm, full public native
+client snapshot and independent revision. Absolute lifetime is1second–7days; idle
+is1second–24hours and cannot exceed absolute lifetime. The absolute grant bound is
+the earlier of original consent time plus configured lifetime and the original
+source/session absolute cap captured under fresh-owner locks. Invalid/overflowing
+times reject; this calculation does not establish consent or extend cookie idle/
+freshness. Existing code, session and access limits remain unchanged.
+
+Migration0033 adds only the profile constraint extension and scoped configuration
+table. A new policy starts disabled. Replacement allocates a fresh revision and
+preserves operator disable; enable requires the exact full policy and current
+enabled full client. Client replacement invalidates the old policy. All mutating/
+checking policy transactions lock client before policy. Disable can reduce stale/
+disabled-client policy without creating user authority. Loading is read-only and
+returns configuration facts; future authority operations must recheck them under
+the same ordered locks. No startup/HTTP/discovery activation, consent, token family,
+refresh secret, local session or owner audit event follows from this table.
+
 ## Remaining full-ticket work
 
 Long-lived refresh authority cannot be obtained by extending the old code/freshness
 cap or treating an existing openid-only approval as offline consent. The native
-increment still needs explicit trusted policy and owner-reviewed consent, a distinct
+increment still needs owner-reviewed consent under that explicit policy, a distinct
 bounded original grant, hash-only one-use rotation with reuse-detected family
 revocation, current source/owner/client and revoke-all lifecycle checks, original
 absolute/idle caps, typed audit and real PostgreSQL race/rollback/isolation evidence.
 Secure client storage and actual owned system-browser/PKCE delivery remain required.
-These are pending design/implementation decisions, not implied by current access APIs.
+Explicit policy is now implemented, but these consent/grant/family operations are
+not implied by configuration or current access APIs.
 
 No independent audit, external interoperability certification, production readiness
 or normal outbound activation follows. Production operations remain supervised.

@@ -713,3 +713,21 @@ no existence/replay distinction. Shared no-store/no-cache,401Basic challenge and
 400/413/415/429/503/504 finite failures apply. Neither operation grants a local session
 or application permissions. See [ADR0038](adr/0038-native-token-lifecycle.md) and
 [the guide](../guides/issuer-token-management.md) for exact lifecycle and pending scope.
+
+### Native offline policy configuration
+
+`issuer-native-refresh` in core/PostgreSQL currently exposes trusted provisioning
+only: `public_native_refresh_loopback`, `IssuerNativeRefreshPolicy`, and
+`configure_issuer_native_refresh_policy`, `enable_issuer_native_refresh_policy`,
+`disable_issuer_native_refresh_policy`, `load_issuer_native_refresh_policy` and
+`check_issuer_native_refresh_policy`. New saved policy is disabled; enable needs
+the exact current full policy and enabled client. Replacement rotates revision and
+preserves disable. Load/check return configuration facts, never authentication or
+consent. Absolute1second–7days and idle1second–24hours/at most absolute are enforced.
+No new HTTP endpoint, accepted scope, grant type, response shape, startup setting
+or discovery claim is introduced. Current authorization still accepts only openid;
+offline_access and refresh-token rotation remain unfinished.
+`supports_online_authorization` is a configuration capability query, not a proof.
+It is false for the new offline profile: default request/SQL code operations and
+core grant validation refuse that profile, including future rows written by a newer
+native implementation. Existing ordinary web/native code behavior is preserved.

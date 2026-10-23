@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-native-refresh = ["issuer-token-management"]
 issuer-token-management = ["issuer-signing"]
 issuer-signing = ["issuer-codes", "dep:josekit", "dep:openssl", "dep:serde_json"]
 issuer-codes = ["issuer-clients"]

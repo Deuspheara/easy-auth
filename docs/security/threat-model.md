@@ -725,6 +725,25 @@ consent-only experimental embedding mounts no token endpoint and establishes no
 signed issuance, full OAuth/OIDC interoperability or outbound production approval.
 See [ADR0036](../architecture/adr/0036-issuer-https-consent-delivery.md).
 
+## Explicit native offline policy
+
+The optional `issuer-native-refresh` component currently persists configuration,
+not refresh authority. New policies default disabled and bind exact realm/HTTPS
+issuer/full public native client revision, independent policy revision and bounded
+absolute/idle seconds. Changed client/policy snapshots fail closed; reconfiguration
+preserves operator disable and stale enable cannot restore an old definition.
+Client-before-policy locking linearizes configuration/check/disable; read-only
+loading is not authorization. A distinct persisted offline client profile makes
+older or feature-disabled loaders refuse rather than silently downgrade it.
+Configuration-aware builds also refuse that offline profile in existing online
+request, preparation/decision/redemption and core grant-validation paths; recognizing
+configuration cannot authorize interpreting a future offline grant as online consent.
+Migration0033 creates no consent, subject, session or token. The eventual separate
+offline consent must preserve original source/session absolute caps and must not
+reinterpret the old online approval, code, cookie freshness or idle deadline as
+long-lived authority. Family rotation/reuse/lifecycle and native delivery remain
+unimplemented acceptance requirements; configuration alone does not close them.
+
 ## Optional signed issuer component
 
 The explicit `issuer-signing`/`issuer-web` extensions use pinned josekit/OpenSSL

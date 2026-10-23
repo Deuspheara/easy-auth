@@ -264,3 +264,12 @@ revocation cannot restore or widen authority. Public possession can reduce only 
 matching credential, but does not authenticate an introspection consumer. Refresh
 families/delegation remain separate unfinished authority in
 [ADR0038](adr/0038-native-token-lifecycle.md).
+
+Optional `IssuerNativeRefreshPolicy` is trusted configuration only: exact authority,
+full offline-capable native client, independent revision and bounded absolute/idle
+seconds. Migration0033 creates initially disabled realm/issuer/client policy rows
+and a distinct native profile; older loaders refuse that profile. Full locked
+definition checks and revision changes preserve disable and reject stale policy.
+An eventual original consent grant is capped by its captured source/session
+absolute expiry; configuration cannot create consent, refresh authority or extend
+cookie freshness/idle. Native consent/family entities remain unfinished.

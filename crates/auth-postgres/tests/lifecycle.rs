@@ -47,3 +47,7 @@ mod issuer_codes;
 #[cfg(feature = "issuer-signing")]
 #[path = "lifecycle/issuer_signing/mod.rs"]
 mod issuer_signing;
+
+#[cfg(feature = "issuer-native-refresh")]
+#[path = "lifecycle/issuer_native_refresh/mod.rs"]
+mod issuer_native_refresh;
