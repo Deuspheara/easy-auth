@@ -1,8 +1,8 @@
 use super::{
-    IssuerAuthority, IssuerAuthorizationInput, IssuerAuthorizationRepository,
-    IssuerAuthorizationRequest, IssuerAuthorizationReturn, IssuerAuthorizationStart,
-    IssuerCodeRedemption, IssuerConsentProof, IssuerPkceVerifier, IssuerRedeemedCode,
-    IssuerTokenError, IssuerTokenResult, response,
+    IssuerAuthority, IssuerAuthorizationInput, IssuerAuthorizationPreview,
+    IssuerAuthorizationRepository, IssuerAuthorizationRequest, IssuerAuthorizationReturn,
+    IssuerAuthorizationStart, IssuerCodeRedemption, IssuerConsentProof, IssuerPkceVerifier,
+    IssuerRedeemedCode, IssuerTokenError, IssuerTokenResult, request, response,
 };
 use crate::{IssuerClientAuthentication, Result, Secret};
 use sha2::{Digest, Sha256};
@@ -53,6 +53,29 @@ impl IssuerAuthorization {
             client: input.client,
             redirect: input.redirect_uri.to_owned(),
             expires,
+        })
+    }
+    pub async fn preview(
+        &self,
+        current: &Secret,
+        browser: &Secret,
+        handle: &Secret,
+        authorization: Uuid,
+    ) -> Result<IssuerAuthorizationPreview> {
+        let data = self
+            .repository
+            .preview_issuer_authorization(&self.proof(current, browser, handle, authorization))
+            .await?;
+        if data.client.realm() != self.authority.realm() {
+            return Err(crate::Error::Unavailable);
+        }
+        request::return_uri(&data.client, &data.redirect_uri)
+            .map_err(|_| crate::Error::Unavailable)?;
+        Ok(IssuerAuthorizationPreview {
+            authorization,
+            client: data.client.client(),
+            redirect_uri: data.redirect_uri,
+            expires_at_us: data.expires_at_us,
         })
     }
     pub async fn approve(

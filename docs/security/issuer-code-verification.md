@@ -2,6 +2,8 @@
 
 AUTH-38 optional core/PostgreSQL increment, 2026-10-23. See
 [ADR0035](../architecture/adr/0035-issuer-consent-and-authorization-codes.md).
+The later [HTTPS consent receipt](issuer-consent-verification.md) adds explicit
+consent/recovery delivery; this earlier receipt retains its original component scope.
 This is component evidence, not an HTTP/token endpoint, independent review,
 conformance or production-approval report.
 

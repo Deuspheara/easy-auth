@@ -39,6 +39,10 @@ async fn private_consent_proofs_owner_session_preview_and_authority_are_not_inte
         (&f.current, &f.browser, pending.handle(), Uuid::new_v4()),
     ] {
         assert!(matches!(
+            f.service.preview(current, browser, handle, id).await,
+            Err(Error::Unauthorized)
+        ));
+        assert!(matches!(
             f.service.approve(current, browser, handle, id).await,
             Err(Error::Unauthorized)
         ));

@@ -151,3 +151,26 @@ cargo test --locked -p easy-auth-core --features issuer-codes issuer::
 DATABASE_URL=postgres://… \
   cargo test --locked -p easy-auth-postgres --features issuer-codes --test lifecycle issuer_codes
 ```
+
+## Optional HTTPS consent page
+
+The Axum `issuer-consent-web` feature exposes
+`experimental_issuer_consent_router(auth, browser, Arc<IssuerAuthorization>)`.
+Use the identical realm and HTTPS root issuer/browser origin. This explicit
+embedding adds the consent page and closed same-origin POST contracts; ordinary
+server configuration remains unchanged. It does not mount a token endpoint.
+
+An application sends the exact code/openid/state/nonce/S256 request to
+`/oidc/authorize`. The page scrubs the query and requests no authority on GET. The
+owner first previews the actual registered client/return address, then chooses
+Allow or Deny using the actual fresh local session. Reloaded pages can explicitly
+resume and review their existing pending request without extending its lifetime.
+Private proofs remain in HttpOnly cookies. A different tab cannot approve a new
+request using an old preview. Logout/session replacement clears transport proofs.
+A restored page drops inputs and requires a new explicit review.
+
+Run the owned browser fixture only against disposable local PostgreSQL; its inbox
+and observation routes are test-only and must never be deployed. External browser
+requests are blocked and its database/TLS files are removed on exit. See
+[the runner](../../tests/browser/issuer-consent/README.md) and
+[ADR0036](../architecture/adr/0036-issuer-https-consent-delivery.md).

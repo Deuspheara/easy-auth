@@ -1014,3 +1014,15 @@ stay below300lines. Longer ordered transactions and negative/positive test scena
 retain lock/write/rollback or lifecycle evidence together as size exceptions; no
 transaction is hidden behind a generic helper, visibility widened or unrelated
 cleanup deferred.
+
+AUTH-38's explicit Axum consent transport owns routing/composition, closed schemas,
+thin POST handlers, fixed pages/script, private-cookie hygiene and contract in
+`issuer_consent/`. Core's read-only preview uses the existing repository port;
+PostgreSQL reuses decision locking without allocating or mutating authority. No
+source/freshness/persistence policy moves into handlers. Feature HTTP tests separate
+boundaries, lifecycle, recovery and contracts. The owned browser example separates
+resource lifecycle from router/fixture composition and imports existing test mail,
+owned database/process and TLS helpers unchanged. Its inbox is confined to that
+explicit example. New files stay below300lines; longer ordered acceptance/transaction
+functions retain evidence and cleanup together as size exceptions. No generic
+provider framework, widened production internals or unrelated cleanup is added.

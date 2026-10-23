@@ -628,3 +628,26 @@ layer, grants no new local session and is not a wire token. Internal owner/sessi
 IDs must never be serialized as `sub`. No HTTP endpoint or startup feature is
 introduced by this core/PostgreSQL increment. See
 [ADR0035](adr/0035-issuer-consent-and-authorization-codes.md).
+
+### Optional issuer HTTPS consent delivery
+
+`issuer-consent-web` adds only the explicit HTTPS root-origin
+`experimental_issuer_consent_router` and `issuer_consent_openapi` composition.
+Default routes and standalone startup do not mount it. Fixed GET `/oidc/authorize`
+and `/oidc/authorize.js` are non-authoritative. Origin-bound closed JSON POSTs:
+
+| Path | Input | Result |
+| --- | --- | --- |
+| `/v1/oidc/consent/prepare` | Exact code request members, `client_id` | Public preview UUID/client/actual URI/original expiry; private proof cookies |
+| `/v1/oidc/consent/resume` | Empty object | Revalidated existing pending preview; no grant or expiry extension |
+| `/v1/oidc/consent/approve` | `authorization` preview UUID | Validated callback with one code/state/iss |
+| `/v1/oidc/consent/cancel` | `authorization` preview UUID | Validated callback with access_denied/state/iss only |
+
+Every operation requires the actual fresh source-aware initiating session. Resume/
+decisions additionally require exact private browser/handle and public operation
+selector cookies; decision JSON must match that selector. Invalid/expired authority
+returns401; malformed input400, Origin403, oversized body413, media415, admission429,
+storage503 and timeout504 remain distinct. No unvalidated redirect receives a
+protocol error. Resume clears permanently unusable proofs on401, preserving them
+on503; failed decisions cannot clear another preview's cookies. There is no token
+endpoint or unsigned token response. See [ADR0036](adr/0036-issuer-https-consent-delivery.md).

@@ -44,6 +44,12 @@ pub trait IssuerAuthorizationRepository: Send + Sync {
         browser: Verifier,
         handle: Verifier,
     ) -> Result<i64>;
+    /// Revalidate existing pending consent for display only, without allocating
+    /// a subject/code or changing its original lifetime.
+    async fn preview_issuer_authorization(
+        &self,
+        proof: &IssuerConsentProof<'_>,
+    ) -> Result<IssuerAuthorizationDestination>;
     async fn approve_issuer_authorization(
         &self,
         proof: &IssuerConsentProof<'_>,

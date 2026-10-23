@@ -12,8 +12,8 @@ mod tests;
 
 pub use authority::IssuerAuthority;
 pub use data::{
-    IssuerAuthorizationDestination, IssuerAuthorizationReturn, IssuerAuthorizationStart,
-    IssuerGrantData, IssuerRedeemedCode,
+    IssuerAuthorizationDestination, IssuerAuthorizationPreview, IssuerAuthorizationReturn,
+    IssuerAuthorizationStart, IssuerGrantData, IssuerRedeemedCode,
 };
 pub use error::{IssuerTokenError, IssuerTokenResult};
 pub use pkce::IssuerPkceVerifier;

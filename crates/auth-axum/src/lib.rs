@@ -7,6 +7,8 @@ mod federation;
 #[cfg(all(feature = "oidc-web", feature = "saml-web"))]
 pub use federation::experimental_oidc_saml_web_router;
 mod handlers;
+#[cfg(feature = "issuer-consent-web")]
+mod issuer_consent;
 #[cfg(feature = "oidc-account-deletion")]
 mod oidc;
 #[cfg(feature = "passkey-enrollment")]
@@ -51,3 +53,6 @@ pub use passkeys::{experimental_passkey_recovery_setup_router, passkey_recovery_
 pub use passkeys::{
     PasskeyRecoveryServices, experimental_passkey_recovery_router, passkey_recovery_openapi,
 };
+
+#[cfg(feature = "issuer-consent-web")]
+pub use issuer_consent::{experimental_issuer_consent_router, issuer_consent_openapi};

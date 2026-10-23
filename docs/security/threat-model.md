@@ -710,3 +710,17 @@ preview confirmation, and token transport must authenticate actual client input
 without ambient-cookie fallback. Signing/key/audience, refresh, native storage and
 interoperability remain release work. See
 [ADR0035](../architecture/adr/0035-issuer-consent-and-authorization-codes.md).
+
+The optional HTTPS consent transport requires the same trusted root issuer/browser
+origin and realm. GET renders only fixed content; explicit Origin-bound POSTs create
+a preview and later approve/deny. Private HttpOnly browser/handle cookies, the actual
+fresh session, an operation cookie and the exact displayed preview UUID bind the
+choice. An old tab cannot approve a newer cookie-selected request. Read-only resume
+revalidates all original/current source/owner/caps without granting or extending
+anything. Storage failure preserves retry proofs; unusable recovery and local session
+replacement clear transport state. The fixed script scrubs query/fragment, uses text
+rendering, stores no protocol data in web storage and drops/aborts on navigation or
+restoration. A browser abort cannot undo an already committed SQL decision. This
+consent-only experimental embedding mounts no token endpoint and establishes no
+signed issuance, full OAuth/OIDC interoperability or outbound production approval.
+See [ADR0036](../architecture/adr/0036-issuer-https-consent-delivery.md).

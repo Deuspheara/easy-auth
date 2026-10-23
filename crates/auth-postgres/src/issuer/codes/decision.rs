@@ -68,6 +68,18 @@ impl DecisionCandidate {
         })
     }
 }
+pub(super) async fn preview(
+    store: &Postgres,
+    proof: &IssuerConsentProof<'_>,
+) -> Result<IssuerAuthorizationDestination> {
+    let candidate = DecisionCandidate::load(store, proof).await?;
+    let mut tx = store.pool.begin().await.map_err(unavailable)?;
+    let (state, _caller, deadline) = candidate.lock(&mut tx, proof).await?;
+    deadline.check(&mut tx).await?;
+    tx.commit().await.map_err(unavailable)?;
+    let expiry = state.expires_at_us;
+    candidate.destination(state, expiry)
+}
 pub(super) async fn approve(
     store: &Postgres,
     proof: &IssuerConsentProof<'_>,

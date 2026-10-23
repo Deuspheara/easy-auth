@@ -4,6 +4,13 @@ use std::fmt;
 use uuid::Uuid;
 use zeroize::{Zeroize, Zeroizing};
 
+/// Public consent metadata only; private credentials and correlation stay hidden.
+pub struct IssuerAuthorizationPreview {
+    pub authorization: Uuid,
+    pub client: Uuid,
+    pub redirect_uri: String,
+    pub expires_at_us: i64,
+}
 pub struct IssuerAuthorizationStart {
     pub(super) authorization: Uuid,
     pub(super) handle: Secret,

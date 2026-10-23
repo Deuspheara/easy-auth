@@ -83,6 +83,8 @@ jobs:
         run: |
           cargo test --locked -p easy-auth-core --features issuer-codes issuer::
           cargo test --locked -p easy-auth-postgres --features issuer-codes --test lifecycle issuer_codes
+      - name: Verify isolated issuer HTTPS consent boundary
+        run: cargo test --locked -p easy-auth-axum --features issuer-consent-web --test browser issuer_consent
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping
@@ -133,6 +135,10 @@ jobs:
         working-directory: tests/browser/passkeys
       - run: npx --no-install playwright install --with-deps chromium
         working-directory: tests/browser/passkeys
+      - name: Verify owned issuer HTTPS consent and browser recovery
+        run: |
+          cargo build --locked -p easy-auth-axum --features issuer-consent-web --example issuer-consent-browser
+          node tests/browser/issuer-consent/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs
       - name: Verify owned Google desktop browser return
         run: |

@@ -234,3 +234,11 @@ not inbound identities, local sessions, application permissions or signed tokens
 Typed issuer audit references bind the exact client/operation/owner/session tuple;
 confirmed owner erasure deidentifies them before cascading operation/subject rows.
 See [ADR0035](adr/0035-issuer-consent-and-authorization-codes.md).
+
+Read-only issuer consent recovery returns only the original public preview UUID,
+client, actual return URI and expiry after the same fresh current source/owner/
+session checks. It allocates no subject/code and never extends the operation.
+The HTTP operation cookie is a selector, not an owner or authorization proof;
+explicit decisions must also match the displayed preview UUID and both private
+proofs. Local session replacement clears transport state without claiming to undo
+an already committed code decision. See [ADR0036](adr/0036-issuer-https-consent-delivery.md).

@@ -47,3 +47,7 @@ mod google_web;
 #[cfg(feature = "saml-web")]
 #[path = "browser/saml/mod.rs"]
 mod saml;
+
+#[cfg(feature = "issuer-consent-web")]
+#[path = "browser/issuer_consent/mod.rs"]
+mod issuer_consent;

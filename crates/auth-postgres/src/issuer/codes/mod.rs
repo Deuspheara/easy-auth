@@ -39,6 +39,12 @@ impl IssuerAuthorizationRepository for Postgres {
     ) -> Result<i64> {
         preparation::save(self, request, current, browser, handle).await
     }
+    async fn preview_issuer_authorization(
+        &self,
+        proof: &IssuerConsentProof<'_>,
+    ) -> Result<IssuerAuthorizationDestination> {
+        decision::preview(self, proof).await
+    }
     async fn approve_issuer_authorization(
         &self,
         proof: &IssuerConsentProof<'_>,

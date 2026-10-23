@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-consent-web = ["auth-core/issuer-codes", "auth-postgres/issuer-codes"]
 saml-web = ["auth-core/saml-identities", "auth-postgres/saml-identities"]
 google-web = ["oidc-web", "auth-core/google"]
 oidc-web = ["oidc-account-deletion"]
@@ -108,3 +109,8 @@ required-features = ["saml-web"]
 name = "saml-keycloak-browser"
 path = "examples/saml-keycloak-browser/main.rs"
 required-features = ["saml-web"]
+
+[[example]]
+name = "issuer-consent-browser"
+path = "examples/issuer-consent-browser/main.rs"
+required-features = ["issuer-consent-web"]
