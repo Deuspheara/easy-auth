@@ -1,10 +1,7 @@
 use super::{FixtureResult, mail::Mail, send};
-use auth_core::{
-    Auth, IssuerAuthority, IssuerClientRegistration, IssuerKeyPublication, IssuerSigningKey,
-};
+use auth_core::{IssuerAuthority, IssuerKeyPublication, IssuerSigningKey};
 use auth_postgres::Postgres;
 use axum::{Json, Router, routing::get};
-use easy_auth_axum::{BrowserConfig, IssuerWebServices, experimental_issuer_web_router};
 use josekit::{jwk::KeyPair, jws::RS256};
 use sqlx::PgPool;
 use std::{net::SocketAddr, sync::Arc, time::Duration};
@@ -38,27 +35,17 @@ pub(super) async fn run(pool: &PgPool, origin: String) -> FixtureResult<()> {
         .await?;
     let revision = store.activate_issuer_key(&authority, key.id()).await?;
     store.enable_issuer_signing(&authority, revision).await?;
-    let client = store
-        .configure_issuer_client(&IssuerClientRegistration::public(
-            realm,
-            Uuid::new_v4(),
-            &["https://client.example/callback"],
-        )?)
-        .await?;
     let mail = Arc::new(Mail::default());
     let inbox = mail.clone();
-    let app = experimental_issuer_web_router(
-        Auth::new(realm, store.clone(), mail),
-        BrowserConfig::new(&origin, false)?,
-        IssuerWebServices::new(authority, store.clone(), store.clone(), vec![key])?,
-    )?;
+    let (app, client_id) =
+        super::profile::application(realm, &origin, authority, store, key, mail).await?;
     // Only public client metadata and actual EmailDelivery are exposed by this
     // disposable fixture; no session, code, token or private PKCE constructor.
     let fixture =
         Router::new()
             .route(
                 "/fixture/issuer/public",
-                get(move || async move { Json(serde_json::json!({"client_id":client.client()})) }),
+                get(move || async move { Json(serde_json::json!({"client_id":client_id})) }),
             )
             .route(
                 "/fixture/mail",

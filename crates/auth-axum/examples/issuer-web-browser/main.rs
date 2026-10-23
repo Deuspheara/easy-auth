@@ -3,6 +3,7 @@
 mod database;
 #[path = "../../tests/support/mail.rs"]
 mod mail;
+mod profile;
 mod server;
 use std::io::Write;
 type FixtureResult<T> = Result<T, Box<dyn std::error::Error>>;
