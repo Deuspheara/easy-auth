@@ -1,12 +1,16 @@
-use super::*;
+use auth_core::{IssuerAuthority, IssuerKeyPublication, IssuerSigningKey};
 use auth_core::{
     IssuerAuthorization, IssuerAuthorizationInput, IssuerClientAuthentication,
     IssuerClientRegistration, IssuerPkceVerifier, IssuerTokenIssuer, IssuerTokenRepository,
     Repository, Secret,
 };
+use easy_auth_postgres::Postgres;
+use josekit::{jwk::KeyPair, jws::RS256};
+use sqlx::PgPool;
 use std::sync::Arc;
+use uuid::Uuid;
 
-pub(super) struct Tokens {
+pub(crate) struct Tokens {
     pub pool: PgPool,
     pub store: Arc<Postgres>,
     pub authority: IssuerAuthority,

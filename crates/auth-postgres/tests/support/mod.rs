@@ -63,3 +63,6 @@ pub(crate) mod lock_observation;
     any(feature = "saml-identities", feature = "google")
 ))]
 pub(crate) use observation as lock_observation;
+
+#[cfg(feature = "issuer-signing")]
+pub(crate) mod issuer_tokens;
