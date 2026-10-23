@@ -90,8 +90,19 @@ impl IssuerGrantData {
         authority: &IssuerAuthority,
         client: &IssuerClientRegistration,
     ) -> IssuerTokenResult<()> {
+        if !client.supports_online_authorization() {
+            return Err(IssuerTokenError::Unavailable);
+        }
+        self.validate_common(authority, client)
+    }
+    /// Shared identity/time facts only. Explicit callers must independently
+    /// enforce their online/native profile and original authorization policy.
+    pub(in crate::issuer) fn validate_common(
+        &self,
+        authority: &IssuerAuthority,
+        client: &IssuerClientRegistration,
+    ) -> IssuerTokenResult<()> {
         if client.realm() != authority.realm()
-            || !client.supports_online_authorization()
             || self.authorization.is_nil()
             || self.owner.is_nil()
             || self.session.is_nil()

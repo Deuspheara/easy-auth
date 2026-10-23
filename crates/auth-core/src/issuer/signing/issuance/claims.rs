@@ -1,5 +1,6 @@
-use super::proof::StagedData;
-use crate::{IssuerClientRegistration, IssuerTokenError, IssuerTokenResult};
+use crate::{
+    IssuerAuthority, IssuerClientRegistration, IssuerGrantData, IssuerTokenError, IssuerTokenResult,
+};
 use serde::Serialize;
 use zeroize::Zeroizing;
 
@@ -14,13 +15,13 @@ struct IdClaims<'a> {
     auth_time: i64,
 }
 pub(super) fn payload(
-    staged: &StagedData,
+    authority: &IssuerAuthority,
+    grant: &IssuerGrantData,
     client: &IssuerClientRegistration,
     expires_at_us: i64,
 ) -> IssuerTokenResult<Zeroizing<Vec<u8>>> {
-    let grant = &staged.data.grant;
     let claims = IdClaims {
-        iss: staged.data.signing.authority().issuer(),
+        iss: authority.issuer(),
         sub: grant.subject.to_string(),
         aud: client.client().to_string(),
         nonce: &grant.nonce,
