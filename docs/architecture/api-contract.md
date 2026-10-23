@@ -605,3 +605,26 @@ with one base and combined contract for engineering tests. It preserves their
 exact HTTPS callbacks, realm checks, Origin boundaries and private proof cookies.
 [ADR 0029](adr/0029-gated-saml-server-composition.md) records trusted provisioning and
 read-only restart semantics; ADR0032 supersedes its separate approval requirement.
+
+### Optional issuer authorization-code component
+
+With `issuer-codes`, `IssuerAuthorization` composes a trusted `IssuerAuthority` and
+`IssuerAuthorizationRepository`. `prepare` takes the actual session/browser Secrets
+and `IssuerAuthorizationInput` (client, code response type, exact actual URI, openid,
+state, nonce and S256 challenge). Its start exposes a private handle and public
+preview UUID, client/destination and original expiry. Neither creates authority.
+`approve`/`cancel` require the initiating session, private browser/handle and that
+exact preview UUID. Only validated registered destinations receive code/state/iss
+or access_denied/state/iss. HTTP must independently enforce private cookie/Origin/
+explicit confirmation and never select owner/realm from these wire fields.
+
+`redeem` takes typed public/Basic client input, canonical code Secret, actual exact
+URI, `IssuerPkceVerifier` and a trusted network-source string. Source is an abuse key,
+never a body-selected credential. The repository atomically checks current client/
+source/session, PKCE and original code binding, consumes once and records audit.
+`IssuerTokenError` separates InvalidClient, InvalidGrant, RateLimited and Unavailable.
+The opaque `IssuerRedeemedCode` contains internal identity/caps for a later signing
+layer, grants no new local session and is not a wire token. Internal owner/session
+IDs must never be serialized as `sub`. No HTTP endpoint or startup feature is
+introduced by this core/PostgreSQL increment. See
+[ADR0035](adr/0035-issuer-consent-and-authorization-codes.md).

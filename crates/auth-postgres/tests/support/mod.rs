@@ -1,4 +1,6 @@
 pub(crate) mod legacy;
+#[cfg(feature = "issuer-codes")]
+pub(crate) mod legacy_attribution;
 #[cfg(feature = "oauth-transactions")]
 pub(crate) mod legacy_oauth;
 #[cfg(any(feature = "saml-identities", feature = "google"))]

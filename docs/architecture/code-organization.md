@@ -996,3 +996,21 @@ orchestration keeps source identity, selected graph/package, test invocation and
 post-test freeze checks together for review. All new modules stay under300lines;
 full graph receipts are deliberate generated-evidence size exceptions. No generic
 resource framework, protocol policy copy, new runtime dependency or proof API.
+
+AUTH-38 keeps request/PKCE/response policy, repository port, orchestration and opaque
+result under core `issuer/codes/`. PostgreSQL `issuer/codes/` separates preparation,
+explicit decisions, redemption, state loading, database clock and committed abuse
+admission. Each authority transaction remains visible from its first lock through
+final clock and commit. `sessions/authorization.rs` composes the unchanged existing
+source-aware fresh-owner rules; it does not copy them. Subject allocation was
+extracted in a separate structural commit before reuse inside approval.
+
+Feature tests separate lifecycle, bindings, credentials, admission, observed
+orderings/final write deadlines, storage constraints, rollback/erasure and migration.
+OIDC/SAML source cases stay beside their existing ordinary producers without a new
+signature fixture or production proof constructor. A focused historical issuer
+fixture under `tests/support/` uses only original pre-0029 audit columns. New modules
+stay below300lines. Longer ordered transactions and negative/positive test scenarios
+retain lock/write/rollback or lifecycle evidence together as size exceptions; no
+transaction is hidden behind a generic helper, visibility widened or unrelated
+cleanup deferred.

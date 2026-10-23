@@ -9,7 +9,11 @@ use uuid::Uuid;
 pub(crate) struct Deadline(i64);
 
 impl Deadline {
-    #[cfg(any(feature = "oauth-transactions", feature = "saml-identities"))]
+    #[cfg(any(
+        feature = "oauth-transactions",
+        feature = "saml-identities",
+        feature = "issuer-codes"
+    ))]
     pub(crate) fn expires_us(&self) -> i64 {
         self.0
     }

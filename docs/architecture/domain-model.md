@@ -223,3 +223,14 @@ registration remain ownership authority. AuthnInstant is the established event,
 not new Response/Assertion issuance; stored sessions and deletion freshness use
 that original signed time. [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md)
 records these gated contracts and the unchanged verifier/clock boundary.
+
+The optional outbound issuer authorization has a distinct realm/issuer/client
+revision, exact actual callback, private browser/handle hashes, S256 challenge,
+nonce/state and initiating source-aware owner/session. Explicit approval allocates
+the existing pairwise sector subject and one short-lived hash-only code; one atomic
+redemption scrubs correlation data. Original authentication time and all original/
+current caps remain authoritative through the final transaction write. These are
+not inbound identities, local sessions, application permissions or signed tokens.
+Typed issuer audit references bind the exact client/operation/owner/session tuple;
+confirmed owner erasure deidentifies them before cascading operation/subject rows.
+See [ADR0035](adr/0035-issuer-consent-and-authorization-codes.md).

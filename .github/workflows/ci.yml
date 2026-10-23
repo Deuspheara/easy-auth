@@ -79,6 +79,10 @@ jobs:
         run: |
           cargo test --locked -p easy-auth-core --features issuer-clients issuer::
           cargo test --locked -p easy-auth-postgres --features issuer-clients --test lifecycle issuer::
+      - name: Verify issuer codes without optional provider backends
+        run: |
+          cargo test --locked -p easy-auth-core --features issuer-codes issuer::
+          cargo test --locked -p easy-auth-postgres --features issuer-codes --test lifecycle issuer_codes
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping

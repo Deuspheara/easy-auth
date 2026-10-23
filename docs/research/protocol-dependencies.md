@@ -320,3 +320,11 @@ crypto primitive or remote sector-document client. Stored random sector/owner UU
 follow the OIDC Core section8.1 GUID method. Reviewed signing/claims, client-auth
 protocol handling, real consent, conformance and M07 prerequisites remain gates;
 [ADR0026](../architecture/adr/0026-outbound-client-registration.md) bounds the slice.
+
+AUTH-38's optional `issuer-codes` uses the already-selected URL, UUID, existing
+Secret/randomness, SHA-256/base64, zeroize and SQLx dependencies. No version, license,
+algorithm, crypto/native verifier or advisory exception changes. S256 uses the
+existing digest implementation and the previously used published RFC7636 vector;
+no custom signature or XML fixture is introduced. The code component does not
+establish an outbound JWT/signing dependency decision, conformance or independent
+approval. AUTH-39 and M07 still require their own actual evidence.

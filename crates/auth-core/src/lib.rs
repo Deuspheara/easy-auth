@@ -111,6 +111,16 @@ pub use saml::{
     SamlDeletionRequests, SamlDeletionVerifier, SamlPreparedDeletion, SamlVerifiedDeletion,
 };
 
+#[cfg(feature = "issuer-codes")]
+pub use issuer::{
+    ISSUER_AUTHORIZATION_LIFETIME_SECONDS, ISSUER_CODE_LIFETIME_SECONDS,
+    ISSUER_TOKEN_ATTEMPTS_PER_MINUTE, ISSUER_TOKEN_RATE_WINDOW_SECONDS, IssuerAuthority,
+    IssuerAuthorization, IssuerAuthorizationDestination, IssuerAuthorizationInput,
+    IssuerAuthorizationRepository, IssuerAuthorizationRequest, IssuerAuthorizationReturn,
+    IssuerAuthorizationStart, IssuerCodeRedemption, IssuerConsentProof, IssuerGrantData,
+    IssuerPkceVerifier, IssuerRedeemedCode, IssuerTokenError, IssuerTokenResult,
+    MAX_ISSUER_PENDING_PER_OWNER, MAX_ISSUER_PENDING_PER_REALM, MAX_ISSUER_TOKEN_SOURCES_PER_REALM,
+};
 #[cfg(feature = "issuer-clients")]
 pub use issuer::{
     IssuerClientAuthentication, IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile,

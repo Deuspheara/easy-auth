@@ -123,3 +123,31 @@ Full client-auth protocol negatives, other native profiles, actual consent, toke
 key rotation, conformance and standalone interoperability remain future M07 work.
 Current source-specific local verification is recorded in the
 [issuer client verification record](../security/issuer-client-verification.md).
+
+## Optional consent/code crate
+
+Enable `issuer-codes` in core/PostgreSQL for the separate explicit consent and
+one-time code component. Construct a trusted `IssuerAuthority` from the operator's
+realm and stable HTTPS issuer, then `IssuerAuthorization` with the repository.
+Prepare with the actual fresh session/browser Secrets and a code/openid request,
+nonempty state/nonce and S256. Approve or cancel using the exact returned preview
+UUID plus the initiating session and private browser/handle. A public preview UUID
+alone authorizes nothing. Approval returns the validated actual callback with
+code/state/iss; cancellation returns only access_denied/state/iss.
+
+Redemption requires typed registered public/Basic input, the canonical code Secret,
+the complete actual redirect, a43–128character RFC7636 verifier and a trusted network
+source for bounded abuse admission. Native port flexibility applies to admission;
+redemption still compares the exact original actual port. The opaque result is for
+a later signing layer, not a wire token. Do not serialize its internal local owner
+or session as an outbound subject. No issuer HTTP router, token endpoint, normal
+server activation or production approval accompanies this optional crate feature.
+See [ADR0035](../architecture/adr/0035-issuer-consent-and-authorization-codes.md).
+
+Verify in isolation against real PostgreSQL:
+
+```sh
+cargo test --locked -p easy-auth-core --features issuer-codes issuer::
+DATABASE_URL=postgres://… \
+  cargo test --locked -p easy-auth-postgres --features issuer-codes --test lifecycle issuer_codes
+```

@@ -1,4 +1,8 @@
+#[cfg(feature = "issuer-codes")]
+mod authorization;
 mod listing;
+#[cfg(feature = "issuer-codes")]
+pub(crate) use authorization::{FreshSessionAuthorization, FreshSessionSnapshot};
 mod logout;
 #[cfg(feature = "oidc-identities")]
 mod oidc;

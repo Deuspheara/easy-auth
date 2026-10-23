@@ -688,3 +688,25 @@ UUIDs use existing randomness, with no new cryptographic scheme. A mapping or
 registered client is not consent, authenticated-client or token authority. No issuer
 route/startup path is enabled. AUTH-32 and M07 production prerequisites, real client
 authentication/consent/PKCE/issuance/key/conformance work remain open.
+
+## Optional outbound consent/code component
+
+`issuer-codes` requires explicit fresh-owner consent under exact private browser,
+handle and preview UUID binding. Preparation grants no authority. Mandatory S256,
+current registered client authentication, exact actual redirect (including native
+port), issuer/realm/revision and source-aware initiating session bind one-use code
+consumption. Public identification cannot replace PKCE; an old or disabled upstream
+source cannot authorize a downstream code. Actual authentication time is retained,
+not inferred from fresh issuance. Original300second consent/60second code and
+session/freshness caps survive waits; the final database-clock check rolls back all
+state/subject/audit writes on expiry. Separate committed bounded source admission
+precedes even unknown-client lookup. Invalid credentials/grants do not mask storage
+failure. Account erasure removes local codes/mappings and deidentifies their audit
+attribution in the owning transaction, preserving other realms.
+
+This optional component returns no signed token, HTTP endpoint or normal startup
+activation. The future browser boundary must bind Origin/private cookies and exact
+preview confirmation, and token transport must authenticate actual client input
+without ambient-cookie fallback. Signing/key/audience, refresh, native storage and
+interoperability remain release work. See
+[ADR0035](../architecture/adr/0035-issuer-consent-and-authorization-codes.md).

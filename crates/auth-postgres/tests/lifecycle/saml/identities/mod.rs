@@ -11,6 +11,8 @@ mod deletion_setup;
 mod delivery;
 mod delivery_setup;
 mod isolation;
+#[cfg(feature = "issuer-codes")]
+mod issuer_codes;
 mod mapping;
 mod migration;
 mod namespace;

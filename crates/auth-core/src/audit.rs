@@ -4,6 +4,18 @@ use uuid::Uuid;
 /// Only the repository transaction that commits a verified operation records its event.
 #[derive(Debug)]
 pub enum AuditEvent {
+    IssuerAuthorized {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+        client_id: Uuid,
+        authorization_id: Uuid,
+    },
+    IssuerCodeRedeemed {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+        client_id: Uuid,
+        authorization_id: Uuid,
+    },
     SamlAuthenticated {
         user_id: Uuid,
         session_id: Uuid,
@@ -91,6 +103,24 @@ pub enum AuditEvent {
 }
 
 impl AuditEvent {
+    pub fn issuer_client_id(&self) -> Option<Uuid> {
+        match self {
+            Self::IssuerAuthorized { client_id, .. }
+            | Self::IssuerCodeRedeemed { client_id, .. } => Some(*client_id),
+            _ => None,
+        }
+    }
+    pub fn issuer_authorization_id(&self) -> Option<Uuid> {
+        match self {
+            Self::IssuerAuthorized {
+                authorization_id, ..
+            }
+            | Self::IssuerCodeRedeemed {
+                authorization_id, ..
+            } => Some(*authorization_id),
+            _ => None,
+        }
+    }
     pub fn recovery_claim_id(&self) -> Option<Uuid> {
         match self {
             Self::PasskeyRecovered { claim_id, .. }
@@ -111,6 +141,8 @@ impl AuditEvent {
 
     pub fn kind(&self) -> &'static str {
         match self {
+            Self::IssuerAuthorized { .. } => "issuer_authorized",
+            Self::IssuerCodeRedeemed { .. } => "issuer_code_redeemed",
             Self::SamlAuthenticated { .. } => "saml_authenticated",
             Self::OidcAuthenticated { .. } => "oidc_authenticated",
             Self::EmailAuthenticated { .. } => "email_authenticated",
@@ -135,7 +167,9 @@ impl AuditEvent {
     }
     pub fn user_id(&self) -> Option<Uuid> {
         match self {
-            Self::EmailAuthenticated { user_id, .. }
+            Self::IssuerAuthorized { user_id, .. }
+            | Self::IssuerCodeRedeemed { user_id, .. }
+            | Self::EmailAuthenticated { user_id, .. }
             | Self::OidcAuthenticated { user_id, .. }
             | Self::SamlAuthenticated { user_id, .. }
             | Self::PasswordAuthenticated { user_id, .. }
@@ -162,7 +196,13 @@ impl AuditEvent {
             Self::PasskeyRecoveryCancelled {
                 actor_session_id, ..
             } => *actor_session_id,
-            Self::PasswordEnrolled {
+            Self::IssuerAuthorized {
+                actor_session_id, ..
+            }
+            | Self::IssuerCodeRedeemed {
+                actor_session_id, ..
+            }
+            | Self::PasswordEnrolled {
                 actor_session_id, ..
             }
             | Self::PasskeyEnrolled {
@@ -213,7 +253,9 @@ impl AuditEvent {
             | Self::PasswordEnrolled { session_id, .. }
             | Self::EmailAttached { session_id, .. }
             | Self::SessionRevoked { session_id, .. } => Some(*session_id),
-            Self::PasswordReset { .. }
+            Self::IssuerAuthorized { .. }
+            | Self::IssuerCodeRedeemed { .. }
+            | Self::PasswordReset { .. }
             | Self::PasskeyEnrolled { .. }
             | Self::PasskeyRenamed { .. }
             | Self::PasskeyRemoved { .. }

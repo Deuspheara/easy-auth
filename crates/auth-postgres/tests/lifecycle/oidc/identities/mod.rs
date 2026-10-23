@@ -10,4 +10,6 @@ mod session_waits;
 mod sessions;
 mod setup;
 
+#[cfg(feature = "issuer-codes")]
+mod issuer_codes;
 mod startup;
