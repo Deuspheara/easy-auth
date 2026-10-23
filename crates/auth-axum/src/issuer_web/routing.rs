@@ -24,6 +24,14 @@ pub fn experimental_issuer_web_router(
     browser: BrowserConfig,
     services: IssuerWebServices,
 ) -> Result<Router> {
+    compose(auth, browser, services, issuer_web_openapi())
+}
+pub(super) fn compose(
+    auth: Auth,
+    browser: BrowserConfig,
+    services: IssuerWebServices,
+    contract: utoipa::openapi::OpenApi,
+) -> Result<Router> {
     if auth.realm() != services.tokens.authority().realm()
         || browser.origin() != services.metadata.origin()
     {
@@ -33,7 +41,7 @@ pub fn experimental_issuer_web_router(
         auth: auth.clone(),
         browser: browser.clone(),
     };
-    let router = configured_router(auth.clone(), browser.clone(), issuer_web_openapi());
+    let router = configured_router(auth.clone(), browser.clone(), contract);
     let router =
         crate::issuer_consent::attach(router, auth, browser, services.authorization.clone())?;
     let state = WebState { services };

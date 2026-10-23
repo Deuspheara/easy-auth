@@ -5,17 +5,7 @@ use std::collections::BTreeMap;
 pub(super) use super::types::TokenFormSchema as TokenForm;
 impl TokenForm {
     pub fn parse(headers: &HeaderMap, body: &[u8]) -> Result<Self, TokenHttpError> {
-        content_type(headers)?;
-        let raw = std::str::from_utf8(body).map_err(|_| invalid())?;
-        let mut fields = BTreeMap::new();
-        for pair in raw.split('&') {
-            let (name, value) = pair.split_once('=').ok_or_else(invalid)?;
-            let name = component(name)?;
-            let value = component(value)?;
-            if fields.insert(name, value).is_some() {
-                return Err(invalid());
-            }
-        }
+        let mut fields = fields(headers, body)?;
         if fields.keys().any(|name| {
             ![
                 "grant_type",
@@ -46,6 +36,25 @@ impl TokenForm {
             client_id: fields.remove("client_id"),
         })
     }
+}
+/// Shared strict form decoding; each operation owns its closed allowed/required
+/// member policy. Percent-decoded duplicate names are rejected before selection.
+pub(super) fn fields(
+    headers: &HeaderMap,
+    body: &[u8],
+) -> Result<BTreeMap<String, String>, TokenHttpError> {
+    content_type(headers)?;
+    let raw = std::str::from_utf8(body).map_err(|_| invalid())?;
+    let mut fields = BTreeMap::new();
+    for pair in raw.split('&') {
+        let (name, value) = pair.split_once('=').ok_or_else(invalid)?;
+        let name = component(name)?;
+        let value = component(value)?;
+        if fields.insert(name, value).is_some() {
+            return Err(invalid());
+        }
+    }
+    Ok(fields)
 }
 pub(super) fn component(input: &str) -> Result<String, TokenHttpError> {
     let bytes = input.as_bytes();
