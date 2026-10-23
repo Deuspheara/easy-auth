@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-signing = ["issuer-codes", "auth-core/issuer-signing", "dep:serde_json", "sqlx/json"]
 issuer-codes = ["issuer-clients", "auth-core/issuer-codes"]
 issuer-clients = ["auth-core/issuer-clients"]
 saml-identities = ["saml-verification", "auth-core/saml-identities"]
@@ -24,6 +25,7 @@ oauth-transactions = ["auth-core/oauth-transactions"]
 passkeys = ["auth-core/passkeys"]
 
 [dependencies]
+serde_json = { workspace = true, optional = true }
 auth-core.workspace = true
 async-trait.workspace = true
 sqlx.workspace = true

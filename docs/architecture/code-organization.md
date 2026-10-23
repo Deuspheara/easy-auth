@@ -86,6 +86,19 @@ The approximate 300-line file and 50-line function thresholds in AGENTS.md trigg
 
 ## Implemented layout
 
+Issuer signing keeps key/publication/metadata and concrete staged issuance in core
+`issuer/signing/`; PostgreSQL registry/metadata and final preparation/completion live
+in the corresponding owning folder. Shared code redemption state retains source/
+owner/lock policy. Axum `issuer_web/` separates strict form/Basic parsing, finite
+wire types/errors, metadata, token handlers and trusted composition; consent pages
+reuse the existing feature. Server `issuer_key` owns only trusted protected-file
+input. Tests separate registry/migrations, ordinary sequential rollover, policy/
+expiry/erasure and wire/RP scenarios. No generic signer, provider framework, public
+proof constructor, SQL in HTTP or new crate is added. Longer final issuance and
+ordered RP/rollover tests keep their invariant sequence visible; new files stay
+under300lines. Owned browser/client fixtures reuse existing TLS/database/process
+support, with only healthy production outputs. No unrelated cleanup is deferred.
+
 Issuer registration keeps native URL admission in core `issuer/native.rs` and
 typed request credentials in `issuer/authentication.rs`, separate from registration
 and unchanged web redirects. PostgreSQL `issuer/authentication.rs` owns only the

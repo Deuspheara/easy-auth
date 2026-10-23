@@ -105,6 +105,32 @@ impl LockedCode {
             session_expires_at_us: self.state.session_cap_us,
         })
     }
+    #[cfg(feature = "issuer-signing")]
+    pub(in crate::issuer) fn matches_grant(
+        &self,
+        grant: &IssuerGrantData,
+    ) -> IssuerTokenResult<bool> {
+        let current = self.facts(grant.issued_at_us)?;
+        Ok(current.authorization == grant.authorization
+            && current.owner == grant.owner
+            && current.session == grant.session
+            && current.subject == grant.subject
+            && current.nonce == grant.nonce
+            && current.authentication_method == grant.authentication_method
+            && current.authenticated_at_us == grant.authenticated_at_us
+            && current.session_expires_at_us == grant.session_expires_at_us)
+    }
+    #[cfg(feature = "issuer-signing")]
+    pub(in crate::issuer) async fn snapshot(
+        &self,
+        tx: &mut Transaction<'_, Pg>,
+        request: &IssuerCodeRedemption<'_>,
+    ) -> Result<String> {
+        // PostgreSQL's own canonical row representation freezes every original
+        // field across the unlocked signing interval. Never log/serialize it to HTTP.
+        sqlx::query_scalar("SELECT to_jsonb(a)::text FROM auth_issuer_authorizations a WHERE realm_id=$1 AND id=$2")
+            .bind(request.authority.realm()).bind(self.state.id).fetch_one(&mut **tx).await.map_err(unavailable)
+    }
     pub(in crate::issuer) async fn consume(
         &self,
         tx: &mut Transaction<'_, Pg>,

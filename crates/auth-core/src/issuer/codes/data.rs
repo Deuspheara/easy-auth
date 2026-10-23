@@ -97,8 +97,9 @@ impl IssuerGrantData {
         Ok(())
     }
 }
-/// Opaque committed code result. Signing/token issuance consumes this value in
-/// the later issuer layer; it has no public constructor, Clone or serialization.
+/// Opaque committed code-component result, not signing authority. Signed token
+/// issuance uses its separate staged/final-check flow. This value has no public
+/// constructor, Clone or serialization.
 pub struct IssuerRedeemedCode {
     pub(super) authority: IssuerAuthority,
     pub(super) client: IssuerClientRegistration,

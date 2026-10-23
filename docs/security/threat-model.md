@@ -724,3 +724,43 @@ restoration. A browser abort cannot undo an already committed SQL decision. This
 consent-only experimental embedding mounts no token endpoint and establishes no
 signed issuance, full OAuth/OIDC interoperability or outbound production approval.
 See [ADR0036](../architecture/adr/0036-issuer-https-consent-delivery.md).
+
+## Optional signed issuer component
+
+The explicit `issuer-signing`/`issuer-web` extensions use pinned josekit/OpenSSL
+RS256 with bounded validated operator input and allowlisted public JWK output.
+Optional Unix loading checks the opened regular owner-only file and refuses final
+symlinks; trusted parent directories, ownership and secret distribution remain
+operator responsibilities. Native library copies are not claimed erased. No default
+key, request-selected algorithm, private SQL/JSON output or old-key fallback exists.
+Current active key/revision, immutable key IDs, bounded prepublication/overlap and
+explicit disable prevent metadata reconfiguration from granting signing authority.
+Emergency removal cannot revoke keys already cached by consumers.
+
+Native signing holds no SQL locks. Its opaque staged result grants nothing until
+the final exact client/key/source/owner/session/code snapshot and all original caps
+are checked again, access hash/code scrub/audit are written and the final clock
+check commits. Replay and storage/expiry/policy failures return no staged credential.
+The issued audience is the registered client; subject is the random pairwise sector
+mapping, never an email/local owner/provider ID. Original auth_time is retained;
+issuance cannot manufacture authentication freshness or MFA. Current conservative
+expiry is bounded by the original60second code and session/freshness/key windows.
+
+Only the dedicated token POST omits browser Origin enforcement. It accepts explicit
+public identity or registered Basic authentication plus code/exact actual redirect/
+S256, with strict closed bounded form/percent/duplicate/header parsing. Ambient
+cookies never authenticate it. Actual transport ConnectInfo selects admission;
+missing peer data fails closed and forwarding headers cannot reset limits. Local
+cookie/consent routes retain their existing Origin/private-proof boundary. Opaque
+access credentials cannot authenticate a local session or grant application roles.
+Owner erasure cascades local ledger/code/subject rows but cannot erase a previously
+issued self-contained ID token or downstream application session. The conservative
+expiry bounds that snapshot; immediate offline revocation/sign-out propagation is
+not provided.
+
+Real-PG, HTTP, sequential ordinary rollover and in-process existing-RP cases provide
+bounded implementation evidence. They do not establish independent review, external
+RP conformance, native secure storage or production approval. The owned healthy TLS
+browser/client runner is separate evidence. No adversarial cryptographic/XML
+producer or custom signature-concurrency experiment is part of this increment.
+See [ADR0037](../architecture/adr/0037-issuer-signing-and-final-issuance.md).

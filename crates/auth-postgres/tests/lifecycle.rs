@@ -43,3 +43,7 @@ mod issuer;
 #[cfg(feature = "issuer-codes")]
 #[path = "lifecycle/issuer_codes/mod.rs"]
 mod issuer_codes;
+
+#[cfg(feature = "issuer-signing")]
+#[path = "lifecycle/issuer_signing/mod.rs"]
+mod issuer_signing;

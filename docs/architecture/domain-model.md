@@ -242,3 +242,14 @@ The HTTP operation cookie is a selector, not an owner or authorization proof;
 explicit decisions must also match the displayed preview UUID and both private
 proofs. Local session replacement clears transport state without claiming to undo
 an already committed code decision. See [ADR0036](adr/0036-issuer-https-consent-delivery.md).
+
+Optional signed issuance adds a distinct realm/issuer public-key registry with full
+revision, explicit active selection, publication/sign/verification windows and
+operator disable. Private operator keys have no persistence/public projection.
+`IssuerSigningSnapshot` is configuration data; only the concrete signer constructs
+the opaque staged `IssuerSignedCode`. Final current-policy/code/owner checks commit
+the ledger before wire credentials exist. Migration0031 binds hash-only access rows
+to the full authorization/client/owner/session/pairwise-subject tuple and public key;
+owner erasure cascades these rows. Access credentials and ID tokens are neither
+local sessions nor application permissions. Original authentication time and all
+earliest original caps survive signing. See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md).

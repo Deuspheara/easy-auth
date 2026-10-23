@@ -126,3 +126,11 @@ pub use issuer::{
     IssuerClientAuthentication, IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile,
     MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
 };
+
+#[cfg(feature = "issuer-signing")]
+pub use issuer::{
+    ISSUER_ID_TOKEN_LIFETIME_SECONDS, ISSUER_KEY_PROPAGATION_SECONDS, IssuerDiscoveryDocument,
+    IssuerJwksDocument, IssuerKeyPublication, IssuerMetadata, IssuerMetadataRepository,
+    IssuerPublicKey, IssuerSignedCode, IssuerSigningKey, IssuerSigningSnapshot, IssuerTokenIssuer,
+    IssuerTokenPreparationData, IssuerTokenRepository, IssuerTokens, MAX_ISSUER_PUBLISHED_KEYS,
+};

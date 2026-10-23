@@ -1,5 +1,15 @@
 # Protocol dependency assessment
 
+AUTH-39's optional outbound signer reuses the pinned josekit0.10.3/OpenSSL0.10.81
+graph from ADR0015 with an explicit RS256-only profile. It introduces no new crypto
+implementation or advisory exception. This reuse and internal RP evidence are not
+an independent audit of outbound issuance. Optional Unix protected-file loading
+uses only safe `OpenOptionsExt` with NOFOLLOW/NONBLOCK constants from the already
+locked libc0.2.191 (MIT OR Apache-2.0); no unsafe application code or libc syscall
+wrapper is introduced. Cargo.lock adds direct feature edges only, with no package
+or version change. Current advisory/license results must be rerun for this source.
+[ADR0037](../architecture/adr/0037-issuer-signing-and-final-issuance.md) records limits.
+
 Current SAML activation policy: [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.

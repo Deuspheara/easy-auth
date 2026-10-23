@@ -23,3 +23,13 @@ pub use codes::{
 };
 pub use redirects::{MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS};
 pub use registration::{IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile};
+
+#[cfg(feature = "issuer-signing")]
+mod signing;
+#[cfg(feature = "issuer-signing")]
+pub use signing::{
+    ISSUER_ID_TOKEN_LIFETIME_SECONDS, ISSUER_KEY_PROPAGATION_SECONDS, IssuerDiscoveryDocument,
+    IssuerJwksDocument, IssuerKeyPublication, IssuerMetadata, IssuerMetadataRepository,
+    IssuerPublicKey, IssuerSignedCode, IssuerSigningKey, IssuerSigningSnapshot, IssuerTokenIssuer,
+    IssuerTokenPreparationData, IssuerTokenRepository, IssuerTokens, MAX_ISSUER_PUBLISHED_KEYS,
+};

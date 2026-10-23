@@ -51,3 +51,7 @@ mod saml;
 #[cfg(feature = "issuer-consent-web")]
 #[path = "browser/issuer_consent/mod.rs"]
 mod issuer_consent;
+
+#[cfg(feature = "issuer-web")]
+#[path = "browser/issuer_web/mod.rs"]
+mod issuer_web;

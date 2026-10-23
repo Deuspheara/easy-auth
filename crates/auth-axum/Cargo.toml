@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-web = ["issuer-consent-web", "auth-core/issuer-signing", "auth-postgres/issuer-signing", "dep:base64", "dep:zeroize"]
 issuer-consent-web = ["auth-core/issuer-codes", "auth-postgres/issuer-codes"]
 saml-web = ["auth-core/saml-identities", "auth-postgres/saml-identities"]
 google-web = ["oidc-web", "auth-core/google"]
@@ -23,6 +24,8 @@ passkey-recovery-setup = ["passkey-management"]
 passkey-recovery = ["passkey-recovery-setup"]
 
 [dependencies]
+base64 = { workspace = true, optional = true }
+zeroize = { workspace = true, optional = true }
 auth-core.workspace = true
 axum.workspace = true
 serde.workspace = true
@@ -114,3 +117,8 @@ required-features = ["saml-web"]
 name = "issuer-consent-browser"
 path = "examples/issuer-consent-browser/main.rs"
 required-features = ["issuer-consent-web"]
+
+[[example]]
+name = "issuer-web-browser"
+path = "examples/issuer-web-browser/main.rs"
+required-features = ["issuer-web"]

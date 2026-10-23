@@ -43,6 +43,28 @@ pub(crate) async fn post_delivery_boundary(
     .await
 }
 
+/// Independent OAuth client/code/PKCE authentication only. Never attach this
+/// Origin exception to a local session-cookie authority route.
+#[cfg(feature = "issuer-web")]
+pub(crate) async fn client_token_boundary(
+    State(state): State<AppState>,
+    request: Request,
+    next: Next,
+) -> Response {
+    let mut response = serve(
+        state,
+        request,
+        next,
+        false,
+        json!({"error":"temporarily_unavailable"}),
+    )
+    .await;
+    response
+        .headers_mut()
+        .insert(header::PRAGMA, HeaderValue::from_static("no-cache"));
+    response
+}
+
 async fn serve(
     state: AppState,
     request: Request,

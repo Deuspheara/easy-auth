@@ -651,3 +651,39 @@ storage503 and timeout504 remain distinct. No unvalidated redirect receives a
 protocol error. Resume clears permanently unusable proofs on401, preserving them
 on503; failed decisions cannot clear another preview's cookies. There is no token
 endpoint or unsigned token response. See [ADR0036](adr/0036-issuer-https-consent-delivery.md).
+
+### Optional signed issuer transport
+
+`issuer-web` adds `IssuerWebServices` and `experimental_issuer_web_router`, extending
+the consent composition above. Supply the identical realm and exact HTTPS root
+issuer/browser origin, separate token/metadata repository ports and explicit protected
+keys. Default routes and standalone startup do not activate an issuer.
+
+| Method/path | Contract |
+| --- | --- |
+| GET `/.well-known/openid-configuration` | Exact issuer/endpoints; code/query, openid, S256, pairwise, RS256, none/Basic only |
+| GET `/oidc/jwks` | At most four enabled retained public RSA verification keys; no private/certificate/key URL members |
+| POST `/oidc/token` | Closed form authorization_code/code/redirect_uri/code_verifier and optional client_id; maximum8192bytes |
+
+Metadata accepts no query-selected realm/issuer. Token POST requires one form content
+type (optional UTF-8 charset), no encoding/query, strict percent/UTF-8 decoding and
+no decoded duplicate or unknown members. Public client_id is explicit; confidential
+clients use one Basic header with separately form-encoded identifier/secret. Header
+and optional body identities must agree. No client_secret_post, refresh, userinfo,
+client assertion, cookie authentication or anonymous fallback is supported.
+
+Mount the router using actual socket `ConnectInfo<SocketAddr>`. Missing peer data
+returns503; Forwarded/X-Forwarded-For cannot change the bounded admission source.
+The token endpoint accepts native/server POSTs without Origin or local cookies;
+existing consent/session endpoints retain their original Origin checks.
+
+Success returns access_token, token_type=Bearer, expires_in, id_token and scope=openid
+only after final committed issuance. The opaque access credential grants no local
+session or application permission and has no userinfo/introspection API in this
+increment. ID tokens contain exact iss/aud/sub/nonce/iat/exp/auth_time; original
+code/session/key caps bound expiry to at most60seconds in the current profile.
+Responses use no-store/no-cache and set no session cookies. Finite errors are
+invalid_request (400/413/415), invalid_client (401 with Basic challenge), invalid_grant
+(400), unsupported_grant_type (400), or temporarily_unavailable (429/503/504).
+See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md) and
+[the component guide](../guides/issuer-signing.md) for trust and evidence limits.

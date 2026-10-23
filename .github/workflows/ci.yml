@@ -85,6 +85,12 @@ jobs:
           cargo test --locked -p easy-auth-postgres --features issuer-codes --test lifecycle issuer_codes
       - name: Verify isolated issuer HTTPS consent boundary
         run: cargo test --locked -p easy-auth-axum --features issuer-consent-web --test browser issuer_consent
+      - name: Verify isolated signed issuer and client token transport
+        run: |
+          cargo test --locked -p easy-auth-core --features issuer-signing issuer::
+          cargo test --locked -p easy-auth-postgres --features issuer-signing --test lifecycle issuer_signing
+          cargo test --locked -p easy-auth-axum --features issuer-web --test browser issuer_web
+          cargo test --locked -p easy-auth-server --features issuer-signing issuer_key::
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping
@@ -139,6 +145,10 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features issuer-consent-web --example issuer-consent-browser
           node tests/browser/issuer-consent/run.cjs
+      - name: Verify owned signed issuer browser and separate HTTPS client
+        run: |
+          cargo build --locked -p easy-auth-axum --features issuer-web --example issuer-web-browser
+          node tests/browser/issuer-web/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs
       - name: Verify owned Google desktop browser return
         run: |

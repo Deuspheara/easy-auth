@@ -5,3 +5,6 @@ mod codes;
 mod configuration;
 mod loading;
 mod subjects;
+
+#[cfg(feature = "issuer-signing")]
+mod signing;

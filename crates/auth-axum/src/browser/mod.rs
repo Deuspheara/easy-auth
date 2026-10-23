@@ -21,3 +21,6 @@ pub(crate) use cookies::read_optional_cookie_value;
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(feature = "issuer-web")]
+pub(crate) use boundary::client_token_boundary;

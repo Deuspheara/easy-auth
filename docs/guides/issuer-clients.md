@@ -174,3 +174,7 @@ and observation routes are test-only and must never be deployed. External browse
 requests are blocked and its database/TLS files are removed on exit. See
 [the runner](../../tests/browser/issuer-consent/README.md) and
 [ADR0036](../architecture/adr/0036-issuer-https-consent-delivery.md).
+
+The separate optional [signed issuer component](issuer-signing.md) extends this
+consent composition with protected keys, public metadata and final signed token
+issuance. Selecting consent-only embedding does not mount those extra endpoints.
