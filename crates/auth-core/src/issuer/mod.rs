@@ -44,3 +44,11 @@ pub use signing::{
     IssuerPublicKey, IssuerSignedCode, IssuerSigningKey, IssuerSigningSnapshot, IssuerTokenIssuer,
     IssuerTokenPreparationData, IssuerTokenRepository, IssuerTokens, MAX_ISSUER_PUBLISHED_KEYS,
 };
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use tokens::{
+    IssuerNativeAuthorization, IssuerNativeAuthorizationDestination,
+    IssuerNativeAuthorizationInput, IssuerNativeAuthorizationPreparation,
+    IssuerNativeAuthorizationPreview, IssuerNativeAuthorizationRepository,
+    IssuerNativeAuthorizationRequest, IssuerNativeAuthorizationStart, IssuerNativeConsentData,
+};

@@ -746,6 +746,19 @@ unimplemented acceptance requirements; configuration alone does not close them.
 
 ## Optional signed issuer component
 
+Explicit native consent library operations require exact offline scope and consent
+prompt, current enabled native policy/client, actual fresh initiating session and
+private browser/handle/authorization bindings. Migration0034 marks only new native
+rows and binds immutable proposed lifetime/source caps to their full realm/issuer/
+client/revision/owner/session tuple. Approval uses current source/owner/session and
+original caps, existing typed actual-owner-session authorization audit and a final
+clock after every write/wait. Default online code paths still refuse the profile
+and marker. Policy disable prevents approval but permits bound pending cancellation;
+revision changes never widen a proposal. Account erasure cascades native consent.
+No refresh credential or extended access is issued yet. A trusted UI must still
+present preview and obtain explicit owner confirmation; a prompt input alone proves
+no human action. Native HTTP delivery and refresh lifecycle acceptance remain open.
+
 The explicit `issuer-signing`/`issuer-web` extensions use pinned josekit/OpenSSL
 RS256 with bounded validated operator input and allowlisted public JWK output.
 Optional Unix loading checks the opened regular owner-only file and refuses final

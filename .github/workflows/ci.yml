@@ -91,7 +91,7 @@ jobs:
           cargo test --locked -p easy-auth-postgres --features issuer-signing --test lifecycle issuer_signing
           cargo test --locked -p easy-auth-axum --features issuer-web --test browser issuer_web
           cargo test --locked -p easy-auth-server --features issuer-signing issuer_key::
-      - name: Verify isolated native offline policy
+      - name: Verify isolated native policy and explicit consent
         run: |
           cargo test --locked -p easy-auth-postgres --features issuer-clients,auth-core/issuer-native-refresh --test lifecycle issuer::native_refresh_unavailable
           cargo test --locked -p easy-auth-core --features issuer-native-refresh issuer::tokens::native

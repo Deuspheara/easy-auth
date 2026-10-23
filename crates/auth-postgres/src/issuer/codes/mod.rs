@@ -3,6 +3,8 @@ mod approval;
 mod clock;
 mod decision;
 mod decision_state;
+#[cfg(feature = "issuer-native-refresh")]
+mod native;
 mod preparation;
 mod redemption;
 pub(in crate::issuer) mod redemption_state;

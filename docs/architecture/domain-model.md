@@ -272,4 +272,14 @@ and a distinct native profile; older loaders refuse that profile. Full locked
 definition checks and revision changes preserve disable and reject stale policy.
 An eventual original consent grant is capped by its captured source/session
 absolute expiry; configuration cannot create consent, refresh authority or extend
-cookie freshness/idle. Native consent/family entities remain unfinished.
+cookie freshness/idle. Native confirmation delivery and family lifecycle remain unfinished.
+
+Migration0034 adds a native marker on new explicit operations and a full-tuple
+proposed-consent sidecar: original policy/client revisions, preparation time,
+source/session absolute cap, fixed grant expiry and idle bound. Actual approval
+time is separate and matches the original code approval audit. No historical online
+authorization is upgraded. `IssuerNativeAuthorization` validates an explicit
+offline request and safe display metadata; its opaque Start has no public proof
+constructor. Core/SQL default online paths still refuse native operations. Consent
+approval creates no refresh family, local session or extended access credential;
+confirmation HTTP/UI and family lifecycle remain work.

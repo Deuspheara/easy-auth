@@ -16,3 +16,11 @@ pub use native::{
 pub use ports::{IssuerTokenStatusRepository, IssuerTokenStatusRequest};
 pub use presented::IssuerPresentedToken;
 pub use service::IssuerTokenManagement;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use native::{
+    IssuerNativeAuthorization, IssuerNativeAuthorizationDestination,
+    IssuerNativeAuthorizationInput, IssuerNativeAuthorizationPreparation,
+    IssuerNativeAuthorizationPreview, IssuerNativeAuthorizationRepository,
+    IssuerNativeAuthorizationRequest, IssuerNativeAuthorizationStart, IssuerNativeConsentData,
+};

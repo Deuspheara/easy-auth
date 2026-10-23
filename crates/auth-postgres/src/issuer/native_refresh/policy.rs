@@ -4,7 +4,7 @@ use sqlx::{Postgres as Pg, Transaction};
 
 /// Caller holds the exact current enabled client. Policy is always locked before
 /// source/owner/session state; no operation may accept a request-selected policy.
-pub(super) async fn lock(
+pub(in crate::issuer) async fn lock(
     tx: &mut Transaction<'_, Pg>,
     policy: &IssuerNativeRefreshPolicy,
     require_enabled: bool,

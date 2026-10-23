@@ -86,6 +86,17 @@ The approximate 300-line file and 50-line function thresholds in AGENTS.md trigg
 
 ## Implemented layout
 
+Explicit native consent owns input, validated facts, port and service in core
+`issuer/tokens/native/consent/`. PostgreSQL `issuer/codes/native/` owns sidecar
+preparation/state/decisions and composes shared pending admission/insert and locked
+approval/audit operations. The behavior-preserving request/decision/approval
+extractions precede this extension. Caller-owned transactions keep client/policy,
+source/owner/session/pending/sidecar order and final clock visible. Default online
+guards remain independent. Tests separate lifecycle, bindings, isolation, storage,
+observed ordering and migration/restart. New source/test files stay below300lines;
+longer ordered transactions/scenarios preserve invariants as function-size
+exceptions. No HTTP policy copy, generic framework, new dependency or deferred cleanup.
+
 Native offline configuration extends core `issuer/tokens/native/` with bounded
 policy and PostgreSQL `issuer/native_refresh/` with scoped configuration/current
 policy locking. It reuses existing native redirect and full-client policy; no HTTP

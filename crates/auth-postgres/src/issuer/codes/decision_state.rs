@@ -11,9 +11,9 @@ use auth_core::{
 use sqlx::{Postgres as Pg, Transaction};
 
 pub(super) struct DecisionCandidate {
-    original: AuthorizationState,
+    pub(super) original: AuthorizationState,
     pub(super) client: IssuerClientRegistration,
-    owner: FreshSessionSnapshot,
+    pub(super) owner: FreshSessionSnapshot,
 }
 impl DecisionCandidate {
     pub(super) async fn load(store: &Postgres, proof: &IssuerConsentProof<'_>) -> Result<Self> {
@@ -21,7 +21,9 @@ impl DecisionCandidate {
         let client = store
             .load_issuer_client(proof.authority.realm(), original.client_id)
             .await?;
-        if !client.supports_online_authorization() || client.revision() != original.client_revision
+        if original.native_refresh
+            || !client.supports_online_authorization()
+            || client.revision() != original.client_revision
         {
             return Err(Error::Unauthorized);
         }
@@ -39,6 +41,15 @@ impl DecisionCandidate {
         proof: &IssuerConsentProof<'_>,
     ) -> Result<(AuthorizationState, FreshSessionAuthorization, Deadline)> {
         configuration::lock(tx, &self.client, true).await?;
+        self.lock_after_client(tx, proof).await
+    }
+    /// Caller holds the current enabled client and any required native policy
+    /// before acquiring source/owner/session/consent locks in this shared tail.
+    pub(super) async fn lock_after_client(
+        &self,
+        tx: &mut Transaction<'_, Pg>,
+        proof: &IssuerConsentProof<'_>,
+    ) -> Result<(AuthorizationState, FreshSessionAuthorization, Deadline)> {
         let caller = self.owner.lock(tx).await?;
         let locked = state::lock_pending(tx, proof, &self.client, &caller).await?;
         if locked != self.original {

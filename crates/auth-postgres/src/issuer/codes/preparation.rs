@@ -8,6 +8,17 @@ use auth_core::{
     MAX_ISSUER_PENDING_PER_OWNER, MAX_ISSUER_PENDING_PER_REALM, Result, Verifier,
 };
 
+enum PreparationProfile {
+    Online,
+    #[cfg(feature = "issuer-native-refresh")]
+    Native(auth_core::IssuerNativeRefreshPolicy),
+}
+struct Prepared {
+    expires: i64,
+    #[cfg(feature = "issuer-native-refresh")]
+    consent: Option<auth_core::IssuerNativeConsentData>,
+}
+
 pub(super) async fn save(
     store: &Postgres,
     request: &IssuerAuthorizationRequest,
@@ -18,6 +29,47 @@ pub(super) async fn save(
     if !request.client().supports_online_authorization() {
         return Err(Error::Unauthorized);
     }
+    Ok(save_for_profile(
+        store,
+        request,
+        current,
+        browser,
+        handle,
+        PreparationProfile::Online,
+    )
+    .await?
+    .expires)
+}
+#[cfg(feature = "issuer-native-refresh")]
+pub(super) async fn save_native(
+    store: &Postgres,
+    request: &auth_core::IssuerNativeAuthorizationRequest,
+    current: Verifier,
+    browser: Verifier,
+    handle: Verifier,
+) -> Result<auth_core::IssuerNativeAuthorizationPreparation> {
+    let saved = save_for_profile(
+        store,
+        request.code(),
+        current,
+        browser,
+        handle,
+        PreparationProfile::Native(request.policy().clone()),
+    )
+    .await?;
+    Ok(auth_core::IssuerNativeAuthorizationPreparation {
+        expires_at_us: saved.expires,
+        consent: saved.consent.ok_or(Error::Unavailable)?,
+    })
+}
+async fn save_for_profile(
+    store: &Postgres,
+    request: &IssuerAuthorizationRequest,
+    current: Verifier,
+    browser: Verifier,
+    handle: Verifier,
+    profile: PreparationProfile,
+) -> Result<Prepared> {
     let realm = request.authority().realm();
     let snapshot = FreshSessionSnapshot::load(&store.pool, realm, current).await?;
     let mut tx = store.pool.begin().await.map_err(unavailable)?;
@@ -35,6 +87,14 @@ pub(super) async fn save(
     .await
     .map_err(unavailable)?;
     configuration::lock(&mut tx, request.client(), true).await?;
+    match &profile {
+        PreparationProfile::Online => {}
+        #[cfg(feature = "issuer-native-refresh")]
+        PreparationProfile::Native(policy) => {
+            crate::issuer::native_refresh::policy::lock(&mut tx, policy, true).await?
+        }
+    }
+
     let caller = snapshot.lock(&mut tx).await?;
     let deadline = Deadline::proof(original).with_proof(caller.deadline.expires_us());
     let now = clock::now(&mut tx).await?;
@@ -120,7 +180,25 @@ pub(super) async fn save(
     .execute(&mut *tx)
     .await
     .map_err(unavailable)?;
+
+    #[cfg(feature = "issuer-native-refresh")]
+    let (deadline, consent) = match &profile {
+        PreparationProfile::Online => (deadline, None),
+        PreparationProfile::Native(policy) => {
+            let consent =
+                super::native::preparation::attach(&mut tx, request, policy, &caller, created)
+                    .await?;
+            (
+                deadline.with_proof(consent.grant_expires_at_us),
+                Some(consent),
+            )
+        }
+    };
     deadline.check(&mut tx).await?;
     tx.commit().await.map_err(unavailable)?;
-    Ok(deadline.expires_us())
+    Ok(Prepared {
+        expires: deadline.expires_us(),
+        #[cfg(feature = "issuer-native-refresh")]
+        consent,
+    })
 }

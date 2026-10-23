@@ -2,8 +2,10 @@
 
 AUTH-40's optional core/PostgreSQL `issuer-native-refresh` now adds explicit
 initially disabled native policy configuration. Exact issuer/realm/client revisions,
-bounded lifetimes and ordered full-definition checks create no consent or token;
-native offline consent/families and actual browser acceptance remain unfinished.
+bounded lifetimes and ordered full-definition checks create no consent or token.
+Separate native consent-library operations now retain fixed proposed/source caps
+and genuine fresh-owner/private bindings through code/audit commit. Native
+confirmation HTTP/UI, refresh families and actual browser acceptance remain unfinished.
 See [ADR0038](adr/0038-native-token-lifecycle.md).
 
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured

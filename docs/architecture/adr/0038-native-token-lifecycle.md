@@ -2,7 +2,8 @@
 
 Date: 2026-10-23. Status: in progress for AUTH-40. Stateful access revocation and
 authenticated introspection are implemented. Explicit native policy persistence is
-implemented; owner consent/families, reuse detection and owned native browser
+implemented, with separate explicit native consent library operations. Refresh
+families, reuse detection, consent HTTP delivery and owned native browser
 acceptance remain work. These increments alone do not complete AUTH-40 or M07.
 
 ## Existing access authority
@@ -77,7 +78,7 @@ an empty body. Default issuer/server composition mounts none of these extra rout
 ## Explicit native offline configuration
 
 The optional core/PostgreSQL `issuer-native-refresh` feature now supplies trusted
-configuration only. `public_native_refresh_loopback` has a distinct persisted
+configuration and separate explicit consent operations. `public_native_refresh_loopback` has a distinct persisted
 `native_refresh_loopback` profile: identical literal-interface/path/variable-port
 and per-client pairwise-sector rules, but older/feature-disabled loaders reject it
 instead of interpreting future offline consent as an older online profile.
@@ -92,7 +93,7 @@ make the new profile enter an online path.
 `IssuerNativeRefreshPolicy` binds an exact HTTPS issuer/realm, full public native
 client snapshot and independent revision. Absolute lifetime is1second–7days; idle
 is1second–24hours and cannot exceed absolute lifetime. The absolute grant bound is
-the earlier of original consent time plus configured lifetime and the original
+the earlier of original consent preparation time plus configured lifetime and the original
 source/session absolute cap captured under fresh-owner locks. Invalid/overflowing
 times reject; this calculation does not establish consent or extend cookie idle/
 freshness. Existing code, session and access limits remain unchanged.
@@ -107,11 +108,53 @@ returns configuration facts; future authority operations must recheck them under
 the same ordered locks. No startup/HTTP/discovery activation, consent, token family,
 refresh secret, local session or owner audit event follows from this table.
 
+## Explicit native consent library
+
+`IssuerNativeAuthorization` is a separate opt-in use case/port, not an extension of
+the default online approval path. `IssuerNativeAuthorizationInput` requires exact
+`openid offline_access` and `prompt=consent`, reusing existing actual-return,
+S256/state/nonce validation. Preparation still needs the genuine fresh initiating
+session and private browser binding, and uses shared bounded pending admission.
+
+Migration0034 marks only new explicit native operations and adds an immutable
+proposed-consent sidecar bound to the complete realm/issuer/client/revision/owner/
+session/authorization tuple. Existing rows default to online; no historical approval
+is upgraded. Under current client/policy then existing source/owner/fresh-session
+locks, capture the original source/session absolute expiry and fixed proposed
+grant expiry. Preview exposes only actual client/return, consent deadline,
+grant expiry and idle bound, without allocating authority or sliding the proposal.
+
+Approval rechecks current full policy/client, original fresh owner/session/method/
+authentication time, pending private bindings, immutable sidecar and original caps.
+Current narrowed source/session absolute expiry cannot be exceeded. Existing
+subject/code allocation and typed IssuerAuthorized audit retain the actual owner
+session and authorization target; the sidecar records its same approval timestamp.
+The existing60second code and original fresh/consent deadlines still bound code
+delivery, with a final database clock after every write/wait. No refresh credential
+or long-lived access follows yet. The default online repository/signer cannot
+prepare, preview, approve, cancel or redeem this new offline operation.
+
+Native cancellation reduces only the bound pending operation, keeps existing fresh
+owner/private proof rules and cascades its sidecar. Policy disable/reconfiguration
+cannot prevent cancellation, but cannot approve/preview old proposals. Client
+replacement invalidates old pending state. Account erasure removes native consent
+alongside the original aggregate and deidentifies its existing audit facts.
+
+Schema migration runs before serving requests on fresh database connections. The
+upgrade evidence reconnects after DDL, avoiding pre-upgrade SELECT * prepared-result
+reuse, and proves existing online code redemption and new native consent after
+restart. No live in-place DDL/old-query concurrency guarantee is claimed.
+
+Native consent HTTP/confirmation UI is not mounted or advertised yet. The core
+approval API requires a trusted application to implement explicit owner confirmation;
+an input prompt string alone is not evidence that a human reviewed a page. Actual
+browser delivery and owned native acceptance remain mandatory full-ticket work.
+
 ## Remaining full-ticket work
 
 Long-lived refresh authority cannot be obtained by extending the old code/freshness
 cap or treating an existing openid-only approval as offline consent. The native
-increment still needs owner-reviewed consent under that explicit policy, a distinct
+increment still needs actual owner-confirmation HTTP/browser delivery, a distinct
 bounded original grant, hash-only one-use rotation with reuse-detected family
 revocation, current source/owner/client and revoke-all lifecycle checks, original
 absolute/idle caps, typed audit and real PostgreSQL race/rollback/isolation evidence.

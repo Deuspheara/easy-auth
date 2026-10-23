@@ -726,8 +726,22 @@ preserves disable. Load/check return configuration facts, never authentication o
 consent. Absolute1second–7days and idle1second–24hours/at most absolute are enforced.
 No new HTTP endpoint, accepted scope, grant type, response shape, startup setting
 or discovery claim is introduced. Current authorization still accepts only openid;
-offline_access and refresh-token rotation remain unfinished.
+HTTP offline_access and refresh-token rotation remain unfinished.
 `supports_online_authorization` is a configuration capability query, not a proof.
 It is false for the new offline profile: default request/SQL code operations and
 core grant validation refuse that profile, including future rows written by a newer
 native implementation. Existing ordinary web/native code behavior is preserved.
+
+Separate core/PostgreSQL `IssuerNativeAuthorization` now supplies explicit native
+`prepare`/`preview`/`approve`/`cancel` operations through
+`IssuerNativeAuthorizationRepository`. `IssuerNativeAuthorizationInput` wraps the
+usual fields plus exact prompt=consent and requires exact openid offline_access.
+Actual session/browser/handle bindings remain mandatory. Safe preview exposes
+client/return/consent deadline/original proposed grant expiry/idle seconds; it grants
+nothing. Approval returns only the existing code/state/iss callback after atomic
+consent/code/actual-owner-session audit. Native cancellation can clean pending state
+after policy disable. Default online APIs and signer refuse native operation rows.
+Migration0034 adds only a native marker and full-tuple immutable proposed-consent
+sidecar; old rows remain online. No native HTTP route, UI, token response, refresh
+grant, discovery change or server activation is supplied yet. Consumers still need
+explicit owner-confirmation delivery; an untrusted prompt string is not that proof.

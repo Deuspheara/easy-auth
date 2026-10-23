@@ -28,3 +28,8 @@ pub const MAX_ISSUER_PENDING_PER_REALM: i64 = 256;
 pub const ISSUER_TOKEN_ATTEMPTS_PER_MINUTE: i64 = 30;
 pub const ISSUER_TOKEN_RATE_WINDOW_SECONDS: i64 = 60;
 pub const MAX_ISSUER_TOKEN_SOURCES_PER_REALM: i64 = 1024;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub(in crate::issuer) use request::return_uri as validate_return_uri;
+#[cfg(feature = "issuer-native-refresh")]
+pub(in crate::issuer) use response::destination as authorization_destination;

@@ -33,6 +33,10 @@ pub(super) struct AuthorizationState {
     pub(super) approved_at_us: Option<i64>,
     pub(super) code_expires_at_us: Option<i64>,
     pub(super) consumed_at_us: Option<i64>,
+    // Historical online migration fixtures predate this marker. Unsupported
+    // native client profiles still fail closed independently of this default.
+    #[sqlx(default)]
+    pub(super) native_refresh: bool,
 }
 pub(super) async fn pending(
     store: &Postgres,

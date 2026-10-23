@@ -26,6 +26,9 @@ impl CodeCandidate {
         let Some(original) = state::code(store, request).await? else {
             return Ok(None);
         };
+        if original.native_refresh {
+            return Err(Error::Unauthorized);
+        }
         let token: Option<Vec<u8>> = sqlx::query_scalar(
             "SELECT token_hash FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND id=$3",
         )

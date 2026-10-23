@@ -1,7 +1,7 @@
 # Optional access revocation and introspection
 
-This is the access-lifecycle increment of AUTH-40. Native refresh families, explicit
-offline consent, secure storage and owned native browser acceptance remain unfinished.
+This is the access-lifecycle and native consent-library work of AUTH-40. Native
+refresh families, offline confirmation UI and owned native browser acceptance remain unfinished.
 Use [ADR0038](../architecture/adr/0038-native-token-lifecycle.md) for authority and
 remaining scope. Normal standalone activation and production approval remain gated.
 
@@ -69,11 +69,12 @@ acceptance requirements or establish independent security approval.
 
 ## Explicit native policy configuration
 
-Optional core/PostgreSQL `issuer-native-refresh` currently adds configuration only;
-it does not accept `offline_access`, issue/rotate refresh credentials or add routes.
+Optional core/PostgreSQL `issuer-native-refresh` adds configuration and separate
+explicit native consent-library operations. Existing HTTP routes still do not
+accept `offline_access`, issue/rotate refresh credentials or add native routes.
 The new offline-capable profile also refuses the existing online-only authorization
 flow, even with an enabled policy. Existing ordinary web/native profiles retain
-their openid flow. Native offline consent/issuance requires separate explicit work.
+their openid flow. Native offline confirmation UI and token issuance remain work.
 Provision `IssuerClientRegistration::public_native_refresh_loopback` through the
 existing trusted client API, then construct `IssuerNativeRefreshPolicy::new` with
 the exact saved client, trusted `IssuerAuthority`, absolute seconds and idle seconds.
@@ -90,13 +91,44 @@ current-definition check. Neither is a user/consent/token proof. Client replacem
 requires a newly configured policy; stale enable cannot restore an old grant.
 
 Absolute lifetime must be1second–7days, idle1second–24hours, idle no greater than
-absolute lifetime. A future explicit consent grant must retain its original source/
+absolute lifetime. The proposed explicit consent grant retains its original source/
 session absolute expiry even if configured lifetime is longer. Cookie freshness,
 cookie idle and the existing short code are separate authority and remain unchanged.
 Migration0033 preserves every existing online row and creates no policy by default.
 Feature-disabled/older loaders refuse the distinct offline client profile.
 The [native policy receipt](../security/issuer-native-policy-verification.md) records
 this configuration increment separately from earlier access-management evidence.
+
+## Explicit native consent library
+
+Create `IssuerNativeAuthorization` with the trusted authority and an
+`Arc<dyn IssuerNativeAuthorizationRepository>` (implemented by PostgreSQL). Its
+`prepare` takes genuine current-session/private-browser secrets and an
+`IssuerNativeAuthorizationInput` wrapping the usual code fields plus exact
+`prompt=consent`; scope must be exactly `openid offline_access`. S256, actual bound
+return URI, state and nonce retain their existing validation. Native policy must
+already be enabled. The default online request/service/repository cannot substitute
+for this use case, even when given its validated code component.
+
+Render the safe `preview` metadata and require an explicit owner decision in the
+trusted UI. `approve` requires the same genuine fresh session, browser, opaque
+handle and authorization selector; it commits a subject, short-lived one-use code,
+fixed native consent and the existing typed owner-session authorization audit before
+returning code/state/iss. `cancel` removes only pending consent and still works after
+policy disable. No refresh token is issued and the old online signer cannot redeem
+that native code. Dedicated confirmation HTTP/routes remain unfinished; do not treat
+the input prompt string as proof that a human reviewed a page.
+
+The proposed grant expires at its original preparation time plus the saved lifetime,
+capped by the captured original source/session absolute expiry. Preview/approval
+never slide that expiry. Actual approval time is separate. Consent/code delivery
+keeps the old short/fresh/idle caps and final clock; later refresh authority must be
+implemented separately under the retained grant bounds. Policy/client revision
+changes invalidate old decisions; current source/session narrowing cannot widen them.
+Apply migration0034 before serving requests on fresh connections. Reconnect after
+schema DDL rather than retaining old prepared SELECT * result types.
+The [native consent receipt](../security/issuer-native-consent-verification.md)
+records the library scope and its explicit remaining acceptance work.
 
 Native clients must keep future refresh credentials in protected per-user platform
 credential storage, never URLs, logs, source files, browser localStorage or shared
