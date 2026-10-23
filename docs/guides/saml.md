@@ -15,6 +15,23 @@ the historical patch counts below, identifies the maintained delivery.
 
 ## Outgoing requests and metadata
 
+In explicitly enabled normal standalone and embedded applications, `GET
+/saml/metadata` publishes the exact configured SP entity and one HTTPS POST ACS at
+`{AUTH_PUBLIC_URL}/saml/acs`. It declares unsigned Redirect requests, required signed
+Assertions and persistent NameID, with no signing/encryption key or logout endpoint.
+Metadata publication creates no request, user or session. Both modes use the same
+trusted registration and return identical XML for that registration.
+
+The normal-startup acceptance suite inspects that served XML and the actual
+library-generated Redirect AuthnRequest. It verifies exact destination, issuer,
+ACS, response binding and NameID policy, and matches request ID/RelayState to the
+three distinct host-only Secure/HttpOnly/Lax proof cookies. Real PostgreSQL reads
+check pending-only start, missing-proof cancellation refusal, successful bound
+cancellation and spent cancellation refusal without changing trust or authority.
+This is outgoing delivery acceptance; inbound XML/signature assurance and wider
+provider interoperability retain their separate evidence and limits. See the
+[AUTH-33 verification record](../security/saml-request-delivery-verification.md).
+
 The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registration,
 metadata, request persistence, cancellation and response preparation. It selects
 the [packaged qualification source](../../third-party/README.md) of saml-rs

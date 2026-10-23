@@ -3,9 +3,10 @@ import json
 from pathlib import Path
 import subprocess
 import uuid
+import urllib.error
 import urllib.request
-import urllib.parse
 
+import saml_startup_contract as contract
 import smoke_oidc_startup as startup
 import smoke_recovery_notice as support
 
@@ -19,6 +20,7 @@ def observe(database):
       'enabled',(SELECT enabled FROM auth_saml_registrations),
       'jit',(SELECT jit FROM auth_saml_identity_policies),
       'pins',(SELECT count(*) FROM auth_saml_certificates),
+      'trust',(SELECT json_agg(c ORDER BY slot) FROM auth_saml_certificates c),
       'users',(SELECT count(*) FROM auth_users),
       'sessions',(SELECT count(*) FROM auth_sessions),
       'pending',(SELECT count(*) FROM auth_saml_requests),
@@ -33,21 +35,36 @@ def provision(values):
 
 
 
-def start_and_cancel(values):
+def start_and_cancel(values, database, baseline):
     port = values["AUTH_BIND"].rsplit(":", 1)[1]
     base = "http://127.0.0.1:" + port
     headers = {"Origin": values["AUTH_PUBLIC_URL"], "Content-Type": "application/json"}
     request = urllib.request.Request(base + "/v1/saml/sign-in/start", data=b"{}", headers=headers)
     with urllib.request.urlopen(request, timeout=3) as response:
         assert response.status == 200
-        url = urllib.parse.urlsplit(json.load(response)["authorization_url"])
-        assert (url.scheme, url.netloc, url.path) == ("https", "idp.example", "/sso")
         cookies = response.headers.get_all("Set-Cookie")
-        assert cookies and all("Secure" in cookie and "HttpOnly" in cookie for cookie in cookies)
+        contract.request_binding(json.load(response)["authorization_url"], cookies, values)
         headers["Cookie"] = "; ".join(cookie.split(";", 1)[0] for cookie in cookies)
+    pending = dict(baseline, pending=1)
+    assert observe(database) == pending, "start must persist only its correlated pending request"
+    unbound = urllib.request.Request(base + "/v1/saml/sign-in/cancel", data=b"{}",
+                                     headers={"Origin": values["AUTH_PUBLIC_URL"], "Content-Type": "application/json"})
+    refused_cancel(unbound)
+    assert observe(database) == pending, "missing private proof must leave the pending request intact"
     request = urllib.request.Request(base + "/v1/saml/sign-in/cancel", data=b"{}", headers=headers)
     with urllib.request.urlopen(request, timeout=3) as response:
         assert response.status == 204
+    assert observe(database) == baseline, "bound cancellation must remove only the pending request"
+    refused_cancel(request)
+    assert observe(database) == baseline, "cancellation must be one-use without authority changes"
+
+
+def refused_cancel(request):
+    try:
+        urllib.request.urlopen(request, timeout=3).close()
+        raise AssertionError("unbound or spent cancellation unexpectedly accepted")
+    except urllib.error.HTTPError as error:
+        assert error.code == 401, "expected proof refusal, not an infrastructure failure"
 
 
 def configured_modes(values, database):
@@ -55,6 +72,7 @@ def configured_modes(values, database):
     baseline = observe(database)
     assert baseline["enabled"] is True and baseline["jit"] == "deny" and baseline["pins"] == 1
     assert all(baseline[key] == 0 for key in ["users", "sessions", "pending", "audits"])
+    published = None
     for mode, binary in [("standalone", ROOT / "target/debug/easy-auth"),
                          ("embedded", ROOT / "target/debug/examples/embedded")]:
         child = startup.running(binary, values)
@@ -64,8 +82,14 @@ def configured_modes(values, database):
                          "/v1/saml/sign-in/start", "/v1/saml/account-delete/start"]:
                 assert path in spec["paths"], "configured provider routes missing"
             assert observe(database) == baseline, "startup must preserve source/revision and authority"
-            start_and_cancel(values)
+            base = "http://127.0.0.1:" + values["AUTH_BIND"].rsplit(":", 1)[1]
+            metadata = contract.metadata(base, values)
+            assert published is None or published == metadata, "both modes must publish the identical trusted profile"
+            published = metadata
+            startup.result("configured-saml-" + mode + "-exact-metadata")
+            start_and_cancel(values, database, baseline)
             assert observe(database) == baseline, "canceled start must not issue local authority"
+            startup.result("configured-saml-" + mode + "-request-binding-and-one-use-cancel")
             startup.result("configured-saml-" + mode + "-routes-start-cancel-and-stable-revision")
         finally:
             startup.stop(child)
