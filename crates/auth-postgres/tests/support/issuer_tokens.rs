@@ -26,6 +26,14 @@ impl Tokens {
     pub async fn new(pool: PgPool) -> Self {
         let (store, realm) = crate::support::realm(pool.clone()).await;
         let current = crate::support::signed_in(&store, realm, "owner@example.test").await;
+        Self::for_session(pool, Arc::new(store), realm, current).await
+    }
+    pub async fn for_session(
+        pool: PgPool,
+        store: Arc<Postgres>,
+        realm: Uuid,
+        current: Secret,
+    ) -> Self {
         let owner = store
             .authenticate(realm, current.verifier())
             .await
@@ -73,7 +81,6 @@ impl Tokens {
             )
             .await
             .unwrap();
-        let store = Arc::new(store);
         Self {
             authorization: IssuerAuthorization::new(authority.clone(), store.clone()),
             pool,
