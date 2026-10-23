@@ -128,6 +128,7 @@ async fn session_insert_failure_rolls_back_proof_and_identity(pool: PgPool) {
 #[sqlx::test(migrations = "./migrations")]
 async fn admission_is_atomic_and_multi_dimensional(pool: PgPool) {
     let (store, realm) = realm(pool.clone()).await;
+    let window = start_stable_admission_window(&pool).await;
     let mut tasks = Vec::new();
     for _ in 0..12 {
         let store = store.clone();
@@ -178,4 +179,44 @@ async fn admission_is_atomic_and_multi_dimensional(pool: PgPool) {
         .begin_email(other, "alice@example.com", [2; 32], [0; 32], [1; 32])
         .await
         .unwrap();
+    assert_eq!(
+        admission_window(&pool).await.0,
+        window,
+        "the limit and isolation controls must exercise the same real rate window"
+    );
+    let buckets: Vec<i64> = sqlx::query_scalar(
+        "SELECT DISTINCT window_id FROM auth_rate_buckets WHERE realm_id=$1 ORDER BY window_id",
+    )
+    .bind(realm)
+    .fetch_all(&pool)
+    .await
+    .unwrap();
+    assert_eq!(buckets, vec![window]);
+}
+
+async fn admission_window(pool: &PgPool) -> (i64, i64) {
+    // The existing email policy uses fixed ten-minute statement-time buckets.
+    // Read one statement timestamp so window and remaining time agree.
+    sqlx::query_as(
+        "SELECT floor(extract(epoch FROM statement_timestamp())/600)::bigint, \
+         ((floor(extract(epoch FROM statement_timestamp())/600)+1)*600000000 \
+         -extract(epoch FROM statement_timestamp())*1000000)::bigint",
+    )
+    .fetch_one(pool)
+    .await
+    .unwrap()
+}
+
+async fn start_stable_admission_window(pool: &PgPool) -> i64 {
+    const MIN_TEST_REMAINING_US: i64 = 5_000_000;
+    let (window, remaining) = admission_window(pool).await;
+    if remaining >= MIN_TEST_REMAINING_US {
+        return window;
+    }
+    // Scheduling only: do not alter clocks, counters, production limits or
+    // assertions. A run split over two valid windows cannot prove one limit.
+    tokio::time::sleep(std::time::Duration::from_micros(remaining as u64 + 50_000)).await;
+    let (window, remaining) = admission_window(pool).await;
+    assert!(remaining >= MIN_TEST_REMAINING_US);
+    window
 }
