@@ -1,88 +1,68 @@
+.resources {
+  border-top: 1px solid var(--line);
+  padding-top: 55px;
+  padding-bottom: 65px;
+}
 .resource-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 32px;
 }
 .resource-grid > a {
   border-top: 1px solid var(--line);
-  padding: 22px 0;
-  position: relative;
-}
-.resource-number {
-  font: 10px monospace;
-  color: var(--muted);
+  padding-top: 23px;
 }
 .resource-grid h3 {
-  margin: 22px 0 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.resource-grid h3 span {
+  color: var(--muted);
 }
 .resource-grid p {
   font-size: 12px;
-  line-height: 1.8;
   color: var(--muted);
-  max-width: 280px;
-}
-.resource-grid > a > span:last-child {
-  position: absolute;
-  right: 0;
-  top: 22px;
-}
-.closing {
-  border-top: 1px solid var(--line);
-  text-align: center;
-  padding-top: 70px;
-  padding-bottom: 80px;
-}
-.closing h2 {
-  font-size: 48px;
-  line-height: 1.1;
-  margin: 18px 0 30px;
-}
-.closing .hero-actions {
-  justify-content: center;
+  line-height: 1.8;
+  max-width: 250px;
+  margin-bottom: 0;
 }
 .site-footer {
+  padding-top: 27px;
+  padding-bottom: 27px;
   border-top: 1px solid var(--line);
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 25px;
-  padding-top: 30px;
-  padding-bottom: 30px;
+  gap: 22px;
 }
-.site-footer > p,
-.site-footer nav {
-  font-size: 11px;
+.site-footer .wordmark {
+  font-size: 16px;
+}
+.site-footer > p {
   color: var(--muted);
+  font-size: 10px;
 }
 .site-footer nav {
   display: flex;
-  gap: 23px;
+  gap: 24px;
+  font-size: 10px;
 }
 .site-footer small {
   grid-column: 1/-1;
   color: var(--muted);
-  font-size: 9px;
+  font:
+    9px ui-monospace,
+    monospace;
 }
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.closing {
+  padding-block: 100px;
+  text-align: center;
 }
-.skip-link {
-  position: absolute;
-  left: 20px;
-  top: -100px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  padding: 12px;
-  z-index: 100;
+.closing h1 {
+  font-size: 60px;
 }
-.skip-link:focus {
-  top: 10px;
+.closing > p:not(.eyebrow) {
+  color: var(--muted);
+  margin-block: 25px;
 }

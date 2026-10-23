@@ -3,8 +3,7 @@ export const features = [
     name: "Email links",
     mark: "@",
     status: "Available",
-    description:
-      "A familiar sign-in flow, with browser-bound confirmation and server-side sessions.",
+    description: "Browser-bound email confirmation and server-side sessions.",
     href: "/docs/getting-started/",
     featured: true,
   },
@@ -49,7 +48,7 @@ export const features = [
     mark: "⌘",
     status: "Experimental",
     description:
-      "Explore registration and sign-in components with documented device and recovery boundaries.",
+      "Registration and sign-in components with documented device and recovery limits.",
     href: "/docs/guides/passkey-enrollment/",
     featured: true,
   },

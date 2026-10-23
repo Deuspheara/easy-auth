@@ -2,114 +2,34 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 100px;
-  padding-top: 75px;
-  padding-bottom: 90px;
   border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.ownership-copy {
-  align-self: center;
+  padding-top: 60px;
+  padding-bottom: 60px;
 }
 .ownership-copy > p:not(.eyebrow) {
+  font-size: 13px;
   color: var(--muted);
-  font-size: 14px;
   line-height: 1.9;
-  max-width: 360px;
-  margin: 22px 0;
+  max-width: 320px;
+  margin: 23px 0;
 }
-.text-link {
+.boundary-list {
+  margin: 0;
+}
+.boundary-list > div {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.boundary-list > div:first-child {
+  padding-top: 0;
+}
+.boundary-list dt {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.boundary-list dd {
+  margin: 0;
+  color: var(--muted);
   font-size: 12px;
-  display: inline-flex;
-  gap: 20px;
-}
-.architecture-board {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 27px;
-  background: var(--panel);
-}
-.board-label {
-  font-size: 8px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: var(--muted);
-  margin-bottom: 28px;
-}
-.architecture-entry {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.architecture-entry > div {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 15px;
-  flex: 1;
-  gap: 6px;
-}
-.architecture-entry strong,
-.core-node strong,
-.board-bottom strong {
-  font-size: 12px;
-}
-.architecture-entry small,
-.core-node small,
-.board-bottom small {
-  font-size: 9px;
-  color: var(--muted);
-  line-height: 1.7;
-}
-.node-symbol {
-  font: 20px monospace;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-.or {
-  font: 8px monospace;
-  color: var(--muted);
-}
-.connector {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  color: var(--muted);
-}
-.connector b {
-  font-weight: 400;
-}
-.core-node {
-  display: flex;
-  align-items: center;
-  border: 1px solid #69895b;
-  border-radius: 6px;
-  padding: 15px;
-  gap: 12px;
-}
-.core-node > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.node-check {
-  margin-left: auto;
-  color: var(--accent);
-}
-.board-bottom {
-  display: flex;
-  align-items: center;
-  gap: 19px;
-  margin: 22px 12px 0;
-  color: var(--muted);
-}
-.board-bottom > div {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.board-bottom strong {
-  color: var(--ink);
+  line-height: 1.8;
 }

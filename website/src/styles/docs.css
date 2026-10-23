@@ -1,14 +1,14 @@
 :root {
-  --sl-color-accent-low: #223b23;
-  --sl-color-accent: #9bd37e;
-  --sl-color-accent-high: #c8edb5;
+  --sl-color-accent-low: #262626;
+  --sl-color-accent: #aaaaaa;
+  --sl-color-accent-high: #eeeeec;
   --sl-font: Arial, Helvetica, sans-serif;
   --sl-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 :root[data-theme="light"] {
-  --sl-color-accent-low: #def1d3;
-  --sl-color-accent: #397440;
-  --sl-color-accent-high: #234c28;
+  --sl-color-accent-low: #e6e6e3;
+  --sl-color-accent: #555552;
+  --sl-color-accent-high: #252524;
 }
 .site-title {
   letter-spacing: -0.6px;

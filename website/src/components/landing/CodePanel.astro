@@ -1,15 +1,20 @@
 ---
+import { Code } from "astro:components";
+
 const embedded = `use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
-// Uses your trusted environment configuration.
 let app = easy_auth_server::configured_application().await?;
+let notifications = easy_auth_server::notification_worker(app.auth.clone());
 let listener = TcpListener::bind(app.bind).await?;
 
-axum::serve(
+let result = axum::serve(
     listener,
     app.router.into_make_service_with_connect_info::<SocketAddr>(),
-).await?;`;
+).await;
+
+notifications.abort();
+result?;`;
 const standalone = `git clone https://github.com/Deuspheara/easy-auth.git
 cd easy-auth
 
@@ -64,9 +69,9 @@ cargo run -p easy-auth-server --bin easy-auth`;
     tabindex="0"
   >
     <div class="code-filename">
-      <span class="file-dot"></span> your-app / main.rs <span>RUST</span>
+      <span class="file-dot"></span> main.rs · excerpt <span>RUST</span>
     </div>
-    <pre><code>{embedded}</code></pre>
+    <Code code={embedded} lang="rust" theme="github-dark" />
   </div>
   <div
     id="panel-standalone"
@@ -78,12 +83,10 @@ cargo run -p easy-auth-server --bin easy-auth`;
     <div class="code-filename">
       <span class="file-dot"></span> terminal <span>SHELL · LOCAL DEV</span>
     </div>
-    <pre><code>{standalone}</code></pre>
+    <Code code={standalone} lang="shellscript" theme="github-dark" />
   </div>
   <div class="code-bottom">
-    <span>
-      <i></i> One core. Both integration modes.
-    </span>
+    <span>Configuration from your trusted environment.</span>
     <a href="/docs/embedding/">
       Full example <span aria-hidden="true">↗</span>
     </a>
