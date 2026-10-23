@@ -17,6 +17,21 @@ pub struct IssuerNativeRefreshPolicy {
     idle_seconds: u32,
 }
 impl IssuerNativeRefreshPolicy {
+    /// Native delegation preserves the actual supported account method. Legacy
+    /// unknown sessions and cross-policy method changes cannot authorize refresh.
+    pub fn permits_authentication(
+        &self,
+        policy: crate::AuthenticationPolicy,
+        method: &str,
+    ) -> bool {
+        match policy {
+            crate::AuthenticationPolicy::Mailbox => {
+                matches!(method, "email" | "password" | "passkey")
+            }
+            crate::AuthenticationPolicy::PasskeyRequired => method == "passkey",
+            crate::AuthenticationPolicy::ProviderRequired => matches!(method, "oidc" | "saml"),
+        }
+    }
     pub fn new(
         authority: IssuerAuthority,
         client: IssuerClientRegistration,

@@ -1,6 +1,7 @@
 mod authorization;
 mod configuration;
 mod consent;
+mod families;
 mod isolation;
 mod ordering;
 mod upgrade;

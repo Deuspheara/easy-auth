@@ -33,7 +33,7 @@ VerificationChallenge holds only token/browser verifiers, email/purpose and expi
 
 Session holds a public opaque ID, user+realm composite FK, SHA-256 verifier of a random 256-bit secret, created/last-seen/absolute expiry and revocation state. Browser receives the secret only in HttpOnly cookie. Lookup validates idle and absolute limits in the same database operation. Revocation takes effect on the next database validation; already-authorized in-flight operations can complete. Sensitive operations use separate authenticated_at provenance; rotation does not reset it. Legacy sessions require fresh sign-in after migration 0004. Application-specific transaction semantics remain the consumer’s responsibility. Active inventory exposes only owned public UUID/time metadata through bounded cursor pages. Fresh-authenticated individual/all-session revocation is implemented; revoke-all serializes with session issuance and cancels outstanding proofs. See [session guide](../guides/sessions.md).
 
-Refresh/token families are separate future native/OAuth entities: short access lifetimes, atomic refresh rotation, family replay detection and OS secure storage. JWT expiration is not revocation. SigningKey records public metadata and protected key reference; never put plaintext private keys into logs/config dumps. AuditEvent is a closed set of committed lifecycle facts with bounded kinds and opaque user/actor/affected-session references. Version 1 shapes and composite foreign keys enforce ownership; there is no arbitrary payload, token, verifier or email field. Deletion clears every subject/session reference. Historical version 0 attribution remains explicitly unknown. See the [audit guide](../guides/audit-events.md).
+Native refresh/token families are separate optional issuer entities: short access lifetimes, atomic refresh rotation, family replay detection and OS secure storage. JWT expiration is not revocation. SigningKey records public metadata and protected key reference; never put plaintext private keys into logs/config dumps. AuditEvent is a closed set of committed lifecycle facts with bounded kinds and opaque user/actor/affected-session references. Version 1 shapes and composite foreign keys enforce ownership; there is no arbitrary payload, token, verifier or email field. Deletion clears every subject/session reference. Historical version 0 attribution remains explicitly unknown. See the [audit guide](../guides/audit-events.md).
 
 The optional passkey boundary persists RP-scoped verified credential state and
 short-lived enrollment and authentication transactions. Experimental HTTP enrollment
@@ -262,7 +262,7 @@ metadata after current source/owner/session/key/client and original-cap checks.
 Migration0032 adds permanent nullable access revoked_at_us; repeated/foreign/unknown
 revocation cannot restore or widen authority. Public possession can reduce only its
 matching credential, but does not authenticate an introspection consumer. Refresh
-families/delegation remain separate unfinished authority in
+families/delegation use separate optional authority described in
 [ADR0038](adr/0038-native-token-lifecycle.md).
 
 Optional `IssuerNativeRefreshPolicy` is trusted configuration only: exact authority,
@@ -282,4 +282,15 @@ authorization is upgraded. `IssuerNativeAuthorization` validates an explicit
 offline request and safe display metadata; its opaque Start has no public proof
 constructor. Core/SQL default online paths still refuse native operations. Consent
 approval creates no refresh family, local session or extended access credential;
-confirmation HTTP/UI and family lifecycle remain work.
+confirmation HTTP/UI remains work; the separate family lifecycle is described below.
+
+## Native refresh family
+
+A distinct native family retains the exact approved
+realm/issuer/client/revision/policy/owner/original-session/subject tuple, original
+method/authentication time, immutable proposed/source absolute cap, bounded rolling
+idle and generation. Only hashes of one-use refresh credentials persist; spent
+generations remain replay detectors. Native access generations remain separate from
+LocalSession. Typed code/refresh/access actor facts carry no fabricated actor-session
+authentication. Erasure deidentifies audit before cascades; credential reduction
+cannot restore authority. See ADR0038.

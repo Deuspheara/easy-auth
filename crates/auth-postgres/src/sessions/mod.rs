@@ -1,5 +1,9 @@
 #[cfg(feature = "issuer-codes")]
 mod authorization;
+#[cfg(feature = "issuer-native-refresh")]
+mod delegation;
+#[cfg(feature = "issuer-native-refresh")]
+pub(crate) use delegation::DelegatedSessionSnapshot;
 mod listing;
 #[cfg(feature = "issuer-codes")]
 pub(crate) use authorization::{FreshSessionAuthorization, FreshSessionSnapshot};

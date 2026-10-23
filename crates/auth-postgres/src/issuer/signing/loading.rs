@@ -28,7 +28,7 @@ impl ActiveKeyRow {
             .map_err(|_| Error::Unavailable)
     }
 }
-pub(super) async fn lock_current(
+pub(in crate::issuer) async fn lock_current(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     authority: &IssuerAuthority,
 ) -> Result<IssuerSigningSnapshot> {

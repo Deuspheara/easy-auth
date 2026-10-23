@@ -814,3 +814,18 @@ token retains only the existing standard credential hash, with no new cryptograp
 scheme. This access-only increment creates no refresh/offline authority, remotely
 erases no ID token/app session and does not complete native/M07/production gates.
 See [ADR0038](../architecture/adr/0038-native-token-lifecycle.md).
+
+## Native refresh delegation boundary
+
+Explicit approved offline consent creates separate bounded authority, never an
+extension of online code/cookie freshness or an upgrade of old openid consent.
+Current source/account method, original authentication/session, revocation,
+client/policy/key and source absolute bounds remain mandatory on rotation. Refresh
+cannot update cookie time or mint new ID tokens. One-use spend/rotation/audit is
+atomic; old hash reuse permanently revokes the family/all descendant access before
+invalid_grant. Concurrent use has no grace fallback. Final clock checks the old idle
+deadline after writes/waits. Unknown or foreign possession cannot select another
+realm/issuer/client; public client IDs remain insufficient for introspection.
+Audit/storage failures return errors and roll back, never a false successful
+grant/revocation. HTTP human confirmation and owned native/browser/storage
+integration remain unverified.

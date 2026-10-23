@@ -2,5 +2,9 @@
 mod attribution;
 mod event;
 mod metadata;
+mod native;
 
 pub use event::AuditEvent;
+pub use native::{
+    IssuerNativeCredentialAction, IssuerNativeCredentialEvent, IssuerNativeCredentialKind,
+};

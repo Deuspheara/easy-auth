@@ -1,7 +1,8 @@
 # Optional access revocation and introspection
 
 This is the access-lifecycle and native consent-library work of AUTH-40. Native
-refresh families, offline confirmation UI and owned native browser acceptance remain unfinished.
+family issuance/rotation/revocation are available as library operations; offline
+confirmation UI and owned native browser acceptance remain unfinished.
 Use [ADR0038](../architecture/adr/0038-native-token-lifecycle.md) for authority and
 remaining scope. Normal standalone activation and production approval remain gated.
 
@@ -74,7 +75,7 @@ explicit native consent-library operations. Existing HTTP routes still do not
 accept `offline_access`, issue/rotate refresh credentials or add native routes.
 The new offline-capable profile also refuses the existing online-only authorization
 flow, even with an enabled policy. Existing ordinary web/native profiles retain
-their openid flow. Native offline confirmation UI and token issuance remain work.
+their openid flow. Native offline confirmation UI and HTTP token delivery remain work.
 Provision `IssuerClientRegistration::public_native_refresh_loopback` through the
 existing trusted client API, then construct `IssuerNativeRefreshPolicy::new` with
 the exact saved client, trusted `IssuerAuthority`, absolute seconds and idle seconds.
@@ -115,26 +116,53 @@ trusted UI. `approve` requires the same genuine fresh session, browser, opaque
 handle and authorization selector; it commits a subject, short-lived one-use code,
 fixed native consent and the existing typed owner-session authorization audit before
 returning code/state/iss. `cancel` removes only pending consent and still works after
-policy disable. No refresh token is issued and the old online signer cannot redeem
+policy disable. Consent itself issues no refresh token; the old online signer cannot redeem
 that native code. Dedicated confirmation HTTP/routes remain unfinished; do not treat
 the input prompt string as proof that a human reviewed a page.
 
 The proposed grant expires at its original preparation time plus the saved lifetime,
 capped by the captured original source/session absolute expiry. Preview/approval
 never slide that expiry. Actual approval time is separate. Consent/code delivery
-keeps the old short/fresh/idle caps and final clock; later refresh authority must be
-implemented separately under the retained grant bounds. Policy/client revision
+keeps the old short/fresh/idle caps and final clock; native refresh authority uses the separate retained grant bounds. Policy/client revision
 changes invalidate old decisions; current source/session narrowing cannot widen them.
 Apply migration0034 before serving requests on fresh connections. Reconnect after
 schema DDL rather than retaining old prepared SELECT * result types.
 The [native consent receipt](../security/issuer-native-consent-verification.md)
 records the library scope and its explicit remaining acceptance work.
 
-Native clients must keep future refresh credentials in protected per-user platform
+Native clients must keep refresh credentials in protected per-user platform
 credential storage, never URLs, logs, source files, browser localStorage or shared
 cookies. Serialize refresh operations and atomically replace the stored credential
 only after successful rotation; ambiguous/lost refresh outcomes require explicit
 reauthentication when reuse detection cannot safely recover. Do not implement a
 parallel retry/grace fallback. Local deletion cannot remotely erase a stolen token;
 server family revocation and downstream session policy remain necessary. These are
-client requirements for the unfinished family flow, not completed integration evidence.
+client requirements for the family flow, not completed integration evidence.
+
+## Native family library
+
+Enable core/PostgreSQL `issuer-native-refresh` and apply migration0035 before
+requests on fresh database connections. Construct `IssuerNativeTokenIssuer::new`
+from the existing `IssuerTokenIssuer` and an
+`Arc<dyn IssuerNativeTokenRepository>`. This shares the concrete RS256 signing keys,
+capacity and timeouts. Its `exchange` accepts only the separately approved native
+code, exact actual callback, original PKCE verifier and matching current client.
+It returns short ID/access credentials plus the initial opaque refresh credential
+only after the complete consent/code/family/audit transaction commits.
+
+Construct `IssuerNativeRefresh` from the same trusted authority and PostgreSQL port.
+`refresh` accepts current client authentication, `IssuerPresentedToken` and actual
+peer source; it returns new opaque access/refresh credentials after one-use atomic
+rotation. It issues no new ID token. Access lasts at most300seconds; idle rolls only
+within the immutable original offline/source absolute cap. Cookie idle/freshness,
+authentication time and session expiry are never extended. Logout/revoke-all, changed
+source/account method, policy/client revision and disabled key namespace deny refresh.
+Maximum10active families per owner/client and10000rotations per family require new
+explicit consent when exhausted. Do not run parallel refresh/retry fallbacks.
+
+Any spent refresh replay permanently revokes its family and descendant access.
+`revoke` accepts a matching refresh or native access credential and reduces only its
+scoped family, including after logout/policy disable. Unknown/repeated input is
+indistinguishable success; storage/audit failures remain errors. No cookie session,
+application permission, authenticated public introspection consumer or immediate
+offline JWT erasure follows. Existing HTTP routes do not expose these native methods.

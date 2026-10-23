@@ -1073,3 +1073,17 @@ owned database/process and TLS helpers unchanged. Its inbox is confined to that
 explicit example. New files stay below300lines; longer ordered acceptance/transaction
 functions retain evidence and cleanup together as size exceptions. No generic
 provider framework, widened production internals or unrelated cleanup is added.
+
+## Native family implementation
+
+Core `issuer/signing/issuance/native_code/` owns concrete initial signing/proof
+validation, sharing the existing private signing engine.
+`issuer/tokens/native/family/` owns credential policy, ports, orchestration and
+committed output. PostgreSQL `issuer/native_refresh/issuance/` and `family/` keep
+separate source-aware preparation/completion and rotation/reduction transactions;
+`sessions/delegation.rs` composes existing source/owner rules for the explicit
+offline grant without changing cookie validation. Shared ordinary signing test setup
+moved separately to `tests/support/issuer_tokens.rs`; family cases are
+feature/invariant modules. No new dependency, generic signer, public proof
+constructor or unrelated cleanup. Longer visible transactions and ordered scenarios
+are function-size exceptions; modules stay below300lines.

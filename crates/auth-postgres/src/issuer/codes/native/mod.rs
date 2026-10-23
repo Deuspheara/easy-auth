@@ -1,6 +1,7 @@
 //! Explicit offline consent. Default online code paths continue refusing it.
 mod decision;
 pub(super) mod preparation;
+pub(in crate::issuer) mod redemption;
 mod state;
 
 use crate::Postgres;

@@ -22,7 +22,10 @@ mod saml;
 mod secret;
 mod sessions;
 
-pub use audit::AuditEvent;
+pub use audit::{
+    AuditEvent, IssuerNativeCredentialAction, IssuerNativeCredentialEvent,
+    IssuerNativeCredentialKind,
+};
 pub use auth::Auth;
 pub use email::normalize_email;
 pub use error::{Error, Result};
@@ -153,3 +156,20 @@ pub use issuer::{
     IssuerNativeAuthorizationPreview, IssuerNativeAuthorizationRepository,
     IssuerNativeAuthorizationRequest, IssuerNativeAuthorizationStart, IssuerNativeConsentData,
 };
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
+    MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    ISSUER_NATIVE_ACCESS_LIFETIME_SECONDS, IssuerNativeCredentialRequest, IssuerNativeRefresh,
+    IssuerNativeRefreshData, IssuerNativeRefreshOutcome, IssuerNativeRefreshRepository,
+    IssuerNativeRotatedTokens, IssuerNativeRotationRequest,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::MAX_ISSUER_NATIVE_REFRESH_GENERATION;

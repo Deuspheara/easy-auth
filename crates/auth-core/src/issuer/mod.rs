@@ -52,3 +52,20 @@ pub use tokens::{
     IssuerNativeAuthorizationPreview, IssuerNativeAuthorizationRepository,
     IssuerNativeAuthorizationRequest, IssuerNativeAuthorizationStart, IssuerNativeConsentData,
 };
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use signing::{
+    IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
+    MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use tokens::{
+    ISSUER_NATIVE_ACCESS_LIFETIME_SECONDS, IssuerNativeCredentialRequest, IssuerNativeRefresh,
+    IssuerNativeRefreshData, IssuerNativeRefreshOutcome, IssuerNativeRefreshRepository,
+    IssuerNativeRotatedTokens, IssuerNativeRotationRequest,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use tokens::MAX_ISSUER_NATIVE_REFRESH_GENERATION;

@@ -8,7 +8,7 @@ use sqlx::{Postgres as Pg, Transaction};
 use uuid::Uuid;
 
 #[derive(sqlx::FromRow, PartialEq, Eq)]
-pub(super) struct ConsentState {
+pub(in crate::issuer::codes) struct ConsentState {
     realm_id: Uuid,
     authorization_id: Uuid,
     issuer: String,
@@ -42,6 +42,31 @@ impl ConsentState {
         tx: &mut Transaction<'_, Pg>,
         state: &AuthorizationState,
     ) -> Result<()> {
+        self.lock_snapshot(tx, state).await?;
+        if self.approved_at_us.is_some() {
+            return Err(Error::Unauthorized);
+        }
+        Ok(())
+    }
+    pub(super) async fn lock_approved(
+        &self,
+        tx: &mut Transaction<'_, Pg>,
+        state: &AuthorizationState,
+    ) -> Result<()> {
+        self.lock_snapshot(tx, state).await?;
+        if self.approved_at_us.is_none()
+            || self.approved_at_us != state.approved_at_us
+            || state.status != "approved"
+        {
+            return Err(Error::Unauthorized);
+        }
+        Ok(())
+    }
+    async fn lock_snapshot(
+        &self,
+        tx: &mut Transaction<'_, Pg>,
+        state: &AuthorizationState,
+    ) -> Result<()> {
         let locked: Self = sqlx::query_as("SELECT * FROM auth_issuer_native_consents WHERE realm_id=$1 AND authorization_id=$2 FOR UPDATE")
             .bind(state.realm_id).bind(state.id).fetch_optional(&mut **tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)?;
         if &locked != self
@@ -55,7 +80,6 @@ impl ConsentState {
             || !self.native_refresh
             || !state.native_refresh
             || self.prepared_at_us != state.created_at_us
-            || self.approved_at_us.is_some()
         {
             return Err(Error::Unauthorized);
         }
@@ -97,5 +121,12 @@ impl ConsentState {
             return Err(Error::Unauthorized);
         }
         Ok(())
+    }
+}
+
+impl ConsentState {
+    pub(super) async fn snapshot(&self, tx: &mut Transaction<'_, Pg>) -> Result<String> {
+        sqlx::query_scalar("SELECT to_jsonb(c)::text FROM auth_issuer_native_consents c WHERE realm_id=$1 AND authorization_id=$2")
+            .bind(self.realm_id).bind(self.authorization_id).fetch_one(&mut **tx).await.map_err(unavailable)
     }
 }

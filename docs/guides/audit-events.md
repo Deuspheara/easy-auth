@@ -98,3 +98,31 @@ claim target, with no invented prior-session actor. Private registration/stage
 advancement creates no authentication success fact. Expiry, collision, cancellation
 or persistence errors create no completion fact; erasure clears its session/user/
 claim references. This fact does not assert policy activation or independent review.
+
+## Optional native issuer credential actors
+
+Migration0035 adds nullable `issuer_family_id`, `issuer_generation` and closed
+`issuer_credential_kind` alongside the existing issuer client/authorization targets.
+The optional native family library records these events in the same transaction as
+the mutation. No raw credential, hash, ID token, nonce or free-form payload is stored.
+
+| Kind | Credential kind | Committed fact |
+| --- | --- | --- |
+| `issuer_native_created` | `authorization_code` | Explicit native code consumed; initial family and generation0 credentials committed |
+| `issuer_native_rotated` | `refresh_token` | Prior hash spent; new generation/hash-only credentials committed |
+| `issuer_native_reuse_revoked` | `refresh_token` | Spent-credential reuse permanently revoked family and descendant access |
+| `issuer_native_revoked` | `refresh_token` or `access_token` | Matching credential possession reduced the family, or generation limit required fresh consent |
+
+These actors have no fabricated `actor_session_id` or `session_id`: refresh
+possession is not fresh browser authentication. Exact realm/owner/client/
+authorization/family/generation foreign keys retain the affected aggregate. Initial
+consent/code events still record the actual initiating owner session under their
+existing contracts. Audit failure rolls back grant/rotation/reduction and returns
+an error; no-op/unknown/repeated revocation does not invent another success event.
+Subject erasure clears every issuer reference before deleting the aggregate.
+A reduction-only database trigger also clears new native references when older or
+feature-disabled erasure SQL sets `subject_erased=true`. This grants no authority.
+
+This is library evidence, not completed confirmation HTTP/native browser acceptance,
+independent security review or production approval. See
+[ADR0038](../architecture/adr/0038-native-token-lifecycle.md).

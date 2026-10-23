@@ -693,8 +693,8 @@ See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md) and
 `issuer-token-management-web` and `experimental_issuer_token_management_web_router`
 explicitly add POST `/oidc/introspect` and `/oidc/revoke` to the same trusted HTTPS
 root issuer/realm. `issuer_token_management_openapi` merges their concrete schemas.
-Default issuer/server routes remain unchanged; refresh families are not implemented
-or advertised by this access-only increment.
+Default issuer/server routes remain unchanged; native families use separate library operations described below and are not
+advertised by this access-only router.
 
 Closed4096byte form bodies accept token and optional client_id/token_type_hint,
 with the same strict percent/media/duplicate/query rules as token issuance. Presented
@@ -726,7 +726,7 @@ preserves disable. Load/check return configuration facts, never authentication o
 consent. Absolute1second–7days and idle1second–24hours/at most absolute are enforced.
 No new HTTP endpoint, accepted scope, grant type, response shape, startup setting
 or discovery claim is introduced. Current authorization still accepts only openid;
-HTTP offline_access and refresh-token rotation remain unfinished.
+HTTP offline_access and refresh-token delivery remain unfinished.
 `supports_online_authorization` is a configuration capability query, not a proof.
 It is false for the new offline profile: default request/SQL code operations and
 core grant validation refuse that profile, including future rows written by a newer
@@ -742,6 +742,19 @@ nothing. Approval returns only the existing code/state/iss callback after atomic
 consent/code/actual-owner-session audit. Native cancellation can clean pending state
 after policy disable. Default online APIs and signer refuse native operation rows.
 Migration0034 adds only a native marker and full-tuple immutable proposed-consent
-sidecar; old rows remain online. No native HTTP route, UI, token response, refresh
-grant, discovery change or server activation is supplied yet. Consumers still need
+sidecar; old rows remain online. No native HTTP route, UI, wire token response, discovery change or server activation
+is supplied yet. Separate native family library operations are described below. Consumers still need
 explicit owner-confirmation delivery; an untrusted prompt string is not that proof.
+
+## Native family library operations
+
+`IssuerNativeTokenIssuer::exchange` uses separate approved native consent and returns
+initial short ID/access plus opaque refresh credentials after atomic commit.
+`IssuerNativeRefresh::refresh` returns only newly rotated opaque access/refresh
+credentials; no ID token or local session. `revoke` reduces the matching native
+family. Exact current client/source/owner/session, immutable consent caps, typed
+credential audit and final clock apply. Migration0035 preserves online rows. Public
+native IDs cannot authenticate introspection. No native HTTP schema, route, discovery
+or startup activation is advertised; confirmation and owned browser acceptance remain
+work. See ADR0038 and the issuer-token-management guide for lifetime/quota/replay
+semantics.

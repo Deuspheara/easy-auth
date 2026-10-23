@@ -2,8 +2,15 @@ use super::AuditEvent;
 use uuid::Uuid;
 
 impl AuditEvent {
+    pub fn native_credential(&self) -> Option<&super::IssuerNativeCredentialEvent> {
+        match self {
+            Self::IssuerNativeCredential(event) => Some(event),
+            _ => None,
+        }
+    }
     pub fn issuer_client_id(&self) -> Option<Uuid> {
         match self {
+            Self::IssuerNativeCredential(event) => Some(event.client_id),
             Self::IssuerAuthorized { client_id, .. }
             | Self::IssuerCodeRedeemed { client_id, .. } => Some(*client_id),
             _ => None,
@@ -11,6 +18,7 @@ impl AuditEvent {
     }
     pub fn issuer_authorization_id(&self) -> Option<Uuid> {
         match self {
+            Self::IssuerNativeCredential(event) => Some(event.authorization_id),
             Self::IssuerAuthorized {
                 authorization_id, ..
             }
@@ -40,6 +48,7 @@ impl AuditEvent {
 
     pub fn kind(&self) -> &'static str {
         match self {
+            Self::IssuerNativeCredential(event) => event.action.kind(),
             Self::IssuerAuthorized { .. } => "issuer_authorized",
             Self::IssuerCodeRedeemed { .. } => "issuer_code_redeemed",
             Self::SamlAuthenticated { .. } => "saml_authenticated",

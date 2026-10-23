@@ -14,7 +14,7 @@ pub struct IssuerNativeConsentData {
     pub approved_at_us: Option<i64>,
 }
 impl IssuerNativeConsentData {
-    pub(super) fn validate(
+    pub(in crate::issuer) fn validate(
         &self,
         authority: &IssuerAuthority,
         client: &IssuerClientRegistration,

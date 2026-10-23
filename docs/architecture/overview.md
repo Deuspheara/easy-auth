@@ -5,7 +5,8 @@ initially disabled native policy configuration. Exact issuer/realm/client revisi
 bounded lifetimes and ordered full-definition checks create no consent or token.
 Separate native consent-library operations now retain fixed proposed/source caps
 and genuine fresh-owner/private bindings through code/audit commit. Native
-confirmation HTTP/UI, refresh families and actual browser acceptance remain unfinished.
+family issuance/rotation/reuse revocation are implemented in the library. Native
+confirmation HTTP/UI and actual browser acceptance remain unfinished.
 See [ADR0038](adr/0038-native-token-lifecycle.md).
 
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
@@ -49,7 +50,7 @@ See domain-model, auth-flows, api-contract, deployment and the threat model. Aut
 The explicit crate-only issuer now has signed issuance, discovery/JWKS and key
 rotation under [ADR0037](adr/0037-issuer-signing-and-final-issuance.md). Separate optional
 access revocation/authenticated introspection extends that existing short-lived
-ledger under [ADR0038](adr/0038-native-token-lifecycle.md). Native refresh families,
+ledger under [ADR0038](adr/0038-native-token-lifecycle.md). Native HTTP/browser and
 independent SDK/standalone acceptance and normal outbound activation remain gated;
 metadata, local sessions and application permissions stay distinct.
 

@@ -4,6 +4,7 @@ use uuid::Uuid;
 impl AuditEvent {
     pub fn user_id(&self) -> Option<Uuid> {
         match self {
+            Self::IssuerNativeCredential(event) => Some(event.user_id),
             Self::IssuerAuthorized { user_id, .. }
             | Self::IssuerCodeRedeemed { user_id, .. }
             | Self::EmailAuthenticated { user_id, .. }
@@ -30,6 +31,7 @@ impl AuditEvent {
     }
     pub fn actor_session_id(&self) -> Option<Uuid> {
         match self {
+            Self::IssuerNativeCredential(_) => None,
             Self::PasskeyRecoveryCancelled {
                 actor_session_id, ..
             } => *actor_session_id,
@@ -80,6 +82,7 @@ impl AuditEvent {
     }
     pub fn session_id(&self) -> Option<Uuid> {
         match self {
+            Self::IssuerNativeCredential(_) => None,
             Self::EmailAuthenticated { session_id, .. }
             | Self::OidcAuthenticated { session_id, .. }
             | Self::SamlAuthenticated { session_id, .. }

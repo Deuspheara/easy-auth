@@ -29,10 +29,19 @@ impl CodeCandidate {
         if original.native_refresh {
             return Err(Error::Unauthorized);
         }
+        Self::from_state(store, request.authority.realm(), original).await
+    }
+    /// Snapshot selects only the source/owner lock path; callers must enforce
+    /// their explicit profile/marker before using this private construction.
+    pub(in crate::issuer::codes) async fn from_state(
+        store: &Postgres,
+        realm: uuid::Uuid,
+        original: AuthorizationState,
+    ) -> Result<Option<Self>> {
         let token: Option<Vec<u8>> = sqlx::query_scalar(
             "SELECT token_hash FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND id=$3",
         )
-        .bind(request.authority.realm())
+        .bind(realm)
         .bind(original.user_id)
         .bind(original.session_id)
         .fetch_optional(&store.pool)
@@ -42,19 +51,18 @@ impl CodeCandidate {
             return Ok(None);
         };
         let token: Verifier = token.try_into().map_err(|_| Error::Unavailable)?;
-        let owner =
-            match FreshSessionSnapshot::load(&store.pool, request.authority.realm(), token).await {
-                Ok(owner) => owner,
-                Err(Error::Unauthorized) => return Ok(None),
-                Err(error) => return Err(error),
-            };
+        let owner = match FreshSessionSnapshot::load(&store.pool, realm, token).await {
+            Ok(owner) => owner,
+            Err(Error::Unauthorized) => return Ok(None),
+            Err(error) => return Err(error),
+        };
         Ok(Some(Self { original, owner }))
     }
 }
 
 pub(in crate::issuer) struct LockedCode {
-    state: AuthorizationState,
-    caller: FreshSessionAuthorization,
+    pub(in crate::issuer::codes) state: AuthorizationState,
+    pub(in crate::issuer::codes) caller: FreshSessionAuthorization,
     deadline: Deadline,
 }
 impl CodeCandidate {

@@ -2,8 +2,8 @@
 
 Date: 2026-10-23. Status: in progress for AUTH-40. Stateful access revocation and
 authenticated introspection are implemented. Explicit native policy persistence is
-implemented, with separate explicit native consent library operations. Refresh
-families, reuse detection, consent HTTP delivery and owned native browser
+implemented, with separate explicit native consent library operations. Native signed issuance, bounded families, one-use rotation and reuse revocation
+are implemented in core/PostgreSQL. Consent HTTP delivery and owned native browser
 acceptance remain work. These increments alone do not complete AUTH-40 or M07.
 
 ## Existing access authority
@@ -53,8 +53,7 @@ allows explicit cleanup after logout/source expiry. The current client lock prec
 the access update. Introspection taking an access share lock linearizes against a
 competing revocation update; a committed revoke observed after a wait cannot return
 active metadata. Existing ledger timestamps record this access revocation, without
-inventing an owner-actor audit event. Typed refresh-family lifecycle audit remains
-part of the later family implementation.
+inventing an owner-actor audit event. Native family lifecycle uses separate typed credential-actor audit, described below.
 
 Local revocation cannot remotely erase already issued self-contained ID tokens,
 cached public keys or downstream app sessions. Their original short expiry and
@@ -130,8 +129,7 @@ Current narrowed source/session absolute expiry cannot be exceeded. Existing
 subject/code allocation and typed IssuerAuthorized audit retain the actual owner
 session and authorization target; the sidecar records its same approval timestamp.
 The existing60second code and original fresh/consent deadlines still bound code
-delivery, with a final database clock after every write/wait. No refresh credential
-or long-lived access follows yet. The default online repository/signer cannot
+delivery, with a final database clock after every write/wait. Consent approval itself emits only a short code; separate native issuance is required. The default online repository/signer cannot
 prepare, preview, approve, cancel or redeem this new offline operation.
 
 Native cancellation reduces only the bound pending operation, keeps existing fresh
@@ -150,17 +148,62 @@ approval API requires a trusted application to implement explicit owner confirma
 an input prompt string alone is not evidence that a human reviewed a page. Actual
 browser delivery and owned native acceptance remain mandatory full-ticket work.
 
+## Native family library
+
+Migration0035 preserves online credentials and approved native consent. It adds
+hash-only refresh generations, an exact full-tuple consent/source/owner-bound family,
+native access generations and closed credential-actor audit references. Schema must
+be applied before serving requests on fresh connections. A database erasure trigger
+clears new references when the unchanged feature-independent account erasure SQL
+sets subject_erased; it only removes identifying facts.
+
+`IssuerNativeTokenIssuer` shares the existing concrete RS256 engine and capacity
+with `IssuerTokenIssuer`. Only its opaque staged proof reaches native completion.
+Preparation and completion each recheck actual current client authentication, exact
+enabled native policy, signing namespace/key, original source/owner/fresh session,
+approved code and immutable consent snapshots. Initial ID/access expiry retains the
+original short code/freshness/key caps; the family retains the separate original
+proposed offline expiry. Code consumption, family, generation0 hashes/access and
+both code/credential audits commit atomically before credentials leave core.
+Maximum active families is10 per realm/issuer/owner/client, checked under owner lock.
+
+`IssuerNativeRefresh` authenticates the current matching native client and exact
+credential possession. Active rotation locks current saved policy/key namespace,
+original provider source, optional mailbox, owner, original session, family and
+refresh generation. Original account method/authentication time, current source
+policy, session revocation and original source/session absolute expiry remain
+mandatory. This explicit offline grant uses its own idle bound rather than cookie
+idle/five-minute freshness, and never updates cookie timestamps or auth_time.
+Actual revoke-all prevents further refresh. Native access is at most300seconds,
+capped by current key, new idle and original absolute expiry. Refresh returns only
+opaque access/refresh credentials; it creates no ID token or local session.
+
+One transaction spends the old hash, increments generation, inserts new hashes,
+rolls idle within the original absolute cap and records typed refresh-actor audit.
+The final database clock follows all writes/waits and checks the pre-rotation idle
+deadline as well as new credential deadlines. No grace/retry window exists. Reusing
+any retained spent hash commits permanent family/all-descendant access revocation
+before reporting invalid_grant. Generation10000 exhausts this family and requires
+fresh explicit consent. Old hashes remain for detection, bounded per family.
+
+Possession of any matching family refresh/access credential can permanently revoke
+the whole family, including after policy/source/session disable. Reduction still
+requires actual current matching client authentication and exact scoped rows; it
+never invents owner authentication. Owner serialization precedes family locks so
+audit foreign keys do not invert erasure order. Unknown/repeated revoke succeeds
+indistinguishably and cannot alter a previous revocation timestamp. Audit failure
+rolls back the mutation and returns unavailable; no revoked/granted success is
+claimed. Typed events distinguish code, refresh and access actors without fabricating
+a local actor session. Public native client IDs remain insufficient for introspection.
+
 ## Remaining full-ticket work
 
-Long-lived refresh authority cannot be obtained by extending the old code/freshness
-cap or treating an existing openid-only approval as offline consent. The native
-increment still needs actual owner-confirmation HTTP/browser delivery, a distinct
-bounded original grant, hash-only one-use rotation with reuse-detected family
-revocation, current source/owner/client and revoke-all lifecycle checks, original
-absolute/idle caps, typed audit and real PostgreSQL race/rollback/isolation evidence.
-Secure client storage and actual owned system-browser/PKCE delivery remain required.
-Explicit policy is now implemented, but these consent/grant/family operations are
-not implied by configuration or current access APIs.
+Actual owner-confirmation HTTP/UI, native token/refresh/revocation transport,
+secure platform storage integration and owned system-browser/PKCE acceptance remain
+required. Library tests and prompt input do not prove human confirmation or native
+client interoperability. Default HTTP/startup/discovery remain unchanged. Source
+OIDC/SAML lifecycle acceptance of this new delegation boundary remains to be added;
+existing source checks are reused and cannot be relaxed to obtain coverage.
 
 No independent audit, external interoperability certification, production readiness
 or normal outbound activation follows. Production operations remain supervised.

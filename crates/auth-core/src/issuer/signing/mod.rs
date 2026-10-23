@@ -31,3 +31,10 @@ pub use issuance::{
 pub use metadata::{
     IssuerDiscoveryDocument, IssuerJwksDocument, IssuerMetadata, IssuerMetadataRepository,
 };
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuance::{
+    IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
+    MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
+};

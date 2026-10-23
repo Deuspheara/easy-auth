@@ -24,3 +24,13 @@ pub use native::{
     IssuerNativeAuthorizationPreview, IssuerNativeAuthorizationRepository,
     IssuerNativeAuthorizationRequest, IssuerNativeAuthorizationStart, IssuerNativeConsentData,
 };
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use native::{
+    ISSUER_NATIVE_ACCESS_LIFETIME_SECONDS, IssuerNativeCredentialRequest, IssuerNativeRefresh,
+    IssuerNativeRefreshData, IssuerNativeRefreshOutcome, IssuerNativeRefreshRepository,
+    IssuerNativeRotatedTokens, IssuerNativeRotationRequest,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use native::MAX_ISSUER_NATIVE_REFRESH_GENERATION;
