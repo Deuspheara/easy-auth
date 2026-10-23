@@ -1,3 +1,5 @@
+#[cfg(all(feature = "issuer-native-consent-web", feature = "issuer-web"))]
+pub(crate) mod issuer_native;
 #[cfg(feature = "issuer-web")]
 pub(crate) mod issuer_web;
 mod mail;
