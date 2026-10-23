@@ -71,6 +71,32 @@ pub struct IssuerGrantData {
     pub expires_at_us: i64,
     pub session_expires_at_us: i64,
 }
+impl IssuerGrantData {
+    pub(in crate::issuer) fn validate(
+        &self,
+        authority: &IssuerAuthority,
+        client: &IssuerClientRegistration,
+    ) -> IssuerTokenResult<()> {
+        if client.realm() != authority.realm()
+            || self.authorization.is_nil()
+            || self.owner.is_nil()
+            || self.session.is_nil()
+            || self.subject.is_nil()
+            || !matches!(
+                self.authentication_method.as_str(),
+                "email" | "password" | "passkey" | "oidc" | "saml"
+            )
+            || self.authenticated_at_us < 0
+            || self.authenticated_at_us > self.issued_at_us
+            || self.issued_at_us >= self.expires_at_us
+            || self.expires_at_us > self.session_expires_at_us
+        {
+            return Err(IssuerTokenError::Unavailable);
+        }
+        request::correlation(&self.nonce).map_err(|_| IssuerTokenError::Unavailable)?;
+        Ok(())
+    }
+}
 /// Opaque committed code result. Signing/token issuance consumes this value in
 /// the later issuer layer; it has no public constructor, Clone or serialization.
 pub struct IssuerRedeemedCode {
@@ -84,23 +110,7 @@ impl IssuerRedeemedCode {
         client: IssuerClientRegistration,
         facts: IssuerGrantData,
     ) -> IssuerTokenResult<Self> {
-        if client.realm() != authority.realm()
-            || facts.authorization.is_nil()
-            || facts.owner.is_nil()
-            || facts.session.is_nil()
-            || facts.subject.is_nil()
-            || !matches!(
-                facts.authentication_method.as_str(),
-                "email" | "password" | "passkey" | "oidc" | "saml"
-            )
-            || facts.authenticated_at_us < 0
-            || facts.authenticated_at_us > facts.issued_at_us
-            || facts.issued_at_us >= facts.expires_at_us
-            || facts.expires_at_us > facts.session_expires_at_us
-        {
-            return Err(IssuerTokenError::Unavailable);
-        }
-        request::correlation(&facts.nonce).map_err(|_| IssuerTokenError::Unavailable)?;
+        facts.validate(&authority, &client)?;
         Ok(Self {
             authority,
             client,

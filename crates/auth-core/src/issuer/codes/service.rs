@@ -116,6 +116,27 @@ impl IssuerAuthorization {
         pkce: &IssuerPkceVerifier,
         source: &str,
     ) -> IssuerTokenResult<IssuerRedeemedCode> {
+        let client = self.client_for_redemption(authentication, source).await?;
+        let facts = self
+            .repository
+            .redeem_issuer_code(&IssuerCodeRedemption {
+                authority: &self.authority,
+                client: &client,
+                authentication,
+                code: code.verifier(),
+                redirect_uri,
+                pkce: pkce.s256_digest(),
+            })
+            .await?;
+        IssuerRedeemedCode::from_repository(self.authority.clone(), client, facts)
+    }
+    /// Shared issuer admission/registered-method selection, not a credential
+    /// proof. Every consuming transaction still authenticates the current client.
+    pub(in crate::issuer) async fn client_for_redemption(
+        &self,
+        authentication: &IssuerClientAuthentication,
+        source: &str,
+    ) -> IssuerTokenResult<crate::IssuerClientRegistration> {
         if source.is_empty() || source.len() > 256 {
             return Err(IssuerTokenError::Unavailable);
         }
@@ -136,18 +157,7 @@ impl IssuerAuthorization {
         authentication
             .validate_for(&client)
             .map_err(IssuerTokenError::client)?;
-        let facts = self
-            .repository
-            .redeem_issuer_code(&IssuerCodeRedemption {
-                authority: &self.authority,
-                client: &client,
-                authentication,
-                code: code.verifier(),
-                redirect_uri,
-                pkce: pkce.s256_digest(),
-            })
-            .await?;
-        IssuerRedeemedCode::from_repository(self.authority.clone(), client, facts)
+        Ok(client)
     }
     fn proof(
         &self,

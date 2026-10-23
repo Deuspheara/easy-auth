@@ -3,6 +3,7 @@ mod clock;
 mod decision;
 mod preparation;
 mod redemption;
+pub(in crate::issuer) mod redemption_state;
 mod state;
 
 use crate::Postgres;
