@@ -3,7 +3,7 @@ use crate::{Error, Result, Secret};
 use url::form_urlencoded::Serializer;
 use zeroize::Zeroizing;
 
-pub(super) fn destination(
+pub(in crate::issuer) fn destination(
     authority: &IssuerAuthority,
     data: IssuerAuthorizationDestination,
     code: Option<&Secret>,

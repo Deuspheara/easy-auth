@@ -32,11 +32,21 @@ impl IssuerAuthorizationRequest {
         client: IssuerClientRegistration,
         input: &IssuerAuthorizationInput<'_>,
     ) -> Result<Self> {
+        if !client.supports_online_authorization() || input.scope != "openid" {
+            return Err(Error::InvalidInput);
+        }
+        Self::validated(authority, client, input)
+    }
+    /// Shared wire bindings only. The explicit caller must first validate the
+    /// permitted profile and scope; this private constructor grants no consent.
+    pub(in crate::issuer) fn validated(
+        authority: IssuerAuthority,
+        client: IssuerClientRegistration,
+        input: &IssuerAuthorizationInput<'_>,
+    ) -> Result<Self> {
         if client.realm() != authority.realm()
-            || !client.supports_online_authorization()
             || client.client() != input.client
             || input.response_type != "code"
-            || input.scope != "openid"
             || input.code_challenge_method != "S256"
         {
             return Err(Error::InvalidInput);
@@ -87,7 +97,7 @@ pub(super) fn correlation(value: &str) -> Result<()> {
     }
     Ok(())
 }
-pub(super) fn return_uri(client: &IssuerClientRegistration, actual: &str) -> Result<()> {
+pub(in crate::issuer) fn return_uri(client: &IssuerClientRegistration, actual: &str) -> Result<()> {
     if !client.permits_redirect(actual) {
         return Err(Error::InvalidInput);
     }
