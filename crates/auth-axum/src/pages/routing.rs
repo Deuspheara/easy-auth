@@ -37,6 +37,7 @@ fn client_modules() -> Router<AppState> {
         ("/ui/auth-screens.js", include_str!("auth-screens.js")),
         ("/ui/signin.js", include_str!("signin.js")),
         ("/ui/account.js", include_str!("account.js")),
+        ("/ui/account-view.js", include_str!("account-view.js")),
         ("/ui/passkeys.js", include_str!("passkeys.js")),
     ] {
         routes = routes.route(

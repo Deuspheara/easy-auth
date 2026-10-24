@@ -70,6 +70,7 @@ async fn reference_ui_advertises_selected_services_without_creating_authority(po
         "/ui/auth-screens.js",
         "/ui/signin.js",
         "/ui/account.js",
+        "/ui/account-view.js",
         "/ui/passkeys.js",
     ] {
         let response = app
