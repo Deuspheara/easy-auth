@@ -233,7 +233,9 @@ jobs:
       - run: cargo build --locked -p easy-auth-server --example passkey-recovery-browser --features experimental-passkey-recovery
       - run: node tests/browser/passkeys/recovery/run.cjs
       - name: Verify reference account UI with real PostgreSQL, SMTP and native passkeys
-        run: node tests/browser/reference-ui/run.cjs
+        run: |
+          python3 scripts/reference_ui_tokens.py --check
+          node tests/browser/reference-ui/run.cjs
       - run: cargo build --locked -p easy-auth-server --bin easy-auth
       - run: python3 scripts/smoke_recovery_notice.py
         env:

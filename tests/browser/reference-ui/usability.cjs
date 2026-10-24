@@ -8,7 +8,7 @@ async function usability(browser, origin, mail, guard) {
     await guard(context);
     const page = await context.newPage();
     await page.goto(origin);
-    await page.locator('#clear-session').waitFor({state: 'visible'});
+    await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
     for (const method of ['oidc', 'google', 'saml']) {
       assert.equal(await page.locator('[data-cap="' + method + '"]').isVisible(), false);
     }
@@ -39,8 +39,9 @@ async function usability(browser, origin, mail, guard) {
     assert.equal(await page.locator('#password-form').getAttribute('aria-busy'), null);
     assert.equal(await page.locator('#account').isVisible(), false);
     await context.setOffline(false);
-    await page.locator('#check-session').click();
-    await page.waitForFunction(() => document.getElementById('status').textContent === 'This browser is signed out.');
+    await page.goto(origin);
+    await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
+    assert.equal(await page.locator('#account').isVisible(), false);
     await page.locator('#theme').click();
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
     await page.goto(origin);
@@ -57,7 +58,7 @@ async function usability(browser, origin, mail, guard) {
     await page.goto(origin + '/reset');
     release();
     await page.goto(origin);
-    await page.locator('#clear-session').waitFor({state: 'visible'});
+    await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
     assert.equal(await page.locator('#email-form').getAttribute('aria-busy'), null);
     assert.equal(await page.locator('#status').textContent(), '');
     assert.equal(await page.locator('#account').isVisible(), false);

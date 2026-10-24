@@ -9,9 +9,11 @@ attempts/navigation; native errors retain fixed categories, and credential POSTs
 are never automatically retried. Navigation aborts and view generations reject
 late rendering, with current-owner checks before sensitive actions. This does not
 create a browser-wide atomic account epoch. Fixed template style insertion uses
-only the exact CSP-allowlisted stylesheet hash; style attributes, other inline
+only the exact CSP-allowlisted combined token/control stylesheet hash; style attributes, other inline
 styles, third-party resources and embedded frames remain denied. Explicit form
 POST methods prevent GET-query credential leakage if module initialization fails.
+The fixed licensed Inter asset is served locally with same-origin font permission;
+there is no remote font origin, runtime palette input or new script permission.
 
 The read-only linked-provider inventory in [ADR0041](../architecture/adr/0041-linked-provider-inventory.md)
 uses the existing source-aware active-caller transaction and configured realm.

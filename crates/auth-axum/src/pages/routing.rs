@@ -6,6 +6,24 @@ pub(crate) fn routes(passwords: bool, api: &utoipa::openapi::OpenApi) -> Router<
     authentication_pages(index)
         .merge(account_pages())
         .merge(client_modules())
+        .merge(font_assets())
+}
+
+fn font_assets() -> Router<AppState> {
+    Router::new()
+        .route(
+            "/ui/fonts/InterVariable.woff2",
+            get(|| async {
+                (
+                    [(header::CONTENT_TYPE, "font/woff2")],
+                    include_bytes!("fonts/InterVariable.woff2").as_slice(),
+                )
+            }),
+        )
+        .route(
+            "/ui/fonts/OFL.txt",
+            get(|| async { include_str!("fonts/OFL.txt") }),
+        )
 }
 
 fn client_modules() -> Router<AppState> {

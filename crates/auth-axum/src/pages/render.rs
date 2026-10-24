@@ -5,6 +5,10 @@ use axum::response::Html;
 pub(crate) fn document(template: &str) -> Html<String> {
     Html(template.replace(
         "<!-- reference-style -->",
-        &format!("<style>{}</style>", include_str!("reference.css")),
+        &format!(
+            "<style>{}{}</style>",
+            include_str!("tokens.css"),
+            include_str!("reference.css")
+        ),
     ))
 }

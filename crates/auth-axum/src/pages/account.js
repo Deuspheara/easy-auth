@@ -98,8 +98,11 @@ export async function loadSessions(reset = true) {
     if (!current()) return;
     for (const session of page.sessions) {
       const row = document.createElement("li");
-      row.append(paragraph(session.current ? "This browser" : "Another active session"));
-      row.append(paragraph("Created " + date(session.created_at_ms)), paragraph("Last seen " + date(session.last_seen_at_ms)));
+      const details = document.createElement("div");
+      details.className = "session-details";
+      details.append(paragraph(session.current ? "This browser" : "Another active session"));
+      details.append(paragraph("Created " + date(session.created_at_ms) + " · Last seen " + date(session.last_seen_at_ms)));
+      row.append(details);
       row.append(actionButton(session.current ? "Sign out this session" : "Sign out session", async () => {
         await requireCurrent();
         requireView(current);

@@ -13,6 +13,15 @@ lines; the form-binding function deliberately keeps its short explicit endpoint/
 input/result handlers together as a reviewed function-size exception. No business
 policy, SQL, verifier or public proof constructor moves into presentation.
 
+The compact authentication adaptation has one semantic JSON value source and a
+small deterministic CSS alias generator, checked in CI. Rendering combines the
+generated aliases with the owning control/layout stylesheet under one exact hash.
+Licensed local Inter and its notice use fixed static asset routes. No frontend
+framework, universal component abstraction or second palette is introduced.
+The per-key row deliberately keeps the captured credential version, owner/view
+checks and rename/removal handlers beside its native disclosure. Its slightly
+longer function is a reviewed size exception that keeps those bindings explicit.
+
 Reference browser acceptance separates owned process lifecycle, exact-recipient
 mail delivery, appearance, mailbox/account flow, native passkey flow, usability
 and post-provider account observations in named modules. Longer ordered mailbox

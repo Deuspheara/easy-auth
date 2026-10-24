@@ -48,8 +48,12 @@ export async function loadPasskeys(caps) {
 
 function keyRow(key, current) {
   const row = document.createElement("li");
-  row.append(paragraph(key.label), paragraph("Created " + date(key.created_at_ms)));
-  row.append(paragraph(key.last_used_at_ms === null ? "Not yet used for sign-in" : "Last used " + date(key.last_used_at_ms)));
+  const details = document.createElement("details");
+  details.className = "key-details";
+  const summary = document.createElement("summary");
+  summary.textContent = key.label;
+  details.append(summary, paragraph("Created " + date(key.created_at_ms)));
+  details.append(paragraph(key.last_used_at_ms === null ? "Not yet used for sign-in" : "Last used " + date(key.last_used_at_ms)));
   const form = document.createElement("form");
   form.method = "post";
   form.action = "/v1/passkeys/rename";
@@ -84,6 +88,7 @@ function keyRow(key, current) {
     announce("Passkey removed and sessions signed out. Sign in with your remaining working key.");
   }, true);
   remove.setAttribute("aria-label", "Remove " + key.label);
-  row.append(form, remove);
+  details.append(form, remove);
+  row.append(details);
   return row;
 }

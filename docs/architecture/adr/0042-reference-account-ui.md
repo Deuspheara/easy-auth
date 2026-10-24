@@ -7,7 +7,7 @@ Date: 2026-10-24.
 
 Keep the reference client in Axum's owning `pages/` modules and feature pages.
 Use fixed HTML, small native JavaScript modules and one fixed stylesheet. No
-frontend runtime, remote font, image, analytics or new dependency is required by
+frontend runtime, remote font, image, analytics or new runtime package is required by
 the server. The root page exposes only boolean presentation capabilities derived
 from its actual selected OpenAPI composition and `Auth::passwords_enabled`.
 Compiling an optional protocol does not advertise or activate it. Capabilities
@@ -41,9 +41,17 @@ account-switch guarantee; database bindings and current authority remain decisiv
 
 ## Style and accessibility boundary
 
-Permit only the exact fixed stylesheet's SHA-256 hash in CSP. Keep default-src
+The maintainer's revised visual direction follows the
+[authentication design contract](../../design/reference-ui.md): compact centered
+sign-in and flat account settings, semantic tokens, locally bundled Inter and
+equal OS-driven light/dark themes. The earlier aurora candidate was rejected and
+is superseded; it is not a visual acceptance baseline.
+
+Permit only the exact combined token/control stylesheets' SHA-256 hash in CSP. Keep default-src
 none, same-origin scripts/connect/forms, base denial and frame denial. Explicitly
 deny style attributes; add neither unsafe-inline nor a broad stylesheet origin.
+Permit same-origin font loading for the fixed licensed Inter asset; no external
+font or script origin is allowed.
 An existing OpenSSL dev dependency verifies the hash against the shipped bytes.
 Fixed style insertion does not parse claims or interpolate unescaped data.
 

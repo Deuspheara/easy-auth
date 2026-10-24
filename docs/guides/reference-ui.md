@@ -56,8 +56,11 @@ Messages report confirmation only after API success and the relevant session
 read. Interrupted credential completion is not automatically retried. Passwords
 are cleared on completion/navigation; callback and recovery proofs keep their
 existing transport and lifetime rules. No browser storage or third-party resource
-is added. Theme choice is temporary for the current page; other pages follow the
-system preference.
+is added. Themes follow the OS; the root light/dark toggle is temporary for the
+current page. The compact, neutral presentation uses a locally bundled Inter
+font, semantic tokens and native controls. There is no decorative animation.
+See the [authentication design contract](../design/reference-ui.md) for the
+adaptation and the separate, pending visual approval.
 
 ## Verification and limits
 
@@ -68,8 +71,10 @@ native passkey signup/enrollment/rename/removal/sign-in and strong contact flows
 It also checks labels/autocomplete, keyboard/dialog focus, delayed-request busy
 state, offline errors/password clearing, navigation cancellation, no false success,
 temporary theme, empty browser storage and no external request or page error.
-Light/dark layouts pass measured contrast and 320/768/1440px reflow; anonymous
-light/dark and authenticated mobile/desktop layouts were visually inspected locally.
+Light/dark layouts pass measured contrast and 320/390/768/1024/1280/1440px reflow;
+both sign-in and account views pass 320px/200% text. Local Inter loading is checked.
+Anonymous and authenticated light/dark mobile/desktop layouts were inspected
+locally. The revised compact design remains pending the owner's visual decision.
 Contrast and reflow targets follow [WCAG text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
 and [reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html). Those targets
 are not a completed accessibility audit or assistive-device certification.

@@ -2,7 +2,11 @@
 
 The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
 uses native browser modules/WebAuthn and fixed included HTML/CSS. It adds no
-server frontend runtime, remote font/image, package version or advisory ignore.
+server frontend runtime, remote font/image, runtime package version or advisory ignore.
+The maintainer-requested compact design bundles the unmodified Inter 4.1 variable
+font under SIL OFL 1.1 with its notice. Its fixed local route and SHA-256 provenance
+are recorded in the [design contract](../design/reference-ui.md). A stdlib-only
+script checks generated semantic CSS aliases; it is not a server dependency.
 The stylesheet hash check uses the existing OpenSSL/base64 dev dependencies;
 the browser still uses existing reviewed protocol implementations and original
 native options. Full browser/device/accessibility evidence is recorded separately,

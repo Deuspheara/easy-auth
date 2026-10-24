@@ -13,7 +13,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
     try {
       await guard(context);
       await page.goto(origin);
-      await page.locator('#clear-session').waitFor({state: 'visible'});
+      await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
       await page.locator('details[data-cap="passkeySignup"] > summary').click();
       await page.locator('#display-name').fill('Reference native account');
       await page.getByRole('button', {name: 'Create and verify a passkey', exact: true}).click();
@@ -29,15 +29,18 @@ async function passkeyFlow(browser, origin, mail, guard) {
         protocol: 'ctap2', transport: 'usb', hasResidentKey: true, hasUserVerification: true,
         isUserVerified: true, automaticPresenceSimulation: true
       }});
+      await page.locator('#add-passkey > summary').click();
       await page.locator('#key-label').fill('Reference spare');
       await page.getByRole('button', {name: 'Add a passkey', exact: true}).click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 2);
       await cdp.send('WebAuthn.removeVirtualAuthenticator', {authenticatorId: spareDevice.authenticatorId});
       await cdp.send('WebAuthn.setAutomaticPresenceSimulation', {authenticatorId, enabled: true});
       const spare = page.locator('#passkeys > li').filter({has: page.getByText('Reference spare', {exact: true})});
+      await spare.locator('summary').click();
       await spare.getByLabel('Passkey name', {exact: true}).fill('Reference renamed');
       await spare.getByRole('button', {name: 'Save name for Reference spare', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent === 'Passkey name updated.');
+      await page.locator('#passkeys summary').filter({hasText: 'Reference renamed'}).click();
       await page.getByRole('button', {name: 'Remove Reference renamed', exact: true}).click();
       await page.getByRole('dialog').waitFor({state: 'visible'});
       await page.keyboard.press('Escape');
@@ -45,7 +48,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#passkeys > li').count(), 2);
       await page.getByRole('button', {name: 'Remove Reference renamed', exact: true}).click();
       await page.locator('#confirmation-accept').click();
-      await page.locator('#clear-session').waitFor({state: 'visible'});
+      await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
       await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Passkey removed and sessions signed out.'));
       stage = 'passkey-signin-contact';
       await page.getByRole('button', {name: 'Sign in with a passkey', exact: true}).click();
@@ -65,15 +68,26 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#mailbox-actions').isVisible(), false);
       assert.equal(await page.locator('#password-enrollment').isVisible(), false);
       assert.equal(await page.locator('#attach-action').isVisible(), false);
-      assert.equal(await page.getByRole('link', {name: 'Save a recovery code or stop a recovery request'}).isVisible(), true);
+      assert.equal(await page.getByRole('link', {name: 'Recovery options', exact: true}).isVisible(), true);
       assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
-      for (const width of [320, 1440]) {
-        await page.setViewportSize({width, height: 1000});
+      for (const scheme of ['light', 'dark']) {
+        await page.emulateMedia({colorScheme: scheme});
+        for (const width of [320, 1440]) {
+          await page.setViewportSize({width, height: 1000});
+          assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+          if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
+            const path = require('node:path');
+            await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + scheme + '-' + width + '.png'), fullPage: true});
+          }
+        }
+        await page.setViewportSize({width: 320, height: 844});
+        await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
           const path = require('node:path');
-          await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + width + '.png'), fullPage: true});
+          await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + scheme + '-320-text200.png'), fullPage: true});
         }
+        await page.evaluate(() => { document.documentElement.style.removeProperty('font-size'); });
       }
       return {native_signup: true, enrollment: true, rename: true, removal: true, native_signin: true,
         verified_contact_preserves_strong_policy: true, recovery_setup_entry: true};

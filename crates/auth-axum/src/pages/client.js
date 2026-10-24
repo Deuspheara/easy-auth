@@ -18,10 +18,12 @@ function signedOut() {
   element("sign-in").hidden = false;
   element("logout").hidden = true;
   element("clear-session").hidden = false;
+  element("check-session").hidden = true;
+  document.body.dataset.account = "signed-out";
   element("identity").textContent = "";
   element("account-id").textContent = "";
-  element("heading").textContent = "Welcome back.";
-  element("intro").textContent = "Choose a sign-in method available for your account. Keep email links in this browser.";
+  element("heading").textContent = "Sign in to easy-auth";
+  element("intro").textContent = "Use a sign-in method available for your account.";
 }
 
 async function refresh() {
@@ -43,8 +45,10 @@ async function refresh() {
   element("account").hidden = false;
   element("logout").hidden = false;
   element("clear-session").hidden = true;
-  element("heading").textContent = "Your account.";
-  element("intro").textContent = "Review your sign-in methods, recovery options and active sessions.";
+  element("check-session").hidden = false;
+  document.body.dataset.account = "signed-in";
+  element("heading").textContent = "Account";
+  element("intro").textContent = "Manage your sign-in methods and active sessions.";
   element("identity").textContent = [user.display_name, user.email].filter(Boolean).join(" · ") || "Signed-in account";
   element("account-id").textContent = user.id;
   const mailbox = user.authentication_policy === "mailbox";

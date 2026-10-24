@@ -11,7 +11,7 @@ async function signedIn(page) {
 }
 async function passwordLogin(page, origin, email, password) {
   await page.goto(origin);
-  await page.locator('#clear-session').waitFor({state: 'visible'});
+  await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
   await openDetails(page, 'details[data-cap="passwords"]');
   await page.locator('#login-email').fill(email);
   await page.locator('#login-password').fill(password);
@@ -21,7 +21,7 @@ async function passwordLogin(page, origin, email, password) {
 }
 async function emailLogin(page, origin, email, mail) {
   await page.goto(origin);
-  await page.locator('#clear-session').waitFor({state: 'visible'});
+  await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
   await page.locator('#email').fill(email);
   await page.locator('#submit').click();
   await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your email.'));
@@ -38,7 +38,7 @@ async function signoutAll(page) {
   assert.equal(await page.locator('#account').isVisible(), true);
   await page.locator('#revoke-all').click();
   await page.locator('#confirmation-accept').click();
-  await page.locator('#clear-session').waitFor({state: 'visible'});
+  await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
   await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('All sessions were signed out.'));
 }
 
@@ -85,12 +85,14 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.locator('#sessions').getByRole('button', {name: 'Sign out session', exact: true}).click();
     await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1);
     await other.locator('#check-session').click();
-    await other.locator('#clear-session').waitFor({state: 'visible'});
+    await other.waitForFunction(() => document.getElementById('clear-session').hidden === false);
+    await other.locator('#signin-help > summary').click();
     await other.locator('#clear-session').click();
+    await other.waitForFunction(() => document.getElementById('status').textContent === 'Signed out in this browser.');
     await passwordLogin(other, origin, email, password);
     await signoutAll(page);
     await other.locator('#check-session').click();
-    await other.locator('#clear-session').waitFor({state: 'visible'});
+    await other.waitForFunction(() => document.getElementById('clear-session').hidden === false);
 
     stage = 'password-reset';
     await openDetails(page, 'details[data-cap="passwords"]');

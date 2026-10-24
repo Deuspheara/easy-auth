@@ -11,7 +11,7 @@ use std::time::Duration;
 use uuid::Uuid;
 
 // Only the exact fixed reference stylesheet may supply inline styles.
-const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-J+Lc2pfELBAdVsa1PWSg2qPRcRG3mu4txsz8SnbNU9M='; style-src-attr 'none'";
+const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-UHkVsWTVXXfN8RFVJHgteApv+ZrR6nsaEsYTTo88rE8='; style-src-attr 'none'";
 
 pub(crate) async fn boundary(
     State(state): State<AppState>,
@@ -132,9 +132,14 @@ mod reference_style_tests {
 
     #[test]
     fn inline_style_permission_matches_only_the_fixed_reference_stylesheet() {
+        let stylesheet = format!(
+            "{}{}",
+            include_str!("../pages/tokens.css"),
+            include_str!("../pages/reference.css")
+        );
         let digest = openssl::hash::hash(
             openssl::hash::MessageDigest::sha256(),
-            include_bytes!("../pages/reference.css"),
+            stylesheet.as_bytes(),
         )
         .unwrap();
         let encoded = base64::engine::general_purpose::STANDARD.encode(digest);
