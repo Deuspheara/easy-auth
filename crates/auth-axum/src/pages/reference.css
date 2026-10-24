@@ -7,10 +7,10 @@
 body { margin: 0; min-height: 100svh; background: var(--surface-app); color: var(--text-primary); font-size: var(--font-body-size); line-height: var(--font-body-line); }
 body[data-reference-account] { display: flex; flex-direction: column; }
 main { width: min(calc(100% - 2 * var(--space-4)), 28rem); margin: var(--space-12) auto; }
-body[data-reference-account] main { width: min(calc(100% - 2 * var(--space-4)), 22.5rem); flex: 1; display: flex; flex-direction: column; justify-content: center; margin: 0 auto; padding: var(--space-8) 0; }
+body[data-reference-account] main { width: min(calc(100% - 2 * var(--space-4)), 26.25rem); flex: 1; display: flex; flex-direction: column; justify-content: center; margin: 0 auto; padding: var(--space-8) 0; }
 body[data-account="signed-in"] main { width: min(calc(100% - 2 * var(--space-4)), 52rem); justify-content: flex-start; }
 body > header { min-height: 48px; padding: var(--space-2) var(--space-6); }
-h1 { margin: 0 0 var(--space-2); font-size: var(--font-title-size); line-height: var(--font-title-line); font-weight: var(--font-title-weight); }
+h1 { margin: 0 0 var(--space-2); font-size: var(--font-page-size); line-height: var(--font-page-line); font-weight: var(--font-page-weight); }
 h2, h3 { margin: 0; font-size: var(--font-section-size); line-height: var(--font-section-line); font-weight: var(--font-section-weight); }
 h1, h2, h3, p, summary { overflow-wrap: anywhere; }
 p { margin: var(--space-2) 0; }
@@ -43,8 +43,8 @@ dialog { width: min(calc(100% - 2 * var(--space-4)), 28rem); padding: var(--spac
 dialog::backdrop { background: rgb(0 0 0 / .5); }
 dialog h2 { font-size: var(--font-title-size); line-height: var(--font-title-line); }
 .topbar, .actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
-.topbar { justify-content: space-between; }
-.brand { color: var(--text-primary); font-size: var(--font-chrome-size); font-weight: 600; text-decoration: none; }
+.topbar { justify-content: flex-end; }
+.brand { display: inline-block; margin-bottom: var(--space-6); color: var(--text-primary); font-size: var(--font-chrome-size); font-weight: 600; text-decoration: none; }
 body > header button { font-size: var(--font-chrome-size); line-height: var(--font-chrome-line); }
 .intro { margin-bottom: var(--space-6); text-align: center; }
 .intro p { color: var(--text-muted); }
@@ -54,10 +54,17 @@ body[data-account="signed-in"] .intro { text-align: left; margin-bottom: var(--s
 .separator::before, .separator::after { content: ""; flex: 1; border-top: 1px solid var(--border-subtle); }
 #sign-in form > button, #provider-methods > a { width: 100%; }
 #sign-in .actions > button { flex: 1; }
-#sign-in .muted, #sign-in summary { font-size: var(--font-chrome-size); line-height: var(--font-chrome-line); }
-.signin-utilities { margin-top: var(--space-6); text-align: center; }
-.signin-utilities button { font-size: var(--font-metadata-size); }
-.signin-utilities summary { margin: 0 auto; }
+#sign-in .muted { font-size: var(--font-chrome-size); line-height: var(--font-chrome-line); }
+#sign-in input, #sign-in button:not(.text-button), #sign-in .button { min-height: var(--control-touch-min); border-radius: var(--radius-popover); }
+#sign-in > div > button { width: 100%; }
+.flow-link { text-align: center; margin-top: var(--space-5); color: var(--text-muted); }
+.flow-link a, .text-button { color: var(--text-secondary); }
+.text-button { background: transparent; border-color: transparent; }
+.icon-button { width: var(--space-10); min-height: var(--space-10); padding: var(--space-2); }
+.icon-button svg { flex-shrink: 0; }
+.help-options { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); }
+.help-options > a { color: var(--text-primary); text-decoration: none; padding: var(--space-3); border: 1px solid var(--border-subtle); border-radius: var(--radius-popover); }
+.help-options span { display: block; margin-top: var(--space-1); color: var(--text-muted); font-size: var(--font-chrome-size); }
 .stack { display: grid; gap: var(--space-2); }
 .notice { padding: var(--space-3); margin: 0 0 var(--space-4); background: var(--status-neutral-background); border-radius: var(--radius-control); }
 #status:empty { display: none; }

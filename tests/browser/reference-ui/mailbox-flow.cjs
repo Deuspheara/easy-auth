@@ -12,7 +12,7 @@ async function signedIn(page) {
 async function passwordLogin(page, origin, email, password) {
   await page.goto(origin);
   await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
-  await openDetails(page, 'details[data-cap="passwords"]');
+  await page.getByRole('link', {name: 'Use a password instead', exact: true}).click();
   await page.locator('#login-email').fill(email);
   await page.locator('#login-password').fill(password);
   await page.getByRole('button', {name: 'Sign in with password', exact: true}).click();
@@ -62,6 +62,20 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.locator('#email').fill(email);
     await page.locator('#submit').click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your email.'));
+    assert.equal(await page.locator('#email-form').isVisible(), false);
+    assert.equal(await page.locator('#heading').textContent(), 'Check your email');
+    if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
+      const path = require('node:path');
+      await page.evaluate(() => document.fonts.ready);
+      for (const scheme of ['light', 'dark']) {
+        await page.emulateMedia({colorScheme: scheme});
+        for (const width of [320, 1440]) {
+          await page.setViewportSize({width, height: 1000});
+          await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+            'inbox-' + scheme + '-' + width + '.png'), fullPage: true});
+        }
+      }
+    }
     const link = await mail.link(email, origin, 'Your sign-in link', '/');
     await page.goto(link);
     await signedIn(page);
@@ -86,7 +100,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1);
     await other.locator('#check-session').click();
     await other.waitForFunction(() => document.getElementById('clear-session').hidden === false);
-    await other.locator('#signin-help > summary').click();
+    await other.getByRole('link', {name: 'Trouble signing in?', exact: true}).click();
     await other.locator('#clear-session').click();
     await other.waitForFunction(() => document.getElementById('status').textContent === 'Signed out in this browser.');
     await passwordLogin(other, origin, email, password);
@@ -95,7 +109,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await other.waitForFunction(() => document.getElementById('clear-session').hidden === false);
 
     stage = 'password-reset';
-    await openDetails(page, 'details[data-cap="passwords"]');
+    await page.getByRole('link', {name: 'Use a password instead', exact: true}).click();
     await page.locator('#login-email').fill(email);
     await page.locator('#reset-request').click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('If this mailbox has a password'));

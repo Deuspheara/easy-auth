@@ -1,5 +1,6 @@
 "use strict";
 import {request, assertKey, createKey, accountId} from "/ui/browser-operations.js";
+import {showAuthScreen} from "/ui/auth-screens.js";
 import {element, announce, submit, run, clearSecrets} from "/ui/view.js";
 
 async function confirmedSession(refresh) {
@@ -7,11 +8,25 @@ async function confirmedSession(refresh) {
   element("heading").focus();
 }
 
-export function bindSignIn(refresh, requireCurrent) {
-  submit("email-form", async () => {
+async function signInWithPasskey(refresh, input) {
+  const started = await request("/v1/passkeys/authentication/start", input);
+  const credential = await assertKey(started.options);
+  await request("/v1/passkeys/authentication/finish", {transaction_id: started.transaction_id, credential});
+  await confirmedSession(refresh);
+  announce("Signed in with a passkey.");
+}
+
+export function bindSignIn(refresh, requireCurrent, caps) {
+  const sendEmail = async () => {
     await request("/v1/email/start", {email: element("email").value});
+    showAuthScreen(caps, "inbox");
+    element("heading").focus();
     announce("Check your email. Open the link in this browser within ten minutes.");
-  }, "Sending your sign-in link…");
+  };
+  submit("email-form", sendEmail, "Sending your sign-in link…");
+  element("email-resend").addEventListener("click", () => {
+    if (element("email").checkValidity()) void run(element("email-resend"), sendEmail, "Sending a fresh sign-in link…");
+  });
   submit("password-form", async () => {
     try {
       await request("/v1/password/login", {email: element("login-email").value, password: element("login-password").value});
@@ -29,15 +44,10 @@ export function bindSignIn(refresh, requireCurrent) {
       } finally { clearSecrets(); }
     }, "Requesting a password reset…");
   });
-  submit("passkey-form", async () => {
-    const hint = element("passkey-account");
-    const input = hint.value.trim() ? {mode: "account_bound", account_id: accountId(hint)} : {mode: "discoverable"};
-    const started = await request("/v1/passkeys/authentication/start", input);
-    const credential = await assertKey(started.options);
-    await request("/v1/passkeys/authentication/finish", {transaction_id: started.transaction_id, credential});
-    await confirmedSession(refresh);
-    announce("Signed in with a passkey.");
-  }, "Choose and verify your passkey…");
+  submit("passkey-form", () => signInWithPasskey(refresh, {mode: "discoverable"}), "Choose and verify your passkey…");
+  submit("account-passkey-form", () => signInWithPasskey(refresh, {
+    mode: "account_bound", account_id: accountId(element("passkey-account"))
+  }), "Choose and verify your passkey…");
   submit("signup-form", async () => {
     const started = await request("/v1/passkeys/signup/start", {display_name: element("display-name").value});
     const credential = await createKey(started.options);

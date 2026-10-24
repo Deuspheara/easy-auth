@@ -36,7 +36,7 @@ export async function run(container, action, pending = "Working…") {
   announce(pending);
   try { await action(); }
   catch (error) {
-    if (stamp === lifecycle) announce(errorMessage(error, ["email-form", "password-form", "passkey-form", "signup-form"].includes(container.id)));
+    if (stamp === lifecycle) announce(errorMessage(error, ["email-form", "password-form", "passkey-form", "account-passkey-form", "signup-form"].includes(container.id)));
   }
   finally { release(); }
 }

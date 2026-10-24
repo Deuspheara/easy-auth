@@ -67,6 +67,7 @@ async fn reference_ui_advertises_selected_services_without_creating_authority(po
         "/client.js",
         "/ui/browser-operations.js",
         "/ui/view.js",
+        "/ui/auth-screens.js",
         "/ui/signin.js",
         "/ui/account.js",
         "/ui/passkeys.js",

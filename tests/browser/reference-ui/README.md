@@ -21,8 +21,12 @@ and removes exact owned messages. No broad database/mail cleanup is permitted.
 
 Focused modules cover genuine email/password, session and account lifecycle;
 native signup, separate-device enrollment, rename/removal and remaining-key
-sign-in; contact confirmation preserving strong policy; keyboard/dialog focus,
+sign-in through both discoverable and saved account-ID paths; contact confirmation preserving strong policy; keyboard/dialog focus,
 autocomplete, busy/offline errors, navigation, temporary theme and browser storage.
+Focused-view checks cover password, signup, help and account-ID access, mobile/desktop
+and enlarged text in both themes, browser back, inert unknown/unavailable view
+queries and direct-inbox rejection. Genuine email flow verifies the check-email
+transition and explicit resend, without fabricated successful responses.
 The lifecycle scenario uses a separate genuinely authenticated mailbox to respect
 unchanged sensitive admission limits. Delayed requests are forwarded unchanged
 or cancelled by actual navigation; successful server responses are never mocked.

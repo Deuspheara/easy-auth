@@ -5,6 +5,7 @@ const {chromium} = require('../passkeys/node_modules/playwright');
 const {withFixture} = require('./fixture.cjs');
 const {ownedMail} = require('./mail.cjs');
 const {presentation} = require('./presentation.cjs');
+const {screens} = require('./screens.cjs');
 const {mailboxFlow} = require('./mailbox-flow.cjs');
 const {passkeyFlow} = require('./passkey-flow.cjs');
 const {usability} = require('./usability.cjs');
@@ -29,20 +30,22 @@ async function main() {
         });
       };
       const context = await browser.newContext();
-      let appearance;
+      let appearance, focusedViews;
       try {
         await guard(context);
-        appearance = await presentation(await context.newPage(), origin);
+        const page = await context.newPage();
+        appearance = await presentation(page, origin);
+        focusedViews = await screens(page, origin);
       } finally { await context.close(); }
       const mailbox = await mailboxFlow(browser, origin, mail, guard);
       const passkeys = await passkeyFlow(browser, origin, mail, guard);
       const controls = await usability(browser, origin, mail, guard);
       assert.equal(external, 0, 'no external browser requests');
       assert.equal(pageErrors, 0, 'no uncaught browser errors');
-      return {versions, appearance, mailbox, passkeys, controls, external_requests: external, page_errors: pageErrors};
+      return {versions, appearance, focusedViews, mailbox, passkeys, controls, external_requests: external, page_errors: pageErrors};
     });
     for (const [key, expected] of Object.entries({users: 2, credentials: 1, strong_verified_users: 1,
-      signup_audits: 1, attachment_audits: 1, authentication_audits: 1,
+      signup_audits: 1, attachment_audits: 1, authentication_audits: 2,
       management_renames: 1, management_removals: 1, unproven_remaining_keys: 0,
       invalid_attachment_provenance: 0, attachment_pending: 0, signup_pending: 0})) {
       assert.equal(result.database[key], expected, 'committed UI database invariant: ' + key);

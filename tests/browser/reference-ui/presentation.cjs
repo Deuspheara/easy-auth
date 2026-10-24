@@ -29,7 +29,7 @@ async function presentation(page, origin) {
   const results = [];
   for (const scheme of ['light', 'dark']) {
     await page.emulateMedia({colorScheme: scheme});
-    await page.waitForFunction(dark => document.getElementById('theme').textContent === (dark ? 'Use light theme' : 'Use dark theme'), scheme === 'dark');
+    await page.waitForFunction(dark => document.getElementById('theme').getAttribute('aria-label') === (dark ? 'Use light theme' : 'Use dark theme'), scheme === 'dark');
     for (const width of [320, 390, 768, 1024, 1280, 1440]) {
       await page.setViewportSize({width, height: 1000});
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'document reflow');
@@ -56,7 +56,7 @@ async function presentation(page, origin) {
     }
     await page.setViewportSize({width: 320, height: 844});
     await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
-    assert.equal(await page.locator('#heading').evaluate(node => getComputedStyle(node).fontSize), '36px');
+    assert.equal(await page.locator('#heading').evaluate(node => getComputedStyle(node).fontSize), '56px');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, '200 percent text reflow');
     if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
       const path = require('node:path');

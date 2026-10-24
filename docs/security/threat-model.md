@@ -2,7 +2,10 @@
 
 The [reference UI](../architecture/adr/0042-reference-account-ui.md) consumes only
 selected-interface booleans and current account policy metadata. Compiled features,
-contact email and UI visibility grant no method, fresh proof or fallback. Issuer/
+contact email, view query and UI visibility grant no method, fresh proof or fallback.
+The closed presentation selector hides unselected methods; inbox/resend follows an
+actual start on this page and uses only the in-memory email. No query supplies a
+resend address or recovery proof. Explicit resend retains existing admission limits. Issuer/
 label text never becomes markup or a navigation target. Existing HTTP and storage
 checks remain authoritative after every click. Password inputs are cleared after
 attempts/navigation; native errors retain fixed categories, and credential POSTs

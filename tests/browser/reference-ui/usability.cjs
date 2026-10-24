@@ -26,10 +26,16 @@ async function usability(browser, origin, mail, guard) {
     assert.equal(await page.locator('#submit').isDisabled(), true);
     release();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your email.'));
-    assert.equal(await page.locator('#submit').isEnabled(), true);
+    assert.equal(await page.locator('#email-form').isVisible(), false);
+    assert.equal(await page.locator('#heading').textContent(), 'Check your email');
+    assert.equal(await page.locator('#email-resend').isEnabled(), true);
+    await page.locator('#email-resend').click();
+    await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your email.'));
+    assert.equal(await page.locator('#email-resend').isEnabled(), true);
     await page.unroute('**/v1/email/start');
 
-    await page.locator('details[data-cap="passwords"] > summary').click();
+    await page.getByRole('link', {name: 'Use another email or sign-in method', exact: true}).click();
+    await page.getByRole('link', {name: 'Use a password instead', exact: true}).click();
     await page.locator('#login-email').fill(mail.recipient(6));
     await page.locator('#login-password').fill('Unsubmitted reference offline password');
     await context.setOffline(true);

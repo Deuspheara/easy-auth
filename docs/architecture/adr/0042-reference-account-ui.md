@@ -44,7 +44,12 @@ account-switch guarantee; database bindings and current authority remain decisiv
 The maintainer's revised visual direction follows the
 [authentication design contract](../../design/reference-ui.md): compact centered
 sign-in and flat account settings, semantic tokens, locally bundled Inter and
-equal OS-driven light/dark themes. The earlier aurora candidate was rejected and
+equal OS-driven light/dark themes. The subsequent owner correction uses one
+420px sign-in column and focused password, registration and help URLs. The closed
+view selector is presentation only, bounded by selected capabilities. The inbox
+state follows an actual email-start response and explicit resend uses the original
+in-memory input and unchanged API limits. Direct inbox navigation returns to sign-in.
+Normal page navigation retains existing cancellation and password clearing. The earlier aurora candidate was rejected and
 is superseded; it is not a visual acceptance baseline.
 
 Permit only the exact combined token/control stylesheets' SHA-256 hash in CSP. Keep default-src

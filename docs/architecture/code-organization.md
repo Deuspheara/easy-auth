@@ -3,12 +3,12 @@
 Reference presentation keeps trusted boolean capability projection, fixed style
 insertion and static asset routing in separate `pages/` Rust modules. Browser
 `client.js` composes the view; `signin.js`, `account.js` and `passkeys.js` own their
-forms/reads, while `view.js` owns busy/focus/dialog presentation. The existing
+forms/reads, `auth-screens.js` owns the closed presentation selector, while `view.js` owns busy/focus/dialog presentation. The existing
 navigation-safe request/native-prompt operations are shared byte-for-byte through
 `browser-operations.js`; the original recovery resource URL remains supported.
 Feature page modules retain callback selection, escaped transport data and
 protocol confirmation. Their fixed HTML shares the stylesheet without adding
-external resources or broad CSP style permission. UI modules remain below 150
+external resources or broad CSP style permission. UI modules remain at or below 150
 lines; the form-binding function deliberately keeps its short explicit endpoint/
 input/result handlers together as a reviewed function-size exception. No business
 policy, SQL, verifier or public proof constructor moves into presentation.
@@ -23,7 +23,7 @@ checks and rename/removal handlers beside its native disclosure. Its slightly
 longer function is a reviewed size exception that keeps those bindings explicit.
 
 Reference browser acceptance separates owned process lifecycle, exact-recipient
-mail delivery, appearance, mailbox/account flow, native passkey flow, usability
+mail delivery, appearance, focused-screen navigation, mailbox/account flow, native passkey flow, usability
 and post-provider account observations in named modules. Longer ordered mailbox
 and native-device scenarios deliberately retain genuine setup, UI observations
 and final effects together; they are test-function size exceptions. No runner

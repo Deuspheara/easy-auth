@@ -24,6 +24,18 @@ Use [standalone configuration](issuer-standalone.md) for the configured issuer,
 Unsupported methods have no placeholder grant or weaker fallback. In particular,
 this UI does not implement the pending Apple provider work.
 
+## Sign-in journey
+
+Email is the primary form. **Use a password instead** opens its own view; selected
+passkeys/providers remain alternatives. **Create an account** opens native passkey
+registration. **Trouble signing in?** contains recovery, saved public account-ID
+access and explicit stale-session sign-out. Unavailable methods stay hidden.
+The `view` query selects presentation only and never enables a method or proves
+identity. After successful email start, the check-email view offers deliberate
+resend; links still require the initiating browser and original ten-minute expiry.
+Resend remains subject to normal server admission. No address or proof is saved in
+URLs or browser storage, and ambiguous credential completions are never retried.
+
 ## Using account controls
 
 Email links must finish in the initiating browser. Password reset has its own
@@ -34,7 +46,7 @@ complete the separate email confirmations in that same browser. Strong accounts
 can request a verified contact email after fresh passkey sign-in without enabling
 mailbox sign-in or weaker recovery.
 Passkey creation requires the browser's native prompt; new accounts also prove
-the new key in a second prompt before sign-in. The optional public account ID is
+the new key in a second prompt before sign-in. Public account-ID access is
 for an already retained account, never an email-to-key lookup.
 
 `/v1/session` now includes the existing account `authentication_policy` metadata.
@@ -67,7 +79,8 @@ adaptation and the separate, pending visual approval.
 The [reference browser runner](../../tests/browser/reference-ui/README.md) uses
 real PostgreSQL, configured SMTP and native virtual authenticators. It passes
 email/password/reset, session revocation, two-address email change/deletion,
-native passkey signup/enrollment/rename/removal/sign-in and strong contact flows.
+native passkey signup/enrollment/rename/removal, discoverable and account-ID sign-in,
+and strong contact flows.
 It also checks labels/autocomplete, keyboard/dialog focus, delayed-request busy
 state, offline errors/password clearing, navigation cancellation, no false success,
 temporary theme, empty browser storage and no external request or page error.

@@ -1,11 +1,14 @@
 "use strict";
 import {request} from "/ui/browser-operations.js";
 import {element, announce, run, clearSecrets, errorMessage} from "/ui/view.js";
+import {showAuthScreen} from "/ui/auth-screens.js";
 import {bindSignIn, finishEmail} from "/ui/signin.js";
 import {bindAccount, resetAccount, loadProviders, loadSessions} from "/ui/account.js";
 import {bindPasskeys, loadPasskeys} from "/ui/passkeys.js";
 
 const caps = JSON.parse(element("capabilities").value);
+let initialView = new URLSearchParams(location.search).get("view");
+if (initialView === "inbox") initialView = "email";
 let revision = 0;
 let owner = null;
 
@@ -22,8 +25,8 @@ function signedOut() {
   document.body.dataset.account = "signed-out";
   element("identity").textContent = "";
   element("account-id").textContent = "";
-  element("heading").textContent = "Sign in to easy-auth";
-  element("intro").textContent = "Use a sign-in method available for your account.";
+  showAuthScreen(caps, initialView);
+  initialView = "email";
 }
 
 async function refresh() {
@@ -93,10 +96,10 @@ async function requireCurrent() {
 }
 
 for (const node of document.querySelectorAll("[data-cap]")) node.hidden = caps[node.dataset.cap] !== true;
-element("other-methods").hidden = !["passkeySignin", "passkeySignup", "google", "oidc", "saml", "recovery"].some(name => caps[name] === true);
+element("other-methods").hidden = !["passkeySignin", "google", "oidc", "saml"].some(name => caps[name] === true);
 bindAccount(refreshForAction, requireCurrent);
 bindPasskeys(refreshKeys, requireCurrent, caps);
-bindSignIn(refresh, requireCurrent);
+bindSignIn(refresh, requireCurrent, caps);
 for (const id of ["refresh-account", "check-session"]) {
   element(id).addEventListener("click", () => {
     void run(element(id), async () => announce(await refreshForAction() ? "Account refreshed." : "This browser is signed out."), "Checking sign-in…");
@@ -115,7 +118,9 @@ for (const id of ["logout", "clear-session"]) {
 const colorPreference = matchMedia("(prefers-color-scheme: dark)");
 function themeLabel() {
   const dark = document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && colorPreference.matches);
-  element("theme").textContent = dark ? "Use light theme" : "Use dark theme";
+  const label = dark ? "Use light theme" : "Use dark theme";
+  element("theme").setAttribute("aria-label", label);
+  element("theme").title = label;
   return dark;
 }
 element("theme").addEventListener("click", () => {

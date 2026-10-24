@@ -34,6 +34,7 @@ fn client_modules() -> Router<AppState> {
             include_str!("browser-operations.js"),
         ),
         ("/ui/view.js", include_str!("view.js")),
+        ("/ui/auth-screens.js", include_str!("auth-screens.js")),
         ("/ui/signin.js", include_str!("signin.js")),
         ("/ui/account.js", include_str!("account.js")),
         ("/ui/passkeys.js", include_str!("passkeys.js")),

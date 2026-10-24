@@ -14,7 +14,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await guard(context);
       await page.goto(origin);
       await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
-      await page.locator('details[data-cap="passkeySignup"] > summary').click();
+      await page.getByRole('link', {name: 'Create an account', exact: true}).click();
       await page.locator('#display-name').fill('Reference native account');
       await page.getByRole('button', {name: 'Create and verify a passkey', exact: true}).click();
       await page.locator('#account').waitFor({state: 'visible'});
@@ -23,6 +23,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#password-enrollment').isVisible(), false);
       await page.locator('#refresh-passkeys').click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 1);
+      const retainedAccountId = await page.locator('#account-id').textContent();
       stage = 'passkey-enrollment-management';
       await cdp.send('WebAuthn.setAutomaticPresenceSimulation', {authenticatorId, enabled: false});
       const spareDevice = await cdp.send('WebAuthn.addVirtualAuthenticator', {options: {
@@ -70,6 +71,16 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#attach-action').isVisible(), false);
       assert.equal(await page.getByRole('link', {name: 'Recovery options', exact: true}).isVisible(), true);
       assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
+      stage = 'account-bound-passkey-signin';
+      await page.locator('#logout').click();
+      await page.waitForFunction(() => document.getElementById('status').textContent === 'Signed out in this browser.');
+      await page.getByRole('link', {name: 'Trouble signing in?', exact: true}).click();
+      await page.getByRole('link', {name: /Find a passkey with your account ID/}).click();
+      await page.locator('#passkey-account').fill(retainedAccountId);
+      await page.getByRole('button', {name: 'Continue with your passkey', exact: true}).click();
+      await page.waitForFunction(() => document.getElementById('status').textContent === 'Signed in with a passkey.');
+      assert.equal(await page.locator('#account-id').textContent(), retainedAccountId);
+      assert.equal(await page.locator('#mailbox-actions').isVisible(), false);
       await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1 &&
         document.getElementById('providers-state').textContent === 'No connected providers.');
       await page.evaluate(() => document.fonts.ready);
@@ -92,7 +103,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
         }
         await page.evaluate(() => { document.documentElement.style.removeProperty('font-size'); });
       }
-      return {native_signup: true, enrollment: true, rename: true, removal: true, native_signin: true,
+      return {native_signup: true, enrollment: true, rename: true, removal: true, native_signin: true, account_bound_signin: true,
         verified_contact_preserves_strong_policy: true, recovery_setup_entry: true};
     } catch (error) { error.stageName = stage; error.uiObservations = {statuses}; throw error; }
   });

@@ -4,13 +4,25 @@ This adapts the maintainer-supplied `engineering-workspace-ui-v1` contract to
 authentication. It is a visual candidate awaiting the owner's review, not an
 approval inherited from another application or from passing browser checks.
 
-The sign-in view is a narrow, borderless column with an 18px title. Email is its
-primary local action; selected password, passkey and provider methods remain
-secondary. Retained IDs, signup, recovery and stale-sign-in cleanup use contextual
-disclosure. Available methods come from the actual selected router, not fixtures.
-The account view uses flat settings sections and aligned session/provider rows.
-Key management and destructive actions reveal their relevant fields and warnings.
-There is no workspace sidebar, marketing hero, ambient effect or decorative mark.
+The owner’s latest UX direction supersedes the earlier 18px-title/disclosure
+candidate. Sign-in is a borderless 420px column with a 28px heading, one brand
+presence, 48px controls and 10px control corners. Email is primary, with only
+selected passkey/provider alternatives. Password, passkey registration, help and
+account-ID passkey access have focused presentation URLs (`/?view=…`), rather than
+sign-in accordions. Query values select presentation only; unavailable/unknown
+views return to sign-in and cannot enable a capability or supply authentication.
+Recovery and saved account IDs are reached through help. Successful email start
+replaces the form with a check-email state and explicit resend, retaining the
+existing browser binding, generic response, expiry and server admission limits.
+A direct inbox query cannot construct that state or supply a resend address.
+The icon theme button has an accessible action label; the repeated footer is removed.
+
+The account view keeps flat settings sections and aligned session/provider rows.
+Key management and destructive actions retain relevant fields, warnings and native
+confirmation. There is no workspace sidebar, marketing hero, ambient effect or
+decorative mark. Native passkey prompts remain explicit; conditional WebAuthn
+mediation is not added by this presentation change. No authentication method,
+account policy, proof lifecycle, automatic completion retry or browser storage is added.
 
 The selected semantic roles live in [reference-ui-tokens.json](reference-ui-tokens.json).
 `python3 scripts/reference_ui_tokens.py` generates the committed `pages/tokens.css`;

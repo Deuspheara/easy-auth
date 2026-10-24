@@ -10,55 +10,78 @@
 <body data-reference-account data-account="signed-out">
 <a class="skip" href="#main">Skip to account access</a>
 <header class="topbar">
-  <a class="brand" href="/">easy-auth</a>
-  <div class="actions"><button id="check-session" class="quiet" type="button" hidden>Check sign-in</button><button id="theme" class="quiet" type="button">Use dark theme</button></div>
+  <div class="actions"><button id="check-session" class="quiet" type="button" hidden>Check sign-in</button><button id="theme" class="quiet icon-button" type="button" aria-label="Use dark theme" title="Use dark theme"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg></button></div>
 </header>
 <main id="main" tabindex="-1">
 <input id="capabilities" type="hidden" value='__CAPABILITIES__'>
 <div class="intro">
-  <h1 id="heading" tabindex="-1">Sign in to easy-auth</h1>
-  <p id="intro" class="muted">Use a sign-in method available for your account.</p>
+  <a class="brand" href="/">easy-auth</a>
+  <h1 id="heading" tabindex="-1">Welcome back</h1>
+  <p id="intro" class="muted">Sign in to your account</p>
 </div>
 <p id="status" class="notice" role="status" aria-live="polite" aria-atomic="true"></p>
 <noscript><p class="notice">JavaScript is required to submit authentication requests.</p></noscript>
-<section id="sign-in" aria-label="Sign-in methods">
-  <h2 class="sr-only">Email sign-in</h2>
-  <form id="email-form" method="post" action="/v1/email/start">
-    <label for="email">Email address</label>
-    <input id="email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="email-help" required maxlength="254">
-    <button id="submit" type="submit">Send sign-in link</button>
-    <small id="email-help">Open the email link in this browser.</small>
-  </form>
-  <details data-cap="passwords" hidden>
-    <summary>Sign in with a password</summary>
-    <form id="password-form" method="post" action="/v1/password/login">
-      <label for="login-email">Email address</label><input id="login-email" name="username" type="email" autocomplete="username" required maxlength="254">
-      <label for="login-password">Password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required maxlength="1024">
-      <div class="actions"><button type="submit">Sign in with password</button><button id="reset-request" class="secondary" type="button">Reset password</button></div>
+<section id="sign-in" aria-label="Account access">
+  <div data-auth-screen="email">
+    <form id="email-form" method="post" action="/v1/email/start">
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email" required maxlength="254">
+      <button id="submit" type="submit">Continue with email</button>
     </form>
-  </details>
-  <div id="other-methods" class="method-group" hidden>
-    <h2 class="separator">Other ways to sign in</h2>
-    <form id="passkey-form" method="post" action="/v1/passkeys/authentication/start" data-cap="passkeySignin" hidden>
-      <button class="secondary" type="submit">Sign in with a passkey</button>
-      <details><summary>Use a retained account ID</summary><label for="passkey-account">Public account ID (optional)</label><input id="passkey-account" pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" autocomplete="off" spellcheck="false" aria-describedby="account-help"><small id="account-help">Leave empty to choose a saved discoverable passkey.</small></details>
-    </form>
-    <div id="provider-methods" class="stack" aria-label="Provider sign-in">
-      <a class="button secondary" data-cap="google" href="/google/sign-in" hidden>Continue with Google</a>
-      <a class="button secondary" data-cap="oidc" href="/oidc/sign-in" hidden>Organization sign-in</a>
-      <a class="button secondary" data-cap="saml" href="/saml/sign-in" hidden>SAML organization sign-in</a>
-    </div>
-    <details data-cap="passkeySignup" hidden>
-      <summary>Create an account with a passkey</summary>
-      <form id="signup-form" method="post" action="/v1/passkeys/signup/start">
-        <label for="display-name">Display name</label><input id="display-name" autocomplete="nickname" required maxlength="256">
-        <p class="muted">Create a key, then verify it in a second prompt. No email address is required.</p>
-        <button type="submit">Create and verify a passkey</button>
+    <p class="flow-link" data-cap="passwords" hidden><a href="/?view=password">Use a password instead</a></p>
+    <div id="other-methods" class="method-group" hidden>
+      <p class="separator">or</p>
+      <form id="passkey-form" method="post" action="/v1/passkeys/authentication/start" data-cap="passkeySignin" hidden>
+        <button class="secondary" type="submit">Sign in with a passkey</button>
       </form>
-    </details>
-    <p class="metadata" data-cap="recovery" hidden><a href="/passkey-recovery">Recover with a saved recovery code</a></p>
+      <div id="provider-methods" class="stack" aria-label="Provider sign-in">
+        <a class="button secondary" data-cap="google" href="/google/sign-in" hidden>Continue with Google</a>
+        <a class="button secondary" data-cap="oidc" href="/oidc/sign-in" hidden>Organization sign-in</a>
+        <a class="button secondary" data-cap="saml" href="/saml/sign-in" hidden>SAML organization sign-in</a>
+      </div>
+    </div>
+    <p class="flow-link" data-cap="passkeySignup" hidden>New here? <a href="/?view=signup">Create an account</a></p>
+    <p class="flow-link metadata"><a href="/?view=help">Trouble signing in?</a></p>
   </div>
-  <div class="signin-utilities"><details id="signin-help"><summary>Trouble signing in?</summary><p class="muted">If an old sign-in is blocking you, sign out this browser before choosing an account.</p><button id="clear-session" class="secondary" type="button" hidden>Sign out this browser</button></details></div>
+  <div data-auth-screen="password" hidden>
+    <form id="password-form" method="post" action="/v1/password/login">
+      <label for="login-email">Email address</label><input id="login-email" name="username" type="email" placeholder="you@example.com" autocomplete="username" required maxlength="254">
+      <label for="login-password">Password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required maxlength="1024">
+      <button type="submit">Sign in with password</button>
+      <button id="reset-request" class="quiet text-button" type="button">Reset password</button>
+    </form>
+    <p class="flow-link"><a href="/">Other sign-in options</a></p>
+  </div>
+  <div data-auth-screen="inbox" hidden>
+    <button id="email-resend" class="secondary" type="button">Resend sign-in link</button>
+    <p class="flow-link"><a href="/">Use another email or sign-in method</a></p>
+  </div>
+  <div data-auth-screen="signup" hidden>
+    <form id="signup-form" method="post" action="/v1/passkeys/signup/start">
+      <label for="display-name">Your name</label><input id="display-name" autocomplete="nickname" required maxlength="256">
+      <p class="muted">Your device will help you create a passkey, then verify it in a second prompt. No email address is required.</p>
+      <button type="submit">Create and verify a passkey</button>
+    </form>
+    <p class="flow-link">Already have an account? <a href="/">Sign in</a></p>
+  </div>
+  <div id="signin-help" data-auth-screen="help" hidden>
+    <div class="help-options">
+      <a data-cap="passwords" href="/?view=password" hidden>Reset your password<span>Enter your email, then choose Reset password.</span></a>
+      <a data-cap="recovery" href="/passkey-recovery" hidden>Recover your passkey account<span>Use the recovery kit you saved earlier.</span></a>
+      <a data-cap="passkeySignin" href="/?view=account-passkey" hidden>Find a passkey with your account ID<span>For keys that need a saved public account ID.</span></a>
+    </div>
+    <p class="muted">An old sign-in blocking you? Sign out this browser before choosing another account.</p>
+    <button id="clear-session" class="secondary" type="button" hidden>Sign out this browser</button>
+    <p class="flow-link"><a href="/">Back to sign in</a></p>
+  </div>
+  <div data-auth-screen="account-passkey" hidden>
+    <form id="account-passkey-form" method="post" action="/v1/passkeys/authentication/start">
+      <label for="passkey-account">Public account ID</label><input id="passkey-account" pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" autocomplete="off" spellcheck="false" aria-describedby="account-help" required>
+      <small id="account-help">Use the ID saved with your passkey. It is not your email address.</small>
+      <button type="submit">Continue with your passkey</button>
+    </form>
+    <p class="flow-link"><a href="/">Choose a saved passkey instead</a></p>
+  </div>
 </section>
 <section id="account" aria-label="Your account" hidden>
   <div class="account-section">
@@ -119,7 +142,6 @@
   </div>
 </section>
 </main>
-<footer class="reference-note">easy-auth reference client</footer>
 <dialog id="confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
   <form method="dialog"><h2 id="confirmation-title">Confirm account action</h2><p id="confirmation-description"></p><div class="actions"><button value="cancel" class="secondary" autofocus>Cancel</button><button id="confirmation-accept" value="confirm" class="danger">Confirm</button></div></form>
 </dialog>
