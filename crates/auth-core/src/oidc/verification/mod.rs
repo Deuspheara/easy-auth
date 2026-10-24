@@ -10,6 +10,7 @@ mod repository;
 #[cfg(test)]
 mod tests;
 mod verified;
+mod work;
 
 pub use flow::OidcTokenVerifier;
 pub use input::OidcIdToken;

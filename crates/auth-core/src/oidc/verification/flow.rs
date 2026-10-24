@@ -1,26 +1,19 @@
 use super::{
     OidcExchangeRepository, OidcVerificationPolicy, VerifiedOidcIdentity,
-    claims::Claims,
     input::{self, OidcIdToken},
-    keys,
+    work::{self, Attempt, SignatureWork},
 };
-use crate::{Error, OAuthExchange, OidcDiscovery, OidcDocuments, OidcJwksDocument, Result};
+use crate::{Error, OAuthExchange, OidcDiscovery, OidcDocuments, Result};
 use std::{sync::Arc, time::Duration};
-use tokio::sync::{OwnedSemaphorePermit, Semaphore};
-use zeroize::Zeroizing;
+use tokio::sync::OwnedSemaphorePermit;
 
 const VERIFY_TIMEOUT: Duration = Duration::from_secs(15);
-const MAX_VERIFICATIONS: usize = 2;
-enum Attempt {
-    UnknownKey,
-    Claims(Box<Claims>),
-}
 
 pub struct OidcTokenVerifier {
     documents: Arc<OidcDocuments>,
     repository: Arc<dyn OidcExchangeRepository>,
     policy: OidcVerificationPolicy,
-    workers: Arc<Semaphore>,
+    work: SignatureWork,
 }
 impl OidcTokenVerifier {
     pub fn new(
@@ -32,7 +25,7 @@ impl OidcTokenVerifier {
             documents,
             repository,
             policy,
-            workers: Arc::new(Semaphore::new(MAX_VERIFICATIONS)),
+            work: SignatureWork::new(),
         }
     }
     pub async fn verify(
@@ -45,12 +38,7 @@ impl OidcTokenVerifier {
     }
 
     pub(in crate::oidc) fn lease_operation(&self) -> Result<Arc<OwnedSemaphorePermit>> {
-        Ok(Arc::new(
-            self.workers
-                .clone()
-                .try_acquire_owned()
-                .map_err(|_| Error::RateLimited)?,
-        ))
+        self.work.lease()
     }
 
     pub(in crate::oidc) async fn verify_leased(
@@ -95,7 +83,7 @@ impl OidcTokenVerifier {
         } else {
             self.documents.keys_from_discovery(&discovery, None).await?
         };
-        let claims = match attempt(&token, observed.clone(), lease.clone()).await? {
+        let claims = match work::attempt(&token, observed.clone(), lease.clone()).await? {
             Attempt::Claims(claims) => claims,
             Attempt::UnknownKey => {
                 let current = self
@@ -104,7 +92,7 @@ impl OidcTokenVerifier {
                     .await?;
                 // Retain the operation lease through the final authority read;
                 // the native retry owns a separate cancellation-safe reference.
-                match attempt(&token, current, lease.clone()).await? {
+                match work::attempt(&token, current, lease.clone()).await? {
                     Attempt::Claims(claims) => claims,
                     Attempt::UnknownKey => return Err(Error::Unauthorized),
                 }
@@ -114,28 +102,4 @@ impl OidcTokenVerifier {
         claims.validate(&exchange, &self.policy, now_us)?;
         Ok(VerifiedOidcIdentity::new(exchange, &claims))
     }
-}
-
-async fn attempt(
-    token: &OidcIdToken,
-    document: OidcJwksDocument,
-    lease: Arc<OwnedSemaphorePermit>,
-) -> Result<Attempt> {
-    let token = token.0.clone();
-    tokio::task::spawn_blocking(move || {
-        // Retain the lease after async cancellation until this native crypto job
-        // finishes; repeated timeouts cannot create unbounded detached workers.
-        let _lease = lease;
-        let header = input::header(&token)?;
-        let Some(verifier) = keys::select(&document, &header)? else {
-            return Ok(Attempt::UnknownKey);
-        };
-        let (payload, _) = josekit::jws::deserialize_compact(token.as_bytes(), verifier.as_ref())
-            .map_err(|_| Error::Unauthorized)?;
-        let payload = Zeroizing::new(payload);
-        let claims = serde_json::from_slice(&payload).map_err(|_| Error::Unauthorized)?;
-        Ok(Attempt::Claims(claims))
-    })
-    .await
-    .map_err(|_| Error::Unavailable)?
 }
