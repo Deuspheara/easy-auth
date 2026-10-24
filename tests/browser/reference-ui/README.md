@@ -27,6 +27,11 @@ Focused-view checks cover password, signup, help and account-ID access, mobile/d
 and enlarged text in both themes, browser back, inert unknown/unavailable view
 queries and direct-inbox rejection. Genuine email flow verifies the check-email
 transition and explicit resend, without fabricated successful responses.
+The focused keyboard module follows genuine email authentication through Profile,
+return navigation and Sessions using Tab/Shift+Tab/Enter. Escape cancellation must
+restore the enabled sign-out button and send no revocation request. A separately
+labelled presentation-only close listener verifies that cleanup preserves a chosen
+visible heading. The real inbox response and keyboard resend both focus the heading.
 Account-access coverage uses a genuine mailbox login, observes inventory401,
 checks Cancel sends no logout, creates a key normally and explicitly verifies it
 through account-bound native authentication before inventory200. Aggregate facts

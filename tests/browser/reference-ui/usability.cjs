@@ -28,10 +28,14 @@ async function usability(browser, origin, mail, guard) {
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your email.'));
     assert.equal(await page.locator('#email-form').isVisible(), false);
     assert.equal(await page.locator('#heading').textContent(), 'Check your email');
+    assert.equal(await page.locator('#heading').evaluate(node => node === document.activeElement), true);
     assert.equal(await page.locator('#email-resend').isEnabled(), true);
-    await page.locator('#email-resend').click();
+    await page.keyboard.press('Tab');
+    assert.equal(await page.locator('#email-resend').evaluate(node => node === document.activeElement), true);
+    await page.keyboard.press('Enter');
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your email.'));
     assert.equal(await page.locator('#email-resend').isEnabled(), true);
+    assert.equal(await page.locator('#heading').evaluate(node => node === document.activeElement), true);
     await page.unroute('**/v1/email/start');
 
     await page.getByRole('link', {name: 'Use another email or sign-in method', exact: true}).click();
@@ -69,7 +73,7 @@ async function usability(browser, origin, mail, guard) {
     assert.equal(await page.locator('#status').textContent(), '');
     assert.equal(await page.locator('#account').isVisible(), false);
     return {selected_methods_only: true, autocomplete: true, genuine_request_busy: true,
-      offline_error_clears_password: true, no_false_signin: true, ephemeral_theme: true, navigation_discards_old_result: true};
+      keyboard_inbox_resend: true, offline_error_clears_password: true, no_false_signin: true, ephemeral_theme: true, navigation_discards_old_result: true};
   } finally { release?.(); await context.close(); }
 }
 module.exports = {usability};

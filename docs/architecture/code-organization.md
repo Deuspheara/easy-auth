@@ -37,6 +37,11 @@ collects private source inventories or persists browser proof/state. Reusable
 post-provider assertions run within existing genuine provider suites. No unrelated
 cleanup is deferred.
 
+Keyboard navigation and closed-dialog focus assertions live in their own
+`keyboard.cjs` module, called from the genuine mailbox flow; they introduce no
+authentication fixture or persistence policy. Lost-focus restoration stays in
+`view.js`, beside operation cleanup and page-lifecycle checks.
+
 Reference account inventory keeps public projection/cursor types in core
 `providers.rs` and the use case in `auth/providers.rs`. PostgreSQL
 `sessions/linked_providers.rs` owns the source-aware caller transaction and fixed

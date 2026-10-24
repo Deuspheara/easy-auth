@@ -60,6 +60,10 @@ observed. Failures expose retry; healthy views have no manual refresh control.
 Success notifications expire after eight seconds. Errors and confirmation-link
 instructions remain visible. Only other sessions have an individual revoke action;
 this browser’s sign-out and confirmed sign-out everywhere are separate.
+Keyboard users can open Profile and Sessions and return to the account heading.
+Escape cancels the sign-out dialog without sending revocation; focus returns to
+the invoking control after it is enabled. Cleanup preserves another visible focus
+destination and never restores a hidden control or an earlier page's focus.
 
 ## Using account controls
 

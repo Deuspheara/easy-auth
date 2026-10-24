@@ -42,7 +42,10 @@ export async function run(container, action, pending = "Working…") {
     container.removeAttribute("aria-busy");
     buttons.forEach((button, index) => { if (button.isConnected) button.disabled = disabled[index]; });
     syncAccountButtons();
-    if (stamp === lifecycle && document.activeElement === document.body && focused?.isConnected && focused.getClientRects().length) focused.focus();
+    const dialog = element("confirmation");
+    // A closed native dialog can retain focus on its now-hidden Cancel button.
+    const lostFocus = document.activeElement === document.body || (!dialog.open && dialog.contains(document.activeElement));
+    if (stamp === lifecycle && active.size === 0 && lostFocus && focused?.isConnected && focused.getClientRects().length) focused.focus();
   };
   active.add(release);
   container.setAttribute("aria-busy", "true");

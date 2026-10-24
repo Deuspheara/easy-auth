@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const {accountKeyboard} = require('./keyboard.cjs');
 
 async function openDetails(page, selector) {
   if (!await page.locator(selector).evaluate(node => node.open)) await page.locator(selector + ' > summary').click();
@@ -84,6 +85,8 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.waitForFunction(() => document.getElementById('providers-card').dataset.loaded === 'true');
     assert.equal(await page.locator('#providers-card').isVisible(), false);
     assert.equal(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
+    stage = 'account-keyboard';
+    const keyboard = await accountKeyboard(page);
 
     stage = 'password-enrollment';
     await page.getByRole('button', {name: 'Manage password', exact: true}).click();
@@ -163,7 +166,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.locator('#confirm').click();
     await page.waitForFunction(() => document.getElementById('status').textContent === 'Authentication account deleted.');
     assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
-    return {email_signin: true, password_enrollment_login_reset: true, session_revocation: true, email_change: true, deletion: true};
+    return {email_signin: true, keyboard, password_enrollment_login_reset: true, session_revocation: true, email_change: true, deletion: true};
   } catch (error) { error.stageName = stage; error.uiObservations = {changeAddress, confirmations}; throw error; }
   finally { await context.close(); await peer.close(); }
 }
