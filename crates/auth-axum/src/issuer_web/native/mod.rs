@@ -1,12 +1,13 @@
 mod authorize;
 mod contract;
 mod input;
+mod introspection;
 mod metadata;
 mod revocation;
 mod routing;
 mod services;
 mod token;
 mod types;
-pub use contract::issuer_native_web_openapi;
+pub use contract::{issuer_native_consumer_openapi, issuer_native_web_openapi};
 pub use routing::experimental_issuer_native_web_router;
 pub use services::IssuerNativeWebServices;

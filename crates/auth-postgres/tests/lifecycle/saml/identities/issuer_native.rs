@@ -24,8 +24,17 @@ async fn genuine_saml_native_grant_keeps_signed_authentication_and_rechecks_regi
     .await;
     let native =
         crate::support::issuer_native_families::Fixture::for_base(base, Uuid::new_v4()).await;
+    let consumer = crate::support::issuer_native_consumers::Consumer::new(&native).await;
+    consumer.enable(&native).await;
     let code = native.code().await;
     let initial = native.exchange(&code).await.unwrap();
+    assert!(
+        consumer
+            .inspect(&native, initial.access_token())
+            .await
+            .unwrap()
+            .is_some()
+    );
     sqlx::query("UPDATE auth_sessions SET last_seen_at=clock_timestamp()-interval '31 minutes' WHERE realm_id=$1 AND user_id=$2").bind(user.realm_id).bind(user.id).execute(&f.pool).await.unwrap();
     assert!(
         f.store
@@ -42,6 +51,13 @@ async fn genuine_saml_native_grant_keeps_signed_authentication_and_rechecks_regi
         )
         .await
         .unwrap();
+    assert!(
+        consumer
+            .inspect(&native, next.access_token())
+            .await
+            .unwrap()
+            .is_some()
+    );
     let facts:(String,i64,bool)=sqlx::query_as("SELECT authentication_method,authenticated_at_us,generation=1 FROM auth_issuer_native_families WHERE realm_id=$1").bind(user.realm_id).fetch_one(&f.pool).await.unwrap();
     assert_eq!(facts, ("saml".into(), auth_time, true));
     assert!(sqlx::query_scalar::<_,bool>("SELECT last_seen_at<clock_timestamp()-interval '30 minutes' FROM auth_sessions WHERE realm_id=$1 AND user_id=$2").bind(user.realm_id).bind(user.id).fetch_one(&f.pool).await.unwrap());
@@ -64,6 +80,13 @@ async fn genuine_saml_native_grant_keeps_signed_authentication_and_rechecks_regi
             .await,
         Err(IssuerTokenError::InvalidGrant)
     ));
+    assert!(
+        consumer
+            .inspect(&native, next.access_token())
+            .await
+            .unwrap()
+            .is_none()
+    );
     native
         .refresher()
         .revoke(

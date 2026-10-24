@@ -27,7 +27,12 @@ pub fn experimental_issuer_native_web_router(
         auth: auth.clone(),
         browser: browser.clone(),
     };
-    let router = routing::root(&auth, &browser, &services.base, issuer_native_web_openapi())?;
+    let contract = if services.introspection.is_some() {
+        super::issuer_native_consumer_openapi()
+    } else {
+        issuer_native_web_openapi()
+    };
+    let router = routing::root(&auth, &browser, &services.base, contract)?;
     let pages = Router::new()
         .route("/oidc/authorize", get(authorize::authorize))
         .route(
@@ -60,6 +65,15 @@ pub fn experimental_issuer_native_web_router(
         .route("/oidc/token", post(token::exchange))
         .layer(DefaultBodyLimit::max(MAX_NATIVE_TOKEN_BODY_BYTES))
         .with_state(services.clone());
+    let consumer = match services.introspection.clone() {
+        Some(service) => Router::new()
+            .route(
+                "/oidc/native/introspect",
+                post(super::introspection::inspect),
+            )
+            .with_state(service),
+        None => Router::new(),
+    };
     let status = Router::new()
         .route("/oidc/revoke", post(revocation::revoke))
         .with_state(services.clone())
@@ -70,6 +84,7 @@ pub fn experimental_issuer_native_web_router(
                     management: services.management.clone(),
                 }),
         )
+        .merge(consumer)
         .layer(DefaultBodyLimit::max(MAX_NATIVE_STATUS_BODY_BYTES));
     Ok(router.merge(documents).merge(
         tokens

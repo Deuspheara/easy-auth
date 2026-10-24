@@ -1114,3 +1114,24 @@ example composition were extracted in separate structural commits; the existing
 ordinary signer is unchanged. New source/test modules stay below300lines. Longer
 ordered scenarios retain invariants as documented function-size exceptions; no
 generic framework, dependency, new proof/crypto constructor or unrelated cleanup.
+
+## Native consumer ownership
+
+Core `issuer/tokens/native/consumer/` separates trusted policy, repository facts,
+sealed metadata and admitted use case. It reuses the existing bounded access
+projection without turning metadata into a local session. PostgreSQL
+`issuer/native_refresh/consumer/` owns administrative provisioning and deterministic
+consumer/audience client ordering; `family/inspection/` owns candidate access state
+and the read-only current-policy/source/family transaction. Original family policy
+restoration inputs were named in a separately verified structural commit. No SQL
+or account/source policy moves into HTTP.
+
+Axum's named native introspection handler reuses strict status input and the closed
+metadata DTO. An explicit builder selects the route and corresponding live contract;
+ordinary online inspection remains separate. Tests separate provisioning, lifecycle,
+key/policy, realm/audience isolation, migration and observed database waits. Existing
+normal provider cases verify source provenance through the same new inspection path.
+All new modules remain below300lines. Longer ordered transaction/scenario functions
+keep current credentials, locks, original caps, waits, final clock and valid controls
+visible together as size-review exceptions. No speculative abstraction, new crate,
+public proof constructor, duplicated policy or unrelated cleanup is deferred.

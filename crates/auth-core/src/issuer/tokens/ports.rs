@@ -22,8 +22,9 @@ impl IssuerTokenStatusRequest<'_> {
             .validate_for(self.client)
             .map_err(IssuerTokenError::client)
     }
-    /// Public identification is insufficient for introspection. This initial
-    /// profile authenticates only the confidential application's own audience.
+    /// Public identification is insufficient for introspection. The owning
+    /// repository must compare actual credentials and enforce its audience policy;
+    /// this method alone grants no cross-client inspection permission.
     pub fn validate_introspection(&self) -> IssuerTokenResult<()> {
         self.validate_client()?;
         if self.client.kind() != IssuerClientKind::ConfidentialBasic {

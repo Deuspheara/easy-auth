@@ -1,4 +1,5 @@
 mod boundary;
+mod consumers;
 mod contract;
 mod lifecycle;
 mod revocation;
@@ -18,7 +19,10 @@ use tower::ServiceExt;
 async fn fixture(pool: PgPool) -> Fixture {
     wire(Fixture::new(pool).await)
 }
-fn wire(mut f: Fixture) -> Fixture {
+fn wire(f: Fixture) -> Fixture {
+    wire_with_inspection(f, false)
+}
+fn wire_with_inspection(mut f: Fixture, inspect: bool) -> Fixture {
     let services = IssuerWebServices::new(
         f.policy.authority().clone(),
         f.base.store.clone(),
@@ -32,6 +36,11 @@ fn wire(mut f: Fixture) -> Fixture {
         f.base.store.clone(),
         f.base.store.clone(),
     );
+    let services = if inspect {
+        services.with_native_introspection(f.base.store.clone())
+    } else {
+        services
+    };
     f.base.app = experimental_issuer_native_web_router(
         Auth::new(f.base.realm, f.base.store.clone(), f.mail.clone()),
         BrowserConfig::new(ORIGIN, false).unwrap(),

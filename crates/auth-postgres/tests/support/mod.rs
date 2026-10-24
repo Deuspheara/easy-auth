@@ -68,3 +68,6 @@ pub(crate) use observation as lock_observation;
 
 #[cfg(feature = "issuer-signing")]
 pub(crate) mod issuer_tokens;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub(crate) mod issuer_native_consumers;

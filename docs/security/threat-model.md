@@ -853,6 +853,27 @@ hints, browser cookies and public native IDs confer no consumer authentication.
 Bounded owned browser/real TCP callback tests check state/issuer, PKCE, production
 signature, rotation/replay/cleanup and privacy using unchanged producers. Actual
 OIDC/SAML cases preserve authentication provenance and current source denial. Native
-authenticated audience-authorized resource consumption is still missing and cannot be
-replaced with local-session acceptance. Production platform storage and broader
+authenticated audience-authorized resource consumption uses the explicit policy
+below and cannot be replaced with local-session acceptance. Production platform storage and broader
 interoperability remain explicit requirements.
+
+## Native consumer authentication and disclosure
+
+The separate optional native inspection path requires current confidential Basic
+credentials plus an exact enabled persisted consumer-to-native-audience policy.
+Public identification, token possession and browser cookies confer no consumer
+authentication. Schema installation and HTTP composition enable no policy. Full
+current consumer/audience definitions and policy revisions prevent stale permission
+reuse; disable remains reduction-only after client changes.
+
+All client pair locks precede policy/key/source/owner/session/family/access locks in
+deterministic immutable-ID order. Snapshots choose paths, not authority. Actual
+credential comparison precedes even unknown/inactive results. Final database time
+after all waits bounds native access/family idle/absolute lifetime. Existing provider
+source guards and original authentication remain mandatory without imposing cookie
+freshness or extending cookie time. Family replay/revocation and key/policy/session
+disable prevent active disclosure. Infrastructure errors never become inactive
+success. Active claims expose only pairwise metadata to the explicitly authorized
+consumer; inactive responses disclose no reason. Native audience metadata never
+becomes a local identity/session or application business permission. ADR0039 records
+the explicit endpoint, scope and limits.

@@ -2,8 +2,8 @@
 
 This is the access-lifecycle and native consent-library work of AUTH-40. Native
 family issuance/rotation/revocation are available as library operations; native wire and bounded owned browser acceptance are available through the
-[explicit native profile](issuer-native.md); native resource-consumer introspection
-and broader acceptance remain unfinished.
+[explicit native profile](issuer-native.md), including optional authenticated native
+consumers. SDK/standalone interoperability and production acceptance remain separate.
 Use [ADR0038](../architecture/adr/0038-native-token-lifecycle.md) for authority and
 remaining scope. Normal standalone activation and production approval remain gated.
 
@@ -54,7 +54,8 @@ app sessions are not remotely erased. A fresh authentication/code is needed to m
 another credential; these APIs cannot refresh or lengthen an existing token.
 
 These extra endpoints are described by `issuer_token_management_openapi`; discovery
-retains the existing issuer profile while the full native feature is unfinished.
+retains the existing online issuer profile. Native capabilities require their
+separate explicit composition.
 Default `issuer-web`, consent-only and standalone routers expose no management routes.
 
 Use disposable real PostgreSQL for verification:
@@ -204,9 +205,10 @@ disable remains possible. Cross-kind/realm/session/operation proofs cannot appro
 operation IDs. This consent-only composition mounts no token, refresh, revocation
 or discovery endpoint. The separate native wire composition below implements token
 HTTP and bounded owned native client/browser acceptance; native consumer
-introspection remains AUTH-40 work. Normal standalone outbound-issuer activation
+introspection uses the separate explicit consumer policy below. Normal standalone outbound-issuer activation
 stays gated.
 
 The separate [native wire composition](issuer-native.md) now adds code/refresh and
 registered revocation on an explicit router; the consent-only component above still
-mounts none of those endpoints. Native consumer introspection remains a required gap.
+mounts none of those endpoints. Optional native consumer inspection is documented
+in that guide and [ADR0039](../architecture/adr/0039-native-introspection-consumers.md).

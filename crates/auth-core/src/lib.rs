@@ -174,3 +174,9 @@ pub use issuer::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use issuer::MAX_ISSUER_NATIVE_REFRESH_GENERATION;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    IssuerNativeAccessData, IssuerNativeActiveAccess, IssuerNativeConsumerPolicy,
+    IssuerNativeIntrospection, IssuerNativeIntrospectionRepository,
+};

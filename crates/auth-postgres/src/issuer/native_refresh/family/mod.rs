@@ -1,4 +1,5 @@
 //! Native credential rotation/revocation; no signature or cookie-idle extension.
+mod inspection;
 mod revocation;
 mod rotation;
 mod state;

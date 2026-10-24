@@ -8,6 +8,7 @@ use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct IssuerNativeWebServices {
+    pub(super) introspection: Option<Arc<auth_core::IssuerNativeIntrospection>>,
     pub(super) base: IssuerWebServices,
     pub(super) consent: Arc<IssuerNativeAuthorization>,
     pub(super) tokens: Arc<IssuerNativeTokenIssuer>,
@@ -15,6 +16,18 @@ pub struct IssuerNativeWebServices {
     pub(super) management: Arc<IssuerTokenManagement>,
 }
 impl IssuerNativeWebServices {
+    /// Explicitly mount native consumer inspection. This neither provisions nor
+    /// enables any persisted consumer/audience permission.
+    pub fn with_native_introspection(
+        mut self,
+        repository: Arc<dyn auth_core::IssuerNativeIntrospectionRepository>,
+    ) -> Self {
+        self.introspection = Some(Arc::new(auth_core::IssuerNativeIntrospection::new(
+            self.base.tokens.authority().clone(),
+            repository,
+        )));
+        self
+    }
     /// Trusted same-authority composition. Uses the base concrete signer's
     /// original engine/capacity, never provisioning keys or enabling policies.
     pub fn new(
@@ -25,6 +38,7 @@ impl IssuerNativeWebServices {
     ) -> Self {
         let authority = base.tokens.authority().clone();
         Self {
+            introspection: None,
             consent: Arc::new(IssuerNativeAuthorization::new(
                 authority.clone(),
                 native.clone(),

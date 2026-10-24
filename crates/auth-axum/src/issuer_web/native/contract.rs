@@ -35,3 +35,12 @@ pub fn issuer_native_web_openapi() -> utoipa::openapi::OpenApi {
     api.merge(native);
     api
 }
+
+#[derive(OpenApi)]
+#[openapi(paths(super::introspection::inspect))]
+struct ConsumerApi;
+pub fn issuer_native_consumer_openapi() -> utoipa::openapi::OpenApi {
+    let mut api = issuer_native_web_openapi();
+    api.merge(ConsumerApi::openapi());
+    api
+}

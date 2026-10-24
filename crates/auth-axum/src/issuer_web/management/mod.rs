@@ -13,3 +13,6 @@ pub(super) use handlers::introspect;
 pub(super) use input::{TokenStatusInput, request as status_request};
 #[cfg(feature = "issuer-native-web")]
 pub(super) use routing::ManagementState;
+
+#[cfg(feature = "issuer-native-web")]
+pub(super) use types::{ActiveToken, InactiveToken, TokenIntrospectionResponse};

@@ -74,12 +74,31 @@ session disable. Unknown/repeated input succeeds with empty200, permanently.
 No user-session actor is fabricated. It cannot erase offline ID tokens/downstream
 application sessions or grant local authentication/business permissions.
 
-The current `/oidc/introspect` remains authenticated confidential own-audience access
-inspection. Public native IDs/cookies/known tokens cannot authenticate a consumer.
-Explicit audience-authorized confidential consumption of native access is still
-required AUTH-40 work; do not treat a native access token as a local session or
-invent an implicit resource-server authorization rule. This gap keeps the ticket
-open despite the implemented native wire/browser lifecycle.
+The existing `/oidc/introspect` retains authenticated confidential own-audience online
+inspection. To enable native consumption explicitly, call
+`services.with_native_introspection(repository)` before building the native router.
+This adds POST `/oidc/native/introspect` and its live contract; the route is absent
+without that builder. The repository implements `IssuerNativeIntrospectionRepository`
+and the separate core service is `IssuerNativeIntrospection`.
+
+Provision a confidential Basic consumer and the native public audience, then save
+`IssuerNativeConsumerPolicy::new(authority, consumer, audience)` through
+`configure_issuer_native_consumer`. New policy is disabled. Enable the exact saved
+policy through `enable_issuer_native_consumer`; disable/load use
+`disable_issuer_native_consumer`/`load_issuer_native_consumer`. Both current full
+client definitions/revisions are mandatory. Reconfiguration cannot clear disable;
+old revisions cannot re-enable themselves. These trusted APIs are not browser input.
+
+Native inspection uses the same strict status form and actual Basic authentication.
+Unknown/foreign/inactive/unauthorized tokens return only active=false. Wrong or
+missing credentials return401, even for unknown tokens; storage faults remain errors.
+Active metadata contains active/iss/aud/client_id/pairwise-sub/iat/exp/Bearer/scope.
+Audience/client_id identify the native audience, and scope is openid offline_access.
+Current exact consumer permission/native policy, retained key, original provider
+source/account/session, family and access bounds remain mandatory after locks/waits.
+No cookie idle/auth_time is extended. Public native IDs/cookies/tokens cannot
+authenticate a consumer or become a local session/business permission. See
+[ADR0039](../architecture/adr/0039-native-introspection-consumers.md).
 
 Production native clients must keep refresh credentials in protected per-user
 platform credential storage, never URLs, logs, source, browser storage or shared

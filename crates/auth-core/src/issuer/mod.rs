@@ -70,3 +70,9 @@ pub use tokens::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use tokens::MAX_ISSUER_NATIVE_REFRESH_GENERATION;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use tokens::{
+    IssuerNativeAccessData, IssuerNativeActiveAccess, IssuerNativeConsumerPolicy,
+    IssuerNativeIntrospection, IssuerNativeIntrospectionRepository,
+};

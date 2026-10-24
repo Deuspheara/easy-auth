@@ -75,5 +75,6 @@ pub use issuer_native_consent::{
 
 #[cfg(feature = "issuer-native-web")]
 pub use issuer_web::{
-    IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_web_openapi,
+    IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_consumer_openapi,
+    issuer_native_web_openapi,
 };

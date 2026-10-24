@@ -273,7 +273,8 @@ definition checks and revision changes preserve disable and reject stale policy.
 An eventual original consent grant is capped by its captured source/session
 absolute expiry; configuration cannot create consent, refresh authority or extend
 cookie freshness/idle. Native confirmation transport and family library are separate implemented components;
-owned native browser/wire acceptance remains unfinished.
+bounded owned native browser/wire acceptance is implemented by the explicit native
+composition. SDK/standalone and production acceptance remain separate.
 
 Migration0034 adds a native marker on new explicit operations and a full-tuple
 proposed-consent sidecar: original policy/client revisions, preparation time,
@@ -284,7 +285,8 @@ offline request and safe display metadata; its opaque Start has no public proof
 constructor. Core/SQL default online paths still refuse native operations. Consent
 approval creates no refresh family, local session or extended access credential;
 confirmation HTTP/UI is a separate optional transport; the family lifecycle is
-described below. Native owned browser/wire acceptance remains work.
+described below. The separate explicit native wire component includes bounded owned
+browser/real-loopback acceptance.
 
 ## Native refresh family
 
@@ -296,3 +298,21 @@ generations remain replay detectors. Native access generations remain separate f
 LocalSession. Typed code/refresh/access actor facts carry no fabricated actor-session
 authentication. Erasure deidentifies audit before cascades; credential reduction
 cannot restore authority. See ADR0038.
+
+## Native audience consumers
+
+`IssuerNativeConsumerPolicy` is trusted operator configuration binding exact
+current confidential Basic consumer and distinct public native audience definitions
+under one realm/issuer. Its independent revision and disabled initial persistence
+create no consent or authentication. Disable/reconfiguration invalidates stale
+snapshots; explicit enable requires both current clients and the saved policy.
+Migration0036 stores configuration only and preserves previous credentials.
+
+`IssuerNativeIntrospection` combines actual consumer authentication with that exact
+permission, current native/source/owner/session/family/generation/key and final
+lifetime checks. `IssuerNativeAccessData` is repository input;
+`IssuerNativeActiveAccess` is sealed validated pairwise metadata, without local
+owner/session/raw credential projection. Its audience remains the native client,
+separate from the authenticated consumer. No cookie, local session, authentication
+time or application permission is created. Optional transport is described in
+[ADR0039](adr/0039-native-introspection-consumers.md).

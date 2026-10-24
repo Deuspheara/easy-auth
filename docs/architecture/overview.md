@@ -6,8 +6,10 @@ bounded lifetimes and ordered full-definition checks create no consent or token.
 Separate native consent-library operations now retain fixed proposed/source caps
 and genuine fresh-owner/private bindings through code/audit commit. Native
 family issuance/rotation/reuse revocation are implemented in the library. Native
-confirmation transport is implemented separately below; native token/refresh HTTP
-and actual native browser acceptance remain unfinished.
+confirmation, native token/refresh HTTP and bounded actual native browser acceptance
+are implemented separately below. Explicit authenticated native consumers follow
+[ADR0039](adr/0039-native-introspection-consumers.md); SDK/standalone and production
+acceptance remain separate.
 See [ADR0038](adr/0038-native-token-lifecycle.md).
 
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
@@ -266,7 +268,8 @@ registered cleanup and current legacy confidential introspection. One core sourc
 admission selects one current registration profile; all selected operation
 checks/transactions remain. Owned Chromium/real TCP loopback/separate HTTPS PKCE
 acceptance and genuine OIDC/SAML delegation cases are implemented. Explicit
-audience-authorized confidential consumption of native access remains unfinished;
+audience-authorized confidential consumption of native access uses the separate
+opt-in policy/endpoint in [ADR0039](adr/0039-native-introspection-consumers.md);
 public native IDs cannot authenticate it. Default standalone/outbound activation and
 broader SDK/standards gates remain. See the
 [native guide](../guides/issuer-native.md) and

@@ -783,7 +783,30 @@ after failure. Scope mismatch returns invalid_scope400. Actual peer/strict bound
 form/query/auth/no-store rules remain. Only this discovery adds
 refresh_token/offline_access; default metadata stays unchanged. Native revocation
 selects matching current registered-method reduction and ignores hint as authority.
-Native resource-consumer introspection remains unfinished; public native
-IDs/cookies/tokens cannot authenticate it. See the
+Explicit native resource-consumer introspection uses the separate policy/endpoint
+below; public native IDs/cookies/tokens cannot authenticate it. See the
 [native guide](../guides/issuer-native.md) and
 [ADR0038](adr/0038-native-token-lifecycle.md).
+
+## Native audience consumers
+
+`IssuerNativeConsumerPolicy` binds exact same-realm confidential consumer and native
+public audience definitions to one trusted issuer. Configure/enable/disable/load
+use `configure_issuer_native_consumer`, `enable_issuer_native_consumer`,
+`disable_issuer_native_consumer` and `load_issuer_native_consumer`. Initial policy
+is disabled; current full definitions and exact saved revision are mandatory.
+Migration0036 adds only consumer configuration and preserves previous token rows.
+
+`IssuerNativeIntrospection::introspect_access` uses
+`IssuerNativeIntrospectionRepository`, actual Basic authentication, committed source
+admission and separate native source/family lifetime checks. Only sealed
+`IssuerNativeActiveAccess` projects validated metadata; it grants no local session.
+Call `IssuerNativeWebServices::with_native_introspection(repository)` to add POST
+`/oidc/native/introspect`; otherwise route/schema are absent. Explicit live contract
+is `issuer_native_consumer_openapi`. Existing online introspection is unchanged.
+Closed4KiB status forms/current Basic/body ID/actual peer/no-cookie fallback and
+finite no-store failures are shared. Output uses the existing closed active/inactive
+shape, native aud/client_id and openid offline_access scope. Invalid credentials401;
+unknown/foreign/inactive/unauthorized only active=false; storage faults503.
+See [ADR0039](adr/0039-native-introspection-consumers.md) and the
+[native guide](../guides/issuer-native.md) for ordering and lifetime semantics.

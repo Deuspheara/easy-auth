@@ -1,5 +1,6 @@
 //! Explicit native offline configuration, separate from browser-session authority.
 mod consent;
+mod consumer;
 mod family;
 mod policy;
 #[cfg(test)]
@@ -23,3 +24,8 @@ pub use policy::{
 
 #[cfg(feature = "issuer-native-refresh")]
 pub use family::MAX_ISSUER_NATIVE_REFRESH_GENERATION;
+
+pub use consumer::{
+    IssuerNativeAccessData, IssuerNativeActiveAccess, IssuerNativeConsumerPolicy,
+    IssuerNativeIntrospection, IssuerNativeIntrospectionRepository,
+};

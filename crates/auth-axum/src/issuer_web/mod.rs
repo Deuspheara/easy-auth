@@ -9,7 +9,8 @@ mod metadata;
 mod native;
 #[cfg(feature = "issuer-native-web")]
 pub use native::{
-    IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_web_openapi,
+    IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_consumer_openapi,
+    issuer_native_web_openapi,
 };
 mod routing;
 mod services;

@@ -4,7 +4,9 @@ Date: 2026-10-23. Status: in progress for AUTH-40. Stateful access revocation an
 authenticated introspection are implemented. Explicit native policy persistence is
 implemented, with separate explicit native consent library operations. Native signed issuance, bounded families, one-use rotation and reuse revocation
 are implemented in core/PostgreSQL. Explicit native consent HTTP/UI is implemented separately; native wire and bounded owned browser/loopback acceptance are now implemented.
-Explicit native resource-consumer introspection and broader acceptance remain work. These increments alone do not complete AUTH-40 or M07.
+Explicit native resource-consumer introspection is implemented separately under
+[ADR0039](0039-native-introspection-consumers.md). Broader SDK/standalone and
+production acceptance remain separate; these components alone do not complete M07.
 
 ## Existing access authority
 
@@ -258,7 +260,7 @@ original authentication, cookie-idle separation and current source disablement.
 No new crypto/XML producer, custom signature-concurrency experiment or policy bypass.
 
 Authenticated confidential own-audience introspection remains intact. Native access
-still needs explicit authenticated audience-authorized resource consumption; public
-native identification/token possession cannot be promoted into that authority.
-This remaining gap keeps AUTH-40 active. Broader SDK/standalone interoperability and
+uses the separate explicit authenticated audience-authorized consumer policy in
+[ADR0039](0039-native-introspection-consumers.md); public native identification/token
+possession cannot be promoted into that authority. Broader SDK/standalone interoperability and
 production gates are separate; no audit/compliance/readiness claim follows.
