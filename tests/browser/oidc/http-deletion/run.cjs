@@ -70,6 +70,6 @@ async function main() {
 main().catch(error=>{
   // Never format browser/native messages, response data, cookies, credentials or IPC.
   const frame=error.stack?.match(/(?:http-deletion\/)?(cases|browser|fixture|keycloak|proxy|run)\.cjs:(\d+)/);
-  console.error('Owned OIDC HTTP suite failed:',error.caseName||'startup/cleanup',error.stageName||'case',error.name,frame?frame[1]+':'+frame[2]:'fixture');
+  console.error('Owned OIDC HTTP suite failed:',error.caseName||'startup/cleanup',error.stageName||'case',error.name,frame?frame[1]+':'+frame[2]:'fixture','cleanup_validation_failure='+String(error.cleanupValidationFailure===true));
   process.exitCode=1;
 });

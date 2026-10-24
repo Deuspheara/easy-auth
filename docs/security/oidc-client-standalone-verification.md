@@ -110,3 +110,30 @@ unchanged from the previously verified baseline; the 118default/1009all-feature
 workspace evidence above is not relabeled as a rerun of these added browser cases.
 The final exact-commit hosted workflow reruns its full gates and extended suite.
 Hosted completion must still be checked before ticket/milestone closure.
+
+## Later HTTP-deletion fixture failure and correction
+
+Exact `dbaf114201d6f5bd9d87191fd9f1333ba06e9443` CI40088449730 attempt1 passed the
+workspace, isolated client/startup, real extended issuer parity, release and secret
+checks, then failed the existing OIDC HTTP-deletion browser step. Overall CI was
+failure, not success. Redacted diagnostics showed one blocked callback-origin
+script request during initial bootstrap; cleanup completed normally. A secondary
+opaque-page storage check masked the original failure in the final reporter.
+
+A stricter controlled-document wait reproduced the failure locally. The redirected
+bootstrap return reached the application confirmation document instead of the
+intended capture document. The browser collector had relied on interception of a
+redirected navigation; [Playwright documents a redirect routing limitation](https://playwright.dev/docs/api/class-page#page-route).
+The fix explicitly selects the existing exact-URI owned TLS capture sink for the
+two library bootstrap operations, counts their actual network deliveries, then
+clears the selection before every real HTTP deletion operation. No production
+code, authentication rule, network allowlist, timeout or crypto fixture changed.
+Controlled documents gain no-store/no-referrer/CSP; unexpected requests still fail.
+Primary errors survive cleanup validation, and contexts close even on failure.
+
+The final six-case real provider HTTP-deletion suite and all23 existing generic
+OIDC browser cases pass with owned database/provider/private-file cleanup. Existing
+protocol assertions and exact token-post/signature-mutation/replay counts remain.
+No new mutation/crypto/bypass/concurrency experiment was introduced. The earlier
+failed CI is retained as evidence; a new exact-source full workflow is required
+before ticket closure.

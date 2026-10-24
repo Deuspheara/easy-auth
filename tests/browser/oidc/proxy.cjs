@@ -18,19 +18,24 @@ async function start(directory) {
   const facts = {posts:0,token_responses:0,signature_mutations:0,token_replays:0};
   const faults = {unavailable:0};
   const clientAuthentication = {basic:0,post:0,public:0};
-  let application;
+  let application,callbackCaptures=0;
   let base, origin, callback, mode = 'normal', captured, firstRequest, lastClaims, lastKid;
   const server = https.createServer({key:fs.readFileSync(key),cert:fs.readFileSync(certificate)}, (incoming, outgoing) => {
+    // An explicitly selected bootstrap capture owns only its exact callback.
+    // Clear it before exercising the application's real deletion callback/UI.
+    if (callback && incoming.headers.host===new URL(callback).host && incoming.url.split('?')[0]===new URL(callback).pathname) {
+      if(incoming.method!=='GET'){outgoing.writeHead(405);outgoing.end();return;}
+      callbackCaptures++;
+      outgoing.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store','Referrer-Policy':'no-referrer',
+        'Content-Security-Policy':"default-src 'none'"});
+      outgoing.end('<!doctype html><title>Owned callback captured</title>');return;
+    }
     if (application && incoming.headers.host===application.host) {
       const upstream=http.request(application.base+incoming.url,{method:incoming.method,headers:incoming.headers},response=>{
         outgoing.writeHead(response.statusCode,response.headers);response.pipe(outgoing);
       });
       upstream.on('error',()=>{outgoing.writeHead(502);outgoing.end();});
       incoming.pipe(upstream);return;
-    }
-    if (callback && incoming.headers.host===new URL(callback).host && incoming.url.split('?')[0]===new URL(callback).pathname) {
-      outgoing.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'});
-      outgoing.end('<!doctype html><title>Owned callback captured</title>');return;
     }
     const token = incoming.method === 'POST' && incoming.url.endsWith('/protocol/openid-connect/token');
     const chunks = [];
@@ -95,7 +100,16 @@ async function start(directory) {
       assert.equal(url.port,String(server.address().port));
       application={base:value,host:url.host};
     }, faults,
-    connect(value) {base=value;}, allowCallback(value) {callback=value;}, mode(value) {mode=value;},
+    connect(value) {base=value;},
+    allowCallback(value) {
+      if(value===null){callback=undefined;return;}
+      const target=new URL(value);
+      assert.equal(target.protocol,'https:');assert.equal(target.hostname,'app.example');
+      assert.equal(target.port,String(server.address().port));
+      assert.equal(target.username+target.password+target.search+target.hash,'');
+      assert.notEqual(target.pathname,'/');callback=target.href;
+    },
+    capturedCallbacks() {return callbackCaptures;}, mode(value) {mode=value;},
     lastKid() {return lastKid;}, lastClaims() {return lastClaims;},
     authentication() {return {...clientAuthentication};},
     async replayCode() {

@@ -53,9 +53,10 @@ async function client(browser,origin,issuer) {
     return result;
   }
   async function close() {
-    assert.equal(unexpected,0,'no unrelated browser network access');assert.equal(pageErrors,0);
-    assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
-    returned=null;await context.close();
+    try {
+      assert.equal(unexpected,0,'no unrelated browser network access');assert.equal(pageErrors,0);
+      assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
+    } finally {returned=null;await context.close();}
   }
   return {context,page,begin,login,finish,close};
 }

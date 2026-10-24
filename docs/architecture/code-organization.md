@@ -1166,3 +1166,11 @@ administration, and `issuer-standalone/rollover.cjs` owns the sequential indepen
 before/after checks. All remain bounded test-only modules under300lines, with no
 production configuration or crypto change. The actual policy interval and genuine
 reauthentication stay visible; no SQL clock/ready-at rewriting is introduced.
+
+The existing owned OIDC callback collector keeps request observation, controlled
+document completion, categorical diagnostics and context cleanup in one bounded
+lifetime. Its longer function is a reviewed fixture ownership exception. The HTTP
+case module scopes bootstrap-only TLS capture separately from actual deletion UI;
+no production proof constructor, network allowlist expansion, timeout increase or
+crypto behavior is introduced. Existing assertions remain and new sink-count and
+document checks strengthen the transport evidence.
