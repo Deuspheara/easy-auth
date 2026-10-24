@@ -14,7 +14,7 @@ navigation-safe request/native-prompt operations are shared byte-for-byte throug
 Feature page modules retain callback selection, escaped transport data and
 protocol confirmation. Their fixed HTML shares the stylesheet without adding
 external resources or broad CSP style permission. Browser modules remain at or below 150
-lines; the fixed164line HTML document keeps its native forms and capability-gated
+lines; the fixed168line HTML document keeps its native forms and capability-gated
 views together without a template framework (a reviewed size exception); the form-binding function deliberately keeps its short explicit endpoint/
 input/result handlers together as a reviewed function-size exception. No business
 policy, SQL, verifier or public proof constructor moves into presentation.

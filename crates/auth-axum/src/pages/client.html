@@ -15,6 +15,7 @@
 <main id="main" tabindex="-1">
 <input id="capabilities" type="hidden" value='__CAPABILITIES__'>
 <div class="intro">
+  <button id="account-back" class="quiet back-button" type="button" data-open-account="overview" hidden>← Account</button>
   <h1 id="heading" tabindex="-1">Welcome back</h1>
   <p id="intro" class="muted">Sign in to your account</p>
 </div>
@@ -84,7 +85,8 @@
 </section>
 <section id="account" aria-label="Account settings" hidden>
   <div data-account-panel="overview">
-    <section class="account-section profile-section" aria-label="Your profile">
+    <section class="account-section profile-section" aria-labelledby="profile-heading">
+      <h2 id="profile-heading">Profile</h2>
       <button class="profile-row setting-row" type="button" data-open-account="details" aria-label="Account details" aria-describedby="identity-name identity-email">
         <span id="avatar" class="avatar" aria-hidden="true"></span><span id="identity" class="object-copy"><span id="identity-name" class="identity-title"></span><span id="identity-email" class="muted email-compact"></span></span><span class="chevron" aria-hidden="true">›</span>
       </button>
@@ -96,7 +98,7 @@
         <button id="enroll-passkey-entry" class="setting-row" type="button" hidden><span class="object-copy"><span class="row-title">Passkeys</span><span class="row-description">Add a passkey for this account</span></span><span class="chevron" aria-hidden="true">›</span></button>
       </div>
       <button id="password-entry" class="setting-row" type="button" data-open-account="password" aria-label="Manage password" hidden><span class="object-copy"><span class="row-title">Password</span><span class="row-description">Password setup and reset options</span></span><span class="chevron" aria-hidden="true">›</span></button>
-      <a id="recovery-card" class="setting-row" href="/passkey-recovery/setup" aria-label="Recovery options" hidden><span class="object-copy"><span class="row-title">Account recovery</span><span class="row-description">Manage recovery options</span></span><span class="chevron" aria-hidden="true">›</span></a>
+      <a id="recovery-card" class="setting-row" href="/passkey-recovery/setup" aria-label="Recovery options" aria-describedby="recovery-description" hidden><span class="object-copy"><span class="row-title">Account recovery</span><span id="recovery-description" class="row-description">Save a recovery code in case you lose access to your passkeys.</span></span><span class="chevron" aria-hidden="true">›</span></a>
       <div id="providers-card" hidden><h3 class="subheading">Connected accounts</h3><p id="providers-state" class="muted" role="status"></p><ul id="providers" class="items"></ul><button id="retry-providers" class="secondary" type="button" hidden>Try again</button><button id="more-providers" class="secondary" type="button" hidden>Show more accounts</button></div>
     </section>
     <section class="account-section" aria-labelledby="sessions-heading">
@@ -106,13 +108,11 @@
     </section>
   </div>
   <section data-account-panel="sessions" hidden>
-    <button class="quiet back-button" type="button" data-open-account="overview">← Account</button>
     <h2>Active sessions</h2><p id="sessions-state" class="muted" role="status"></p><ul id="sessions" class="items"></ul>
     <button id="retry-sessions" class="secondary" type="button" hidden>Try again</button>
     <div class="session-actions"><button id="more-sessions" class="secondary" type="button" hidden>Show more sessions</button><button id="revoke-all" class="danger" type="button">Sign out everywhere</button></div>
   </section>
   <section data-account-panel="passkeys" hidden>
-    <button class="quiet back-button" type="button" data-open-account="overview">← Account</button>
     <div class="section-heading"><h2>Registered passkeys</h2><button id="add-passkey" class="secondary" type="button" data-cap="passkeyEnrollment" hidden>Add passkey</button></div>
     <p id="passkeys-state" class="muted" role="status"></p><button id="retry-passkeys" class="secondary" type="button" hidden>Try again</button><ul id="passkeys" class="items"></ul>
     <form id="enrollment-form" method="post" action="/v1/passkeys/enrollment/start" hidden>
@@ -120,18 +120,12 @@
     </form>
   </section>
   <section data-account-panel="details" hidden>
-    <button class="quiet back-button" type="button" data-open-account="overview">← Account</button>
-    <h2>Profile</h2><p id="details-name"></p><p id="details-email" class="muted full-email"></p>
+    <h2>Personal information</h2><dl class="profile-fields"><div><dt>Display name</dt><dd id="details-name"></dd></div><div id="details-email-field"><dt>Email address</dt><dd id="details-email" class="full-email"></dd></div></dl>
     <div id="mailbox-actions" hidden>
       <div><button type="button" class="secondary" data-reveal="email-change-form">Change email address</button><form hidden id="email-change-form" method="post" action="/v1/account/email/start">
         <label for="new-email">New email address</label><input id="new-email" type="email" autocomplete="email" required maxlength="254">
         <p class="muted">Confirm both email links in this browser. All sessions are signed out when the change completes.</p>
         <button type="submit">Send both confirmation links</button>
-      </form></div>
-      <div><button type="button" class="danger" data-reveal="deletion-start-form">Delete account</button><form hidden id="deletion-start-form" method="post" action="/v1/account/delete/start">
-        <label for="delete-confirmation">Type “delete my account” to request deletion</label><input id="delete-confirmation" autocomplete="off" required pattern="delete my account">
-        <p class="muted">Permanently removes this authentication account, credentials and sessions. Confirm the email link in this browser to finish. Applications manage their own data separately.</p>
-        <button class="danger" type="submit">Request deletion confirmation</button>
       </form></div>
     </div>
     <div id="attach-action" hidden><button type="button" class="secondary" data-reveal="attachment-start-form">Add contact email</button><form hidden id="attachment-start-form" method="post" action="/v1/account/email/attachment/start">
@@ -139,13 +133,23 @@
       <p class="muted">Requires a fresh passkey sign-in. This does not enable email sign-in or weaker recovery.</p>
       <button type="submit">Send contact confirmation</button>
     </form></div>
+    <section id="account-deletion" class="account-section" hidden><h2>Account deletion</h2>
+      <p class="muted">Permanently remove your account and its sign-in methods.</p>
+      <div id="mailbox-deletion" hidden>
+      <div><button type="button" class="danger" data-reveal="deletion-start-form">Delete account</button><form hidden id="deletion-start-form" method="post" action="/v1/account/delete/start">
+        <label for="delete-confirmation">Type “delete my account” to request deletion</label><input id="delete-confirmation" autocomplete="off" required pattern="delete my account">
+        <p class="muted">Permanently removes this authentication account, credentials and sessions. Confirm the email link in this browser to finish. Applications manage their own data separately.</p>
+        <button class="danger" type="submit">Request deletion confirmation</button>
+      </form></div>
+      </div>
     <div id="provider-deletion" hidden>
       <p class="muted">Account deletion requires fresh confirmation from the provider that signed you in.</p>
       <div class="actions"><a class="button secondary" data-cap="googleDeletion" href="/google/account-delete" hidden>Delete with Google reauthentication</a><a class="button secondary" data-cap="oidcDeletion" href="/oidc/account-delete" hidden>Delete with organization reauthentication</a><a class="button secondary" data-cap="samlDeletion" href="/saml/account-delete" hidden>Delete with SAML reauthentication</a></div>
     </div>
+    </section>
     <details id="developer-details"><summary>Advanced developer details</summary><p class="metadata muted">Public account ID: <output id="account-id"></output></p><p class="metadata muted">Retain this ID with your passkeys and recovery kit. It is not a sign-in secret.</p><button id="check-session" class="secondary" type="button" hidden>Check sign-in</button><h3>Session timestamps</h3><ul id="session-diagnostics" class="items metadata"></ul><h3>Provider identifiers</h3><ul id="provider-diagnostics" class="items metadata"></ul></details>
   </section>
-  <section data-account-panel="password" hidden><button class="quiet back-button" type="button" data-open-account="overview">← Account</button><h2>Password sign-in</h2>
+  <section data-account-panel="password" hidden><h2>Password sign-in</h2>
     <div id="password-enrollment" hidden>
       <p class="muted" id="password-help">Use 15–256 characters. Spaces and Unicode are allowed. Avoid compromised passwords. If you already have a password, sign out and use Reset password.</p>
       <form id="enroll-password-form" method="post" action="/v1/password/enroll">

@@ -21,9 +21,24 @@ async function accountLayout(page, email) {
   assert.equal(compact.clipped, true);
   assert.equal(compact.overflow, 'ellipsis');
   await page.getByRole('button', {name: 'Account details', exact: true}).click();
+  assert.equal(await page.getByRole('heading', {level: 1}).textContent(), 'Profile');
+  assert.equal(await page.locator('.profile-fields dt').allTextContents().then(labels => labels.join(', ')), 'Display name, Email address');
+  assert.equal(await page.locator('#account-deletion').isVisible(), false, 'strong accounts do not acquire mailbox deletion');
   assert.equal(await page.locator('#details-email').textContent(), email);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
+    const path = require('node:path');
+    for (const scheme of ['light', 'dark']) {
+      await page.emulateMedia({colorScheme: scheme});
+      for (const width of [320, 1440]) {
+        await page.setViewportSize({width, height: 1000});
+        await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+          'profile-' + scheme + '-' + width + '.png'), fullPage: true});
+      }
+    }
+  }
   await page.getByRole('button', {name: '← Account', exact: true}).click();
+  assert.match(await page.locator('#recovery-card').textContent(), /lose access to your passkeys/);
   await page.locator('#manage-sessions').click();
   await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1 &&
     !document.querySelector('[aria-busy="true"]'));

@@ -20,6 +20,7 @@ async function passkeyAccess(browser, origin, mail, guard) {
     const owner = await page.locator('#account-id').textContent();
     await page.locator('#refresh-passkeys').click();
     await page.getByRole('dialog').waitFor({state: 'visible'});
+    assert.equal(await page.locator('#account-back').isDisabled(), true, 'return navigation stays disabled during protected verification');
     assert.equal(statuses.at(-1), 401, 'real mailbox session does not confer fresh passkey access');
     await page.getByRole('button', {name: 'Cancel', exact: true}).click();
     await page.waitForFunction(() => document.getElementById('passkeys-state').textContent.startsWith('Verification cancelled.'));

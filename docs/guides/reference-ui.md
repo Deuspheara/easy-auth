@@ -39,6 +39,10 @@ URLs or browser storage, and ambiguous credential completions are never retried.
 ## Account overview
 
 The compact overview separates profile, security and the current browser session.
+Profile details use labelled name/email fields and keep account deletion separate.
+Account recovery explains how a saved code can help when all passkeys are lost;
+save it before losing access. Recovery still requires the account ID, its waiting
+period and the existing experimental composition.
 Select the identity row for profile details, or a security row for password,
 passkey or recovery management. A passkey count follows a successful explicit
 inventory read; unknown inventory and recovery status are not guessed.

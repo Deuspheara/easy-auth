@@ -32,7 +32,7 @@ function signedOut() {
   element("avatar").textContent = "";
   element("details-name").textContent = "";
   element("details-email").textContent = "";
-  element("header-context").hidden = true;
+  element("header-context").hidden = element("account-back").hidden = true;
   element("account-id").textContent = "";
   showAuthScreen(caps, initialView);
   initialView = "email";

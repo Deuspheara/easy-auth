@@ -11,7 +11,7 @@ use std::time::Duration;
 use uuid::Uuid;
 
 // Only the exact fixed reference stylesheet may supply inline styles.
-const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-PGLkzYSCU4YIO0+nY8Ea/dyHb6Cjl5FnYEhsEJo1mUk='; style-src-attr 'none'";
+const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-aq2W00wAxseuRONwhU9OEmUQEYDOzLqApkm4Gwm40Is='; style-src-attr 'none'";
 
 pub(crate) async fn boundary(
     State(state): State<AppState>,

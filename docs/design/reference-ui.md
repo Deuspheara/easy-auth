@@ -1,11 +1,10 @@
 # Authentication presentation
 
-This adapts the maintainer-supplied `engineering-workspace-ui-v1` contract to
-authentication. It is a visual candidate awaiting the owner's review, not an
-approval inherited from another application or from passing browser checks.
+easy-auth uses a compact, neutral interface for managing identity and security.
+The design must make each section’s purpose clear before asking someone to act.
+Rendered owner approval remains separate from passing browser checks.
 
-The owner’s latest UX direction supersedes the earlier 18px-title/disclosure
-candidate. Sign-in is a borderless 420px column with a 28px heading, one brand
+Sign-in is a borderless 420px column with a 28px heading, one brand
 presence, 48px controls and 10px control corners. Email is primary, with only
 selected passkey/provider alternatives. Password, passkey registration, help and
 account-ID passkey access have focused presentation URLs (`/?view=…`), rather than
@@ -17,8 +16,28 @@ existing browser binding, generic response, expiry and server admission limits.
 A direct inbox query cannot construct that state or supply a resend address.
 The icon theme button has an accessible action label; the repeated footer is removed.
 
-The account overview uses a 660px column and a shared brand/theme header. Identity
-has its own avatar/name/email row; long email addresses truncate visually while
+## Account hierarchy and language
+
+The account overview uses a 660px column and a shared brand/theme header.
+Use three distinct sections: **Profile** for who the account belongs to,
+**Security** for sign-in and recovery, and **Sessions** for where it is active.
+Section labels describe the information; row labels describe the destination.
+Avoid repeating Account, Your account and Profile as competing headings.
+Focused views place the return action above the page title, with the same busy
+protection as account actions. The profile view has one **Profile** page title,
+labelled display-name/email values under **Personal information**, and account deletion in a separate section.
+Do not imply that a read-only name is editable. Contact and deletion controls remain
+conditional on actual account policy and selected services.
+
+Recovery needs a purpose, not a circular description such as “Manage recovery
+options.” Explain the situation in plain language: **Save a recovery code in case
+you lose access to your passkeys.** The destination first explains that the code
+must be saved while sign-in still works, is used with the account ID to request a
+replacement passkey, and includes a waiting period. Preserve experimental status,
+secret-handling warnings, fresh-proof requirements and explicit confirmations.
+Do not imply instant access, email fallback or that recovery is already configured.
+
+Identity has its own avatar/name/email row; long email addresses truncate visually while
 remaining intact in accessible text and the wrapping profile view. Security uses
 quiet navigation rows for passkeys, password and account recovery. Recovery is not
 labelled a sign-in method. A passkey count appears only after an explicit successful
@@ -26,10 +45,6 @@ inventory read and clears with account metadata; no recovery status is invented.
 The current session and its sign-out share one row. Other sessions, contextual
 revocation and confirmed sign-out everywhere live in a separate management view;
 the existing all-session API is never relabelled as other-session-only.
-These relationships draw on the published
-[Linear Security & Access settings](https://linear.app/docs/security-and-access)
-and [Clerk User Profile](https://clerk.com/components/user-profile), inspected as
-references without importing their assets or runtime components.
 Empty provider inventory is hidden;
 unsupported linking is never presented as a connect action. Detailed passkey and
 password management and account changes use focused panels. Passkeys remain an

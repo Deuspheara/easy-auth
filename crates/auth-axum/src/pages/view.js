@@ -4,7 +4,7 @@ export const element = id => document.getElementById(id);
 let lifecycle = 0;
 const active = new Set();
 function syncAccountButtons() {
-  for (const button of document.querySelectorAll("#account button")) button.disabled = active.size > 0;
+  for (const button of document.querySelectorAll("#account button, #account-back")) button.disabled = active.size > 0;
 }
 window.addEventListener("pagehide", () => {
   lifecycle += 1;
