@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 const {withAuthenticator} = require('../passkeys/browser.cjs');
+const {accountLayout} = require('./account-layout.cjs');
 
 async function passkeyFlow(browser, origin, mail, guard) {
   return withAuthenticator(browser, origin, undefined, 'internal', async ({context, page, cdp, authenticatorId}) => {
@@ -23,6 +24,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#password-enrollment').isVisible(), false);
       await page.locator('#refresh-passkeys').click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 1);
+      assert.equal(await page.locator('#passkeys-summary').textContent(), '1 registered passkey');
       if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
         const path = require('node:path');
         await page.evaluate(() => document.fonts.ready);
@@ -67,7 +69,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       stage = 'passkey-signin-contact';
       await page.getByRole('button', {name: 'Sign in with a passkey', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent === 'Signed in with a passkey.');
-      await page.getByRole('button', {name: 'Details', exact: true}).click();
+      await page.getByRole('button', {name: 'Account details', exact: true}).click();
       await page.getByRole('button', {name: 'Add contact email', exact: true}).click();
       const email = mail.recipient(3);
       await page.locator('#contact-email').fill(email);
@@ -118,7 +120,8 @@ async function passkeyFlow(browser, origin, mail, guard) {
         }
         await page.evaluate(() => { document.documentElement.style.removeProperty('font-size'); });
       }
-      return {native_signup: true, enrollment: true, rename: true, removal: true, native_signin: true, account_bound_signin: true,
+      await accountLayout(page, email);
+      return {compact_account_layout: true, native_signup: true, enrollment: true, rename: true, removal: true, native_signin: true, account_bound_signin: true,
         verified_contact_preserves_strong_policy: true, recovery_setup_entry: true};
     } catch (error) { error.stageName = stage; error.uiObservations = {statuses}; throw error; }
   });

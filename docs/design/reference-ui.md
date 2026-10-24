@@ -17,8 +17,20 @@ existing browser binding, generic response, expiry and server admission limits.
 A direct inbox query cannot construct that state or supply a resend address.
 The icon theme button has an accessible action label; the repeated footer is removed.
 
-The account overview uses a 768px column, identity avatar/name/email, recognizable
-sign-in/recovery rows and current/other sessions. Empty provider inventory is hidden;
+The account overview uses a 660px column and a shared brand/theme header. Identity
+has its own avatar/name/email row; long email addresses truncate visually while
+remaining intact in accessible text and the wrapping profile view. Security uses
+quiet navigation rows for passkeys, password and account recovery. Recovery is not
+labelled a sign-in method. A passkey count appears only after an explicit successful
+inventory read and clears with account metadata; no recovery status is invented.
+The current session and its sign-out share one row. Other sessions, contextual
+revocation and confirmed sign-out everywhere live in a separate management view;
+the existing all-session API is never relabelled as other-session-only.
+These relationships draw on the published
+[Linear Security & Access settings](https://linear.app/docs/security-and-access)
+and [Clerk User Profile](https://clerk.com/components/user-profile), inspected as
+references without importing their assets or runtime components.
+Empty provider inventory is hidden;
 unsupported linking is never presented as a connect action. Detailed passkey and
 password management and account changes use focused panels. Passkeys remain an
 explicit sensitive read; **Manage passkeys** requests inventory and, only after an

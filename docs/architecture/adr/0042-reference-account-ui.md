@@ -50,6 +50,13 @@ completion retry or weaker fallback. Recheck owner/view before logout and requir
 the actual refreshed owner to match before reading inventory. Existing core/SQL
 freshness and credential restrictions remain authoritative.
 
+The subsequent owner refinement uses a 660px overview, a shared brand/theme header
+and native navigation rows. Keep recovery under Security and separate current-session
+sign-out from full session management. Preserve the exact all-session semantics of
+bulk revocation. Show key counts only after a successful explicit inventory read;
+clear them with account metadata. Long emails remain complete in accessible text
+and profile details even when visually truncated in the overview.
+
 Refresh ordinary metadata on visible-page return, coalescing return events and
 avoiding active operations. Reset unfinished forms on an observed owner change.
 Keep only current/other status and genuine relative activity on session rows;

@@ -30,6 +30,9 @@ function signedOut() {
   element("identity-name").textContent = "";
   element("identity-email").textContent = "";
   element("avatar").textContent = "";
+  element("details-name").textContent = "";
+  element("details-email").textContent = "";
+  element("header-context").hidden = true;
   element("account-id").textContent = "";
   showAuthScreen(caps, initialView);
   initialView = "email";

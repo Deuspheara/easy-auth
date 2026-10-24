@@ -46,8 +46,11 @@ audit counts, contact policy, provenance and absent pending signup/contact rows.
 Presentation checks loaded local Inter, OS theme defaults, measured light/dark
 text/control contrast, 320/390/768/1024/1280/1440px reflow, 320px/200% text and
 forced-color borders. The actual account view also checks both themes at 320/1440
-and 320px/200% text. Optional `EASY_AUTH_UI_SCREENSHOT_DIR` saves desktop/mobile
-sign-in and owned-account screenshots locally for visual inspection. Never publish images,
+and 320px/200% text. Compact account assertions cover the 660px column, shared header, genuine initials,
+long-email truncation with complete profile text, unknown versus verified key count
+and contextual current-session versus dedicated bulk-session actions.
+Optional `EASY_AUTH_UI_SCREENSHOT_DIR` saves desktop/mobile sign-in and owned-account
+screenshots locally for visual inspection. Never publish images,
 trace/storage state, message bodies, proof URLs, credentials or private keys.
 Failures emit finite stages/status codes/source locations, never assertion values
 or raw browser call logs. The summary contains only fixed outcomes and DB counts.

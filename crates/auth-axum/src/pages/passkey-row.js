@@ -34,10 +34,6 @@ export function keyRow(key, current, requireCurrent, refresh) {
   const row = document.createElement("li");
   const heading = document.createElement("div");
   heading.className = "object-row";
-  const icon = document.createElement("span");
-  icon.className = "object-icon";
-  icon.setAttribute("aria-hidden", "true");
-  icon.textContent = "⚿";
   const copy = document.createElement("div");
   copy.className = "object-copy";
   const title = document.createElement("h3");
@@ -61,7 +57,7 @@ export function keyRow(key, current, requireCurrent, refresh) {
   const actions = document.createElement("div");
   actions.className = "actions";
   actions.append(rename, remove);
-  heading.append(icon, copy, actions);
+  heading.append(copy, actions);
   row.append(heading, editor.form, paragraph("Added " + new Date(key.created_at_ms).toLocaleDateString()));
   return row;
 }

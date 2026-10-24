@@ -38,11 +38,17 @@ URLs or browser storage, and ambiguous credential completions are never retried.
 
 ## Account overview
 
-The overview shows identity, selected sign-in/recovery methods and actual sessions.
-**Details**, **Manage password** and **Manage passkeys** open focused panels.
+The compact overview separates profile, security and the current browser session.
+Select the identity row for profile details, or a security row for password,
+passkey or recovery management. A passkey count follows a successful explicit
+inventory read; unknown inventory and recovery status are not guessed.
+Long email addresses truncate in the overview and wrap in full in profile details.
+**Manage sessions** opens the complete owned-session inventory and its contextual
+actions. Current-browser **Sign out** stays beside that session in the overview;
+confirmed **Sign out everywhere** is available only in session management.
 Empty connected-account inventory stays hidden; provider linking is not offered.
 Public account IDs, full issuers, exact session timestamps and the manual sign-in
-check are available in **Details → Advanced developer details**.
+check are available in **Account details → Advanced developer details**.
 
 Metadata refreshes after actions and when returning to the visible page; it avoids
 interrupting active operations and resets unfinished forms when an owner change is

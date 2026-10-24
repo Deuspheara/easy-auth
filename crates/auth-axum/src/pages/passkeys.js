@@ -52,6 +52,7 @@ export async function loadPasskeys(caps, verifyFresh = false) {
     showAccountPanel("passkeys", false);
     element("passkeys").replaceChildren();
     for (const key of inventory.passkeys) element("passkeys").append(keyRow(key, current, requireCurrent, refresh));
+    element("passkeys-summary").textContent = inventory.passkeys.length + (inventory.passkeys.length === 1 ? " registered passkey" : " registered passkeys");
     element("passkeys-state").textContent = inventory.passkeys.length ? "" : "No passkeys registered. Add one to sign in with your device.";
     return true;
   } catch (error) {

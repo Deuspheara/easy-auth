@@ -16,7 +16,7 @@ async function accountReturn(browser, origin, mail, guard) {
     await guard(context);
     const page = await context.newPage();
     await signIn(page, origin, mail.recipient(9), mail);
-    await page.getByRole('button', {name: 'Details', exact: true}).click();
+    await page.getByRole('button', {name: 'Account details', exact: true}).click();
     await page.getByRole('button', {name: 'Change email address', exact: true}).click();
     await page.locator('#new-email').fill(mail.recipient(11));
     const peer = await context.newPage();

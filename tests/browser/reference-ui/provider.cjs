@@ -16,9 +16,9 @@ async function providerAccount(page, origin, issuer, kind, deletion = true) {
   assert.equal(await page.locator('#password-enrollment').isVisible(), false);
   assert.equal(await page.locator('#attach-action').isVisible(), false);
   assert.equal(await page.locator('#passkeys-card').isVisible(), false);
-  await page.getByRole('button', {name: 'Details', exact: true}).click();
+  await page.getByRole('button', {name: 'Account details', exact: true}).click();
   assert.equal(await page.locator('#provider-deletion').isVisible(), deletion);
-  await page.getByRole('button', {name: '← Account settings', exact: true}).click();
+  await page.getByRole('button', {name: '← Account', exact: true}).click();
   assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
 }
 module.exports = {providerAccount};

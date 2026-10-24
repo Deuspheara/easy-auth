@@ -9,13 +9,12 @@
 </head>
 <body data-reference-account data-account="signed-out">
 <a class="skip" href="#main">Skip to account access</a>
-<header class="topbar">
+<header class="topbar"><div class="header-inner"><div class="header-brand"><a class="brand" href="/">easy-auth</a><span id="header-context" hidden>Account</span></div>
   <div class="actions"><button id="theme" class="quiet icon-button" type="button" aria-label="Use dark theme" title="Use dark theme"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg></button></div>
-</header>
+</div></header>
 <main id="main" tabindex="-1">
 <input id="capabilities" type="hidden" value='__CAPABILITIES__'>
 <div class="intro">
-  <a class="brand" href="/">easy-auth</a>
   <h1 id="heading" tabindex="-1">Welcome back</h1>
   <p id="intro" class="muted">Sign in to your account</p>
 </div>
@@ -85,33 +84,35 @@
 </section>
 <section id="account" aria-label="Account settings" hidden>
   <div data-account-panel="overview">
-    <section class="account-section" aria-labelledby="profile-heading">
-      <h2 id="profile-heading">Your account</h2>
-      <div class="object-row profile-row">
-        <span id="avatar" class="avatar" aria-hidden="true"></span>
-        <div id="identity" class="object-copy"><h3 id="identity-name"></h3><p id="identity-email" class="muted"></p></div>
-        <button class="secondary" type="button" data-open-account="details">Details</button>
-      </div>
+    <section class="account-section profile-section" aria-label="Your profile">
+      <button class="profile-row setting-row" type="button" data-open-account="details" aria-label="Account details" aria-describedby="identity-name identity-email">
+        <span id="avatar" class="avatar" aria-hidden="true"></span><span id="identity" class="object-copy"><span id="identity-name" class="identity-title"></span><span id="identity-email" class="muted email-compact"></span></span><span class="chevron" aria-hidden="true">›</span>
+      </button>
     </section>
     <section id="signin-methods" class="account-section" aria-labelledby="methods-heading">
-      <h2 id="methods-heading">Sign-in methods</h2>
-      <div id="passkeys-card" class="object-row" hidden>
-        <span class="object-icon" aria-hidden="true">⚿</span><div class="object-copy"><h3>Passkeys</h3><p class="muted">Manage your registered passkeys</p></div>
-        <button id="refresh-passkeys" class="secondary" type="button" data-cap="passkeyManagement" hidden>Manage passkeys</button>
-        <button id="enroll-passkey-entry" class="secondary" type="button" hidden>Add passkey</button>
+      <h2 id="methods-heading">Security</h2>
+      <div id="passkeys-card" hidden>
+        <button id="refresh-passkeys" class="setting-row" type="button" data-cap="passkeyManagement" aria-label="Manage passkeys" hidden><span class="object-copy"><span class="row-title">Passkeys</span><span id="passkeys-summary" class="row-description">View and manage registered passkeys</span></span><span class="chevron" aria-hidden="true">›</span></button>
+        <button id="enroll-passkey-entry" class="setting-row" type="button" hidden><span class="object-copy"><span class="row-title">Passkeys</span><span class="row-description">Add a passkey for this account</span></span><span class="chevron" aria-hidden="true">›</span></button>
       </div>
-      <div id="password-entry" class="object-row" hidden><span class="object-icon" aria-hidden="true">⁕</span><div class="object-copy"><h3>Password</h3><p class="muted">Password setup and reset options</p></div><button class="secondary" type="button" data-open-account="password">Manage password</button></div>
-      <div id="recovery-card" class="object-row" hidden><span class="object-icon" aria-hidden="true">◇</span><div class="object-copy"><h3>Account recovery</h3><p class="muted">Recovery methods and backup codes</p></div><a class="button secondary" href="/passkey-recovery/setup">Recovery options</a></div>
+      <button id="password-entry" class="setting-row" type="button" data-open-account="password" aria-label="Manage password" hidden><span class="object-copy"><span class="row-title">Password</span><span class="row-description">Password setup and reset options</span></span><span class="chevron" aria-hidden="true">›</span></button>
+      <a id="recovery-card" class="setting-row" href="/passkey-recovery/setup" aria-label="Recovery options" hidden><span class="object-copy"><span class="row-title">Account recovery</span><span class="row-description">Manage recovery options</span></span><span class="chevron" aria-hidden="true">›</span></a>
       <div id="providers-card" hidden><h3 class="subheading">Connected accounts</h3><p id="providers-state" class="muted" role="status"></p><ul id="providers" class="items"></ul><button id="retry-providers" class="secondary" type="button" hidden>Try again</button><button id="more-providers" class="secondary" type="button" hidden>Show more accounts</button></div>
     </section>
     <section class="account-section" aria-labelledby="sessions-heading">
-      <div class="section-heading"><h2 id="sessions-heading">Active sessions</h2><button id="refresh-account" class="secondary" type="button" hidden>Try again</button></div>
-      <p id="sessions-state" class="muted" role="status"></p><ul id="sessions" class="items"></ul>
-      <div class="session-actions"><button id="logout" class="secondary" type="button" hidden>Sign out of this browser</button><button id="more-sessions" class="secondary" type="button" hidden>Show more sessions</button><button id="revoke-all" class="danger" type="button">Sign out everywhere</button></div>
+      <div class="section-heading"><h2 id="sessions-heading">Sessions</h2><button id="manage-sessions" class="quiet text-button" type="button" data-open-account="sessions">Manage sessions</button></div>
+      <div class="current-session"><div class="object-copy"><p id="session-overview-state" class="muted" role="status"></p><ul id="current-session" class="items"></ul></div><button id="logout" class="quiet text-button" type="button" hidden>Sign out</button></div>
+      <button id="refresh-account" class="secondary" type="button" hidden>Try again</button>
     </section>
   </div>
+  <section data-account-panel="sessions" hidden>
+    <button class="quiet back-button" type="button" data-open-account="overview">← Account</button>
+    <h2>Active sessions</h2><p id="sessions-state" class="muted" role="status"></p><ul id="sessions" class="items"></ul>
+    <button id="retry-sessions" class="secondary" type="button" hidden>Try again</button>
+    <div class="session-actions"><button id="more-sessions" class="secondary" type="button" hidden>Show more sessions</button><button id="revoke-all" class="danger" type="button">Sign out everywhere</button></div>
+  </section>
   <section data-account-panel="passkeys" hidden>
-    <button class="quiet back-button" type="button" data-open-account="overview">← Account settings</button>
+    <button class="quiet back-button" type="button" data-open-account="overview">← Account</button>
     <div class="section-heading"><h2>Registered passkeys</h2><button id="add-passkey" class="secondary" type="button" data-cap="passkeyEnrollment" hidden>Add passkey</button></div>
     <p id="passkeys-state" class="muted" role="status"></p><button id="retry-passkeys" class="secondary" type="button" hidden>Try again</button><ul id="passkeys" class="items"></ul>
     <form id="enrollment-form" method="post" action="/v1/passkeys/enrollment/start" hidden>
@@ -119,8 +120,8 @@
     </form>
   </section>
   <section data-account-panel="details" hidden>
-    <button class="quiet back-button" type="button" data-open-account="overview">← Account settings</button>
-    <h2>Account details</h2>
+    <button class="quiet back-button" type="button" data-open-account="overview">← Account</button>
+    <h2>Profile</h2><p id="details-name"></p><p id="details-email" class="muted full-email"></p>
     <div id="mailbox-actions" hidden>
       <div><button type="button" class="secondary" data-reveal="email-change-form">Change email address</button><form hidden id="email-change-form" method="post" action="/v1/account/email/start">
         <label for="new-email">New email address</label><input id="new-email" type="email" autocomplete="email" required maxlength="254">
@@ -144,7 +145,7 @@
     </div>
     <details id="developer-details"><summary>Advanced developer details</summary><p class="metadata muted">Public account ID: <output id="account-id"></output></p><p class="metadata muted">Retain this ID with your passkeys and recovery kit. It is not a sign-in secret.</p><button id="check-session" class="secondary" type="button" hidden>Check sign-in</button><h3>Session timestamps</h3><ul id="session-diagnostics" class="items metadata"></ul><h3>Provider identifiers</h3><ul id="provider-diagnostics" class="items metadata"></ul></details>
   </section>
-  <section data-account-panel="password" hidden><button class="quiet back-button" type="button" data-open-account="overview">← Account settings</button><h2>Password sign-in</h2>
+  <section data-account-panel="password" hidden><button class="quiet back-button" type="button" data-open-account="overview">← Account</button><h2>Password sign-in</h2>
     <div id="password-enrollment" hidden>
       <p class="muted" id="password-help">Use 15–256 characters. Spaces and Unicode are allowed. Avoid compromised passwords. If you already have a password, sign out and use Reset password.</p>
       <form id="enroll-password-form" method="post" action="/v1/password/enroll">
