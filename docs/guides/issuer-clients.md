@@ -1,11 +1,17 @@
-# Gated outbound issuer client metadata
+# Outbound issuer client registration and composition
 
 The `issuer-clients` Cargo feature in core/PostgreSQL implements trusted outbound
 client configuration, current credential validation and opaque sector-subject
-storage. It does not turn easy-auth
-into an authorization server. There are no authorization, token, consent, discovery,
-JWKS, dynamic registration or standalone activation routes. SAML and M07 release
-prerequisites remain open. See [ADR0026](../architecture/adr/0026-outbound-client-registration.md).
+storage. Selecting this component alone mounts no HTTP routes. The separate
+[signed issuer](issuer-signing.md), [native lifecycle](issuer-native.md) and
+[configured standalone/embedded composition](issuer-standalone.md) implement
+explicit consent, code/token delivery, discovery/JWKS and optional native refresh.
+Each composition remains opt-in and requires its own current trusted configuration;
+registration alone grants no authority. Dynamic registration is unsupported.
+See [ADR0026](../architecture/adr/0026-outbound-client-registration.md) for the
+registration boundary and [ADR0040](../architecture/adr/0040-independent-oidc-client-and-standalone.md)
+for the independent client and configured delivery boundary. Broader release and
+assurance requirements remain separate from the bounded evidence below.
 
 ## Trusted registration
 
@@ -15,7 +21,9 @@ public web client, or `::confidential(..., &secret)` with an existing generated
 `Secret` for a confidential web client. The latter declares client_secret_basic;
 only its SHA-256 verifier is stored. Keep the raw secret private at provisioning;
 it is not serializable or printed in registration Debug. The public UUID is not
-an authentication credential. Token-endpoint parsing/authentication is future work.
+an authentication credential. The optional signed token endpoint enforces the
+registered method; it does not accept client_secret_post or infer credentials
+from issuer cookies.
 
 `Postgres::configure_issuer_client(&input)` returns the actual freshly persisted
 revision. Retain it instead of the original input. Redirect comparison through
@@ -52,8 +60,8 @@ that differ only by port and noncanonical spellings reject. Native clients have 
 shared secret; no confidential-native fallback exists.
 
 Do not reconfigure per operation to choose a port. `permits_redirect(actual)` checks
-the stable profile, while the future authorization-code transaction must store the
-exact actual URI and compare that entire URI during redemption. Metadata admission
+the stable profile, while the authorization-code transaction stores the
+exact actual URI and compares that entire URI during redemption. Metadata admission
 does not own a socket or authenticate the installed app. Custom URI schemes and
 claimed HTTPS dispatch are separate future profiles. See
 [ADR0034](../architecture/adr/0034-issuer-native-registration-and-authentication.md).
@@ -70,9 +78,12 @@ reject; storage failure is Unavailable, never public fallback.
 
 Public identification authenticates no app or user. Successful credential validation
 issues no code, session, consent or token, and cannot be cached as an authorization
-proof. The actual code exchange must compose credential/current-policy checks in
-its own transaction through consumption and final expiry. HTTP Basic decoding,
-the token endpoint and signed cross-client token audience tests remain protocol work.
+proof. The actual code exchange retains credential/current-policy checks in
+its own transaction through consumption and final expiry. The optional signed
+HTTP composition adds strict Basic/form decoding and current-method admission.
+Actual public/Basic/native token cases reject wrong or missing credentials,
+method/body client conflicts and wrong actual native ports without consuming the
+healthy code. Signed-token client tests also reject the wrong trusted audience.
 
 ## Opaque subject metadata
 
@@ -92,10 +103,10 @@ one stored subject. Existing account erasure cascades only its subject mappings.
 Re-creating a mailbox creates a new owner and a new subject. Disable or stale
 configuration cannot select a mapping, even if it already exists.
 
-**This is metadata, not consent or token authority.** Do not expose this method as
-a user-selected account lookup. Future issuance must authenticate the real current
-session, authorize the owner/client/request, enforce exact redirects and S256,
-obtain actual explicit consent, and bind its final transaction to current
+Subject allocation grants no consent or token authority. Do not expose this method
+as a user-selected account lookup. The separate issuance path authenticates the
+real current session, authorizes the owner/client/request, enforces exact redirects
+and S256, obtains actual explicit consent and binds its final transaction to current
 configuration and original deadlines. Fixed `explicit` consent and `pairwise`
 subject policy columns prohibit a silent storage-level bypass; they do not record
 that any user has consented. Public subjects and client_credentials are unavailable.
@@ -118,10 +129,14 @@ The additive profile migration preserves disabled legacy web registrations,
 credentials, revisions, subject mappings and sessions. Native cases cover stable
 concurrent allocation, real erasure, per-client/realm separation and observed
 credential replacement/operator-disable waits. Method/client/secret/realm failures
-cannot create grants or select weaker methods. No dependency or HTTP route is added.
-Full client-auth protocol negatives, other native profiles, actual consent, token issuance,
-key rotation, conformance and standalone interoperability remain future M07 work.
-Current source-specific local verification is recorded in the
+cannot create grants or select weaker methods. These isolated component commands
+exercise no HTTP route. Later full-source checks also cover actual client-auth
+negatives, browser consent and signed issuance, independent Node/Rust verification,
+normal key rollover and configured executable/embedded parity. See the
+[standalone acceptance scope](issuer-standalone.md#bounded-owned-acceptance) and
+[SDK guide](oidc-client.md) for those separate compositions and commands.
+Other native dispatch profiles, certification and production acceptance remain
+unverified. Source-specific component and integration evidence is recorded in the
 [issuer client verification record](../security/issuer-client-verification.md).
 
 ## Optional consent/code crate
