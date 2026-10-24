@@ -15,6 +15,14 @@ create a browser-wide atomic account epoch. Fixed template style insertion uses
 only the exact CSP-allowlisted combined token/control stylesheet hash; style attributes, other inline
 styles, third-party resources and embedded frames remain denied. Explicit form
 POST methods prevent GET-query credential leakage if module initialization fails.
+Explicit passkey management can offer native reauthentication only after the API
+rejects freshness. Confirmation explains normal logout of this browser; cancellation
+preserves its session. The new assertion is account-bound to the confirmed owner,
+with current view/owner checks before logout and an actual same-owner session read
+after the single finish. Only inventory GET follows successful verification; no
+credential completion retry or weaker fallback is introduced. Return-to-page
+metadata reads avoid active operations, discard stale views and clear unfinished
+forms on observed owner change; browser-wide account switching is still not atomic.
 The fixed licensed Inter asset is served locally with same-origin font permission;
 there is no remote font origin, runtime palette input or new script permission.
 

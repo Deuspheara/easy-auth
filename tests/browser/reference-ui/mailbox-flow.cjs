@@ -80,11 +80,12 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.goto(link);
     await signedIn(page);
     assert.equal(new URL(page.url()).hash, '');
-    assert.equal(await page.locator('#providers-state').textContent(), 'No connected providers.');
-    assert.equal(await page.locator('#mailbox-actions').isVisible(), true);
+    await page.waitForFunction(() => document.getElementById('providers-card').dataset.loaded === 'true');
+    assert.equal(await page.locator('#providers-card').isVisible(), false);
+    assert.equal(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
 
     stage = 'password-enrollment';
-    await openDetails(page, '#password-enrollment');
+    await page.getByRole('button', {name: 'Manage password', exact: true}).click();
     await page.locator('#new-password').fill(password);
     await page.locator('#confirm-password').fill(password);
     await page.getByRole('button', {name: 'Set up password', exact: true}).click();
@@ -92,12 +93,18 @@ async function mailboxFlow(browser, origin, mail, guard) {
     assert.equal(await page.locator('#new-password').inputValue(), '');
     assert.equal(await page.locator('#confirm-password').inputValue(), '');
 
+    await page.getByRole('button', {name: '← Account settings', exact: true}).click();
     stage = 'session-revocation';
     await passwordLogin(other, origin, email, password);
-    await page.locator('#refresh-account').click();
+    await page.getByRole('button', {name: 'Details', exact: true}).click();
+    await openDetails(page, '#developer-details');
+    await page.locator('#check-session').click();
+    await page.getByRole('button', {name: '← Account settings', exact: true}).click();
     await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 2);
     await page.locator('#sessions').getByRole('button', {name: 'Sign out session', exact: true}).click();
     await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1);
+    await other.getByRole('button', {name: 'Details', exact: true}).click();
+    await openDetails(other, '#developer-details');
     await other.locator('#check-session').click();
     await other.waitForFunction(() => document.getElementById('clear-session').hidden === false);
     await other.getByRole('link', {name: 'Trouble signing in?', exact: true}).click();
@@ -105,6 +112,8 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await other.waitForFunction(() => document.getElementById('status').textContent === 'Signed out in this browser.');
     await passwordLogin(other, origin, email, password);
     await signoutAll(page);
+    await other.getByRole('button', {name: 'Details', exact: true}).click();
+    await openDetails(other, '#developer-details');
     await other.locator('#check-session').click();
     await other.waitForFunction(() => document.getElementById('clear-session').hidden === false);
 
@@ -128,7 +137,8 @@ async function mailboxFlow(browser, origin, mail, guard) {
     // password/session scenario within unchanged per-mailbox admission limits.
     const lifecycleEmail = mail.recipient(4);
     await emailLogin(page, origin, lifecycleEmail, mail);
-    await openDetails(page, '#mailbox-actions details:first-child');
+    await page.getByRole('button', {name: 'Details', exact: true}).click();
+    await page.getByRole('button', {name: 'Change email address', exact: true}).click();
     await page.locator('#new-email').fill(changedEmail);
     await page.getByRole('button', {name: 'Send both confirmation links', exact: true}).click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check both email inboxes.'));
@@ -141,7 +151,8 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await emailLogin(page, origin, changedEmail, mail);
 
     stage = 'account-deletion';
-    await openDetails(page, '#mailbox-actions details:last-child');
+    await page.getByRole('button', {name: 'Details', exact: true}).click();
+    await page.getByRole('button', {name: 'Delete account', exact: true}).click();
     await page.locator('#delete-confirmation').fill('delete my account');
     await page.getByRole('button', {name: 'Request deletion confirmation', exact: true}).click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Deletion was requested.'));

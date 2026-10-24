@@ -39,6 +39,24 @@ recheck the session after a restored page. Never retry an ambiguous credential
 completion or persist proof in browser storage. This is not a browser-wide atomic
 account-switch guarantee; database bindings and current authority remain decisive.
 
+## Account overview and verified management
+
+Separate identity/security overview from focused management panels and developer
+diagnostics. Empty provider lists do not invent linking. Sensitive key inventory
+remains deliberate. A genuine inventory401 may initiate an explicit confirmation
+that replaces this browser’s session through normal logout and account-bound
+WebAuthn start/finish. Cancel does not log out; there is no automatic credential
+completion retry or weaker fallback. Recheck owner/view before logout and require
+the actual refreshed owner to match before reading inventory. Existing core/SQL
+freshness and credential restrictions remain authoritative.
+
+Refresh ordinary metadata on visible-page return, coalescing return events and
+avoiding active operations. Reset unfinished forms on an observed owner change.
+Keep only current/other status and genuine relative activity on session rows;
+raw timestamps and immutable provider/public IDs belong in advanced details.
+Nonessential success feedback expires after eight seconds, while failures and
+confirmation instructions remain available. No location/device inference is added.
+
 ## Style and accessibility boundary
 
 The maintainer's revised visual direction follows the

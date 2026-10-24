@@ -3,13 +3,19 @@
 Reference presentation keeps trusted boolean capability projection, fixed style
 insertion and static asset routing in separate `pages/` Rust modules. Browser
 `client.js` composes the view; `signin.js`, `account.js` and `passkeys.js` own their
-forms/reads, `auth-screens.js` owns the closed presentation selector, while `view.js` owns busy/focus/dialog presentation. The existing
+forms/reads. `account-view.js` owns account identity/policy presentation and panels;
+`inventory-rows.js` and `passkey-row.js` render named inventory objects, retaining
+captured key versions and checks with their actions. `passkey-reauth.js` owns only
+the deliberate existing logout/account-bound prompt sequence. `auth-screens.js`
+owns the closed anonymous presentation selector; `view.js` owns busy/focus/dialog
+and nonessential success notification presentation. The existing
 navigation-safe request/native-prompt operations are shared byte-for-byte through
 `browser-operations.js`; the original recovery resource URL remains supported.
 Feature page modules retain callback selection, escaped transport data and
 protocol confirmation. Their fixed HTML shares the stylesheet without adding
-external resources or broad CSP style permission. UI modules remain at or below 150
-lines; the form-binding function deliberately keeps its short explicit endpoint/
+external resources or broad CSP style permission. Browser modules remain at or below 150
+lines; the fixed163line HTML document keeps its native forms and capability-gated
+views together without a template framework (a reviewed size exception); the form-binding function deliberately keeps its short explicit endpoint/
 input/result handlers together as a reviewed function-size exception. No business
 policy, SQL, verifier or public proof constructor moves into presentation.
 
@@ -18,9 +24,9 @@ small deterministic CSS alias generator, checked in CI. Rendering combines the
 generated aliases with the owning control/layout stylesheet under one exact hash.
 Licensed local Inter and its notice use fixed static asset routes. No frontend
 framework, universal component abstraction or second palette is introduced.
-The per-key row deliberately keeps the captured credential version, owner/view
-checks and rename/removal handlers beside its native disclosure. Its slightly
-longer function is a reviewed size exception that keeps those bindings explicit.
+The per-key row separates inline rename editing from the captured-version remove
+action. Both keep owner/view checks immediately beside protected requests; no
+public proof constructor or shared persistence rule moves into rendering.
 
 Reference browser acceptance separates owned process lifecycle, exact-recipient
 mail delivery, appearance, focused-screen navigation, mailbox/account flow, native passkey flow, usability

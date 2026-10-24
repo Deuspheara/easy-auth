@@ -10,7 +10,7 @@
 <body data-reference-account data-account="signed-out">
 <a class="skip" href="#main">Skip to account access</a>
 <header class="topbar">
-  <div class="actions"><button id="check-session" class="quiet" type="button" hidden>Check sign-in</button><button id="theme" class="quiet icon-button" type="button" aria-label="Use dark theme" title="Use dark theme"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg></button></div>
+  <div class="actions"><button id="theme" class="quiet icon-button" type="button" aria-label="Use dark theme" title="Use dark theme"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg></button></div>
 </header>
 <main id="main" tabindex="-1">
 <input id="capabilities" type="hidden" value='__CAPABILITIES__'>
@@ -83,63 +83,77 @@
     <p class="flow-link"><a href="/">Choose a saved passkey instead</a></p>
   </div>
 </section>
-<section id="account" aria-label="Your account" hidden>
-  <div class="account-section">
-    <div class="section-heading"><h2>Profile</h2><button id="logout" class="secondary" type="button" hidden>Sign out</button></div>
-    <p id="identity"></p>
-    <details><summary>Account details</summary><p class="metadata muted">Public account ID: <output id="account-id"></output></p><p class="metadata muted">Retain this ID with your passkeys and recovery kit. It is not a sign-in secret.</p></details>
+<section id="account" aria-label="Account settings" hidden>
+  <div data-account-panel="overview">
+    <section class="account-section" aria-labelledby="profile-heading">
+      <h2 id="profile-heading">Your account</h2>
+      <div class="object-row profile-row">
+        <span id="avatar" class="avatar" aria-hidden="true"></span>
+        <div id="identity" class="object-copy"><h3 id="identity-name"></h3><p id="identity-email" class="muted"></p></div>
+        <button class="secondary" type="button" data-open-account="details">Details</button>
+      </div>
+    </section>
+    <section id="signin-methods" class="account-section" aria-labelledby="methods-heading">
+      <h2 id="methods-heading">Sign-in methods</h2>
+      <div id="passkeys-card" class="object-row" hidden>
+        <span class="object-icon" aria-hidden="true">⚿</span><div class="object-copy"><h3>Passkeys</h3><p class="muted">Manage your registered passkeys</p></div>
+        <button id="refresh-passkeys" class="secondary" type="button" data-cap="passkeyManagement" hidden>Manage passkeys</button>
+        <button id="enroll-passkey-entry" class="secondary" type="button" hidden>Add passkey</button>
+      </div>
+      <div id="password-entry" class="object-row" hidden><span class="object-icon" aria-hidden="true">⁕</span><div class="object-copy"><h3>Password</h3><p class="muted">Password setup and reset options</p></div><button class="secondary" type="button" data-open-account="password">Manage password</button></div>
+      <div id="recovery-card" class="object-row" hidden><span class="object-icon" aria-hidden="true">◇</span><div class="object-copy"><h3>Account recovery</h3><p class="muted">Recovery methods and backup codes</p></div><a class="button secondary" href="/passkey-recovery/setup">Recovery options</a></div>
+      <div id="providers-card" hidden><h3 class="subheading">Connected accounts</h3><p id="providers-state" class="muted" role="status"></p><ul id="providers" class="items"></ul><button id="retry-providers" class="secondary" type="button" hidden>Try again</button><button id="more-providers" class="secondary" type="button" hidden>Show more accounts</button></div>
+    </section>
+    <section class="account-section" aria-labelledby="sessions-heading">
+      <div class="section-heading"><h2 id="sessions-heading">Active sessions</h2><button id="refresh-account" class="secondary" type="button" hidden>Try again</button></div>
+      <p id="sessions-state" class="muted" role="status"></p><ul id="sessions" class="items"></ul>
+      <div class="session-actions"><button id="logout" class="secondary" type="button" hidden>Sign out of this browser</button><button id="more-sessions" class="secondary" type="button" hidden>Show more sessions</button><button id="revoke-all" class="danger" type="button">Sign out everywhere</button></div>
+    </section>
+  </div>
+  <section data-account-panel="passkeys" hidden>
+    <button class="quiet back-button" type="button" data-open-account="overview">← Account settings</button>
+    <div class="section-heading"><h2>Registered passkeys</h2><button id="add-passkey" class="secondary" type="button" data-cap="passkeyEnrollment" hidden>Add passkey</button></div>
+    <p id="passkeys-state" class="muted" role="status"></p><button id="retry-passkeys" class="secondary" type="button" hidden>Try again</button><ul id="passkeys" class="items"></ul>
+    <form id="enrollment-form" method="post" action="/v1/passkeys/enrollment/start" hidden>
+      <label for="key-label">Passkey name</label><input id="key-label" required maxlength="256" autocomplete="off"><button type="submit">Add a passkey</button>
+    </form>
+  </section>
+  <section data-account-panel="details" hidden>
+    <button class="quiet back-button" type="button" data-open-account="overview">← Account settings</button>
+    <h2>Account details</h2>
     <div id="mailbox-actions" hidden>
-      <details><summary>Change email address</summary><form id="email-change-form" method="post" action="/v1/account/email/start">
+      <div><button type="button" class="secondary" data-reveal="email-change-form">Change email address</button><form hidden id="email-change-form" method="post" action="/v1/account/email/start">
         <label for="new-email">New email address</label><input id="new-email" type="email" autocomplete="email" required maxlength="254">
         <p class="muted">Confirm both email links in this browser. All sessions are signed out when the change completes.</p>
         <button type="submit">Send both confirmation links</button>
-      </form></details>
-      <details><summary>Delete account</summary><form id="deletion-start-form" method="post" action="/v1/account/delete/start">
+      </form></div>
+      <div><button type="button" class="danger" data-reveal="deletion-start-form">Delete account</button><form hidden id="deletion-start-form" method="post" action="/v1/account/delete/start">
         <label for="delete-confirmation">Type “delete my account” to request deletion</label><input id="delete-confirmation" autocomplete="off" required pattern="delete my account">
         <p class="muted">Permanently removes this authentication account, credentials and sessions. Confirm the email link in this browser to finish. Applications manage their own data separately.</p>
         <button class="danger" type="submit">Request deletion confirmation</button>
-      </form></details>
+      </form></div>
     </div>
-    <details id="attach-action" hidden><summary>Add a verified contact email</summary><form id="attachment-start-form" method="post" action="/v1/account/email/attachment/start">
+    <div id="attach-action" hidden><button type="button" class="secondary" data-reveal="attachment-start-form">Add contact email</button><form hidden id="attachment-start-form" method="post" action="/v1/account/email/attachment/start">
       <label for="contact-email">Contact email address</label><input id="contact-email" type="email" autocomplete="email" required maxlength="254">
       <p class="muted">Requires a fresh passkey sign-in. This does not enable email sign-in or weaker recovery.</p>
       <button type="submit">Send contact confirmation</button>
-    </form></details>
-    <details id="password-enrollment" hidden>
-      <summary>Set up a password</summary>
+    </form></div>
+    <div id="provider-deletion" hidden>
+      <p class="muted">Account deletion requires fresh confirmation from the provider that signed you in.</p>
+      <div class="actions"><a class="button secondary" data-cap="googleDeletion" href="/google/account-delete" hidden>Delete with Google reauthentication</a><a class="button secondary" data-cap="oidcDeletion" href="/oidc/account-delete" hidden>Delete with organization reauthentication</a><a class="button secondary" data-cap="samlDeletion" href="/saml/account-delete" hidden>Delete with SAML reauthentication</a></div>
+    </div>
+    <details id="developer-details"><summary>Advanced developer details</summary><p class="metadata muted">Public account ID: <output id="account-id"></output></p><p class="metadata muted">Retain this ID with your passkeys and recovery kit. It is not a sign-in secret.</p><button id="check-session" class="secondary" type="button" hidden>Check sign-in</button><h3>Session timestamps</h3><ul id="session-diagnostics" class="items metadata"></ul><h3>Provider identifiers</h3><ul id="provider-diagnostics" class="items metadata"></ul></details>
+  </section>
+  <section data-account-panel="password" hidden><button class="quiet back-button" type="button" data-open-account="overview">← Account settings</button><h2>Password sign-in</h2>
+    <div id="password-enrollment" hidden>
       <p class="muted" id="password-help">Use 15–256 characters. Spaces and Unicode are allowed. Avoid compromised passwords. If you already have a password, sign out and use Reset password.</p>
       <form id="enroll-password-form" method="post" action="/v1/password/enroll">
         <label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" required maxlength="1024" aria-describedby="password-help">
         <label for="confirm-password">Confirm password</label><input id="confirm-password" type="password" autocomplete="new-password" required maxlength="1024">
         <button type="submit">Set up password</button>
       </form>
-    </details>
-  </div>
-  <div class="account-section">
-    <div class="section-heading"><h2>Connected providers</h2></div>
-    <p id="providers-state" class="muted"></p><ul id="providers" class="items"></ul>
-    <button id="more-providers" class="secondary" type="button" hidden>Load more providers</button>
-    <div id="provider-deletion" hidden>
-      <p class="muted">Account deletion requires fresh confirmation from the provider that signed you in.</p>
-      <div class="actions"><a class="button secondary" data-cap="googleDeletion" href="/google/account-delete" hidden>Delete with Google reauthentication</a><a class="button secondary" data-cap="oidcDeletion" href="/oidc/account-delete" hidden>Delete with organization reauthentication</a><a class="button secondary" data-cap="samlDeletion" href="/saml/account-delete" hidden>Delete with SAML reauthentication</a></div>
     </div>
-  </div>
-  <div id="passkeys-card" class="account-section" hidden>
-    <div class="section-heading"><h2>Passkeys</h2><button id="refresh-passkeys" class="secondary" type="button" data-cap="passkeyManagement" hidden>Load passkeys</button></div>
-    <p id="passkeys-state" class="muted"></p><ul id="passkeys" class="items"></ul>
-    <details id="add-passkey" data-cap="passkeyEnrollment" hidden><summary>Add a passkey</summary>
-      <form id="enrollment-form" method="post" action="/v1/passkeys/enrollment/start">
-        <label for="key-label">Passkey name</label><input id="key-label" required maxlength="256" autocomplete="off">
-        <button type="submit">Add a passkey</button>
-      </form>
-    </details>
-    <p class="metadata" data-cap="recoverySetup" hidden><a href="/passkey-recovery/setup">Recovery options</a></p>
-  </div>
-  <div class="account-section">
-    <div class="section-heading"><h2>Active sessions</h2><button id="refresh-account" class="secondary" type="button">Refresh account</button></div>
-    <p id="sessions-state" class="muted"></p><ul id="sessions" class="items"></ul>
-    <div class="actions"><button id="more-sessions" class="secondary" type="button" hidden>Load more sessions</button><button id="revoke-all" class="danger" type="button">Sign out all sessions</button></div>
-  </div>
+  </section>
 </section>
 </main>
 <dialog id="confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">

@@ -1,7 +1,7 @@
 "use strict";
 import {request, assertKey, createKey, accountId} from "/ui/browser-operations.js";
 import {showAuthScreen} from "/ui/auth-screens.js";
-import {element, announce, submit, run, clearSecrets} from "/ui/view.js";
+import {element, announce, notify, submit, run, clearSecrets} from "/ui/view.js";
 
 async function confirmedSession(refresh) {
   if (!await refresh()) throw Object.assign(new Error("Session not confirmed"), {name: "PageChangedError"});
@@ -13,7 +13,7 @@ async function signInWithPasskey(refresh, input) {
   const credential = await assertKey(started.options);
   await request("/v1/passkeys/authentication/finish", {transaction_id: started.transaction_id, credential});
   await confirmedSession(refresh);
-  announce("Signed in with a passkey.");
+  notify("Signed in with a passkey.");
 }
 
 export function bindSignIn(refresh, requireCurrent, caps) {
@@ -31,7 +31,7 @@ export function bindSignIn(refresh, requireCurrent, caps) {
     try {
       await request("/v1/password/login", {email: element("login-email").value, password: element("login-password").value});
       await confirmedSession(refresh);
-      announce("Signed in.");
+      notify("Signed in.");
     } finally { clearSecrets(); }
   }, "Checking your password…");
   element("reset-request").addEventListener("click", () => {
@@ -56,7 +56,7 @@ export function bindSignIn(refresh, requireCurrent, caps) {
     const assertion = await assertKey(created.options);
     await request("/v1/passkeys/signup/finish", {transaction_id: created.transaction_id, credential: assertion});
     await confirmedSession(refresh);
-    announce("Your account and verified passkey are ready. Retain the public account ID and configure recovery with your working key.");
+    notify("Account created. Your passkey is ready.");
   }, "Create a passkey…");
   submit("enroll-password-form", async () => {
     const password = element("new-password");
@@ -72,7 +72,7 @@ export function bindSignIn(refresh, requireCurrent, caps) {
       await requireCurrent();
       await request("/v1/password/enroll", {password: proposed});
       await confirmedSession(refresh);
-      announce("Password saved. Previous sessions were signed out.");
+      notify("Password saved. Previous sessions were signed out.");
     } finally { clearSecrets(); }
   }, "Saving your password…");
   for (const id of ["new-password", "confirm-password"]) element(id).addEventListener("input", () => element("confirm-password").setCustomValidity(""));
@@ -85,6 +85,6 @@ export async function finishEmail(refresh) {
   await run(element("email-form"), async () => {
     await request("/v1/email/finish", {token});
     await confirmedSession(refresh);
-    announce("Signed in.");
+    notify("Signed in.");
   }, "Confirming your email sign-in…");
 }

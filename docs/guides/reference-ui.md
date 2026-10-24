@@ -36,6 +36,21 @@ resend; links still require the initiating browser and original ten-minute expir
 Resend remains subject to normal server admission. No address or proof is saved in
 URLs or browser storage, and ambiguous credential completions are never retried.
 
+## Account overview
+
+The overview shows identity, selected sign-in/recovery methods and actual sessions.
+**Details**, **Manage password** and **Manage passkeys** open focused panels.
+Empty connected-account inventory stays hidden; provider linking is not offered.
+Public account IDs, full issuers, exact session timestamps and the manual sign-in
+check are available in **Details → Advanced developer details**.
+
+Metadata refreshes after actions and when returning to the visible page; it avoids
+interrupting active operations and resets unfinished forms when an owner change is
+observed. Failures expose retry; healthy views have no manual refresh control.
+Success notifications expire after eight seconds. Errors and confirmation-link
+instructions remain visible. Only other sessions have an individual revoke action;
+this browser’s sign-out and confirmed sign-out everywhere are separate.
+
 ## Using account controls
 
 Email links must finish in the initiating browser. Password reset has its own
@@ -54,14 +69,18 @@ Mailbox account actions, passkey-only contact attachment and provider-only
 reauthenticated deletion are presented separately. This string does not prove
 freshness or the authentication method. Existing backend restrictions remain
 authoritative, including genuine fresh passkey proof and another proven key for
-key removal. After a fresh passkey sign-in, choose **Load passkeys** to retrieve
-this sensitive inventory explicitly. No weaker recovery is selected after a rejection.
+key removal. Choose **Manage passkeys** to retrieve
+this sensitive inventory explicitly. If the server requires fresh passkey proof,
+confirm native verification: this browser signs out and asks for the same account’s
+passkey, then returns to management. Other sessions stay signed in; Cancel leaves
+the current sign-in intact. Failed or interrupted finish is never automatically
+retried. Account-bound owner checks and normal APIs remain authoritative. No weaker recovery is selected after a rejection.
 
 Connected-provider inventory shows immutable linked issuers, not current enabled
 trust, raw subjects or claims. It supports bounded pages. Session inventory lists
 only owned active records, also with bounded pages. Explicitly confirm all-session
 sign-out and passkey removal; both can sign out this browser. If another tab changes
-the account, use **Check sign-in** before continuing. There is no cross-tab atomic
+the account, the return refresh rechecks it; advanced **Check sign-in** is also available. There is no cross-tab atomic
 account epoch or downstream application-session revocation claim.
 
 Messages report confirmation only after API success and the relevant session

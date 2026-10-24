@@ -3,11 +3,24 @@
 export const element = id => document.getElementById(id);
 let lifecycle = 0;
 const active = new Set();
+function syncAccountButtons() {
+  for (const button of document.querySelectorAll("#account button")) button.disabled = active.size > 0;
+}
 window.addEventListener("pagehide", () => {
   lifecycle += 1;
   for (const release of [...active]) release();
 });
-export function announce(text) { element("status").textContent = text; }
+let notificationTimer;
+export function announce(text) {
+  clearTimeout(notificationTimer);
+  delete element("status").dataset.transient;
+  element("status").textContent = text;
+}
+export function notify(text) {
+  announce(text);
+  element("status").dataset.transient = "true";
+  notificationTimer = setTimeout(() => announce(""), 8000);
+}
 export function errorMessage(error, signIn = false) {
   if (error.name === "PageChangedError") return "The page or account changed. Check your account before trying again; no action is confirmed here.";
   if (error.name === "UnsupportedPasskeyClient") return "This browser cannot use this passkey client. Use a supported browser with your existing key.";
@@ -28,11 +41,13 @@ export async function run(container, action, pending = "Working…") {
     if (!active.delete(release)) return;
     container.removeAttribute("aria-busy");
     buttons.forEach((button, index) => { if (button.isConnected) button.disabled = disabled[index]; });
+    syncAccountButtons();
     if (stamp === lifecycle && document.activeElement === document.body && focused?.isConnected && focused.getClientRects().length) focused.focus();
   };
   active.add(release);
   container.setAttribute("aria-busy", "true");
   buttons.forEach(button => { button.disabled = true; });
+  syncAccountButtons();
   announce(pending);
   try { await action(); }
   catch (error) {
@@ -52,6 +67,7 @@ export function submit(id, action, pending) {
 export function actionButton(label, action, danger = false) {
   const button = document.createElement("button");
   button.type = "button";
+  button.disabled = active.size > 0;
   button.className = danger ? "danger" : "secondary";
   button.textContent = label;
   button.addEventListener("click", () => { void run(button, action); });
@@ -64,14 +80,24 @@ export function paragraph(text) {
   return node;
 }
 
+export function activity(value) {
+  const age = Math.max(0, Date.now() - value);
+  if (!Number.isFinite(age)) return "unavailable";
+  if (age < 60000) return "just now";
+  const minutes = Math.floor(age / 60000);
+  if (minutes < 60) return minutes + (minutes === 1 ? " minute ago" : " minutes ago");
+  return new Date(value).toLocaleDateString(undefined, {month: "short", day: "numeric", year: "numeric"});
+}
+
 export function date(value) {
   const date = new Date(value);
   return Number.isFinite(date.getTime()) ? date.toLocaleString() : "Unavailable";
 }
 
-export function confirmAction(title, description) {
+export function confirmAction(title, description, acceptLabel = "Confirm") {
   const dialog = element("confirmation");
   if (dialog.open || typeof dialog.showModal !== "function") return Promise.resolve(false);
+  element("confirmation-accept").textContent = acceptLabel;
   element("confirmation-title").textContent = title;
   element("confirmation-description").textContent = description;
   dialog.returnValue = "cancel";

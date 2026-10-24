@@ -1,10 +1,11 @@
 "use strict";
 import {request} from "/ui/browser-operations.js";
-import {element, announce, run, clearSecrets, errorMessage} from "/ui/view.js";
+import {element, announce, notify, run, clearSecrets, errorMessage} from "/ui/view.js";
 import {showAuthScreen} from "/ui/auth-screens.js";
 import {bindSignIn, finishEmail} from "/ui/signin.js";
 import {bindAccount, resetAccount, loadProviders, loadSessions} from "/ui/account.js";
-import {renderAccount} from "/ui/account-view.js";
+import {verifyPasskey} from "/ui/passkey-reauth.js";
+import {renderAccount, bindAccountViews, resetAccountPanels, showAccountPanel} from "/ui/account-view.js";
 import {bindPasskeys, loadPasskeys} from "/ui/passkeys.js";
 
 const caps = JSON.parse(element("capabilities").value);
@@ -14,9 +15,11 @@ let revision = 0;
 let owner = null;
 
 function signedOut() {
+  announce("");
   owner = null;
   revision += 1;
   resetAccount();
+  resetAccountPanels();
   clearSecrets();
   element("account").hidden = true;
   element("sign-in").hidden = false;
@@ -24,7 +27,9 @@ function signedOut() {
   element("clear-session").hidden = false;
   element("check-session").hidden = true;
   document.body.dataset.account = "signed-out";
-  element("identity").textContent = "";
+  element("identity-name").textContent = "";
+  element("identity-email").textContent = "";
+  element("avatar").textContent = "";
   element("account-id").textContent = "";
   showAuthScreen(caps, initialView);
   initialView = "email";
@@ -32,6 +37,7 @@ function signedOut() {
 
 async function refresh() {
   const stamp = ++revision;
+  const previousOwner = owner;
   owner = null;
   resetAccount();
   element("account").hidden = true;
@@ -44,6 +50,7 @@ async function refresh() {
     return null;
   }
   if (stamp !== revision) return null;
+  if (previousOwner && user.id !== previousOwner) { resetAccountPanels(); clearSecrets(); }
   owner = user.id;
   renderAccount(user, caps);
   await Promise.all([loadProviders(), loadSessions()]);
@@ -58,7 +65,7 @@ async function refreshForAction() {
 }
 async function refreshKeys() {
   const user = await refreshForAction();
-  if (user) await loadPasskeys(caps);
+  if (user) { showAccountPanel("passkeys"); await loadPasskeys(caps); }
   return user;
 }
 async function requireCurrent() {
@@ -77,16 +84,21 @@ async function requireCurrent() {
     announce("The signed-in account changed. Check sign-in before continuing.");
     throw changed();
   }
+  return user;
 }
 
 for (const node of document.querySelectorAll("[data-cap]")) node.hidden = caps[node.dataset.cap] !== true;
 element("other-methods").hidden = !["passkeySignin", "google", "oidc", "saml"].some(name => caps[name] === true);
+bindAccountViews();
 bindAccount(refreshForAction, requireCurrent);
-bindPasskeys(refreshKeys, requireCurrent, caps);
+bindPasskeys(refreshKeys, requireCurrent, caps, () => verifyPasskey(refresh, signedOut, requireCurrent));
 bindSignIn(refresh, requireCurrent, caps);
 for (const id of ["refresh-account", "check-session"]) {
   element(id).addEventListener("click", () => {
-    void run(element(id), async () => announce(await refreshForAction() ? "Account refreshed." : "This browser is signed out."), "Checking sign-in…");
+    void run(element(id), async () => {
+      if (await refreshForAction()) notify("Account updated.");
+      else announce("This browser is signed out.");
+    }, "Checking sign-in…");
   });
 }
 for (const id of ["logout", "clear-session"]) {
@@ -120,6 +132,15 @@ window.addEventListener("pageshow", event => {
     void refresh().catch(error => announce(errorMessage(error)));
   }
 });
+let refreshingOnReturn = false;
+async function refreshOnReturn() {
+  if (!owner || document.visibilityState !== "visible" || refreshingOnReturn || document.querySelector('[aria-busy="true"]')) return;
+  refreshingOnReturn = true;
+  try { await refresh(); } catch (error) { announce(errorMessage(error)); }
+  finally { refreshingOnReturn = false; }
+}
+window.addEventListener("focus", refreshOnReturn);
+document.addEventListener("visibilitychange", refreshOnReturn);
 window.addEventListener("hashchange", () => {
   if (new URLSearchParams(location.hash.slice(1)).has("token")) void finishEmail(refresh).catch(error => announce(errorMessage(error)));
 });

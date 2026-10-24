@@ -17,12 +17,32 @@ existing browser binding, generic response, expiry and server admission limits.
 A direct inbox query cannot construct that state or supply a resend address.
 The icon theme button has an accessible action label; the repeated footer is removed.
 
-The account view keeps flat settings sections and aligned session/provider rows.
-Key management and destructive actions retain relevant fields, warnings and native
-confirmation. There is no workspace sidebar, marketing hero, ambient effect or
-decorative mark. Native passkey prompts remain explicit; conditional WebAuthn
-mediation is not added by this presentation change. No authentication method,
-account policy, proof lifecycle, automatic completion retry or browser storage is added.
+The account overview uses a 768px column, identity avatar/name/email, recognizable
+sign-in/recovery rows and current/other sessions. Empty provider inventory is hidden;
+unsupported linking is never presented as a connect action. Detailed passkey and
+password management and account changes use focused panels. Passkeys remain an
+explicit sensitive read; **Manage passkeys** requests inventory and, only after an
+authoritative freshness denial, offers confirmed native verification. It explains
+that this browser will sign out, preserves other sessions and binds the new prompt
+to the previously confirmed owner. Cancel preserves the existing session. An
+ambiguous credential finish is never retried; only inventory is read after a
+successfully verified same-owner session. No backend freshness or policy changes.
+
+Name and email are separate text nodes. Public IDs, full provider identifiers,
+manual checks and exact timestamps live under advanced developer details. Session
+rows show only actual current status and activity derived from returned timestamps;
+no invented device/location/method. Current-session sign-out and confirmed sign-out
+everywhere remain distinct; only other sessions have an individual revoke button.
+Metadata refreshes after mutations and visible-page return, with overlapping return
+refreshes suppressed and active operations left alone. An observed owner change
+clears unfinished account forms and returns to the overview. Every sensitive action
+still rechecks its owner; this is not a cross-tab atomic account-switch guarantee.
+
+Nonessential success feedback is a small eight-second live notification; errors and
+confirmation instructions persist. The same native layout supports both themes,
+mobile and enlarged text. No sidebar, marketing hero, ambient effect, decorative
+image or new runtime dependency is added. Conditional WebAuthn mediation remains
+outside this presentation change. Rendered owner approval is still pending.
 
 The selected semantic roles live in [reference-ui-tokens.json](reference-ui-tokens.json).
 `python3 scripts/reference_ui_tokens.py` generates the committed `pages/tokens.css`;

@@ -72,6 +72,9 @@ async fn reference_ui_advertises_selected_services_without_creating_authority(po
         "/ui/account.js",
         "/ui/account-view.js",
         "/ui/passkeys.js",
+        "/ui/passkey-row.js",
+        "/ui/passkey-reauth.js",
+        "/ui/inventory-rows.js",
     ] {
         let response = app
             .clone()

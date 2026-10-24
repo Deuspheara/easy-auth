@@ -15,14 +15,27 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await page.goto(origin);
       await page.waitForFunction(() => document.getElementById('clear-session').hidden === false);
       await page.getByRole('link', {name: 'Create an account', exact: true}).click();
-      await page.locator('#display-name').fill('Reference native account');
+      await page.locator('#display-name').fill('Alex Morgan');
       await page.getByRole('button', {name: 'Create and verify a passkey', exact: true}).click();
       await page.locator('#account').waitFor({state: 'visible'});
-      await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Your account and verified passkey are ready.'));
-      assert.equal(await page.locator('#mailbox-actions').isVisible(), false);
+      await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Account created. Your passkey is ready.'));
+      assert.notEqual(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
       assert.equal(await page.locator('#password-enrollment').isVisible(), false);
       await page.locator('#refresh-passkeys').click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 1);
+      if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
+        const path = require('node:path');
+        await page.evaluate(() => document.fonts.ready);
+        for (const scheme of ['light', 'dark']) {
+          await page.emulateMedia({colorScheme: scheme});
+          for (const width of [320, 1440]) {
+            await page.setViewportSize({width, height: 1000});
+            assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+            await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+              'passkeys-' + scheme + '-' + width + '.png'), fullPage: true});
+          }
+        }
+      }
       const retainedAccountId = await page.locator('#account-id').textContent();
       stage = 'passkey-enrollment-management';
       await cdp.send('WebAuthn.setAutomaticPresenceSimulation', {authenticatorId, enabled: false});
@@ -30,18 +43,18 @@ async function passkeyFlow(browser, origin, mail, guard) {
         protocol: 'ctap2', transport: 'usb', hasResidentKey: true, hasUserVerification: true,
         isUserVerified: true, automaticPresenceSimulation: true
       }});
-      await page.locator('#add-passkey > summary').click();
+      await page.locator('#add-passkey').click();
       await page.locator('#key-label').fill('Reference spare');
       await page.getByRole('button', {name: 'Add a passkey', exact: true}).click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 2);
       await cdp.send('WebAuthn.removeVirtualAuthenticator', {authenticatorId: spareDevice.authenticatorId});
       await cdp.send('WebAuthn.setAutomaticPresenceSimulation', {authenticatorId, enabled: true});
       const spare = page.locator('#passkeys > li').filter({has: page.getByText('Reference spare', {exact: true})});
-      await spare.locator('summary').click();
+      await spare.getByRole('button', {name: 'Rename Reference spare', exact: true}).click();
       await spare.getByLabel('Passkey name', {exact: true}).fill('Reference renamed');
       await spare.getByRole('button', {name: 'Save name for Reference spare', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent === 'Passkey name updated.');
-      await page.locator('#passkeys summary').filter({hasText: 'Reference renamed'}).click();
+      assert.equal(await page.getByRole('button', {name: 'Remove Reference renamed', exact: true}).isVisible(), true);
       await page.getByRole('button', {name: 'Remove Reference renamed', exact: true}).click();
       await page.getByRole('dialog').waitFor({state: 'visible'});
       await page.keyboard.press('Escape');
@@ -54,7 +67,8 @@ async function passkeyFlow(browser, origin, mail, guard) {
       stage = 'passkey-signin-contact';
       await page.getByRole('button', {name: 'Sign in with a passkey', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent === 'Signed in with a passkey.');
-      await page.locator('#attach-action > summary').click();
+      await page.getByRole('button', {name: 'Details', exact: true}).click();
+      await page.getByRole('button', {name: 'Add contact email', exact: true}).click();
       const email = mail.recipient(3);
       await page.locator('#contact-email').fill(email);
       await page.getByRole('button', {name: 'Send contact confirmation', exact: true}).click();
@@ -66,7 +80,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await page.goto(origin);
       await page.locator('#account').waitFor({state: 'visible'});
       assert.equal((await page.locator('#identity').textContent()).includes(email), true);
-      assert.equal(await page.locator('#mailbox-actions').isVisible(), false);
+      assert.notEqual(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
       assert.equal(await page.locator('#password-enrollment').isVisible(), false);
       assert.equal(await page.locator('#attach-action').isVisible(), false);
       assert.equal(await page.getByRole('link', {name: 'Recovery options', exact: true}).isVisible(), true);
@@ -80,9 +94,10 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await page.getByRole('button', {name: 'Continue with your passkey', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent === 'Signed in with a passkey.');
       assert.equal(await page.locator('#account-id').textContent(), retainedAccountId);
-      assert.equal(await page.locator('#mailbox-actions').isVisible(), false);
+      assert.notEqual(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
       await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1 &&
-        document.getElementById('providers-state').textContent === 'No connected providers.');
+        document.getElementById('providers-card').dataset.loaded === 'true');
+      await page.waitForFunction(() => document.getElementById('status').textContent === '');
       await page.evaluate(() => document.fonts.ready);
       for (const scheme of ['light', 'dark']) {
         await page.emulateMedia({colorScheme: scheme});

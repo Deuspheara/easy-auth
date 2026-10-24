@@ -27,6 +27,16 @@ Focused-view checks cover password, signup, help and account-ID access, mobile/d
 and enlarged text in both themes, browser back, inert unknown/unavailable view
 queries and direct-inbox rejection. Genuine email flow verifies the check-email
 transition and explicit resend, without fabricated successful responses.
+Account-access coverage uses a genuine mailbox login, observes inventory401,
+checks Cancel sends no logout, creates a key normally and explicitly verifies it
+through account-bound native authentication before inventory200. Aggregate facts
+include the extra genuinely created owner/proven key and authentication event.
+A separate genuine two-tab mailbox flow switches account through real logout and
+SMTP login, then explicitly triggers the return focus event and verifies refresh clears the previous owner’s unfinished
+form, returns to the overview and labels the current session without a duplicate
+revoke action. The pinned headless driver reports both pages focused; the trigger is simulated,
+not native-tab-focus qualification. Cookies, owner/data responses and all sign-in
+operations remain genuine. It seeds no identity/session or successful response.
 The lifecycle scenario uses a separate genuinely authenticated mailbox to respect
 unchanged sensitive admission limits. Delayed requests are forwarded unchanged
 or cancelled by actual navigation; successful server responses are never mocked.

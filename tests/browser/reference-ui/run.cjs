@@ -8,6 +8,8 @@ const {presentation} = require('./presentation.cjs');
 const {screens} = require('./screens.cjs');
 const {mailboxFlow} = require('./mailbox-flow.cjs');
 const {passkeyFlow} = require('./passkey-flow.cjs');
+const {passkeyAccess} = require('./passkey-access.cjs');
+const {accountReturn} = require('./account-return.cjs');
 const {usability} = require('./usability.cjs');
 
 async function main() {
@@ -39,13 +41,15 @@ async function main() {
       } finally { await context.close(); }
       const mailbox = await mailboxFlow(browser, origin, mail, guard);
       const passkeys = await passkeyFlow(browser, origin, mail, guard);
+      const access = await passkeyAccess(browser, origin, mail, guard);
+      const returned = await accountReturn(browser, origin, mail, guard);
       const controls = await usability(browser, origin, mail, guard);
       assert.equal(external, 0, 'no external browser requests');
       assert.equal(pageErrors, 0, 'no uncaught browser errors');
-      return {versions, appearance, focusedViews, mailbox, passkeys, controls, external_requests: external, page_errors: pageErrors};
+      return {versions, appearance, focusedViews, mailbox, passkeys, access, returned, controls, external_requests: external, page_errors: pageErrors};
     });
-    for (const [key, expected] of Object.entries({users: 2, credentials: 1, strong_verified_users: 1,
-      signup_audits: 1, attachment_audits: 1, authentication_audits: 2,
+    for (const [key, expected] of Object.entries({users: 5, credentials: 2, strong_verified_users: 1,
+      signup_audits: 1, attachment_audits: 1, authentication_audits: 3,
       management_renames: 1, management_removals: 1, unproven_remaining_keys: 0,
       invalid_attachment_provenance: 0, attachment_pending: 0, signup_pending: 0})) {
       assert.equal(result.database[key], expected, 'committed UI database invariant: ' + key);
