@@ -70,6 +70,9 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#attach-action').isVisible(), false);
       assert.equal(await page.getByRole('link', {name: 'Recovery options', exact: true}).isVisible(), true);
       assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
+      await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1 &&
+        document.getElementById('providers-state').textContent === 'No connected providers.');
+      await page.evaluate(() => document.fonts.ready);
       for (const scheme of ['light', 'dark']) {
         await page.emulateMedia({colorScheme: scheme});
         for (const width of [320, 1440]) {
