@@ -1,4 +1,4 @@
-//! Trusted embedding input only; no environment activation or key provisioning.
+//! Protected operator key input; no key generation, publication or activation.
 use auth_core::{Error, IssuerSigningKey, Result};
 use std::path::Path;
 use uuid::Uuid;

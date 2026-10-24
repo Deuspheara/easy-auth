@@ -1,7 +1,8 @@
 //! Ordinary owned registration/key input using maintained producers only.
 use super::FixtureResult;
 use auth_core::{
-    IssuerAuthority, IssuerClientRegistration, IssuerKeyPublication, IssuerSigningKey,
+    IssuerAuthority, IssuerClientRegistration, IssuerKeyPublication, IssuerNativeRefreshPolicy,
+    IssuerSigningKey,
 };
 use auth_postgres::Postgres;
 use josekit::{jwk::KeyPair, jws::RS256};
@@ -16,6 +17,7 @@ use zeroize::Zeroizing;
 pub(super) struct Provision {
     pub realm: Uuid,
     pub client: Uuid,
+    pub native_client: Uuid,
     pub key: Uuid,
     pub key_file: PathBuf,
 }
@@ -44,6 +46,7 @@ impl Provision {
         let mut owned = Self {
             realm,
             client: Uuid::nil(),
+            native_client: Uuid::nil(),
             key: key_id,
             key_file,
         };
@@ -70,6 +73,23 @@ impl Provision {
             )?)
             .await?
             .client();
+        let native = store
+            .configure_issuer_client(&IssuerClientRegistration::public_native_refresh_loopback(
+                realm,
+                Uuid::new_v4(),
+                &["http://127.0.0.1/callback"],
+            )?)
+            .await?;
+        let policy = store
+            .configure_issuer_native_refresh_policy(&IssuerNativeRefreshPolicy::new(
+                authority,
+                native.clone(),
+                3600,
+                600,
+            )?)
+            .await?;
+        store.enable_issuer_native_refresh_policy(&policy).await?;
+        owned.native_client = native.client();
         Ok(owned)
     }
 }

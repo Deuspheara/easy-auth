@@ -215,6 +215,7 @@ An owned runner exercises the real executable and configured embedded factory
 with identical settings, PostgreSQL, SMTP, browser consent and separate Node/Rust
 clients. Both check normal production-issued tokens, code replay refusal, bound
 denial with no POST, access/local-session separation, browser privacy and logout,
+exercise the actual SDK native loopback/refresh and post-logout denial,
 then remove owned databases, recipient mail and private files. Real-PG startup
 checks also refuse missing/disabled/foreign/mismatched keys without provisioning.
 Selected-provider contract/realm checks retain the mixed native issuer profile.

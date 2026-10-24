@@ -11,15 +11,17 @@ const owned=require('../oidc/owned-process.cjs');
 const {client}=require('../issuer-web/client.cjs');
 const {mailbox}=require('./mail.cjs');
 const cases=require('./cases.cjs');
+const loopback=require('../issuer-native/listener.cjs');
 const root=path.resolve(__dirname,'../../..');
 async function mode(mode,browser) {
   const directory=fs.mkdtempSync(path.join(os.tmpdir(),'easy-auth-issuer-parity-'));
   fs.chmodSync(directory,0o700);
   const mail=mailbox(process.env.EASY_AUTH_MAILPIT_URL||'http://127.0.0.1:8025');
-  let proxy,fixture,report,failure,removed=false,closed,messages,configuration,emergency=false,stage="tls";
+  let proxy,fixture,report,failure,removed=false,closed,messages,configuration,emergency=false,stage="tls",listener;
   try {
     proxy=await proxyFixture.start(directory);
-    const config={mode,directory,issuer:proxy.origin,address:proxy.address,certificate_der:proxy.certificate_der,
+    listener=await loopback.start();
+    const config={mode,directory,native_listener:new URL(listener.origin).host,issuer:proxy.origin,address:proxy.address,certificate_der:proxy.certificate_der,
       database_name:'easy_auth_oidc_'+crypto.randomUUID().replaceAll('-',''),server_binary:path.join(root,'target/debug/easy-auth')};
     configuration=config;
     stage="fixture-startup";
@@ -28,10 +30,10 @@ async function mode(mode,browser) {
     proxy.connect('http://'+fixture.readyValue.application_address);
     const actor=client(proxy.origin,fs.readFileSync(path.join(directory,'fixture.pem')));
     stage="browser-cases";
-    report=await cases.run(browser,proxy.origin,fixture,actor,mail);
+    report=await cases.run(browser,proxy.origin,fixture,actor,mail,listener);
   } catch(error) {error.stageName ||= stage;failure=error;}
   finally {
-    for(const action of [async()=>{if(fixture)closed=await fixture.close();},async()=>{if(proxy)await proxy.close();},async()=>{messages=await mail.cleanup();}]) {
+    for(const action of [async()=>{if(listener)await listener.close();},async()=>{if(fixture)closed=await fixture.close();},async()=>{if(proxy)await proxy.close();},async()=>{messages=await mail.cleanup();}]) {
       try{await action();}catch(error){failure ||= error;}
     }
     if(configuration&&!removed) {

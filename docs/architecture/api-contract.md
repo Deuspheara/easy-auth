@@ -819,8 +819,8 @@ one-use `OidcClientAuthorization`, finite `OidcClientError`, verified
 `OidcClientCredentials`. `authorize`/`complete` retain private S256/state/nonce
 correlation and verify actual discovery and RS256 tokens. Native `refresh` consumes
 one credential and returns credentials only. These are library contracts, not
-new local HTTP endpoints or session proofs. Configured standalone and parity
-acceptance remain in progress. See [the SDK guide](../guides/oidc-client.md) and
+new local HTTP endpoints or session proofs. Bounded configured standalone/embedded parity and remaining assurance limits
+are documented separately. See [the SDK guide](../guides/oidc-client.md) and
 [ADR0040](adr/0040-independent-oidc-client-and-standalone.md).
 
 ## Explicit configured issuer delivery

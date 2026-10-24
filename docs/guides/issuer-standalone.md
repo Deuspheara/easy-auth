@@ -67,8 +67,10 @@ binary and embedded factory in separate processes with identical trusted setting
 Both perform real SMTP email sign-in and browser confirmation, then independent
 cookie-free HTTPS Node and Rust clients fetch actual discovery/JWKS and verify
 production-issued tokens. Replay, bound denial without POST, access/local-session
-separation, browser privacy and logout are checked in both modes. It checks normal
-child exit, database removal, exact owned mail removal and private-file cleanup.
+separation, browser privacy and logout are checked in both modes. It also sends an SDK native authorization through an actual already-bound
+loopback listener, rotates its credential once and verifies logout refuses another refresh.
+It checks normal fixture-parent exit, database removal, exact owned mail removal
+and private-file cleanup.
 The child is forcibly stopped for fixture teardown; graceful shutdown is not tested.
 
 The unchanged owned TLS transport substitutes only its local address/certificate;

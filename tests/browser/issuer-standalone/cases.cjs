@@ -1,13 +1,13 @@
 'use strict';
 const assert=require('node:assert/strict');
-async function run(browser,origin,fixture,actor,mail) {
+async function run(browser,origin,fixture,actor,mail,listener) {
   const context=await browser.newContext({ignoreHTTPSErrors:true});
   const page=await context.newPage();
   let actualCallback,errors=0,stage="signin";
   page.on('pageerror',()=>{errors++;});
   await context.route('**/*',async route=>{
     const url=new URL(route.request().url());
-    if(url.origin===origin)return route.continue();
+    if(url.origin===origin||url.origin===listener.origin)return route.continue();
     if(url.origin==='https://client.example'&&url.pathname==='/callback') {
       actualCallback=url;
       return route.fulfill({status:200,contentType:'text/html',headers:{'Cache-Control':'no-store'},body:'<!doctype html><title>Owned RP return</title>'});
@@ -60,15 +60,32 @@ async function run(browser,origin,fixture,actor,mail) {
     const denialCallback=await consent(denied.authorization_url,'cancel');
     const result=await fixture.command('complete',{callback:denialCallback.href});
     assert.equal(result.denied,true);assert.equal(result.posts,0);
+    stage='native-sdk';
+    const native=await fixture.command('authorize_native');
+    await page.goto(native.authorization_url);
+    await page.waitForFunction(()=>location.pathname==='/oidc/native/authorize'&&location.search==='');
+    const prepare=page.waitForResponse(r=>new URL(r.url()).pathname==='/v1/oidc/native/consent/prepare');
+    await page.locator('#prepare').click();assert.equal((await prepare).status(),200);
+    await page.locator('#preview').waitFor({state:'visible'});
+    const received=listener.next();
+    await Promise.all([page.waitForURL(url=>url.origin===listener.origin&&url.pathname==='/done'),page.locator('#approve').click()]);
+    const nativeReturn=await received;
+    // Existing listener reports a relative request with a fixed base. Restore
+    // only the actual already-bound listener origin, retaining the received query.
+    const actual=new URL(nativeReturn.pathname+nativeReturn.search,listener.origin);
+    const nativeComplete=await fixture.command('complete',{callback:actual.href});
+    assert.equal(nativeComplete.verified,true);assert.equal(nativeComplete.native,true);assert.equal(nativeComplete.posts,1);
+    const rotated=await fixture.command('refresh');assert.equal(rotated.rotated,true);assert.equal(rotated.posts,1);
     stage='privacy-logout';
     await page.goto(origin+'/');
     assert.equal(await page.evaluate(async ()=>(await fetch('/v1/session')).status),200);
     assert.deepEqual(await page.evaluate(()=>({cookie:document.cookie,local:localStorage.length,session:sessionStorage.length})),{cookie:'',local:0,session:0});
     assert.equal(await post('/v1/logout',{}),204);
     assert.equal(await page.evaluate(async ()=>(await fetch('/v1/session')).status),401);
+    const afterLogout=await fixture.command('refresh');assert.equal(afterLogout.invalid_grant,true);assert.equal(afterLogout.posts,1);
     assert.equal(errors,0);
     return {smtp_signin:true,node_production_token:true,code_replay_rejected:true,access_is_not_local_session:true,
-      sdk_verified:true,bound_denial_without_post:true,browser_privacy:true,logout:true};
+      sdk_verified:true,bound_denial_without_post:true,native_sdk_verified:true,native_rotated:true,logout_blocks_refresh:true,browser_privacy:true,logout:true};
   } catch(error) {error.caseName=stage;throw error;} finally {actualCallback=null;await context.close();}
 }
 module.exports={run};
