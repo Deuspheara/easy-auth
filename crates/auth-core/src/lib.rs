@@ -180,3 +180,11 @@ pub use issuer::{
     IssuerNativeAccessData, IssuerNativeActiveAccess, IssuerNativeConsumerPolicy,
     IssuerNativeIntrospection, IssuerNativeIntrospectionRepository,
 };
+
+#[cfg(feature = "oidc-client")]
+pub use oidc::{
+    OidcClient, OidcClientAuthorization, OidcClientConfiguration, OidcClientError, OidcClientResult,
+};
+
+#[cfg(feature = "oidc-client")]
+pub use oidc::{OidcClientCredential, OidcClientCredentials, OidcClientIdentity, OidcClientTokens};

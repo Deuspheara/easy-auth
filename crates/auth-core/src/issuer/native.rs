@@ -61,3 +61,8 @@ fn without_port(value: &str) -> Result<String> {
     url.set_port(None).map_err(|_| Error::InvalidInput)?;
     Ok(url.into())
 }
+
+#[cfg(feature = "oidc-client")]
+pub(crate) fn validate_native_client_return(value: &str) -> Result<()> {
+    without_port(value).map(|_| ())
+}

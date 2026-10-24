@@ -76,3 +76,6 @@ pub use tokens::{
     IssuerNativeAccessData, IssuerNativeActiveAccess, IssuerNativeConsumerPolicy,
     IssuerNativeIntrospection, IssuerNativeIntrospectionRepository,
 };
+
+#[cfg(feature = "oidc-client")]
+pub(crate) use native::validate_native_client_return;

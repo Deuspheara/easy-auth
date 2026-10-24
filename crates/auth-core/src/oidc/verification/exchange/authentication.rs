@@ -29,7 +29,7 @@ pub enum OidcClientAuthentication {
     ClientSecretPost(OidcClientSecret),
 }
 impl OidcClientAuthentication {
-    pub(super) fn method(&self) -> &'static str {
+    pub(in crate::oidc) fn method(&self) -> &'static str {
         match self {
             Self::Public => "none",
             Self::ClientSecretBasic(_) => "client_secret_basic",

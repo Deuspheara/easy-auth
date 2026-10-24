@@ -39,3 +39,13 @@ pub use verification::{
     OidcTokenRequest, OidcTokenResponse, OidcTokenVerifier, OidcVerificationPolicy,
     VerifiedOidcIdentity,
 };
+
+#[cfg(feature = "oidc-client")]
+pub use verification::{
+    OidcClient, OidcClientAuthorization, OidcClientConfiguration, OidcClientError, OidcClientResult,
+};
+
+#[cfg(feature = "oidc-client")]
+pub use verification::{
+    OidcClientCredential, OidcClientCredentials, OidcClientIdentity, OidcClientTokens,
+};

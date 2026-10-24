@@ -810,3 +810,15 @@ shape, native aud/client_id and openid offline_access scope. Invalid credentials
 unknown/foreign/inactive/unauthorized only active=false; storage faults503.
 See [ADR0039](adr/0039-native-introspection-consumers.md) and the
 [native guide](../guides/issuer-native.md) for ordering and lifetime semantics.
+
+## Independent Rust relying-party client
+
+The optional core `oidc-client` API exposes `OidcClientConfiguration`, `OidcClient`,
+one-use `OidcClientAuthorization`, finite `OidcClientError`, verified
+`OidcClientIdentity`, `OidcClientTokens` and opaque `OidcClientCredential`/
+`OidcClientCredentials`. `authorize`/`complete` retain private S256/state/nonce
+correlation and verify actual discovery and RS256 tokens. Native `refresh` consumes
+one credential and returns credentials only. These are library contracts, not
+new local HTTP endpoints or session proofs. Configured standalone and parity
+acceptance remain in progress. See [the SDK guide](../guides/oidc-client.md) and
+[ADR0040](adr/0040-independent-oidc-client-and-standalone.md).

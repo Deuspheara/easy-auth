@@ -1135,3 +1135,15 @@ All new modules remain below300lines. Longer ordered transaction/scenario functi
 keep current credentials, locks, original caps, waits, final clock and valid controls
 visible together as size-review exceptions. No speculative abstraction, new crate,
 public proof constructor, duplicated policy or unrelated cleanup is deferred.
+
+The independent core RP client lives in `oidc/verification/client/`: immutable
+configuration, private pending state, callback admission, authorization/completion,
+finite errors, opaque credentials, bounded wire responses and native rotation have
+separate responsibilities. The existing concrete signature worker, validated claim
+context, document retrieval and token wire primitives were extracted in preceding
+behavior-preserving commits. The public document facade still requires current
+provider configuration; only the private SDK context uses immutable RP settings.
+Named client tests reuse the existing normal signer and transport producer. No new
+crate, crypto implementation, proof constructor or runtime dependency is added.
+New modules remain below300lines; ordered completion/claim scenarios keep their
+security sequence visible as function-size exceptions. Standalone work is separate.

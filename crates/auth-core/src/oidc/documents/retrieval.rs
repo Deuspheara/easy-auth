@@ -132,7 +132,7 @@ impl DocumentRetrieval {
         let response = self.fetch(self.policy.discovery_url()?).await?;
         let received = Instant::now();
         let age = response.cache_seconds.min(MAX_CACHE_SECONDS);
-        let value = metadata::discovery(response, context.configuration(), &self.policy)?;
+        let value = context.decode(response, &self.policy)?;
         context.check().await?;
         cache.cached = Some(DiscoveryCache {
             expires: received + Duration::from_secs(age),

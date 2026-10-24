@@ -316,3 +316,14 @@ owner/session/raw credential projection. Its audience remains the native client,
 separate from the authenticated consumer. No cookie, local session, authentication
 time or application permission is created. Optional transport is described in
 [ADR0039](adr/0039-native-introspection-consumers.md).
+
+## Independent relying-party state
+
+`OidcClientAuthorization` owns a single private state/nonce/S256 operation, bound to
+an immutable service instance, exact return and original monotonic/wall-clock caps.
+It is consumed even on denial or an ambiguous code exchange. `OidcClientIdentity`
+is verified pairwise RP metadata with its own expiry, never an `OAuthExchange`,
+provider completion identity, local session or business permission. Native rotation
+returns only opaque access/refresh credentials and conservative expiries; it cannot
+renew that identity or manufacture authentication time. Credential exposure/storage
+is a distinct trusted application boundary. See [ADR0040](adr/0040-independent-oidc-client-and-standalone.md).

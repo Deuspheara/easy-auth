@@ -877,3 +877,19 @@ success. Active claims expose only pairwise metadata to the explicitly authorize
 consumer; inactive responses disclose no reason. Native audience metadata never
 becomes a local identity/session or application business permission. ADR0039 records
 the explicit endpoint, scope and limits.
+
+## Independent relying-party SDK boundary
+
+The optional `oidc-client` operation requires exact trusted issuer/client/return,
+S256, private state/nonce and response issuer before a one-attempt code exchange.
+Strict callback encoding/duplicates/fixed query, originating service identity and
+wall-clock plus monotonic deadlines prevent ambiguous or stale callbacks from
+selecting a token request. Shared bounded discovery/JWKS and RS256 claim validation
+produce only RP metadata, with no public local-session/provider-proof conversion.
+Native refresh consumes the presented generation, makes one POST and returns no new
+identity or authentication time. Applications must atomically replace generations
+in protected per-user storage and restart authorization after ambiguous outcomes;
+Rust ownership cannot stop deliberately copying an exposed secret. The trusted HTTP
+ports must use the existing reviewed HTTPS/DNS restrictions and shared budget;
+there is no production private-address or local-CA fallback. Local client/standalone
+parity and independent assurance remain separate acceptance gates. See ADR0040.

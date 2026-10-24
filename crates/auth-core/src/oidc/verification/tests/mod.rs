@@ -12,3 +12,6 @@ mod workers;
 
 #[cfg(feature = "oidc-identities")]
 mod persisted_policy;
+
+#[cfg(feature = "oidc-client")]
+mod client;

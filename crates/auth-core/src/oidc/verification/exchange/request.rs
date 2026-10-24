@@ -16,7 +16,7 @@ const RESERVED_TOKEN_PARAMETERS: &[&str] = &[
     "client_assertion_type",
 ];
 
-pub(super) fn validate_endpoint(url: &url::Url) -> Result<()> {
+pub(in crate::oidc) fn validate_endpoint(url: &url::Url) -> Result<()> {
     if url.query_pairs().any(|(key, _)| {
         key.chars().any(char::is_control)
             || RESERVED_TOKEN_PARAMETERS.contains(&key.to_ascii_lowercase().as_str())
@@ -69,6 +69,18 @@ impl OidcTokenRequest {
             authentication,
         )
     }
+    #[cfg(feature = "oidc-client")]
+    pub(in crate::oidc) fn refresh(client: &str, token: &str) -> Self {
+        let mut form = url::form_urlencoded::Serializer::new(String::new());
+        form.append_pair("grant_type", "refresh_token")
+            .append_pair("client_id", client)
+            .append_pair("refresh_token", token);
+        Self {
+            form: Zeroizing::new(form.finish()),
+            authorization: None,
+        }
+    }
+
     pub(in crate::oidc) fn for_client(
         client: &str,
         redirect: &str,

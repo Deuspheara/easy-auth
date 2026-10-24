@@ -4,7 +4,7 @@ mod retrieval;
 use super::OidcTarget;
 use super::{OidcConnectionRepository, OidcDiscovery, OidcHttp, OidcJwksDocument, policy::Policy};
 use crate::{OAuthConnection, Result};
-use context::DocumentContext;
+pub(super) use context::DocumentContext;
 pub(super) use retrieval::DocumentRetrieval;
 use std::sync::Arc;
 #[cfg(feature = "oidc-verification")]
