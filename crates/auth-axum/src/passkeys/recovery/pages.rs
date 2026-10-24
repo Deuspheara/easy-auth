@@ -16,7 +16,7 @@ pub(super) fn routes() -> Router<RecoveryState> {
             get(|| async {
                 (
                     [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
-                    include_str!("../../pages/recovery/shared.js"),
+                    include_str!("../../pages/browser-operations.js"),
                 )
             }),
         )

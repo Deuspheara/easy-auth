@@ -2,7 +2,21 @@ use crate::router::AppState;
 use axum::{Router, http::header, response::Html, routing::get};
 
 pub(crate) fn routes() -> Router<AppState> {
-    authentication_pages().merge(account_pages())
+    authentication_pages()
+        .merge(account_pages())
+        .merge(browser_operations())
+}
+
+fn browser_operations() -> Router<AppState> {
+    Router::new().route(
+        "/ui/browser-operations.js",
+        get(|| async {
+            (
+                [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
+                include_str!("browser-operations.js"),
+            )
+        }),
+    )
 }
 
 fn authentication_pages() -> Router<AppState> {
