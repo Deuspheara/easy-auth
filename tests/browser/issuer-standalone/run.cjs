@@ -28,7 +28,12 @@ async function mode(mode,browser) {
     fixture=owned.start(path.join(root,'target/debug/examples/issuer-client-acceptance'),config,root,{observe(value){if(value.database_removed)removed=true;if(value.phase)stage=value.phase;}});
     fixture.readyValue=await fixture.ready;
     proxy.connect('http://'+fixture.readyValue.application_address);
-    const actor=client(proxy.origin,fs.readFileSync(path.join(directory,'fixture.pem')));
+    fixture.createClient=()=>client(proxy.origin,fs.readFileSync(path.join(directory,'fixture.pem')));
+    fixture.activateRotation=async()=>{
+      const response=await fixture.command('activate_rotation');
+      proxy.connect('http://'+response.application_address);
+    };
+    const actor=fixture.createClient();
     stage="browser-cases";
     report=await cases.run(browser,proxy.origin,fixture,actor,mail,listener);
   } catch(error) {error.stageName ||= stage;failure=error;}
@@ -43,7 +48,7 @@ async function mode(mode,browser) {
     fs.rmSync(directory,{recursive:true,force:true});
   }
   if(failure)throw failure;
-  assert.deepEqual(closed,{diagnostics:false,exit:0});assert.equal(removed,true);assert.equal(emergency,false);assert.equal(messages,1);
+  assert.deepEqual(closed,{diagnostics:false,exit:0});assert.equal(removed,true);assert.equal(emergency,false);assert.equal(messages,2);
   return {behavior:report,database_removed:removed,mail_removed:true,private_files_removed:true};
 }
 async function main() {

@@ -223,3 +223,9 @@ Selected-provider contract/realm checks retain the mixed native issuer profile.
 [ADR0040](../architecture/adr/0040-independent-oidc-client-and-standalone.md) separate
 bounded acceptance from broader assurance. Hosted CI and final verification receipts
 are recorded per exact commit; this prose is not certification or production approval.
+
+The owned issuer suite also verifies one ordinary operator-directed rollover in
+both modes after the actual prepublication interval and genuine new sign-in.
+Independent Node and Rust clients verify before/after; retained old-key overlap
+and wrong trusted audience expectation use unchanged normal production tokens.
+This closes that local M07 evidence gap without timing shortcuts or crypto fixtures.

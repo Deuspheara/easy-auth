@@ -84,3 +84,29 @@ SDK metadata cannot become a local session or provider completion proof. Applica
 sessions, authorization, protected per-user storage, operator rollover and broader
 production/assurance requirements remain separate. SAML independent review remains
 waived under ADR0032, not performed; these results do not alter that distinction.
+
+## Independent ordinary rollover extension
+
+A final M07 parent audit identified that initial independent key verification did
+not itself prove client interoperability through rotation. The existing normal
+key/file owner was extracted in separate verified commit `40a5c7d`; its original
+executable/embedded parity and isolated strict Clippy passed before extension.
+
+The extended actual suite now passes both executable and embedded modes with the
+same 15 behavior facts, including ordinary rollover, retained old-key overlap,
+independent wrong-audience rejection and SDK verification on both sides of rotation.
+It prepublishes one replacement through existing operator APIs, waits the actual
+300-second policy plus one second in each mode, genuinely reauthenticates and only
+then obtains healthy old-key tokens. Explicit activation and restart load the exact
+new protected key; both old and new normal signatures verify against current public
+JWKS while still unexpired. A different trusted audience expectation is rejected
+against unchanged ordinary bytes. No custom/adversarial cryptographic fixture,
+timestamp rewriting, policy bypass or signature-concurrency experiment is used.
+
+Both modes remove their owned databases, two exact recipient messages per mode and
+private TLS/key files. Strict default/all-feature all-target workspace Clippy and
+formatting pass on the extension. Runtime implementation and dependencies are
+unchanged from the previously verified baseline; the 118default/1009all-feature
+workspace evidence above is not relabeled as a rerun of these added browser cases.
+The final exact-commit hosted workflow reruns its full gates and extended suite.
+Hosted completion must still be checked before ticket/milestone closure.

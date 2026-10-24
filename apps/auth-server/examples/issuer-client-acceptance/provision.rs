@@ -5,7 +5,7 @@ use auth_core::{
 };
 use auth_postgres::Postgres;
 use sqlx::PgPool;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
 pub(super) struct Provision {
@@ -13,6 +13,10 @@ pub(super) struct Provision {
     pub client: Uuid,
     pub native_client: Uuid,
     pub signing: OperatorKey,
+    authority: IssuerAuthority,
+    directory: PathBuf,
+    replacement: Option<OperatorKey>,
+    retained: Vec<OperatorKey>,
 }
 impl Provision {
     pub async fn new(pool: &PgPool, origin: &str, directory: &Path) -> FixtureResult<Self> {
@@ -27,6 +31,10 @@ impl Provision {
             client: Uuid::nil(),
             native_client: Uuid::nil(),
             signing,
+            authority: authority.clone(),
+            directory: directory.into(),
+            replacement: None,
+            retained: Vec::new(),
         };
         let now: i64 =
             sqlx::query_scalar("SELECT (extract(epoch FROM clock_timestamp())*1000000)::bigint")
@@ -71,5 +79,43 @@ impl Provision {
         store.enable_issuer_native_refresh_policy(&policy).await?;
         owned.native_client = native.client();
         Ok(owned)
+    }
+    pub async fn publish_rotation(&mut self, pool: &PgPool) -> FixtureResult<u32> {
+        if self.replacement.is_some() || !self.retained.is_empty() {
+            return Err("one ordinary owned rollover only".into());
+        }
+        let store = Postgres::new(pool.clone());
+        let current = store.load_issuer_signing(&self.authority).await?;
+        let key = OperatorKey::new(&self.directory)?;
+        let old = current.publication();
+        store
+            .publish_issuer_key(&IssuerKeyPublication::new(
+                self.authority.clone(),
+                key.key.public_key()?,
+                old.sign_from_us(),
+                old.sign_until_us(),
+                old.verify_until_us(),
+            )?)
+            .await?;
+        self.replacement = Some(key);
+        // The caller waits the actual unchanged policy interval. Neither this
+        // fixture nor production accepts a caller-selected ready_at/clock.
+        Ok(auth_core::ISSUER_KEY_PROPAGATION_SECONDS as u32)
+    }
+    pub async fn activate_rotation(&mut self, pool: &PgPool) -> FixtureResult<()> {
+        let next = self
+            .replacement
+            .as_ref()
+            .ok_or("owned prepublished key required")?;
+        Postgres::new(pool.clone())
+            .activate_issuer_key(&self.authority, next.key.id())
+            .await?;
+        let next = self
+            .replacement
+            .take()
+            .ok_or("owned prepublished key required")?;
+        self.retained
+            .push(std::mem::replace(&mut self.signing, next));
+        Ok(())
     }
 }

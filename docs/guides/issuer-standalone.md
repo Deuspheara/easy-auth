@@ -62,7 +62,7 @@ node tests/browser/issuer-standalone/run.cjs
 ```
 
 Supply the normal local `DATABASE_URL` privately. The runner creates a random owned
-database, ordinary ephemeral operator key and private TLS files. It runs the actual
+database, ordinary ephemeral operator keys and private TLS files. It runs the actual
 binary and embedded factory in separate processes with identical trusted settings.
 Both perform real SMTP email sign-in and browser confirmation, then independent
 cookie-free HTTPS Node and Rust clients fetch actual discovery/JWKS and verify
@@ -71,6 +71,15 @@ separation, browser privacy and logout are checked in both modes. It also sends 
 loopback listener, rotates its credential once and verifies logout refuses another refresh.
 It checks normal fixture-parent exit, database removal, exact owned mail removal
 and private-file cleanup.
+The same suite prepublishes one ordinary replacement key, waits the unchanged
+300-second policy plus a one-second margin in each mode, and genuinely signs in
+again. It issues and verifies healthy tokens before and after explicit activation
+and restart with the exact protected replacement file. Independent Node verification
+checks retained overlap and rejects a different trusted audience expectation against
+the unchanged healthy token. The same Rust client verifies both sides of rotation.
+No pending operation spans the wait and no ready-at/authentication timestamp is
+rewritten. The two-mode suite therefore takes at least ten minutes.
+
 The child is forcibly stopped for fixture teardown; graceful shutdown is not tested.
 
 The unchanged owned TLS transport substitutes only its local address/certificate;

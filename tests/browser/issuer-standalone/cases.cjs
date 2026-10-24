@@ -1,5 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict');
+const rollover=require('./rollover.cjs');
 async function run(browser,origin,fixture,actor,mail,listener) {
   const context=await browser.newContext({ignoreHTTPSErrors:true});
   const page=await context.newPage();
@@ -27,6 +28,8 @@ async function run(browser,origin,fixture,actor,mail,listener) {
     assert.equal(Boolean(actualCallback),true);return actualCallback;
   }
   try {
+    const plan=await fixture.command('publish_rotation');
+    plan.observed=performance.now();
     await page.goto(origin+'/');
     assert.equal(await post('/v1/email/start',{email:mail.address}),202);
     let token=await mail.proof(origin);
@@ -83,9 +86,11 @@ async function run(browser,origin,fixture,actor,mail,listener) {
     assert.equal(await post('/v1/logout',{}),204);
     assert.equal(await page.evaluate(async ()=>(await fetch('/v1/session')).status),401);
     const afterLogout=await fixture.command('refresh');assert.equal(afterLogout.invalid_grant,true);assert.equal(afterLogout.posts,1);
+    stage='ordinary-key-rollover';
+    const rolloverFacts=await rollover.run({origin,fixture,mail,page,post,consent,plan});
     assert.equal(errors,0);
     return {smtp_signin:true,node_production_token:true,code_replay_rejected:true,access_is_not_local_session:true,
-      sdk_verified:true,bound_denial_without_post:true,native_sdk_verified:true,native_rotated:true,logout_blocks_refresh:true,browser_privacy:true,logout:true};
+      sdk_verified:true,bound_denial_without_post:true,native_sdk_verified:true,native_rotated:true,logout_blocks_refresh:true,browser_privacy:true,logout:true,...rolloverFacts};
   } catch(error) {error.caseName=stage;throw error;} finally {actualCallback=null;await context.close();}
 }
 module.exports={run};

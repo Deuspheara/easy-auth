@@ -1157,3 +1157,12 @@ provisioning, process lifetime and SDK IPC, reusing existing database/TLS/HTTP a
 normal maintained key producers. New modules remain under300lines. Longer ordered
 startup/fixture/test scenarios retain resource ownership and invariant sequence as
 function-size exceptions; no unrelated cleanup is deferred.
+
+Owned issuer rollover acceptance keeps the unchanged maintained key producer and
+protected-file lifetime in `issuer-client-acceptance/key_input.rs`, extracted and
+verified separately. Provisioning owns the single prepublished replacement and
+retained file; process dispatch owns explicit restart, client operations own no
+administration, and `issuer-standalone/rollover.cjs` owns the sequential independent
+before/after checks. All remain bounded test-only modules under300lines, with no
+production configuration or crypto change. The actual policy interval and genuine
+reauthentication stay visible; no SQL clock/ready-at rewriting is introduced.

@@ -19,7 +19,7 @@ function mailbox(base) {
       const deadline=Date.now()+10000;
       while(Date.now()<deadline) {
         for(const summary of await messages()) {
-          if(summary.Subject!=='Your sign-in link')continue;
+          if(summary.Subject!=='Your sign-in link'||ids.has(summary.ID))continue;
           ids.add(summary.ID);
           const message=await (await request('/api/v1/message/'+encodeURIComponent(summary.ID))).json();
           assert.equal(message.To.length===1&&message.To[0].Address===address,true);
