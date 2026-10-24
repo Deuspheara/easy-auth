@@ -82,9 +82,23 @@ pub(super) fn discovery(
     connection: &OAuthConnection,
     policy: &Policy,
 ) -> Result<OidcDiscovery> {
+    discovery_expected(
+        response,
+        connection.issuer(),
+        connection.defense() == OAuthMixupDefense::RequireIssuer,
+        policy,
+    )
+}
+
+pub(super) fn discovery_expected(
+    response: OidcHttpResponse,
+    issuer: &str,
+    require_response_issuer: bool,
+    policy: &Policy,
+) -> Result<OidcDiscovery> {
     check_response(&response, false)?;
     let wire: Discovery = serde_json::from_slice(&response.body).map_err(|_| Error::Unavailable)?;
-    if wire.issuer != connection.issuer()
+    if wire.issuer != issuer
         || wire.code_challenge_methods_supported.len() > MAX_PKCE_METHODS
         || wire
             .code_challenge_methods_supported
@@ -97,8 +111,7 @@ pub(super) fn discovery(
             .any(|method| {
                 method.len() > MAX_PKCE_METHOD_BYTES || method.chars().any(char::is_control)
             })
-        || (connection.defense() == OAuthMixupDefense::RequireIssuer
-            && !wire.authorization_response_iss_parameter_supported)
+        || (require_response_issuer && !wire.authorization_response_iss_parameter_supported)
     {
         return Err(Error::Unavailable);
     }

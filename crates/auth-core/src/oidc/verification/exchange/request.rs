@@ -1,5 +1,5 @@
 use super::OidcClientAuthentication;
-use crate::{Error, OAuthExchange, Result};
+use crate::{Error, OAuthExchange, Result, Secret};
 use base64::{Engine, engine::general_purpose::STANDARD};
 use std::fmt;
 use zeroize::Zeroizing;
@@ -61,12 +61,26 @@ impl OidcTokenRequest {
         code: OidcAuthorizationCode,
         authentication: &OidcClientAuthentication,
     ) -> Self {
-        let client = exchange.configuration().provider_client();
+        Self::for_client(
+            exchange.configuration().provider_client(),
+            exchange.redirect(),
+            exchange.proof().pkce_verifier(),
+            code,
+            authentication,
+        )
+    }
+    pub(in crate::oidc) fn for_client(
+        client: &str,
+        redirect: &str,
+        pkce: &Secret,
+        code: OidcAuthorizationCode,
+        authentication: &OidcClientAuthentication,
+    ) -> Self {
         let mut form = url::form_urlencoded::Serializer::new(String::new());
         form.append_pair("grant_type", "authorization_code")
             .append_pair("code", &code.0)
-            .append_pair("redirect_uri", exchange.redirect())
-            .append_pair("code_verifier", exchange.proof().pkce_verifier().expose());
+            .append_pair("redirect_uri", redirect)
+            .append_pair("code_verifier", pkce.expose());
         let authorization = match authentication {
             OidcClientAuthentication::Public => {
                 form.append_pair("client_id", client);
