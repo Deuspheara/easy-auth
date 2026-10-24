@@ -1,9 +1,10 @@
-use super::{
-    OIDC_FETCH_TIMEOUT, OidcConnectionRepository, OidcDiscovery, OidcHttp, OidcHttpResponse,
-    OidcJwksDocument, OidcTarget, metadata,
+use super::context::DocumentContext;
+use crate::oidc::{
+    OIDC_FETCH_TIMEOUT, OidcDiscovery, OidcHttp, OidcHttpResponse, OidcJwksDocument, OidcTarget,
+    metadata,
     policy::{Policy, literal},
 };
-use crate::{Error, OAuthConnection, Result};
+use crate::{Error, Result};
 use std::{net::SocketAddr, sync::Arc, time::Duration};
 use tokio::{sync::Mutex, time::Instant};
 use url::Url;
@@ -36,51 +37,37 @@ struct KeysSlot {
 
 /// One immutable realm/connection/client/revision and two bounded cache slots.
 /// No caller-supplied URL, token `jku`, provider identity or session is accepted.
-pub struct OidcDocuments {
-    connection: OAuthConnection,
+pub(in crate::oidc) struct DocumentRetrieval {
     policy: Policy,
-    repository: Arc<dyn OidcConnectionRepository>,
     http: Arc<dyn OidcHttp>,
     discovery: Mutex<DiscoverySlot>,
     keys: Mutex<KeysSlot>,
 }
 
-impl OidcDocuments {
-    /// Validate trusted URL/egress metadata before provisioning or allocating
-    /// services. This performs no I/O and establishes no current authority.
-    pub fn validate_configuration(connection: &OAuthConnection, origins: &[&str]) -> Result<()> {
-        Policy::new(connection, origins).map(|_| ())
-    }
-    #[cfg(feature = "oidc-verification")]
-    pub(super) fn connection(&self) -> &OAuthConnection {
-        &self.connection
-    }
-
-    pub fn new(
-        connection: OAuthConnection,
-        origins: &[&str],
-        repository: Arc<dyn OidcConnectionRepository>,
-        http: Arc<dyn OidcHttp>,
-    ) -> Result<Self> {
-        let policy = Policy::new(&connection, origins)?;
-        Ok(Self {
-            connection,
+impl DocumentRetrieval {
+    pub(in crate::oidc) fn new(policy: Policy, http: Arc<dyn OidcHttp>) -> Self {
+        Self {
             policy,
-            repository,
             http,
             discovery: Mutex::new(DiscoverySlot::default()),
             keys: Mutex::new(KeysSlot::default()),
-        })
+        }
     }
 
-    pub async fn discovery(&self) -> Result<OidcDiscovery> {
-        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_discovery())
+    pub(in crate::oidc) async fn discovery(
+        &self,
+        context: DocumentContext<'_>,
+    ) -> Result<OidcDiscovery> {
+        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_discovery(context))
             .await
             .map_err(|_| Error::Unavailable)?
     }
 
     #[cfg(feature = "oidc-verification")]
-    pub(super) async fn discovery_when_admitted(&self) -> Result<OidcDiscovery> {
+    pub(in crate::oidc) async fn discovery_when_admitted(
+        &self,
+        context: DocumentContext<'_>,
+    ) -> Result<OidcDiscovery> {
         let delay = {
             let cache = self.discovery.try_lock().map_err(|_| Error::RateLimited)?;
             let now = Instant::now();
@@ -102,13 +89,16 @@ impl OidcDocuments {
         if !delay.is_zero() {
             tokio::time::sleep(delay).await;
         }
-        self.discovery().await
+        self.discovery(context).await
     }
 
     /// Raw bounded envelope for a future reviewed JOSE verifier. These bytes do
     /// not establish a trusted key, signature, algorithm, claim or authentication.
-    pub async fn jwks(&self) -> Result<OidcJwksDocument> {
-        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys(None))
+    pub(in crate::oidc) async fn jwks(
+        &self,
+        context: DocumentContext<'_>,
+    ) -> Result<OidcJwksDocument> {
+        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys(context, None))
             .await
             .map_err(|_| Error::Unavailable)?
     }
@@ -116,16 +106,18 @@ impl OidcDocuments {
     /// Request a bounded refresh after a verifier found an unknown key ID in this
     /// exact snapshot. A newer cached snapshot is reused without another fetch.
     /// This operation verifies no signature or claim and never authenticates.
-    pub async fn refresh_jwks(&self, observed: &OidcJwksDocument) -> Result<OidcJwksDocument> {
-        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys(Some(observed)))
+    pub(in crate::oidc) async fn refresh_jwks(
+        &self,
+        context: DocumentContext<'_>,
+        observed: &OidcJwksDocument,
+    ) -> Result<OidcJwksDocument> {
+        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys(context, Some(observed)))
             .await
             .map_err(|_| Error::Unavailable)?
     }
 
-    async fn load_discovery(&self) -> Result<OidcDiscovery> {
-        self.repository
-            .check_oidc_connection(&self.connection)
-            .await?;
+    async fn load_discovery(&self, context: DocumentContext<'_>) -> Result<OidcDiscovery> {
+        context.check().await?;
         // A fetch owns only this in-memory slot, never a database lock. Contenders
         // fail promptly rather than queue unbounded requests behind network I/O.
         let mut cache = self.discovery.try_lock().map_err(|_| Error::RateLimited)?;
@@ -140,10 +132,8 @@ impl OidcDocuments {
         let response = self.fetch(self.policy.discovery_url()?).await?;
         let received = Instant::now();
         let age = response.cache_seconds.min(MAX_CACHE_SECONDS);
-        let value = metadata::discovery(response, &self.connection, &self.policy)?;
-        self.repository
-            .check_oidc_connection(&self.connection)
-            .await?;
+        let value = metadata::discovery(response, context.configuration(), &self.policy)?;
+        context.check().await?;
         cache.cached = Some(DiscoveryCache {
             expires: received + Duration::from_secs(age),
             value: value.clone(),
@@ -151,25 +141,34 @@ impl OidcDocuments {
         Ok(value)
     }
 
-    async fn load_keys(&self, observed: Option<&OidcJwksDocument>) -> Result<OidcJwksDocument> {
-        let discovery = self.load_discovery().await?;
-        self.load_keys_from(&discovery, observed).await
+    async fn load_keys(
+        &self,
+        context: DocumentContext<'_>,
+        observed: Option<&OidcJwksDocument>,
+    ) -> Result<OidcJwksDocument> {
+        let discovery = self.load_discovery(context).await?;
+        self.load_keys_from(context, &discovery, observed).await
     }
 
     #[cfg(feature = "oidc-verification")]
-    pub(super) async fn keys_from_discovery(
+    pub(in crate::oidc) async fn keys_from_discovery(
         &self,
+        context: DocumentContext<'_>,
         discovery: &OidcDiscovery,
         observed: Option<&OidcJwksDocument>,
     ) -> Result<OidcJwksDocument> {
-        tokio::time::timeout(OIDC_FETCH_TIMEOUT, self.load_keys_from(discovery, observed))
-            .await
-            .map_err(|_| Error::Unavailable)?
+        tokio::time::timeout(
+            OIDC_FETCH_TIMEOUT,
+            self.load_keys_from(context, discovery, observed),
+        )
+        .await
+        .map_err(|_| Error::Unavailable)?
     }
 
     #[cfg(feature = "oidc-verification")]
-    pub(super) async fn keys_when_admitted(
+    pub(in crate::oidc) async fn keys_when_admitted(
         &self,
+        context: DocumentContext<'_>,
         discovery: &OidcDiscovery,
     ) -> Result<OidcJwksDocument> {
         let delay =
@@ -191,17 +190,16 @@ impl OidcDocuments {
         }
         // First ordinary key fetch only. Unknown-kid refresh still uses prompt
         // admission and its independent fixed forced-refresh budget.
-        self.keys_from_discovery(discovery, None).await
+        self.keys_from_discovery(context, discovery, None).await
     }
 
     async fn load_keys_from(
         &self,
+        context: DocumentContext<'_>,
         discovery: &OidcDiscovery,
         observed: Option<&OidcJwksDocument>,
     ) -> Result<OidcJwksDocument> {
-        self.repository
-            .check_oidc_connection(&self.connection)
-            .await?;
+        context.check().await?;
         let mut cache = self.keys.try_lock().map_err(|_| Error::RateLimited)?;
         if let Some(cached) = cache
             .cached
@@ -230,9 +228,7 @@ impl OidcDocuments {
         let received = Instant::now();
         let age = response.cache_seconds.min(MAX_CACHE_SECONDS);
         let value = metadata::jwks(response)?;
-        self.repository
-            .check_oidc_connection(&self.connection)
-            .await?;
+        context.check().await?;
         cache.cached = Some(KeysCache {
             expires: received + Duration::from_secs(age),
             url: discovery.jwks_uri().to_owned(),
@@ -246,7 +242,7 @@ impl OidcDocuments {
         self.http.get(&target).await
     }
 
-    pub(super) async fn resolve_target(&self, url: Url) -> Result<OidcTarget> {
+    pub(in crate::oidc) async fn resolve_target(&self, url: Url) -> Result<OidcTarget> {
         let port = url.port_or_known_default().ok_or(Error::Unavailable)?;
         let addresses = if let Some(ip) = literal(&url) {
             vec![SocketAddr::new(ip, port)]
