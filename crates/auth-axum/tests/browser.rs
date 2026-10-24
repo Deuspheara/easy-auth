@@ -10,6 +10,8 @@ mod contract;
 mod email;
 #[path = "browser/passwords.rs"]
 mod passwords;
+#[path = "browser/providers.rs"]
+mod providers;
 #[path = "browser/recovery.rs"]
 mod recovery;
 

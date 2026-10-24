@@ -1,5 +1,18 @@
 # Code organization
 
+Reference account inventory keeps public projection/cursor types in core
+`providers.rs` and the use case in `auth/providers.rs`. PostgreSQL
+`sessions/linked_providers.rs` owns the source-aware caller transaction and fixed
+owner/realm query; the transaction visibly retains final deadline/commit. Axum
+`handlers/providers.rs` owns only closed query/response DTOs and delegation.
+No identity grant, linking framework, new crate, dependency or schema is added.
+Real-PG tests separate paging/isolation, observed revocation and fault rollback;
+existing normal provider fixtures verify actual source-bound sessions. Reusable
+trusted metadata setup and the single existing lock observer stay in test support.
+Inventory implementation files remain below 110 lines. Longer ordered HTTP privacy
+and compound-cursor scenarios keep genuine setup, observations and positive/
+negative controls together as test-function size exceptions. No cleanup is deferred.
+
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.

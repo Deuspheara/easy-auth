@@ -1,5 +1,16 @@
 # Threat model — alpha design, before credential flows
 
+The read-only linked-provider inventory in [ADR0041](../architecture/adr/0041-linked-provider-inventory.md)
+uses the existing source-aware active-caller transaction and configured realm.
+Only the locked owner's public identity UUID, protocol and immutable issuer are
+projected; subjects, provider claims, email, credentials and verifiers stay private.
+The protocol-plus-UUID cursor cannot select another owner or realm. Metadata does
+not establish current trust, enable a source, link identities or grant a fallback.
+Final retained-session deadline checks and rollback remain mandatory after the
+read; current source disable/revocation rejects old caller proof. UI output must
+use text, with no issuer-derived navigation or HTML. Public password-service
+presence is composition metadata, never permission to use a weaker method.
+
 Current SAML activation policy: [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.

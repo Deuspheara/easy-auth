@@ -6,7 +6,25 @@ trusted persisted configuration and every protocol/security check remain require
 Earlier source-disabled stage descriptions below are superseded only as to
 activation policy; their assurance gaps remain unverified, not independently approved.
 
+## Linked-provider inventory
 
+GET `/v1/account/providers` validates the normal current session and returns
+`{providers:[{id,kind,issuer}],next:{kind,id}|null}`. Each page contains at most 50
+records ordered by `kind` (`oidc` before `saml`) then UUID. Continue with both
+`after_kind` and `after_id` from `next`, or omit both. Unknown/duplicate fields,
+unsupported kinds and partial/malformed cursors return 400. Missing, duplicated,
+expired, revoked or current-source-invalid session proof returns 401. Storage
+unavailability remains 503; the normal boundary timeout remains 504.
+
+No request field selects a realm, user or provider source. Subjects, claims,
+email, credentials and verifier material are excluded. Issuer metadata describes
+the linked identity; it is neither current enabled/trusted status nor permission
+to sign in, link, unlink or delete. The response uses the existing no-store,
+no-referrer and browser security headers. See
+[ADR0041](adr/0041-linked-provider-inventory.md). Existing repository adapters
+without this optional read return Unavailable rather than an invented empty list.
+
+## Existing authentication contracts
 The opt-in core/PostgreSQL `saml-requests` Rust component adds no HTTP route or
 OpenAPI operation. `SamlRegistration::unsigned_redirect` selects the explicit
 outgoing profile; `SamlTransactions::start` persists browser-bound request state

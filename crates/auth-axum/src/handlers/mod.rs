@@ -2,6 +2,7 @@ pub(crate) mod account;
 pub(crate) mod email;
 pub(crate) mod health;
 pub(crate) mod passwords;
+pub(crate) mod providers;
 pub(crate) mod recovery;
 pub(crate) mod sessions;
 

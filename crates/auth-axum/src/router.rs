@@ -45,6 +45,10 @@ pub(crate) fn configured_router(
         .route("/v1/account/delete/start", post(start_account_deletion))
         .route("/v1/account/delete/finish", post(finish_account_deletion))
         .route("/v1/session", get(session))
+        .route(
+            "/v1/account/providers",
+            get(crate::handlers::providers::linked_providers),
+        )
         .route("/v1/sessions", get(list_sessions))
         .route("/v1/sessions/revoke", post(revoke_session))
         .route("/v1/sessions/revoke-all", post(revoke_all_sessions))

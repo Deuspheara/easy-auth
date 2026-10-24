@@ -1,5 +1,14 @@
 # Domain model
 
+`LinkedProvider` is public owner-scoped inventory metadata: identity UUID,
+closed OIDC/SAML kind and immutable linked issuer. `LinkedProviderCursor` orders
+protocol plus UUID, and `LinkedProviderPage` bounds results to 50. These are not
+verified identity/session proofs or current provider trust. Only normal active
+session validation selects the owner and realm; no subject, provider claim,
+credential or local secret is projected. No entity/table is added and no identity
+can be linked or removed through this read. See
+[ADR0041](adr/0041-linked-provider-inventory.md).
+
 A realm is an authentication security partition; it is not a workspace/business organization. A registered client belongs to a realm and has exact redirects, origin policy and audience. The first slice binds one realm per server/router in trusted configuration; no request body may select it.
 
 User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. Optional OIDC identity records are unique by (realm, connection, local client, exact issuer, subject), with bytewise issuer/subject equality; matching emails never merge users. Provider-only JIT users have null contact and explicit provider_required policy, with source/revision-bound oidc sessions and optional original provider authentication time. Planned linking must prove the current fresh session and a new provider transaction. Unlinking must preserve a usable credential/recovery path. Merges are disabled until separately reviewed.

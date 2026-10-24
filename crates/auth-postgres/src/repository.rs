@@ -6,6 +6,14 @@ use uuid::Uuid;
 
 #[async_trait]
 impl Repository for Postgres {
+    async fn linked_providers(
+        &self,
+        realm: Uuid,
+        current: Verifier,
+        after: Option<auth_core::LinkedProviderCursor>,
+    ) -> Result<auth_core::LinkedProviderPage> {
+        Postgres::linked_providers(self, realm, current, after).await
+    }
     async fn begin_email_attachment(
         &self,
         realm: Uuid,

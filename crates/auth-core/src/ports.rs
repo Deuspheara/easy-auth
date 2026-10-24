@@ -4,6 +4,16 @@ use uuid::Uuid;
 
 #[async_trait]
 pub trait Repository: Send + Sync {
+    /// Validate/touch the caller and read one bounded page of its public provider metadata.
+    /// Adapters that have not implemented inventory must report it unavailable.
+    async fn linked_providers(
+        &self,
+        _realm: Uuid,
+        _current: Verifier,
+        _after: Option<crate::LinkedProviderCursor>,
+    ) -> Result<crate::LinkedProviderPage> {
+        Err(crate::Error::Unavailable)
+    }
     /// Rate admission and challenge persistence must be atomic. Clock is database-owned.
     async fn begin_email(
         &self,

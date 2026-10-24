@@ -1,5 +1,12 @@
 # Protocol dependency assessment
 
+AUTH-43's read-only linked-provider inventory and password-service presence
+projection add no dependency, verifier, network client, cryptographic fixture,
+provider activation or migration. Existing source/session validation and SQL
+transaction policy remain authoritative. Public inventory is not a verified
+identity or current provider trust; [ADR0041](../architecture/adr/0041-linked-provider-inventory.md)
+records that boundary. Advisory/license and exact-source CI gates remain unchanged.
+
 AUTH-39's optional outbound signer reuses the pinned josekit0.10.3/OpenSSL0.10.81
 graph from ADR0015 with an explicit RS256-only profile. It introduces no new crypto
 implementation or advisory exception. This reuse and internal RP evidence are not

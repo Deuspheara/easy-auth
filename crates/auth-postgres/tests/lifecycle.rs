@@ -22,6 +22,8 @@ mod oidc;
 mod passkeys;
 #[path = "lifecycle/passwords.rs"]
 mod passwords;
+#[path = "lifecycle/providers.rs"]
+mod providers;
 #[path = "lifecycle/recovery.rs"]
 mod recovery;
 #[cfg(feature = "saml-requests")]
