@@ -15,6 +15,7 @@ mod issuer_native_consent;
 mod issuer_web;
 #[cfg(feature = "oidc-account-deletion")]
 mod oidc;
+mod pages;
 #[cfg(feature = "passkey-enrollment")]
 mod passkeys;
 mod router;
