@@ -7,6 +7,10 @@ use std::sync::atomic::Ordering;
 async fn discovery_pkce_and_normal_signature_complete_without_provider_cookie() {
     let f = ClientFixture::new();
     let pending = f.client.authorize().await.unwrap();
+    assert_eq!(
+        format!("{pending:?}"),
+        "OidcClientAuthorization([REDACTED])"
+    );
     let parameters = parameters(&pending);
     assert_eq!(parameters["client_id"], f.id.to_string());
     assert_eq!(parameters["scope"], "openid");

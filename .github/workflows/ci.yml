@@ -104,6 +104,14 @@ jobs:
           cargo test --locked -p easy-auth-core --features issuer-token-management issuer::tokens
           cargo test --locked -p easy-auth-postgres --features issuer-token-management --test lifecycle token_status
           cargo test --locked -p easy-auth-axum --features issuer-token-management-web --test browser issuer_web
+      - name: Verify independent Rust client and configured issuer startup
+        run: |
+          cargo test --locked -p easy-auth-core --features oidc-client oidc::verification::tests::client
+          cargo test --locked -p easy-auth-server --features issuer-web,oidc-client application::issuer
+          cargo test --locked -p easy-auth-server --features issuer-web,oidc-client configuration::issuer
+          cargo test --locked -p easy-auth-server --features oidc-client oidc_http::
+          cargo check --locked -p easy-auth-axum --features issuer-native-web,oidc-web
+          cargo check --locked -p easy-auth-axum --features issuer-native-web,saml-web
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping
@@ -166,6 +174,10 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features issuer-native-web --example issuer-web-browser
           node tests/browser/issuer-native/run.cjs
+      - name: Verify actual standalone and embedded issuer client parity
+        run: |
+          cargo build --locked -p easy-auth-server --features issuer-web,oidc-client --bin easy-auth --example issuer-client-acceptance
+          node tests/browser/issuer-standalone/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs
       - name: Verify owned Google desktop browser return
         run: |

@@ -10,7 +10,7 @@ use tokio::sync::Semaphore;
 
 const MAX_IN_FLIGHT_OPERATIONS: usize = 4;
 
-#[cfg(feature = "oidc-verification")]
+#[cfg(any(feature = "oidc-verification", feature = "oidc-client"))]
 #[path = "token.rs"]
 mod token;
 

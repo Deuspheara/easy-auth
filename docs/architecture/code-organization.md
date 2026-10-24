@@ -1147,3 +1147,13 @@ Named client tests reuse the existing normal signer and transport producer. No n
 crate, crypto implementation, proof constructor or runtime dependency is added.
 New modules remain below300lines; ordered completion/claim scenarios keep their
 security sequence visible as function-size exceptions. Standalone work is separate.
+
+Configured issuer startup adds focused `configuration/issuer/` parsing/settings and
+`application/issuer.rs` composition, with real-PG startup tests in its named folder.
+Application entry files compose only. The optional HTTP provider attachment belongs
+to `issuer_web/native/providers.rs`; it reuses provider attach/cleanup and contracts,
+without duplicating handlers or policy. Owned standalone acceptance separates
+provisioning, process lifetime and SDK IPC, reusing existing database/TLS/HTTP and
+normal maintained key producers. New modules remain under300lines. Longer ordered
+startup/fixture/test scenarios retain resource ownership and invariant sequence as
+function-size exceptions; no unrelated cleanup is deferred.

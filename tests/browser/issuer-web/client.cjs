@@ -7,7 +7,7 @@ const crypto = require('node:crypto');
 // no system trust changes, disabled TLS verification or external destinations.
 function client(origin, certificate, redirect = 'https://client.example/callback') {
   const expected = new URL(origin);
-  assert.equal(expected.hostname,'app.example');
+  assert.equal(['app.example','fixture.invalid'].includes(expected.hostname),true);
   const verifier = crypto.randomBytes(32).toString('base64url');
   const nonce = crypto.randomBytes(32).toString('base64url');
   const state = crypto.randomBytes(32).toString('base64url');

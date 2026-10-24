@@ -88,7 +88,7 @@ impl OidcClient {
             if self.configuration.offline {
                 url.query_pairs_mut().append_pair("prompt", "consent");
             }
-            pending.url = url.into();
+            pending.url = zeroize::Zeroizing::new(url.into());
             pending.check(self.id)?;
             Ok(pending)
         })

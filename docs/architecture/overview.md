@@ -1,5 +1,16 @@
 # Architecture
 
+The optional server `issuer-web` composition now uses the same configured factory
+for executable and embedded delivery. Explicit HTTPS/key settings must match the
+current enabled persisted signing key; startup neither provisions nor enables
+issuer policy. Selected inbound providers retain their own checks around the same
+issuer handlers. Independent Rust `oidc-client` operations produce RP metadata,
+never local-session/provider completion proofs. Owned PostgreSQL/SMTP/TLS/browser,
+Node and Rust acceptance checks bounded standalone/embedded parity; final gates and
+broader production/assurance work remain separate. See [ADR0040](adr/0040-independent-oidc-client-and-standalone.md)
+and [standalone setup](../guides/issuer-standalone.md). Older staged descriptions
+below remain historical where superseded by this explicit composition.
+
 AUTH-40's optional core/PostgreSQL `issuer-native-refresh` now adds explicit
 initially disabled native policy configuration. Exact issuer/realm/client revisions,
 bounded lifetimes and ordered full-definition checks create no consent or token.

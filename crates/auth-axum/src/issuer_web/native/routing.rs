@@ -32,6 +32,8 @@ pub fn experimental_issuer_native_web_router(
     } else {
         issuer_native_web_openapi()
     };
+    #[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+    let contract = services.providers.contract(contract);
     let router = routing::root(&auth, &browser, &services.base, contract)?;
     let pages = Router::new()
         .route("/oidc/authorize", get(authorize::authorize))
@@ -41,8 +43,8 @@ pub fn experimental_issuer_native_web_router(
         );
     let router = crate::issuer_native_consent::attach_with_pages(
         router,
-        auth,
-        browser,
+        auth.clone(),
+        browser.clone(),
         services.base.authorization.clone(),
         services.consent.clone(),
         pages,
@@ -86,9 +88,12 @@ pub fn experimental_issuer_native_web_router(
         )
         .merge(consumer)
         .layer(DefaultBodyLimit::max(MAX_NATIVE_STATUS_BODY_BYTES));
-    Ok(router.merge(documents).merge(
+    let router = router.merge(documents).merge(
         tokens
             .merge(status)
             .layer(middleware::from_fn_with_state(base, client_token_boundary)),
-    ))
+    );
+    #[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+    let router = services.providers.attach(router, auth, browser)?;
+    Ok(router)
 }

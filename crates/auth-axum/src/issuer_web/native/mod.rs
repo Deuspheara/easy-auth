@@ -3,6 +3,8 @@ mod contract;
 mod input;
 mod introspection;
 mod metadata;
+#[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+mod providers;
 mod revocation;
 mod routing;
 mod services;

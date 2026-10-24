@@ -893,3 +893,16 @@ Rust ownership cannot stop deliberately copying an exposed secret. The trusted H
 ports must use the existing reviewed HTTPS/DNS restrictions and shared budget;
 there is no production private-address or local-CA fallback. Local client/standalone
 parity and independent assurance remain separate acceptance gates. See ADR0040.
+
+## Configured issuer and provider composition
+
+Default-off issuer startup validates complete trusted HTTPS/protected-file settings
+and exact current enabled persisted key/public material in the chosen realm/issuer.
+It cannot provision, repair or re-enable issuer policy. Later key/client/source/
+owner/policy changes are still checked by the existing final issuance/rotation
+transactions. Combined inbound-provider attachment checks each source's realm and
+HTTPS callback and applies cleanup around all selected routes. It supplies no new
+provider or signing authority. Native consumer inspection remains separately
+selected and requires exact persisted authenticated-reader permission. Owned
+executable/embedded/SMTP/browser/client parity is implementation evidence, not
+public-root TLS, certification, independent review or live-production approval.

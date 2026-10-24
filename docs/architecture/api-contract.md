@@ -822,3 +822,15 @@ one credential and returns credentials only. These are library contracts, not
 new local HTTP endpoints or session proofs. Configured standalone and parity
 acceptance remain in progress. See [the SDK guide](../guides/oidc-client.md) and
 [ADR0040](adr/0040-independent-oidc-client-and-standalone.md).
+
+## Explicit configured issuer delivery
+
+Server `issuer-web` plus complete `AUTH_ISSUER_ENABLED=true` HTTPS/protected matching
+key settings selects the existing mixed web/native issuer handlers in the shared
+configured application. Default-off and unsupported/partial settings fail closed.
+Startup reads the current enabled realm/issuer/public-key registration and performs
+no issuer enable or provisioning writes. Optional native inspection requires
+`AUTH_ISSUER_NATIVE_INTROSPECTION_ENABLED=true` and the existing exact persisted
+consumer policy. Selected inbound providers extend the same router/contract and
+retain their own realm/source/proof-cleanup rules. No new token schema, grant or
+local-session authority is introduced. [Setup and acceptance limits](../guides/issuer-standalone.md).

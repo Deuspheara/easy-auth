@@ -26,6 +26,8 @@ mod transport;
 #[path = "../oidc-keycloak/transport.rs"]
 mod transport_port;
 
+#[cfg(feature = "issuer-web")]
+use easy_auth_server::load_issuer_signing_key;
 use ipc::{read_command, send};
 use transport::OwnedHttps as OidcHttps;
 type FixtureResult<T> = Result<T, Box<dyn std::error::Error>>;

@@ -10,6 +10,8 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-web = ["issuer-signing", "auth-postgres/issuer-native-refresh", "auth-axum/issuer-native-web"]
+oidc-client = ["oidc-egress", "auth-core/oidc-client"]
 issuer-signing = ["auth-core/issuer-signing", "dep:libc"]
 saml-web = ["auth-core/saml-identities", "auth-postgres/saml-identities", "auth-axum/saml-web"]
 google-desktop-launch = ["google-desktop", "tokio/process", "dep:open"]
@@ -104,3 +106,8 @@ required-features = ["oidc-web"]
 name = "saml-startup-provision"
 path = "examples/saml-startup-provision.rs"
 required-features = ["saml-web"]
+
+[[example]]
+name = "issuer-client-acceptance"
+path = "examples/issuer-client-acceptance/main.rs"
+required-features = ["issuer-web", "oidc-client"]

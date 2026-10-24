@@ -2,8 +2,9 @@
 
 The optional `easy-auth-core/oidc-client` component provides discovery, a bounded
 S256 authorization-code operation, callback correlation, RS256 token verification
-and native credential rotation. AUTH-41 standalone/parity acceptance remains in
-progress; these library operations alone do not establish that acceptance.
+and native credential rotation. Owned standalone/embedded parity is covered separately in the
+[acceptance guide](issuer-standalone.md); library operations alone do not establish
+production approval.
 
 Create `OidcClientConfiguration::web` with the exact trusted HTTPS issuer, registered
 UUID client, canonical HTTPS return and explicit Public or ClientSecretBasic method.
@@ -16,7 +17,7 @@ Pass the same maintained `easy-auth-server::OidcHttps` instance to both HTTP por
 of `OidcClient::new`. The transport owns DNS pinning, TLS, redirect/proxy refusal and
 resource bounds. An arbitrary implementation of these trusted ports can invalidate
 those guarantees. There is no production private-address or local-CA override.
-Enable the server `oidc-egress` feature to use that adapter.
+Enable the server `oidc-client` feature to use its discovery and token ports.
 
 Call `authorize()`, retain its opaque non-cloneable operation privately, and direct
 the user's system browser to `authorization_url()`. Retain pending state in memory;

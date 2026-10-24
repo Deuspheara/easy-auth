@@ -1,6 +1,6 @@
 # ADR0040: Independent OIDC client and configured standalone composition
 
-Status: accepted implementation direction; AUTH-41 acceptance remains in progress.
+Status: accepted; full verification and exact-source CI are recorded separately.
 
 ## Context
 
@@ -37,9 +37,15 @@ Transport remains an explicit trusted boundary using the existing `OidcHttp` and
 shared resource limits. No private-address, custom-root or plaintext production
 fallback is introduced. Owned acceptance transports remain test-only evidence.
 
-Configured standalone issuer delivery, persisted startup checks, local independent
-client acceptance and embedded/standalone parity are still required before AUTH-41
-can be completed. This ADR does not activate those unfinished paths.
+The server `issuer-web` feature adds explicit default-off issuer composition through
+`configured_application`, shared by embedded consumers and the binary. Complete
+HTTPS configuration and a protected operator key must match the enabled current
+persisted key, including realm/issuer/public material. Startup provisions/enables no
+issuer registry or client. Optional native consumer introspection requires another
+explicit setting and exact persisted consumer policy. Trusted inbound providers
+attach around the same issuer handlers and retain independent realm/source policy
+and cleanup. Owned actual executable/embedded, PostgreSQL, SMTP, browser, Node and
+Rust-client acceptance demonstrate bounded parity, not public-TLS or certification.
 
 ## Consequences and limits
 

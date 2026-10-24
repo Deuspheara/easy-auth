@@ -104,3 +104,6 @@ async fn revoke(f: &Fixture, token: &str) -> Response {
         .await
         .unwrap()
 }
+
+#[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+mod providers;

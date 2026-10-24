@@ -8,6 +8,8 @@ use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct IssuerNativeWebServices {
+    #[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+    pub(super) providers: super::providers::Providers,
     pub(super) introspection: Option<Arc<auth_core::IssuerNativeIntrospection>>,
     pub(super) base: IssuerWebServices,
     pub(super) consent: Arc<IssuerNativeAuthorization>,
@@ -38,6 +40,8 @@ impl IssuerNativeWebServices {
     ) -> Self {
         let authority = base.tokens.authority().clone();
         Self {
+            #[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+            providers: Default::default(),
             introspection: None,
             consent: Arc::new(IssuerNativeAuthorization::new(
                 authority.clone(),

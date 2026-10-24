@@ -104,3 +104,21 @@ The [configuration guide](../guides/saml.md#normal-server-configuration) and
 [release guide](../guides/saml-release.md) document operator inputs and resource
 limits. [ADR0032](adr/0032-saml-maintainer-directed-activation.md) records the
 maintainer's independent-review waiver and unresolved assurance limitations.
+
+## Explicit outbound issuer startup
+
+The server `issuer-web` feature and complete `AUTH_ISSUER_ENABLED=true` settings
+select the existing issuer services through the same `configured_application` used
+by the executable and embedding. Require trusted HTTPS public origin, stable realm
+and protected current matching key input; startup performs no issuer provision or
+enable writes. Current enabled registry/key and exact public material must match
+before binding a listener. Client/native/consumer policy remains request-time
+persisted authority. The optional authenticated native inspection route requires
+its own explicit boolean setting. Old auth-only consumers refuse enabled issuer
+settings. Default routes remain absent. See [setup, rollover and bounded acceptance](../guides/issuer-standalone.md).
+
+Owned parity uses disposable PostgreSQL, local SMTP and a private TLS proxy, not a
+live deployment. Public DNS/system-root operation, platform vault integration,
+independent assurance and production operations remain separate. Compiling or
+passing these checks is not production approval. SAML ADR0032 review waiver stays
+explicit and does not approve any other boundary.

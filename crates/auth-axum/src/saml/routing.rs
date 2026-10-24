@@ -107,7 +107,7 @@ async fn clear_revoked_proofs(
     response
 }
 
-#[cfg(feature = "oidc-web")]
+#[cfg(any(feature = "oidc-web", feature = "issuer-native-web"))]
 pub(crate) fn web_contract(services: &SamlWebServices) -> utoipa::openapi::OpenApi {
     if services.deletion.is_some() {
         saml_account_deletion_web_openapi()

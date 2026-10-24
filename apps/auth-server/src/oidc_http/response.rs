@@ -75,7 +75,7 @@ pub(super) async fn read(
     read_statuses(response, addresses, &[200]).await
 }
 
-#[cfg(feature = "oidc-verification")]
+#[cfg(any(feature = "oidc-verification", feature = "oidc-client"))]
 pub(super) async fn read_token(
     response: reqwest::Response,
     addresses: &[SocketAddr],

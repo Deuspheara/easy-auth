@@ -6,6 +6,7 @@ use std::{
 };
 use tokio::time::Instant;
 use uuid::Uuid;
+use zeroize::Zeroizing;
 
 const PENDING_LIFETIME: Duration = Duration::from_secs(300);
 /// One privately retained authorization operation. No Clone/Serialize or proof
@@ -17,7 +18,7 @@ pub struct OidcClientAuthorization {
     pub(super) pkce: Secret,
     pub(super) expires_us: i64,
     pub(super) deadline: Instant,
-    pub(super) url: String,
+    pub(super) url: Zeroizing<String>,
 }
 impl OidcClientAuthorization {
     pub(super) fn new(configuration: Uuid) -> OidcClientResult<Self> {
@@ -31,7 +32,7 @@ impl OidcClientAuthorization {
                 .checked_add(PENDING_LIFETIME.as_micros() as i64)
                 .ok_or(OidcClientError::Unavailable)?,
             deadline: Instant::now() + PENDING_LIFETIME,
-            url: String::new(),
+            url: Zeroizing::new(String::new()),
         })
     }
     pub fn authorization_url(&self) -> &str {
