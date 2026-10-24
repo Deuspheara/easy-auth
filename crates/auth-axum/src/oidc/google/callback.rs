@@ -7,11 +7,11 @@ use axum::{extract::RawQuery, http::HeaderMap, response::Html};
 #[utoipa::path(get,path="/google/callback",
     params(("state"=String,Query),("iss"=String,Query),("code"=Option<String>,Query),("error"=Option<String>,Query),("error_description"=Option<String>,Query),("error_uri"=Option<String>,Query),("scope"=Option<String>,Query),("authuser"=Option<String>,Query),("hd"=Option<String>,Query),("prompt"=Option<String>,Query),("session_state"=Option<String>,Query)),
     responses((status=200,body=String,content_type="text/html",description="Fixed bridge; unique original state cookie selects sign-in/deletion UI, including provider errors. No grant or mutation. Raw callback member set is deliberately closed.")))]
-pub(super) async fn bridge(RawQuery(query): RawQuery, headers: HeaderMap) -> Html<&'static str> {
+pub(super) async fn bridge(RawQuery(query): RawQuery, headers: HeaderMap) -> Html<String> {
     match select(query.as_deref(), &headers) {
         Some(Bridge::SignIn) => pages::sign_in_page().await,
         Some(Bridge::Deletion) => pages::deletion_page().await,
-        None => Html(include_str!("error.html")),
+        None => crate::pages::document(include_str!("error.html")),
     }
 }
 enum Bridge {

@@ -1,27 +1,47 @@
 use crate::router::AppState;
-use axum::{Router, http::header, response::Html, routing::get};
+use axum::{Router, http::header, routing::get};
 
-pub(crate) fn routes() -> Router<AppState> {
-    authentication_pages()
+pub(crate) fn routes(passwords: bool, api: &utoipa::openapi::OpenApi) -> Router<AppState> {
+    let index = super::capabilities::index(passwords, api);
+    authentication_pages(index)
         .merge(account_pages())
-        .merge(browser_operations())
+        .merge(client_modules())
 }
 
-fn browser_operations() -> Router<AppState> {
-    Router::new().route(
-        "/ui/browser-operations.js",
-        get(|| async {
-            (
-                [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
-                include_str!("browser-operations.js"),
-            )
-        }),
-    )
+fn client_modules() -> Router<AppState> {
+    let mut routes = Router::new();
+    for (path, source) in [
+        (
+            "/ui/browser-operations.js",
+            include_str!("browser-operations.js"),
+        ),
+        ("/ui/view.js", include_str!("view.js")),
+        ("/ui/signin.js", include_str!("signin.js")),
+        ("/ui/account.js", include_str!("account.js")),
+        ("/ui/passkeys.js", include_str!("passkeys.js")),
+    ] {
+        routes = routes.route(
+            path,
+            get(move || async move {
+                (
+                    [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
+                    source,
+                )
+            }),
+        );
+    }
+    routes
 }
 
-fn authentication_pages() -> Router<AppState> {
+fn authentication_pages(index: String) -> Router<AppState> {
     Router::new()
-        .route("/", get(|| async { Html(include_str!("client.html")) }))
+        .route(
+            "/",
+            get(move || {
+                let index = index.clone();
+                async move { super::document(&index) }
+            }),
+        )
         .route(
             "/client.js",
             get(|| async {
@@ -31,7 +51,10 @@ fn authentication_pages() -> Router<AppState> {
                 )
             }),
         )
-        .route("/reset", get(|| async { Html(include_str!("reset.html")) }))
+        .route(
+            "/reset",
+            get(|| async { crate::pages::document(include_str!("reset.html")) }),
+        )
         .route(
             "/reset.js",
             get(|| async {
@@ -47,11 +70,11 @@ fn account_pages() -> Router<AppState> {
     Router::new()
         .route(
             "/email-change",
-            get(|| async { Html(include_str!("email-change.html")) }),
+            get(|| async { crate::pages::document(include_str!("email-change.html")) }),
         )
         .route(
             "/account-delete",
-            get(|| async { Html(include_str!("account-delete.html")) }),
+            get(|| async { crate::pages::document(include_str!("account-delete.html")) }),
         )
         .route(
             "/account-action.js",

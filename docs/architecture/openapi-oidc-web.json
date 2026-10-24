@@ -2585,9 +2585,14 @@
           "id",
           "realm_id",
           "email",
-          "display_name"
+          "display_name",
+          "authentication_policy"
         ],
         "properties": {
+          "authentication_policy": {
+            "type": "string",
+            "description": "mailbox, passkey_required or provider_required; current method/freshness still governs APIs."
+          },
           "display_name": {
             "type": [
               "string",

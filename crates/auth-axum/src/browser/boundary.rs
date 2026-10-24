@@ -10,6 +10,9 @@ use serde_json::json;
 use std::time::Duration;
 use uuid::Uuid;
 
+// Only the exact fixed reference stylesheet may supply inline styles.
+const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-J+Lc2pfELBAdVsa1PWSg2qPRcRG3mu4txsz8SnbNU9M='; style-src-attr 'none'";
+
 pub(crate) async fn boundary(
     State(state): State<AppState>,
     request: Request,
@@ -100,7 +103,10 @@ async fn serve(
         "x-content-type-options",
         HeaderValue::from_static("nosniff"),
     );
-    headers.insert("content-security-policy", HeaderValue::from_static("default-src 'none'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"));
+    headers.insert(
+        "content-security-policy",
+        HeaderValue::from_static(CONTENT_SECURITY_POLICY),
+    );
     if state.browser.secure {
         headers.insert(
             "strict-transport-security",
@@ -117,4 +123,26 @@ async fn serve(
         "http_request_completed"
     );
     response
+}
+
+#[cfg(test)]
+mod reference_style_tests {
+    use super::CONTENT_SECURITY_POLICY;
+    use base64::Engine;
+
+    #[test]
+    fn inline_style_permission_matches_only_the_fixed_reference_stylesheet() {
+        let digest = openssl::hash::hash(
+            openssl::hash::MessageDigest::sha256(),
+            include_bytes!("../pages/reference.css"),
+        )
+        .unwrap();
+        let encoded = base64::engine::general_purpose::STANDARD.encode(digest);
+        assert!(CONTENT_SECURITY_POLICY.contains(&format!("style-src 'sha256-{encoded}'")));
+        assert!(CONTENT_SECURITY_POLICY.contains("style-src-attr 'none'"));
+        assert!(CONTENT_SECURITY_POLICY.contains("default-src 'none'"));
+        assert!(CONTENT_SECURITY_POLICY.contains("frame-ancestors 'none'"));
+        assert!(!CONTENT_SECURITY_POLICY.contains("unsafe-inline"));
+        assert!(!CONTENT_SECURITY_POLICY.contains("style-src 'self'"));
+    }
 }

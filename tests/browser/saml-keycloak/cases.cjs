@@ -2,6 +2,7 @@
 const assert=require('node:assert/strict');
 const certificates=require('./provider.cjs');
 const {login,status}=require('./browser.cjs');
+const {providerAccount}=require('../reference-ui/provider.cjs');
 async function run(owner,provider,browser,origin,initial) {
   const sessions=[];const cases=[];
   const configure=(realm,pins,jit='allow')=>owner.command('configure',{realm,certificates:pins,jit});
@@ -17,6 +18,7 @@ async function run(owner,provider,browser,origin,initial) {
     cases.push('actual_signed_default_deny_grants_nothing');
     await configure(0,[initial.pin]);
     const first=await signIn();
+    await providerAccount(first.page,origin,provider.issuer,'saml');
     cases.push('real_keycloak_post_signature_identity_session');
     await provider.rotate();
     const next=await certificates.active(provider);

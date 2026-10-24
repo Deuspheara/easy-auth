@@ -34,6 +34,9 @@ pub(crate) struct UserResponse {
     pub(crate) email: Option<String>,
     #[schema(required = true)]
     pub(crate) display_name: Option<String>,
+    /// mailbox, passkey_required or provider_required; current method/freshness still governs APIs.
+    #[schema(value_type=String)]
+    pub(crate) authentication_policy: auth_core::AuthenticationPolicy,
 }
 
 pub(super) fn source_key(source: Option<Extension<ConnectInfo<SocketAddr>>>) -> String {

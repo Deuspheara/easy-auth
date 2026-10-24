@@ -26,7 +26,7 @@ pub(super) struct WebState {
     pub base: AppState,
     pub services: SamlWebServices,
 }
-/// Gated engineering composition; normal server activation remains source-locked.
+/// Explicit opt-in SAML composition under ADR0032's maintainer review waiver.
 /// The cross-site ACS renders a handoff page; only same-origin finish grants authority.
 pub fn experimental_saml_web_router(
     auth: Auth,

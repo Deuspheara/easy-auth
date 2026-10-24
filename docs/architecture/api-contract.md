@@ -24,6 +24,17 @@ no-referrer and browser security headers. See
 [ADR0041](adr/0041-linked-provider-inventory.md). Existing repository adapters
 without this optional read return Unavailable rather than an invented empty list.
 
+## Reference presentation metadata
+
+`/v1/session` additionally returns the existing core `authentication_policy`
+string (`mailbox`, `passkey_required` or `provider_required`). This is current
+account metadata, not authentication-method or freshness proof. The root reference
+page advertises only boolean capabilities for the actually selected router and
+password service; URL fields cannot activate a method. Read-only inventory and
+all protected mutations retain the same backend authority checks. See
+[the reference client](../guides/reference-ui.md) and
+[ADR0042](adr/0042-reference-account-ui.md).
+
 ## Existing authentication contracts
 The opt-in core/PostgreSQL `saml-requests` Rust component adds no HTTP route or
 OpenAPI operation. `SamlRegistration::unsigned_redirect` selects the explicit

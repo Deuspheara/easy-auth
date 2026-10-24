@@ -26,6 +26,7 @@ async fn provider_inventory_contains_only_public_owner_metadata(pool: PgPool) {
         serde_json::from_slice(&response.into_body().collect().await.unwrap().to_bytes()).unwrap();
     let realm = Uuid::parse_str(owner["realm_id"].as_str().unwrap()).unwrap();
     let user = Uuid::parse_str(owner["id"].as_str().unwrap()).unwrap();
+    assert_eq!(owner["authentication_policy"], "mailbox");
     for kind in [ProviderKind::Oidc, ProviderKind::Saml] {
         linked_provider_records::insert(&pool, realm, user, Uuid::new_v4(), kind).await;
     }

@@ -14,6 +14,8 @@ mod passwords;
 mod providers;
 #[path = "browser/recovery.rs"]
 mod recovery;
+#[path = "browser/reference_ui.rs"]
+mod reference_ui;
 
 #[path = "browser/sessions/mod.rs"]
 mod sessions;

@@ -4,8 +4,8 @@ use axum::{
 };
 
 #[utoipa::path(get,path="/saml/account-delete",responses((status=200,body=String,content_type="text/html")))]
-pub(in crate::saml) async fn page() -> Html<&'static str> {
-    Html(include_str!("page.html"))
+pub(in crate::saml) async fn page() -> Html<String> {
+    crate::pages::document(include_str!("page.html"))
 }
 pub(super) async fn script() -> impl IntoResponse {
     (

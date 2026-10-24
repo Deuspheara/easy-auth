@@ -1,6 +1,132 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>easy-auth alpha</title>
-<body><main><h1>Sign in</h1><p>Development reference client. Email sign-in requires opening the link in this browser.</p>
-<form id="email-form"><label for="email">Email</label> <input id="email" type="email" autocomplete="email" required maxlength="254"><button id="submit">Send sign-in link</button> <button id="reset-request" type="button">Reset password</button></form>
-<p id="status" role="status" aria-live="polite"></p><pre id="identity"></pre><button id="logout" hidden>Sign out</button>
-<p>Alpha: email proof and revocable sessions. Headless password APIs are optional; other authentication methods are planned.</p></main><script src="/client.js" defer></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your account · easy-auth</title>
+<!-- reference-style -->
+<script type="module" src="/client.js"></script>
+</head>
+<body data-reference-account>
+<a class="skip" href="#main">Skip to account access</a>
+<header class="topbar">
+  <a class="brand" href="/">easy-auth <span class="badge">Reference client</span></a>
+  <div class="actions"><button id="check-session" class="secondary" type="button">Check sign-in</button><button id="clear-session" class="secondary" type="button" hidden>Sign out this browser</button><button id="theme" class="secondary" type="button">Use dark theme</button></div>
+</header>
+<main id="main" tabindex="-1">
+<input id="capabilities" type="hidden" value='__CAPABILITIES__'>
+<div class="intro">
+  <p class="eyebrow">Account access</p>
+  <h1 id="heading" tabindex="-1">Welcome back.</h1>
+  <p id="intro" class="muted">Choose a sign-in method available for your account. Keep email links in this browser.</p>
+</div>
+<p id="status" class="notice" role="status" aria-live="polite" aria-atomic="true"></p>
+<noscript><p class="notice">This reference client needs JavaScript to submit authentication requests. Your application can also use the documented HTTP APIs.</p></noscript>
+<section id="sign-in" class="grid" aria-label="Sign-in methods">
+  <div class="card">
+    <h2>Sign in with email</h2>
+    <p class="muted" id="email-help">We will send a link that works once, in this browser, for ten minutes.</p>
+    <form id="email-form" method="post" action="/v1/email/start">
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="email-help" required maxlength="254">
+      <button id="submit" type="submit">Send sign-in link</button>
+    </form>
+    <details data-cap="passwords" hidden>
+      <summary>Use a password</summary>
+      <form id="password-form" method="post" action="/v1/password/login">
+        <label for="login-email">Email address</label><input id="login-email" name="username" type="email" autocomplete="username" required maxlength="254">
+        <label for="login-password">Password</label><input id="login-password" name="password" type="password" autocomplete="current-password" required maxlength="1024">
+        <div class="actions"><button type="submit">Sign in with password</button><button id="reset-request" class="secondary" type="button">Reset password</button></div>
+      </form>
+    </details>
+  </div>
+  <div id="other-methods" class="card" hidden>
+    <h2>Another way in</h2>
+    <form id="passkey-form" method="post" action="/v1/passkeys/authentication/start" data-cap="passkeySignin" hidden>
+      <p class="muted">Use a passkey saved on a device or security key.</p>
+      <button type="submit">Sign in with a passkey</button>
+      <details><summary>Use a retained account ID</summary><label for="passkey-account">Public account ID (optional)</label><input id="passkey-account" pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" autocomplete="off" spellcheck="false" aria-describedby="account-help"><small id="account-help">Leave empty to choose a saved discoverable passkey. We do not look up passkeys by email.</small></details>
+    </form>
+    <div id="provider-methods" class="stack" aria-label="Provider sign-in">
+      <a class="button secondary" data-cap="google" href="/google/sign-in" hidden>Continue with Google</a>
+      <a class="button secondary" data-cap="oidc" href="/oidc/sign-in" hidden>Organization sign-in</a>
+      <a class="button secondary" data-cap="saml" href="/saml/sign-in" hidden>SAML organization sign-in</a>
+    </div>
+    <details data-cap="passkeySignup" hidden>
+      <summary>Create an account with a passkey</summary>
+      <form id="signup-form" method="post" action="/v1/passkeys/signup/start">
+        <label for="display-name">Display name</label><input id="display-name" autocomplete="nickname" required maxlength="256">
+        <p class="muted">Create a key, then verify it in a second prompt. No email address is required.</p>
+        <button type="submit">Create and verify a passkey</button>
+      </form>
+    </details>
+    <p data-cap="recovery" hidden><a href="/passkey-recovery">Recover with a saved recovery code</a></p>
+  </div>
+</section>
+<section id="account" class="grid" aria-label="Your account" hidden>
+  <div class="card wide">
+    <div class="topbar"><div><h2>Your profile</h2><p id="identity"></p></div><button id="logout" class="secondary" type="button" hidden>Sign out</button></div>
+    <p class="muted">Public account ID: <output id="account-id"></output></p>
+    <p class="muted">Retain this ID with your passkeys and saved recovery kit. It is not a sign-in secret.</p>
+    <div id="mailbox-actions" hidden>
+      <details><summary>Change email address</summary><form id="email-change-form" method="post" action="/v1/account/email/start">
+        <label for="new-email">New email address</label><input id="new-email" type="email" autocomplete="email" required maxlength="254">
+        <p class="muted">Confirm separate links sent to both addresses in this browser. All sessions are signed out when the change completes.</p>
+        <button type="submit">Send both confirmation links</button>
+      </form></details>
+      <details><summary>Delete account</summary><form id="deletion-start-form" method="post" action="/v1/account/delete/start">
+        <label for="delete-confirmation">Type “delete my account” to request deletion</label><input id="delete-confirmation" autocomplete="off" required pattern="delete my account">
+        <p class="muted">Deletion permanently removes this authentication account, credentials and sessions. Confirm the email link in this browser to finish. Applications manage their own data separately.</p>
+        <button class="danger" type="submit">Request deletion confirmation</button>
+      </form></details>
+    </div>
+    <details id="attach-action" hidden><summary>Add a verified contact email</summary><form id="attachment-start-form" method="post" action="/v1/account/email/attachment/start">
+      <label for="contact-email">Contact email address</label><input id="contact-email" type="email" autocomplete="email" required maxlength="254">
+      <p class="muted">A fresh passkey sign-in is required. This does not enable email sign-in or weaker recovery.</p>
+      <button type="submit">Send contact confirmation</button>
+    </form></details>
+    <details id="password-enrollment" hidden>
+      <summary>Set up a password</summary>
+      <p class="muted" id="password-help">Use 15–256 characters. Spaces and Unicode are allowed. Avoid common or compromised passwords. This sets a password once and replaces your current sessions. If you already have one, sign out and use Reset password.</p>
+      <form id="enroll-password-form" method="post" action="/v1/password/enroll">
+        <label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" required maxlength="1024" aria-describedby="password-help">
+        <label for="confirm-password">Confirm password</label><input id="confirm-password" type="password" autocomplete="new-password" required maxlength="1024">
+        <button type="submit">Set up password</button>
+      </form>
+    </details>
+  </div>
+  <div class="card">
+    <h2>Connected providers</h2><p class="muted">Linked issuers are listed here. Your organization controls their current availability.</p>
+    <p id="providers-state"></p><ul id="providers" class="items"></ul>
+    <button id="more-providers" class="secondary" type="button" hidden>Load more providers</button>
+    <div id="provider-deletion" class="stack" hidden>
+      <p class="muted">Use the provider that authenticated this session. Deletion requires fresh provider confirmation.</p>
+      <a class="button secondary" data-cap="googleDeletion" href="/google/account-delete" hidden>Delete with Google reauthentication</a>
+      <a class="button secondary" data-cap="oidcDeletion" href="/oidc/account-delete" hidden>Delete with organization reauthentication</a>
+      <a class="button secondary" data-cap="samlDeletion" href="/saml/account-delete" hidden>Delete with SAML reauthentication</a>
+    </div>
+  </div>
+  <div id="passkeys-card" class="card" hidden>
+    <div class="topbar"><h2>Your passkeys</h2><button id="refresh-passkeys" class="secondary" type="button" data-cap="passkeyManagement" hidden>Load passkeys</button></div>
+    <p class="muted" data-cap="passkeyManagement" hidden>Managing existing keys requires a fresh passkey sign-in. Removing a key signs out every session; another proven key must remain.</p>
+    <p id="passkeys-state"></p><ul id="passkeys" class="items"></ul>
+    <form id="enrollment-form" method="post" action="/v1/passkeys/enrollment/start" data-cap="passkeyEnrollment" hidden>
+      <label for="key-label">New passkey name</label><input id="key-label" required maxlength="256" autocomplete="off">
+      <button type="submit">Add a passkey</button>
+    </form>
+    <p data-cap="recoverySetup" hidden><a href="/passkey-recovery/setup">Save a recovery code or stop a recovery request</a></p>
+  </div>
+  <div class="card wide">
+    <div class="topbar"><h2>Active sessions</h2><button id="refresh-account" class="secondary" type="button">Refresh account</button></div>
+    <p class="muted">Only your active sessions appear here. Signing out another session or all sessions requires fresh authentication.</p>
+    <p id="sessions-state"></p><ul id="sessions" class="items"></ul>
+    <div class="actions"><button id="more-sessions" class="secondary" type="button" hidden>Load more sessions</button><button id="revoke-all" class="danger" type="button">Sign out all sessions</button></div>
+  </div>
+</section>
+<p class="muted">Reference client. Your account's configured sign-in and recovery rules apply.</p>
+</main>
+<dialog id="confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
+  <form method="dialog"><h2 id="confirmation-title">Confirm account action</h2><p id="confirmation-description"></p><div class="actions"><button value="cancel" class="secondary" autofocus>Cancel</button><button id="confirmation-accept" value="confirm" class="danger">Confirm</button></div></form>
+</dialog>
+</body>
+</html>

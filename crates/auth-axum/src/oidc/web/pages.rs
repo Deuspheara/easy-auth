@@ -2,8 +2,8 @@ use super::routing::WebState;
 use axum::{Router, http::header, response::Html, routing::get};
 
 #[utoipa::path(get, path = "/oidc/sign-in", responses((status=200,body=String,content_type="text/html",description="Fixed sign-in page; no URL proof import or automatic sign-in")))]
-pub(super) async fn sign_in_page() -> Html<&'static str> {
-    Html(include_str!("signin.html"))
+pub(super) async fn sign_in_page() -> Html<String> {
+    crate::pages::document(include_str!("signin.html"))
 }
 pub(super) fn routes() -> Router<WebState> {
     Router::new()

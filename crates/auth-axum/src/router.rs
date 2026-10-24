@@ -23,6 +23,7 @@ pub(crate) fn configured_router(
     browser: BrowserConfig,
     spec: utoipa::openapi::OpenApi,
 ) -> Router {
+    let pages = crate::pages::routes(auth.passwords_enabled(), &spec);
     let state = AppState { auth, browser };
     Router::new()
         .route("/healthz", get(health))
@@ -53,7 +54,7 @@ pub(crate) fn configured_router(
         .route("/v1/sessions/revoke", post(revoke_session))
         .route("/v1/sessions/revoke-all", post(revoke_all_sessions))
         .route("/v1/logout", post(logout))
-        .merge(crate::pages::routes())
+        .merge(pages)
         .layer(DefaultBodyLimit::max(8192))
         .layer(middleware::from_fn_with_state(state.clone(), boundary))
         .with_state(state)

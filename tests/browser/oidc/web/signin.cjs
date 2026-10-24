@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const {request,finishBody,signedClaims}=require('./browser.cjs');
+const {providerAccount}=require('../../reference-ui/provider.cjs');
 
 async function run({view,provider,proxy,owner,mode,record,status,origin,restart}) {
   let originalOwner;
@@ -57,9 +58,10 @@ async function run({view,provider,proxy,owner,mode,record,status,origin,restart}
     await restart();
     const retained=await request(view.page,'/v1/session');assert.equal(retained.status,200);assert.equal(retained.body.id,originalOwner);
     await status({users:1,sessions:1,live_sessions:1,identities:1,audit:1,pending:0});
+    await providerAccount(view.page,origin,provider.issuer,'oidc');
     // Keep only transient test evidence for the next local replay assertion.
     view.previousCallback=callback;
-    return {...proof,real_audit_wait_observed:true,http_response_and_cookie_wait_for_commit:true,no_grant_before_commit:true,session_cookie_protected:true,session_survives_factory_restart:true,committed_owner_and_session:true};
+    return {...proof,reference_provider_account:true,real_audit_wait_observed:true,http_response_and_cookie_wait_for_commit:true,no_grant_before_commit:true,session_cookie_protected:true,session_survives_factory_restart:true,committed_owner_and_session:true};
   });
   await record('ambient-session-cannot-switch-and-logout-revokes',async()=>{
     const before=proxy.facts.posts;

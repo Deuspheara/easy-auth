@@ -1,5 +1,13 @@
 # Protocol dependency assessment
 
+The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
+uses native browser modules/WebAuthn and fixed included HTML/CSS. It adds no
+server frontend runtime, remote font/image, package version or advisory ignore.
+The stylesheet hash check uses the existing OpenSSL/base64 dev dependencies;
+the browser still uses existing reviewed protocol implementations and original
+native options. Full browser/device/accessibility evidence is recorded separately,
+not inferred from dependency reuse or a source/format check.
+
 AUTH-43's read-only linked-provider inventory and password-service presence
 projection add no dependency, verifier, network client, cryptographic fixture,
 provider activation or migration. Existing source/session validation and SQL

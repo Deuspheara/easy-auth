@@ -3,7 +3,7 @@ use crate::error::ApiError;
 use axum::{
     extract::{Query, RawQuery, rejection::QueryRejection},
     http::{StatusCode, header},
-    response::{Html, IntoResponse, Response},
+    response::{IntoResponse, Response},
 };
 
 #[utoipa::path(get,path="/oidc/native/authorize",operation_id="nativeConsentAuthorize",responses((status=200,body=String,content_type="text/html"),(status=414)))]
@@ -13,7 +13,7 @@ pub(super) async fn authorize(RawQuery(query): RawQuery) -> Result<Response, Api
     }
     // GET neither parses authority nor persists anything. The fixed page scrubs
     // the query and requires explicit protected POST preparation/confirmation.
-    Ok(Html(include_str!("authorize.html")).into_response())
+    Ok(crate::pages::document(include_str!("authorize.html")).into_response())
 }
 pub(super) async fn script(
     query: Result<Query<NoQuery>, QueryRejection>,

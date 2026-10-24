@@ -7,7 +7,7 @@ pub(super) fn routes() -> Router<DeletionState> {
     Router::new()
         .route(
             "/oidc/account-delete",
-            get(|| async { Html(include_str!("pages.html")) }),
+            get(|| async { crate::pages::document(include_str!("pages.html")) }),
         )
         .route(
             "/oidc/account-delete.js",
@@ -20,6 +20,6 @@ pub(super) fn routes() -> Router<DeletionState> {
         )
 }
 
-pub(in crate::oidc) async fn callback_page() -> Html<&'static str> {
-    Html(include_str!("pages.html"))
+pub(in crate::oidc) async fn callback_page() -> Html<String> {
+    crate::pages::document(include_str!("pages.html"))
 }

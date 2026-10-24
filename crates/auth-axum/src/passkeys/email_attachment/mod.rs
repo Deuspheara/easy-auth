@@ -6,7 +6,6 @@ use axum::{
     extract::DefaultBodyLimit,
     http::header,
     middleware,
-    response::Html,
     routing::{get, post},
 };
 use utoipa::OpenApi;
@@ -24,7 +23,7 @@ pub(super) fn routes(auth: &Auth, browser: &BrowserConfig) -> Router {
         )
         .route(
             "/email-attach",
-            get(|| async { Html(include_str!("../../pages/email-attach.html")) }),
+            get(|| async { crate::pages::document(include_str!("../../pages/email-attach.html")) }),
         )
         .route(
             "/email-attach.js",
