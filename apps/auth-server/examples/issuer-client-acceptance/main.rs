@@ -7,6 +7,7 @@ mod client;
 mod database;
 #[path = "../oidc-keycloak/ipc.rs"]
 mod ipc;
+mod key_input;
 mod operations;
 #[path = "../../src/oidc_http/post.rs"]
 mod post;

@@ -43,8 +43,8 @@ impl Server {
             .env("AUTH_BIND", address.to_string())
             .env("AUTH_REALM_ID", provision.realm.to_string())
             .env("AUTH_ISSUER_ENABLED", "true")
-            .env("AUTH_ISSUER_KEY_ID", provision.key.to_string())
-            .env("AUTH_ISSUER_KEY_FILE", &provision.key_file)
+            .env("AUTH_ISSUER_KEY_ID", provision.signing.key.id().to_string())
+            .env("AUTH_ISSUER_KEY_FILE", &provision.signing.file)
             .env("SMTP_HOST", "127.0.0.1")
             .env(
                 "SMTP_PORT",
