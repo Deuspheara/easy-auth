@@ -6,7 +6,7 @@ Experimental Rust-first authentication for developers embedding Axum and teams s
 
 Available: same-browser email magic-link sign-in, verified email identity creation, opaque revocable sessions, a protected session endpoint, bounded session inventory, individual/all-session revocation, logout, PostgreSQL migrations, local SMTP and a minimal reference client. Opt-in headless password enrollment/sign-in and recovery use an explicit compromised-password corpus; see the [password guide](docs/guides/passwords.md). Tested negative cases include replay, cross-realm use, misbound browser proof and expiry. There is no Better Auth compatibility promise.
 
-Planned and required before the first feature-complete release: passkeys, Apple, Google, enterprise OIDC, SAML SP, outbound OIDC issuer, account/credential management and native integration. See the [Huly backlog export](docs/planning/backlog.json). Verified email changes and confirmed account deletion are available through the [lifecycle API](docs/guides/account-lifecycle.md). SAML validator review and issuer interoperability are release blockers. Password recovery and notification operations are documented in the [recovery guide](docs/guides/password-recovery.md).
+Planned and required before the first feature-complete release: passkeys, Apple, Google, enterprise OIDC, SAML SP, outbound OIDC issuer, account/credential management and native integration. See the [Huly backlog export](docs/planning/backlog.json). Verified email changes and confirmed account deletion are available through the [lifecycle API](docs/guides/account-lifecycle.md). SAML’s independent-review waiver leaves unresolved assurance findings; issuer acceptance and broader production gates are documented separately below. Password recovery and notification operations are documented in the [recovery guide](docs/guides/password-recovery.md).
 
 An explicit [experimental passkey-enrollment boundary](docs/guides/passkey-enrollment.md)
 now has core/PostgreSQL, HTTP and Chromium virtual-authenticator evidence. It is
@@ -45,9 +45,19 @@ The experimental [OIDC token verifier](docs/guides/oidc-verification.md) now che
 transaction-bound signatures and required claims, with explicit S256 code exchange
 and owned Keycloak evidence. Optional [identity mapping](docs/architecture/adr/0016-oidc-identity-mapping.md)
 adds typed display selection, exact issuer allowlists, explicit JIT and atomic local
-identity/session issuance with provider source/provenance checks. Public callback
-routes, complete provider lifecycle and ordinary activation remain gated. See the
+identity/session issuance with provider source/provenance checks. The optional [browser/startup boundary](docs/guides/oidc-web.md) supplies explicit
+HTTPS sign-in and confirmed deletion under exact persisted provider policy. Broader
+provider/production acceptance stays separate. See the
 [identity guide](docs/guides/oidc-identities.md) for scope and limitations.
+
+The optional [independent Rust client](docs/guides/oidc-client.md) performs bounded
+S256/state/nonce, real discovery/JWKS and RS256 verification without issuer cookies.
+The explicit [configured issuer](docs/guides/issuer-standalone.md) shares one
+application factory between executable and embedded modes, requires HTTPS and a
+protected key matching current persisted policy, and defaults off. Owned PostgreSQL,
+SMTP, browser, Node/Rust and native-loopback acceptance has bounded parity evidence;
+[verification scope](docs/security/oidc-client-standalone-verification.md) separates
+these results from production approval and independent assurance.
 
 ## Run locally
 
@@ -92,7 +102,7 @@ auth-axum = { package = "easy-auth-axum", path = "crates/auth-axum" }
 
 Construct `Postgres` from an SQLx pool, run its migrations and provision a trusted realm. Provide `EmailDelivery`, then mount `auth_axum::router(Auth::new(realm, repository, email), BrowserConfig::new(public_url, development)?)`. `GET /v1/session` is a protected Axum route using the core's session verification. The standalone binary is a complete executable composition example. Run the [embedded example](apps/auth-server/examples/embedded.rs) with `cargo run -p easy-auth-server --example embedded`; it adds `/private` to the same application and uses `auth_axum::authenticate` to retrieve the user. The binary and example share the real SMTP/PostgreSQL composition.
 
-Standalone alpha supports same-origin first-party browser apps. Unrelated applications must wait for the outbound OIDC issuer; do not share cookies or treat incoming vendor ID tokens as our application sessions. Application roles and business permissions remain in the consuming backend.
+Default standalone alpha supports same-origin first-party browser apps. Explicit `issuer-web` composition supports independent relying parties with their own callback state and application sessions; see the [issuer setup](docs/guides/issuer-standalone.md). Do not share issuer cookies or treat incoming vendor ID tokens as local application sessions. Application roles and business permissions remain in the consuming backend.
 
 ## Verify
 
