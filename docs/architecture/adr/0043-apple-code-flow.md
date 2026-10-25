@@ -54,6 +54,43 @@ the separate AUTH-26 scope; ordinary activation cannot strand provider-only user
 
 ## Evidence and remaining work
 
+## Experimental web delivery decision
+
+The next AUTH-24 boundary adds an explicit `apple-web` Axum composition, not
+ordinary server activation. Aligned persisted web-only Apple services, realm and
+exact HTTPS `/apple/callback` are mandatory. Start, finish and cancellation use
+the ordinary exact-Origin boundary and independent five-minute Secure/HttpOnly/
+host-only Lax operation cookies. Existing ambient session cookies prevent sign-in
+or silent account replacement; logout/revocation clears this feature's proofs.
+
+Only POST `/apple/callback` uses the shared non-authoritative cross-site delivery
+boundary. It enforces content type/body/core form bounds, escapes the actual form
+into a fixed handoff document, reads no cookies/storage and sets no authority.
+It never consumes state, exchanges codes or creates sessions. Fixed same-origin
+script removes the payload from DOM immediately and retains it only transiently.
+The user must deliberately confirm before a same-origin finish reads original
+private cookies and calls the existing Apple core/mapping/commit path. Keep
+ordinary cookies Lax; no SameSite=None, permissive CORS or Apple Origin bypass
+on authority routes. A foreign delivery origin proves no provider authenticity.
+
+Callback-aware cancellation carries the returned public state, checked against
+the current protected operation before clearing its cookies. The sign-in page
+may separately cancel its current pending operation deliberately. Malformed or
+stale callback rejection cannot clear a newer operation. Completion payloads are
+discarded before submission and on page navigation/restoration; failed or lost
+finishes cannot be automatically repeated. Raw proofs/provider details never
+enter URLs, script storage, logs or rendered diagnostics. Unsigned first-consent
+profile is not promoted into local contact or identity/display policy.
+
+Owned HTTPS Chromium plus real PostgreSQL and maintained offline JOSE producers
+must establish actual cross-site Lax behavior, deliberate completion, replay and
+wrong-browser/source/realm rejection, cancellation, CSP/privacy and cleanup.
+Those fixtures grant no authority directly and are not registered Apple/device
+acceptance. Native OS delivery, ordinary activation and grant lifecycle remain
+separate gates. No PR, merge or deployment follows from this experimental adapter.
+
+## Backend component evidence
+
 The implemented optional backend now composes that signer with exact Apple
 discovery/endpoints, client_secret_post and RS256 code-result verification. A
 private verifier profile admits Apple's exact boolean/text email flag encodings
