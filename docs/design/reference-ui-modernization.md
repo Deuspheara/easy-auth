@@ -103,7 +103,9 @@ Native dialog geometry and focus restoration stay application/browser-owned.
 
 Password/code clearing, stale-result rejection, current-owner checks, credential
 versions, native WebAuthn and server proofs remain in existing feature controllers.
-No backend API, schema, verifier or recovery policy changed. The supplied design's
+The visual adaptation changes no backend API, schema, verifier or recovery policy.
+The branch's earlier read-only linked-provider inventory is documented in ADR0041.
+The supplied design's
 prototype transport, invented response flags and broader CSP were not imported.
 
 ## Reproducible verification
@@ -190,3 +192,58 @@ passed syntax checks. Package notice line endings are normalized without changin
 license text. Staged whitespace checks passed. All 73 protected working files were
 unchanged; retained human-preview account/passkey counts and record IDs matched
 their pre-cleanup values. No migrations or account/credential cleanup ran.
+
+## Integration review — 2026-10-25
+
+The fetched `origin/main` is `7bd87b405dabd501562bb392042933743b125d2d`.
+Its direct comparison includes the inherited issuer delivery stack (558 files at
+`a7277cc`), not just this UI. The UI starts after
+`b7a2ed2d76b7f3c8013e798c51901a84b9a636b8`, the tip of
+`feat/auth-37-client-acceptance`. A stacked UI PR targets that prerequisite;
+integration into main still requires the prerequisite stack and final hosted gates.
+
+Two inventory invalidation issues were corrected:
+
+- Starting a passkey read now discards old labels, row actions and count before
+  loading, so an interrupted or freshness-denied read cannot retain that snapshot.
+- Reloading sessions/providers now discards the previous pagination cursor and
+  hides Show more. Failed continuation reads retain the accepted page and cursor;
+  failed reloads cannot skip the missing first page with an obsolete continuation.
+
+The genuine reference browser regression failed on the original embedded passkey
+module at `passkey-invalidation.cjs:16` and verified owned fixture cleanup. It passes
+with the fix, including held-request loading, actual network interruption and an
+explicit successful inventory retry. The separate Node presentation regression
+failed on the original pagination controller at its obsolete-continuation assertion
+and passes both inventory cases after correction. It uses fixed inventory outcomes
+without a server, authentication, session or proof; it is not authentication evidence.
+
+The final rebuilt genuine browser suite passes with zero external requests,
+uncaught page errors or CSP violations and verified disposable database/mail cleanup.
+The existing real freshness-denial, explicit native verification, account ownership,
+keyboard, responsive and account lifecycle checks remain in that run.
+
+Maintainability review keeps both fixes in the owning inventory controllers and
+regressions in named feature test modules. The controllers remain at or below
+150 lines, new test modules below 90 lines and functions below 50 lines. Existing
+documented ordered-scenario exceptions remain; no structural refactor, new
+dependency, API/schema/policy change or unrelated cleanup is introduced.
+
+Final follow-up checks passed on both corrected controllers: formatting, strict
+default/all-feature workspace/all-target Clippy, 128 default workspace tests and
+1,022 all-feature test reports (1,021 primary plus one isolated child), including
+181 HTTP cases and all 596 real PostgreSQL lifecycle cases. Suites ran sequentially.
+The commands are the required Rust checks above, the genuine reference UI runner,
+and `node --experimental-vm-modules tests/browser/reference-ui/inventory-pagination.cjs`.
+Token drift, shipped asset hashes, SAML source integrity, compiled dependency audit,
+cargo-deny, both npm audits, changed JavaScript syntax and scoped redacted gitleaks
+also passed. No advisory ignore was added; the inactive RSA lockfile notice remains.
+
+Initial browser execution was blocked by the restricted sandbox; permitted local
+execution resolved that environment failure. Initial advisory/license invocations
+could not find the existing audit/deny tools on PATH; reruns using that installation
+passed. An initial pagination test lacked its diagnostic-node DOM stub; adding the
+stub corrected the harness without changing controller assertions. The two expected
+pre-fix regression failures remain distinct from the passing final-source checks.
+Final logs use the local `/tmp/auth43-integration-` prefix. Hosted verification of
+the follow-up commit is separate and must be checked before integration.

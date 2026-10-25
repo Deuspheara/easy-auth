@@ -235,6 +235,7 @@ jobs:
       - name: Verify reference account UI with real PostgreSQL, SMTP and native passkeys
         run: |
           python3 scripts/reference_ui_tokens.py --check
+          node --experimental-vm-modules tests/browser/reference-ui/inventory-pagination.cjs
           node tests/browser/reference-ui/run.cjs
       - run: cargo build --locked -p easy-auth-server --bin easy-auth
       - run: python3 scripts/smoke_recovery_notice.py

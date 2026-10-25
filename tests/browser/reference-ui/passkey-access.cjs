@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 const {withAuthenticator} = require('../passkeys/browser.cjs');
+const {passkeyInvalidation} = require('./passkey-invalidation.cjs');
 
 async function passkeyAccess(browser, origin, mail, guard) {
   return withAuthenticator(browser, origin, undefined, 'internal', async ({context, page}) => {
@@ -70,9 +71,11 @@ async function passkeyAccess(browser, origin, mail, guard) {
     assert.equal(statuses.at(-1), 200);
     assert.equal(await page.locator('#account-id').textContent(), owner, 'account-bound native verification preserves the owner');
     assert.equal(await page.getByRole('heading', {name: 'Account security key', exact: true}).isVisible(), true);
+    await passkeyInvalidation(page);
     assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
     return {no_automatic_verification: true, accepted_addition_explained: true, real_freshness_denial: true, cancel_preserves_session: true,
-      explicit_native_verification: true, prompt_retry_retains_account: true, fresh_click_for_native_prompt: true, same_owner: true, passkeys_displayed: true};
+      explicit_native_verification: true, prompt_retry_retains_account: true, fresh_click_for_native_prompt: true, same_owner: true, passkeys_displayed: true,
+      inventory_invalidation: true};
   });
 }
 module.exports = {passkeyAccess};

@@ -65,5 +65,6 @@ are retained instead of adopting the prototype's French copy or invented adapter
 
 The ZIP design integration is recorded in
 [the modernization record](reference-ui-modernization.md). Rendered approval is
-separate from passing tests. AUTH-43 remains In Progress until owner approval is
-actually recorded; no accessibility audit or production-readiness claim is made.
+separate from passing tests. The owner approved the rendered UI and passkey
+verification journey on 2026-10-25. Integration review and prerequisite delivery
+remain separate; no accessibility audit or production-readiness claim is made.

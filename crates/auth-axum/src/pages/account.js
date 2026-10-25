@@ -78,7 +78,12 @@ function bindAccountRequests() {
 
 export async function loadProviders(reset = true) {
   const current = currentView();
-  if (reset) { element("providers").replaceChildren(); element("provider-diagnostics").replaceChildren(); }
+  if (reset) {
+    nextProviders = null;
+    element("more-providers").hidden = true;
+    element("providers").replaceChildren();
+    element("provider-diagnostics").replaceChildren();
+  }
   element("providers-card").hidden = false;
   element("retry-providers").hidden = true;
   element("providers-card").removeAttribute("data-loaded");
@@ -108,7 +113,11 @@ export async function loadProviders(reset = true) {
 
 export async function loadSessions(reset = true) {
   const current = currentView();
-  if (reset) { for (const id of ["sessions", "current-session", "session-diagnostics"]) element(id).replaceChildren(); }
+  if (reset) {
+    nextSessions = null;
+    element("more-sessions").hidden = true;
+    for (const id of ["sessions", "current-session", "session-diagnostics"]) element(id).replaceChildren();
+  }
   element("refresh-account").hidden = element("retry-sessions").hidden = true;
   element("session-overview-state").textContent = "Checking sessions…";
   element("sessions-state").textContent = "Loading active sessions…";

@@ -46,6 +46,9 @@ export function bindPasskeys(refreshAccount, checkAccount, caps, verifyAccount) 
 
 export async function loadPasskeys(caps, verifyFresh = false) {
   inventoryAvailable = false;
+  // A previous accepted snapshot must not survive a pending or denied read.
+  element("passkeys").replaceChildren();
+  element("passkeys-summary").textContent = "View and manage registered passkeys";
   if (!caps.passkeyManagement) return false;
   const current = currentView();
   element("passkeys-state").textContent = "Checking passkey access…";

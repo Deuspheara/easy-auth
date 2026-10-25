@@ -10,6 +10,7 @@ cd tests/browser/passkeys && npx --no-install playwright install chromium
 cd ../../..
 cargo build --locked -p easy-auth-server --example passkey-recovery-browser --features experimental-passkey-recovery
 python3 scripts/reference_ui_tokens.py --check
+node --experimental-vm-modules tests/browser/reference-ui/inventory-pagination.cjs
 node tests/browser/reference-ui/run.cjs
 ```
 
@@ -37,6 +38,14 @@ Account-access coverage uses a genuine mailbox login, observes inventory401,
 checks Cancel sends no logout, creates a key normally and explicitly verifies it
 through account-bound native authentication before inventory200. Aggregate facts
 include the extra genuinely created owner/proven key and authentication event.
+The inventory invalidation module holds and then aborts a new read after genuine
+passkey verification. It checks that previous labels, actions and count disappear
+while pending, stay absent on failure, and return only after an explicit successful
+retry against the real inventory endpoint.
+An isolated Node presentation test checks session/provider cursor invalidation
+after failed reloads and preserves cursors after failed continuations. Its fixed
+inventory outcomes exercise controller rendering only; it starts no server and
+creates no authentication, session or proof. Genuine acceptance remains separate.
 A separate genuine two-tab mailbox flow switches account through real logout and
 SMTP login, then explicitly triggers the return focus event and verifies refresh clears the previous owner’s unfinished
 form, returns to the overview and labels the current session without a duplicate
