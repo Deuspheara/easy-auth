@@ -86,8 +86,18 @@ impl AppleCodeExchange {
         exchange: OAuthExchange,
         code: OidcAuthorizationCode,
     ) -> Result<VerifiedOidcIdentity> {
-        if !matches!(exchange.purpose(), OAuthPurpose::SignIn)
-            || exchange.configuration() != self.configuration()
+        if !matches!(exchange.purpose(), OAuthPurpose::SignIn) {
+            return Err(Error::Unauthorized);
+        }
+        self.exchange_registered(exchange, code).await
+    }
+
+    async fn exchange_registered(
+        &self,
+        exchange: OAuthExchange,
+        code: OidcAuthorizationCode,
+    ) -> Result<VerifiedOidcIdentity> {
+        if exchange.configuration() != self.configuration()
             || exchange.redirect() != self.configuration().redirect()
         {
             return Err(Error::Unauthorized);
