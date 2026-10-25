@@ -10,6 +10,7 @@ pub(in crate::sessions) async fn list(
     current: Uuid,
     after: Option<Uuid>,
     limit: i64,
+    linked_only: bool,
 ) -> Result<Vec<PgRow>> {
     sqlx::query(r#"
         SELECT s.id,s.id=$3 AS current,
@@ -25,6 +26,7 @@ pub(in crate::sessions) async fn list(
         WHERE s.realm_id=$1 AND s.user_id=$2 AND s.authentication_method='oidc' AND s.revoked_at IS NULL
           AND s.expires_at>statement_timestamp() AND s.last_seen_at>statement_timestamp()-interval '30 minutes'
           AND c.enabled AND c.revision=s.oidc_revision AND p.revision=c.revision AND e.issuer=c.issuer
+          AND (NOT $6::boolean OR e.explicitly_linked)
           AND ($4::uuid IS NULL OR s.id>$4)
         ORDER BY s.id LIMIT $5
     "#)
@@ -33,6 +35,7 @@ pub(in crate::sessions) async fn list(
         .bind(current)
         .bind(after)
         .bind(limit)
+        .bind(linked_only)
         .fetch_all(&mut **tx)
         .await
         .map_err(unavailable)

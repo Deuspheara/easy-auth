@@ -70,8 +70,14 @@ removing a different identity under the account's unchanged policy.
 
 Serialize the target subject before source/email/owner/session locks. Recheck target
 ownership after waits, retain the caller's original idle/absolute/freshness caps,
-and remove only the target identity. Existing foreign-key cascades invalidate its
-sessions; unrelated sources and realms remain intact. Reciprocal unlink attempts
+and remove only the target identity. Revoke its sessions and detach only their
+identity UUID before deletion, preserving original OIDC method/revision/timestamps
+and historical session rows required by composite audit foreign keys. An additive
+constraint admits missing OIDC identity only on revoked historical rows; current
+source validation still requires an actual bound identity, even if a row were
+improperly unrevoked. Do not rewrite history as a local authentication method or
+deidentify unrelated account audit. Ordinary account-deletion cascades remain.
+Unrelated sources and realms remain intact. Reciprocal unlink attempts
 serialize on owner: after one removes a source, the other's retained-source recheck
 must reject. A disabled target may be removed using another still-valid method.
 

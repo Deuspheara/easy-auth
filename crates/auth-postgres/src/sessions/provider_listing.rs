@@ -12,7 +12,7 @@ pub(super) async fn list(
 ) -> Result<Vec<PgRow>> {
     let mut rows = Vec::new();
     #[cfg(feature = "oidc-identities")]
-    rows.extend(super::oidc::list(tx, realm, owner, current, after, limit).await?);
+    rows.extend(super::oidc::list(tx, realm, owner, current, after, limit, false).await?);
     #[cfg(feature = "saml-identities")]
     rows.extend(super::saml::list(tx, realm, owner, current, after, limit).await?);
     // Both queries use the same exact UUID cursor/order. Merge their bounded

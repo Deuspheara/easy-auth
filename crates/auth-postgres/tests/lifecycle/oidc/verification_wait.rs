@@ -110,7 +110,9 @@ async fn linking_context_rechecks_original_freshness_after_an_unchanged_owner_wa
     };
     wait_for_lock(
         &f.pool,
-        "%FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE%",
+        // The shared owner lock retains an additional email-snapshot predicate;
+        // the wait, original cap and rejection assertions remain authoritative.
+        "%SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2%FOR UPDATE%",
     )
     .await;
     tokio::time::sleep(Duration::from_millis(2100)).await;

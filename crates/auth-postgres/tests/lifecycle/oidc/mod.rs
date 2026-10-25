@@ -15,6 +15,8 @@ mod identities;
 mod identity_policy;
 #[cfg(feature = "oidc-identities")]
 mod identity_policy_schema;
+#[cfg(all(feature = "oidc-linking", feature = "apple"))]
+mod linking;
 mod refresh;
 mod setup;
 

@@ -35,7 +35,7 @@ impl Postgres {
                 return Err(Error::Unauthorized);
             }
         } else {
-            sqlx::query(r#"
+            let rows=sqlx::query(r#"
             SELECT id,id=$3 AS current,
                 floor(extract(epoch FROM created_at)*1000)::bigint AS created_at_ms,
                 floor(extract(epoch FROM last_seen_at)*1000)::bigint AS last_seen_at_ms,
@@ -62,7 +62,29 @@ impl Postgres {
             .bind((PAGE_SIZE+1) as i64)
             .fetch_all(&mut *tx)
             .await
-            .map_err(unavailable)?
+            .map_err(unavailable)?;
+            #[cfg(feature = "oidc-linking")]
+            let rows = if user.authentication_policy == AuthenticationPolicy::Mailbox {
+                let mut combined = rows;
+                combined.extend(
+                    super::oidc::list(
+                        &mut tx,
+                        realm,
+                        user.id,
+                        current_id,
+                        after,
+                        (PAGE_SIZE + 1) as i64,
+                        true,
+                    )
+                    .await?,
+                );
+                combined.sort_unstable_by_key(|row| row.get::<Uuid, _>("id"));
+                combined.truncate(PAGE_SIZE + 1);
+                combined
+            } else {
+                rows
+            };
+            rows
         };
         let more = rows.len() > PAGE_SIZE;
         let sessions: Vec<SessionInfo> = rows

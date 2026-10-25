@@ -1,7 +1,11 @@
 mod deletion;
+#[cfg(feature = "oidc-linking")]
+mod linking;
 mod mapped;
 mod policy;
 mod signin;
+#[cfg(feature = "oidc-linking")]
+pub use linking::{OidcIdentityLinkRepository, OidcIdentityLinking};
 
 pub use deletion::{
     MAX_OIDC_DELETION_AUTH_AGE_SECONDS, OidcAccountDeletion, OidcAccountDeletionRepository,

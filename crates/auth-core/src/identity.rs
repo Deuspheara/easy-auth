@@ -11,6 +11,22 @@ pub enum AuthenticationPolicy {
     ProviderRequired,
 }
 
+impl AuthenticationPolicy {
+    /// Pure account-method policy, never authentication. Method and the explicit
+    /// link marker must come from current authoritative source storage. Signature,
+    /// credential, source, realm, owner/session and deadline checks remain required.
+    pub fn permits_session_method(self, method: &str, explicitly_linked: bool) -> bool {
+        match self {
+            Self::Mailbox => {
+                matches!(method, "email" | "password" | "passkey" | "legacy_unknown")
+                    || (method == "oidc" && explicitly_linked)
+            }
+            Self::PasskeyRequired => method == "passkey",
+            Self::ProviderRequired => matches!(method, "oidc" | "saml"),
+        }
+    }
+}
+
 impl TryFrom<&str> for AuthenticationPolicy {
     type Error = Error;
 

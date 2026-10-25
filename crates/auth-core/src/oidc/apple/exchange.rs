@@ -92,6 +92,22 @@ impl AppleCodeExchange {
         self.exchange_registered(exchange, code).await
     }
 
+    /// Explicit web-link proof only. Sign-in and deletion inputs remain rejected;
+    /// native OS linking is not enabled by this backend entry point.
+    #[cfg(feature = "oidc-linking")]
+    pub async fn exchange_linking(
+        &self,
+        exchange: OAuthExchange,
+        code: OidcAuthorizationCode,
+    ) -> Result<VerifiedOidcIdentity> {
+        if !matches!(exchange.purpose(), OAuthPurpose::Link { .. })
+            || self.client_type != AppleClientType::Web
+        {
+            return Err(Error::Unauthorized);
+        }
+        self.exchange_registered(exchange, code).await
+    }
+
     async fn exchange_registered(
         &self,
         exchange: OAuthExchange,

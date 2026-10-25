@@ -1,5 +1,25 @@
 # Domain model
 
+Optional `oidc-linking` adds an explicit identity mutation boundary using the
+existing `OAuthPurpose::Link {user,session}`, opaque mapped proof and current fresh
+session. `OidcIdentityLinking` returns existing public `LinkedProvider` metadata;
+it creates no session, contact, display update or account-policy transition.
+Migration0037 adds `explicitly_linked`, default false for historical/JIT identities.
+Mailbox policy can accept an actually linked OIDC source; passkey-required policy
+still requires a passkey. A policy change alone never converts a JIT identity into
+a mailbox link. The marker is authoritative storage, never a request flag.
+
+Unlink requires a fresh method that will remain and rejects removal of the
+current OIDC source. It removes only the scoped owned identity, revokes/detaches
+its sessions and keeps their original OIDC method/revision/timestamps and audit
+references. A detached historical row must remain revoked and cannot authenticate.
+Existing scoped five-minute subject cooldown prevents held callbacks from
+reattaching or creating replacement owners. Finite linked/unlinked audit facts
+and a notice only to existing verified local contact commit with the mutation;
+provider email never selects ownership or a recipient. Remote provider-grant
+revocation remains separate. [ADR0044](adr/0044-explicit-social-identity-linking.md)
+records proof, retained-factor, transaction and deferred acceptance boundaries.
+
 Apple's opt-in backend uses the existing exact-issuer external OIDC subject
 namespace and `provider_required` account/session provenance. Apple is a provider,
 not a new storage protocol or email-based owner key. Unsigned initial profile,
@@ -19,7 +39,7 @@ can be linked or removed through this read. See
 
 A realm is an authentication security partition; it is not a workspace/business organization. A registered client belongs to a realm and has exact redirects, origin policy and audience. The first slice binds one realm per server/router in trusted configuration; no request body may select it.
 
-User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. Optional OIDC identity records are unique by (realm, connection, local client, exact issuer, subject), with bytewise issuer/subject equality; matching emails never merge users. Provider-only JIT users have null contact and explicit provider_required policy, with source/revision-bound oidc sessions and optional original provider authentication time. Planned linking must prove the current fresh session and a new provider transaction. Unlinking must preserve a usable credential/recovery path. Merges are disabled until separately reviewed.
+User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. Optional OIDC identity records are unique by (realm, connection, local client, exact issuer, subject), with bytewise issuer/subject equality; matching emails never merge users. Provider-only JIT users have null contact and explicit provider_required policy, with source/revision-bound oidc sessions and optional original provider authentication time. Explicit optional linking proves the current fresh session and a purpose-bound provider transaction. Unlinking requires fresh authentication with a retained method as described above. Merges are disabled until separately reviewed.
 
 Password credentials now store a salted Argon2id PHC string under a realm/user composite key, with single-enrollment uniqueness. Enrollment requires a fresh verified session and replaces existing sessions atomically. Credentials (password, passkey) are distinct from provider accounts and user records. The optional passkey enrollment boundary stores RP-scoped credential/public-key state, counter/backup state, last-use metadata and a user label; ordinary activation and credential management remain unfinished. Planned discoverable enrollment must provision a passkey-first user under a reviewed enrollment transaction. Recovery cannot silently replace stronger assurance with email; explicit policy, delays/notifications and audit required.
 

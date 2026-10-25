@@ -1,5 +1,17 @@
 # Architecture
 
+Optional core/PostgreSQL `oidc-linking` now extends existing provider modules with
+explicit purpose-bound linking and fresh retained-method unlink. Its mapped proof
+and original session are separate from public inventory metadata. Current source,
+owner, policy, uniqueness and original caps remain authoritative; identity/audit/
+verified-contact notice commit atomically with no session, contact or policy upgrade.
+An explicit-linked marker permits OIDC on existing mailbox accounts while retaining
+passkey requirements and rejecting accidental JIT-policy conversion. Unlink revokes
+and detaches removed-source sessions without breaking audit history, and installs
+the existing scoped cooldown against old callbacks. Provider-grant revocation and
+ordinary activation stay gated. [ADR0044](adr/0044-explicit-social-identity-linking.md)
+records this boundary and its remaining web/acceptance requirements.
+
 The optional core/PostgreSQL `apple` component now supplies protected ES256 client
 secrets, explicit web/native code redemption, a dedicated nonce-bound Apple RS256
 profile and shared sign-in preparation/completion. It reuses the existing opaque

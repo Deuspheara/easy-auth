@@ -2,6 +2,10 @@ mod authorization;
 mod callback;
 mod exchange;
 mod flow;
+#[cfg(feature = "oidc-linking")]
+mod linking;
+#[cfg(feature = "oidc-linking")]
+pub use linking::AppleIdentityLinkAuthorization;
 mod key;
 mod nonce;
 mod profile;

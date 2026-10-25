@@ -55,9 +55,6 @@ pub(super) async fn active_caller(
           AND s.expires_at>clock_timestamp()
           AND s.last_seen_at>clock_timestamp()-interval '30 minutes'
           AND s.authentication_method=$4
-          AND ((u.authentication_policy='mailbox' AND s.authentication_method NOT IN ('oidc','saml'))
-            OR (u.authentication_policy='passkey_required' AND s.authentication_method='passkey')
-            OR (u.authentication_policy='provider_required' AND s.authentication_method IN ('oidc','saml')))
         "#,
     )
     .bind(realm)
@@ -68,9 +65,16 @@ pub(super) async fn active_caller(
     .await
     .map_err(unavailable)?
     .ok_or(Error::Unauthorized)?;
+    let account = user_from_row(realm, &row)?;
+    if !source
+        .permits_policy(tx, realm, account.id, account.authentication_policy)
+        .await?
+    {
+        return Err(Error::Unauthorized);
+    }
     let deadline = Deadline::active_session(tx, realm, user, session).await?;
     sqlx::query("UPDATE auth_sessions SET last_seen_at=clock_timestamp() WHERE realm_id=$1 AND user_id=$2 AND id=$3")
         .bind(realm).bind(user).bind(session)
         .execute(&mut **tx).await.map_err(unavailable)?;
-    Ok((user_from_row(realm, &row)?, session, deadline))
+    Ok((account, session, deadline))
 }

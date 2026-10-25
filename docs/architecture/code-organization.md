@@ -1,5 +1,24 @@
 # Code organization
 
+Optional identity linking extends core `oidc/identities/linking.rs` and the owning
+Google/Apple authorization modules. Default operations still reject another
+purpose. PostgreSQL `oauth/identities/linking/` owns completion, retained-factor
+unlink and verified-contact notice enqueue; current source/session authorization
+and subject/cooldown helpers remain shared. Pure account-method eligibility lives
+in core; local credential mutation retains the existing local freshness validator.
+Audit kinds carry finite UUID metadata, not provider claims.
+
+Subject/owner lookup, Apple registered completion and test-producer module graphs
+were extracted in separate regression-tested commits before extension. Test modules
+separate lifecycle, binding, account policy, retained-factor races, atomic faults,
+observed deadlines and migration/privacy constraints. A producer is loaded only
+once per suite; no Clippy suppression, public proof constructor, SQL in HTTP,
+generic provider framework or new dependency is introduced. New implementation/test
+modules remain below300 lines. Longer ordered transactions/producer/scenarios keep
+lock order, original caps, mutations, rollback and valid/negative controls visible
+together as reviewed function-size exceptions. Migration constraints are explicit
+data, preserving published migrations. No unrelated cleanup is deferred.
+
 The explicit Axum Apple adapter extends `oidc/apple/`: trusted web services,
 routing, closed wire types, delivery escaping, thin completion/cancel handlers,
 fixed pages/script and selected contract each own one purpose. Existing cookie,

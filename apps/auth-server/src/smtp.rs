@@ -25,6 +25,9 @@ impl Smtp {
 }
 #[async_trait]
 impl EmailDelivery for Smtp {
+    async fn providers_changed(&self, email: &str) -> auth_core::Result<()> {
+        self.send(email,"Your linked sign-in providers changed","An external sign-in identity was linked or unlinked after a fresh authentication and deliberate confirmation. Unlinking revokes sessions from that identity; the confirming method remains. If this was not you, use a retained method to review your account and contact the service operator through a trusted channel. This notice contains no credential, provider token, subject or sign-in link.".to_owned()).await
+    }
     async fn passkey_recovery_completed(&self, email: &str) -> auth_core::Result<()> {
         self.send(email, "Passkey recovery completed", "A saved-code recovery request completed after the waiting period and proof of a replacement passkey. Previous passkeys and sessions were invalidated. Sign in with the replacement key and configure a new saved recovery code. If this was not you, contact the service operator through a trusted channel. This notice contains no credential, code or sign-in link.".to_owned()).await
     }

@@ -70,6 +70,7 @@ pub(crate) async fn fresh_session(
         AND last_seen_at>clock_timestamp()-interval '30 minutes'
         AND authenticated_at>clock_timestamp()-interval '5 minutes'
         AND authenticated_at<=clock_timestamp()
+        AND authentication_method NOT IN ('oidc','saml')
         AND EXISTS (SELECT 1 FROM auth_users owner
             WHERE owner.realm_id=$1 AND owner.id=$2
               AND (owner.authentication_policy='mailbox'

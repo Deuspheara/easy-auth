@@ -1,5 +1,24 @@
 # Threat model — alpha design, before credential flows
 
+Explicit social linking uses a separate Link purpose and original fresh owner/
+session with a signed nonce-bound provider result; matching email/profile never
+selects a local owner. Default sign-in/deletion cannot consume a linking proof.
+Current target/source policy, exact subject uniqueness and earliest original caps
+are rechecked under locks after provider I/O and final writes. Explicit-linked
+storage permits only the existing mailbox policy's optional provider source;
+historical JIT records and passkey requirements gain no fallback. Local-only
+credential mutations still reject provider methods even with recent signed time.
+
+Unlink requires a genuinely fresh retained method and rejects removal of its own
+OIDC source. Reciprocal attempts serialize on owner and revalidate retained source
+after waits. Only removed-source sessions are revoked/detached; their historical
+method/revision/timestamps/audit rows remain. Detached source rows cannot be
+unrevoked or validated. Scoped cooldown blocks old verified callbacks from
+reattaching/JIT replacement. Link/unlink/audit/verified-local-contact notice enqueue
+commit atomically; notices use no provider recipient. Remote grant revocation,
+native linking, ordinary activation and real-provider qualification remain gated.
+See [ADR0044](../architecture/adr/0044-explicit-social-identity-linking.md).
+
 The optional Apple backend signs only fixed ES256 team/client/audience claims
 from one protected P-256 key with a finite operator window. Five-minute secrets
 are capped at key retirement; signing capacity remains owned through cancellation.

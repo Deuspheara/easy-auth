@@ -4,6 +4,8 @@ use uuid::Uuid;
 impl AuditEvent {
     pub fn user_id(&self) -> Option<Uuid> {
         match self {
+            Self::OidcIdentityLinked { user_id, .. }
+            | Self::OidcIdentityUnlinked { user_id, .. } => Some(*user_id),
             Self::IssuerNativeCredential(event) => Some(event.user_id),
             Self::IssuerAuthorized { user_id, .. }
             | Self::IssuerCodeRedeemed { user_id, .. }
@@ -31,6 +33,12 @@ impl AuditEvent {
     }
     pub fn actor_session_id(&self) -> Option<Uuid> {
         match self {
+            Self::OidcIdentityLinked {
+                actor_session_id, ..
+            }
+            | Self::OidcIdentityUnlinked {
+                actor_session_id, ..
+            } => Some(*actor_session_id),
             Self::IssuerNativeCredential(_) => None,
             Self::PasskeyRecoveryCancelled {
                 actor_session_id, ..
@@ -82,6 +90,7 @@ impl AuditEvent {
     }
     pub fn session_id(&self) -> Option<Uuid> {
         match self {
+            Self::OidcIdentityLinked { .. } | Self::OidcIdentityUnlinked { .. } => None,
             Self::IssuerNativeCredential(_) => None,
             Self::EmailAuthenticated { session_id, .. }
             | Self::OidcAuthenticated { session_id, .. }

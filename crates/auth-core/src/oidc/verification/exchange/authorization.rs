@@ -23,6 +23,22 @@ impl OidcAuthorizationUrl {
     pub fn expose(&self) -> &str {
         &self.0
     }
+    /// Fixed account selection for the explicit Google linking operation. This
+    /// is a user-choice request, never evidence of recent provider authentication.
+    #[cfg(all(feature = "google", feature = "oidc-linking"))]
+    pub(in crate::oidc) fn with_google_account_selection(mut self) -> Result<Self> {
+        let mut url = url::Url::parse(&self.0).map_err(|_| Error::Unavailable)?;
+        if url
+            .query_pairs()
+            .any(|(name, _)| name.eq_ignore_ascii_case("prompt"))
+        {
+            return Err(Error::Unavailable);
+        }
+        url.query_pairs_mut()
+            .append_pair("prompt", "select_account");
+        self.0 = Zeroizing::new(url.into());
+        Ok(self)
+    }
     #[cfg(feature = "google")]
     pub(in crate::oidc) fn with_google_session_age(mut self) -> Result<Self> {
         let mut url = url::Url::parse(&self.0).map_err(|_| Error::Unavailable)?;

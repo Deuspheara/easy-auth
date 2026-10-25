@@ -1,4 +1,4 @@
-//! Existing fresh-owner authorization reused by outbound consent/code commits.
+//! Current fresh-owner authorization reused by consent and explicit identity links.
 use super::ownership::Owner;
 use crate::{deadlines::Deadline, unavailable};
 use auth_core::{Error, Result, Verifier};
@@ -15,6 +15,7 @@ pub(crate) struct FreshSessionSnapshot {
 pub(crate) struct FreshSessionAuthorization {
     pub(crate) user: Uuid,
     pub(crate) session: Uuid,
+    #[cfg(feature = "issuer-codes")]
     pub(crate) authenticated_at_us: i64,
     pub(crate) method: String,
     pub(crate) deadline: Deadline,
@@ -37,7 +38,7 @@ impl FreshSessionSnapshot {
     ) -> Result<FreshSessionAuthorization> {
         let user = self.owner.user;
         let session = self.owner.lock_fresh(tx, self.realm, self.current).await?;
-        let (method, authenticated_at_us): (String, i64) = sqlx::query_as(
+        let details: (String, i64) = sqlx::query_as(
             "SELECT authentication_method,(extract(epoch FROM authenticated_at)*1000000)::bigint FROM auth_sessions WHERE realm_id=$1 AND user_id=$2 AND id=$3 AND authentication_method IN ('email','password','passkey','oidc','saml')",
         ).bind(self.realm).bind(user).bind(session).fetch_optional(&mut **tx).await
             .map_err(unavailable)?.ok_or(Error::Unauthorized)?;
@@ -45,8 +46,9 @@ impl FreshSessionSnapshot {
         Ok(FreshSessionAuthorization {
             user,
             session,
-            authenticated_at_us,
-            method,
+            #[cfg(feature = "issuer-codes")]
+            authenticated_at_us: details.1,
+            method: details.0,
             deadline,
         })
     }

@@ -18,6 +18,12 @@ pub use google::{
 };
 #[cfg(feature = "oidc-identities")]
 mod identities;
+#[cfg(all(feature = "apple", feature = "oidc-linking"))]
+pub use apple::AppleIdentityLinkAuthorization;
+#[cfg(all(feature = "google", feature = "oidc-linking"))]
+pub use google::GoogleIdentityLinkAuthorization;
+#[cfg(feature = "oidc-linking")]
+pub use identities::{OidcIdentityLinkRepository, OidcIdentityLinking};
 mod metadata;
 mod policy;
 mod ports;

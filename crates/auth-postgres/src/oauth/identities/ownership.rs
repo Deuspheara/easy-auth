@@ -1,7 +1,6 @@
-use crate::{
-    identity::{lock_provider_user, user_from_row},
-    unavailable,
-};
+#[cfg(not(feature = "oidc-linking"))]
+use crate::identity::lock_provider_user;
+use crate::{identity::user_from_row, unavailable};
 use auth_core::{Error, OidcJitPolicy, OidcMappedIdentity, Result, User};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
@@ -12,7 +11,15 @@ pub(super) async fn resolve(
 ) -> Result<(User, Uuid)> {
     let proof = mapped.identity();
     let c = proof.configuration();
-    super::subject::lock(tx, mapped).await?;
+    super::subject::lock(
+        tx,
+        c.realm(),
+        c.connection(),
+        c.client(),
+        c.issuer(),
+        proof.subject(),
+    )
+    .await?;
     let existing: Option<(Uuid,Uuid,Option<String>)> = sqlx::query_as(r#"
         SELECT e.id,e.user_id,u.email FROM auth_oidc_identities e
         JOIN auth_users u ON u.realm_id=e.realm_id AND u.id=e.user_id
@@ -27,7 +34,11 @@ pub(super) async fn resolve(
         .await
         .map_err(unavailable)?;
     if let Some((identity, owner, email)) = existing {
+        #[cfg(not(feature = "oidc-linking"))]
         let user = lock_provider_user(tx, c.realm(), owner, email.as_deref()).await?;
+        #[cfg(feature = "oidc-linking")]
+        let user =
+            crate::identity::lock_user_snapshot(tx, c.realm(), owner, email.as_deref()).await?;
         let bound: Option<Uuid> = sqlx::query_scalar(
             r#"
             SELECT id FROM auth_oidc_identities
@@ -47,6 +58,17 @@ pub(super) async fn resolve(
         .map_err(unavailable)?;
         if bound != Some(identity) {
             return Err(Error::Unauthorized);
+        }
+        #[cfg(feature = "oidc-linking")]
+        {
+            let linked:bool=sqlx::query_scalar("SELECT explicitly_linked FROM auth_oidc_identities WHERE realm_id=$1 AND id=$2 AND user_id=$3")
+                .bind(c.realm()).bind(identity).bind(owner).fetch_one(&mut **tx).await.map_err(unavailable)?;
+            if !user
+                .authentication_policy
+                .permits_session_method("oidc", linked)
+            {
+                return Err(Error::Unauthorized);
+            }
         }
         // A vanished owner never falls through to JIT in an old callback.
         return Ok((user, identity));

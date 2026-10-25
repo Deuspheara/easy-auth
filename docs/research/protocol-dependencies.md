@@ -1,5 +1,14 @@
 # Protocol dependency assessment
 
+AUTH-25's optional linking boundary reuses existing Google/Apple/OAuth/JOSE and
+PostgreSQL primitives; no dependency/version or custom cryptographic primitive is
+introduced. Fixed Google `select_account` is a documented account-choice request,
+not a fresh-event claim; the explicitly selected session-age profile still rejects
+missing signed authentication time. Apple retains its own nonce/code contract,
+without an invented prompt or PKCE fallback. Explicit local ownership and purpose
+binding replace email-based linking; [ADR0044](../architecture/adr/0044-explicit-social-identity-linking.md)
+records primary references and the retained real-provider/lifecycle gates.
+
 AUTH-24's optional Apple component reuses pinned josekit0.10.3/OpenSSL0.10.81:
 established P-256 key import/ES256 compact JWS for fixed client secrets and the
 existing RS256 verification worker for Apple identity tokens. No dependency or

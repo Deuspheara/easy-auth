@@ -105,12 +105,18 @@ pub use oidc::{
     GoogleCodeExchange, GoogleSessionAgeCodeExchange,
 };
 
+#[cfg(all(feature = "apple", feature = "oidc-linking"))]
+pub use oidc::AppleIdentityLinkAuthorization;
+#[cfg(all(feature = "google", feature = "oidc-linking"))]
+pub use oidc::GoogleIdentityLinkAuthorization;
 #[cfg(feature = "oidc-identities")]
 pub use oidc::{
     MAX_OIDC_DELETION_AUTH_AGE_SECONDS, OidcAccountDeletion, OidcAccountDeletionRepository,
     OidcDisplayNameClaim, OidcIdentityPolicy, OidcIdentityRepository, OidcJitPolicy,
     OidcMappedIdentity, OidcSignIn,
 };
+#[cfg(feature = "oidc-linking")]
+pub use oidc::{OidcIdentityLinkRepository, OidcIdentityLinking};
 
 #[cfg(feature = "oidc-verification")]
 pub use oidc::{

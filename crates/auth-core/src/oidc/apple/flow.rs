@@ -28,11 +28,35 @@ pub enum AppleAuthorizationCompletion {
 pub struct AppleAuthorization {
     transactions: Arc<OAuthTransactions>,
     exchange: Arc<AppleCodeExchange>,
+    purpose: ExpectedPurpose,
+}
+pub(super) enum ExpectedPurpose {
+    SignIn,
+    #[cfg(feature = "oidc-linking")]
+    Link,
+}
+impl ExpectedPurpose {
+    fn require(&self, purpose: &OAuthPurpose) -> Result<()> {
+        match (self, purpose) {
+            (Self::SignIn, OAuthPurpose::SignIn) => Ok(()),
+            #[cfg(feature = "oidc-linking")]
+            (Self::Link, OAuthPurpose::Link { .. }) => Ok(()),
+            _ => Err(Error::Unauthorized),
+        }
+    }
 }
 impl AppleAuthorization {
     pub fn new(
         transactions: Arc<OAuthTransactions>,
         exchange: Arc<AppleCodeExchange>,
+    ) -> Result<Self> {
+        Self::configured(transactions, exchange, ExpectedPurpose::SignIn)
+    }
+
+    pub(super) fn configured(
+        transactions: Arc<OAuthTransactions>,
+        exchange: Arc<AppleCodeExchange>,
+        purpose: ExpectedPurpose,
     ) -> Result<Self> {
         if transactions.configuration() != exchange.configuration()
             || transactions.redirect() != exchange.configuration().redirect()
@@ -42,6 +66,7 @@ impl AppleAuthorization {
         Ok(Self {
             transactions,
             exchange,
+            purpose,
         })
     }
     pub fn configuration(&self) -> &OAuthConnection {
@@ -49,7 +74,7 @@ impl AppleAuthorization {
     }
 
     pub async fn begin(&self, intent: &OAuthIntent<'_>) -> Result<AppleAuthorizationStart> {
-        require_signin(&intent.purpose)?;
+        self.purpose.require(&intent.purpose)?;
         let transaction = self.transactions.begin(intent).await?;
         match self.exchange.authorization(&transaction).await {
             Ok(request) => Ok(AppleAuthorizationStart {
@@ -73,7 +98,7 @@ impl AppleAuthorization {
         actual_redirect: &str,
         response: AppleAuthorizationResponse,
     ) -> Result<AppleAuthorizationCompletion> {
-        require_signin(&intent.purpose)?;
+        self.purpose.require(&intent.purpose)?;
         let (state, outcome) = response.into_parts();
         if state.verifier() != expected_state.verifier()
             || actual_redirect != self.transactions.redirect()
@@ -97,7 +122,11 @@ impl AppleAuthorization {
                         },
                     )
                     .await?;
-                let identity = self.exchange.exchange(exchange, code).await?;
+                let identity = match self.purpose {
+                    ExpectedPurpose::SignIn => self.exchange.exchange(exchange, code).await?,
+                    #[cfg(feature = "oidc-linking")]
+                    ExpectedPurpose::Link => self.exchange.exchange_linking(exchange, code).await?,
+                };
                 return Ok(AppleAuthorizationCompletion::Verified {
                     identity: Box::new(identity),
                     initial_profile,
@@ -118,14 +147,7 @@ impl AppleAuthorization {
         state: &Secret,
         proof: &OAuthBrowserProof,
     ) -> Result<()> {
-        require_signin(&intent.purpose)?;
+        self.purpose.require(&intent.purpose)?;
         self.transactions.cancel(intent, state, proof).await
-    }
-}
-fn require_signin(purpose: &OAuthPurpose) -> Result<()> {
-    if matches!(purpose, OAuthPurpose::SignIn) {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
     }
 }

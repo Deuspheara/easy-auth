@@ -87,27 +87,7 @@ impl Postgres {
         .await
         .map_err(unavailable)?;
         let user = user.ok_or(Error::Unauthorized)?;
-        let active: Option<Uuid> = sqlx::query_scalar(
-            r#"
-            SELECT id
-            FROM auth_sessions
-            WHERE realm_id=$1
-            AND token_hash=$2
-            AND revoked_at IS NULL
-            AND authenticated_at > clock_timestamp()-interval '5 minutes'
-            AND authenticated_at <= clock_timestamp()
-            AND expires_at > clock_timestamp()
-            AND last_seen_at > clock_timestamp()-interval '30 minutes'
-            FOR
-            UPDATE
-            "#,
-        )
-        .bind(realm)
-        .bind(current.as_slice())
-        .fetch_optional(&mut *tx)
-        .await
-        .map_err(unavailable)?;
-        let actor_session_id = active.ok_or(Error::Unauthorized)?;
+        let actor_session_id = crate::locking::fresh_session(&mut tx, realm, user, current).await?;
         let deadline = Deadline::fresh_session(&mut tx, realm, user, actor_session_id).await?;
         let inserted = sqlx::query("INSERT INTO auth_password_credentials(realm_id,user_id,password_hash) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING")
             .bind(realm)

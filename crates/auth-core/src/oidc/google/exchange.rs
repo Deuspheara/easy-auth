@@ -92,4 +92,18 @@ impl GoogleCodeExchange {
         }
         self.exchange.exchange(exchange, code).await
     }
+
+    #[cfg(feature = "oidc-linking")]
+    pub async fn exchange_linking(
+        &self,
+        exchange: OAuthExchange,
+        code: OidcAuthorizationCode,
+    ) -> Result<VerifiedOidcIdentity> {
+        if !matches!(exchange.purpose(), OAuthPurpose::Link { .. })
+            || self.configuration().redirect_policy() != crate::OAuthRedirectPolicy::Exact
+        {
+            return Err(Error::Unauthorized);
+        }
+        self.exchange.exchange(exchange, code).await
+    }
 }

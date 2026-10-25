@@ -1,5 +1,28 @@
 # HTTP contract v1
 
+## Optional Rust social identity mutation
+
+Core/PostgreSQL `oidc-linking` exposes `OidcIdentityLinking` and the
+`OidcIdentityLinkRepository` port. Explicit `AppleIdentityLinkAuthorization` and
+`GoogleIdentityLinkAuthorization` retain original private web operation proof and
+only accept linking purpose; default sign-in/deletion components still reject it.
+Google's selected ordinary/session-age profile remains explicit and requests fixed
+account selection without inventing freshness. Apple native kind and Google desktop
+loopback linking are rejected; OS delivery remains unimplemented.
+
+`finish(mapped,current_session)` consumes the mapped link proof and requires its
+original session/owner, current source/policy, uniqueness and original deadlines.
+It returns public `LinkedProvider` metadata only; no local session or policy change.
+Duplicate/conflicting ownership, including same-owner repeat, is Unauthorized
+without exposing another owner. `unlink(realm,current_session,identity_uuid)`
+requires fresh retained-method authority and rejects removal of the caller's own
+OIDC source. Cross-owner/realm UUIDs are not authority. Identity mutation, scoped
+cooldown, finite audit and existing verified-contact notice enqueue are atomic.
+The delivery port's additive `providers_changed` hook must be implemented by custom
+adapters selecting this feature; its default reports Unavailable and leaves retry
+work rather than claiming delivery. Existing SMTP implements a fixed non-secret notice.
+See [ADR0044](adr/0044-explicit-social-identity-linking.md).
+
 The optional Rust Apple boundary exposes `AppleClientSecretSigner`,
 `AppleCodeExchange` and `AppleAuthorization` behind core/PostgreSQL `apple`.
 Preparation returns private proof separately from public web/native request
