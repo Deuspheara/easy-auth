@@ -84,7 +84,7 @@ check passed. No assertion, admission limit, timeout, security policy or signatu
 verification was weakened to fix those failures. Current Apple metadata and claim
 references were read from official primary sources; no provider data was invented.
 
-Maintained modules are cohesive and under200 lines. The longer constructors and
+New Apple modules are cohesive and under200 lines. The longer constructors and
 ordered consume/cancel, signing and test sequences retain their security invariants
 visibly; no public proof constructor, generic provider framework, duplicated SQL
 policy or unrelated cleanup was introduced. The protected original checkout's73
