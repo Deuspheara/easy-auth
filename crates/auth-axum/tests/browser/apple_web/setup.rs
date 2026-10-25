@@ -1,5 +1,5 @@
 pub(super) use super::provider::{CLIENT, ISSUER, Provider};
-use crate::support::{Mail, post};
+use crate::support::post;
 pub(super) use auth_core::*;
 use auth_postgres::Postgres;
 use axum::Router;
@@ -8,7 +8,7 @@ pub(super) use axum::{
     http::Request,
     response::Response,
 };
-use easy_auth_axum::{AppleWebServices, BrowserConfig, experimental_apple_web_router};
+use easy_auth_axum::AppleWebServices;
 pub(super) use serde_json::{Value, json};
 use sqlx::PgPool;
 pub(super) use std::sync::{Arc, atomic::Ordering};
@@ -51,72 +51,7 @@ impl Fixture {
         Self::with_origin(pool, ORIGIN).await
     }
     pub async fn with_origin(pool: PgPool, origin: &str) -> Self {
-        let store = Arc::new(Postgres::new(pool.clone()));
-        store.migrate().await.unwrap();
-        let realm = Uuid::new_v4();
-        store.ensure_realm(realm).await.unwrap();
-        let now: i64 =
-            sqlx::query_scalar("SELECT floor(extract(epoch FROM clock_timestamp()))::bigint")
-                .fetch_one(&pool)
-                .await
-                .unwrap();
-        let (provider, signer) = Provider::new(now as u64);
-        let config = OAuthConnection::new(
-            realm,
-            Uuid::new_v4(),
-            Uuid::new_v4(),
-            ISSUER,
-            CLIENT,
-            &format!("{origin}/apple/callback"),
-            OAuthMixupDefense::DedicatedRedirect,
-        )
-        .unwrap();
-        let policy = store
-            .configure_oidc_identity_policy(
-                &OidcIdentityPolicy::new(config, &[ISSUER], OidcDisplayNameClaim::Subject)
-                    .unwrap()
-                    .with_jit(OidcJitPolicy::Allow),
-            )
-            .await
-            .unwrap();
-        let exchange = Arc::new(
-            AppleCodeExchange::new(
-                policy.configuration().clone(),
-                store.clone(),
-                store.clone(),
-                signer,
-                AppleClientType::Web,
-                provider.clone(),
-                provider.clone(),
-            )
-            .unwrap(),
-        );
-        let services = AppleWebServices::new(
-            policy.clone(),
-            Arc::new(OAuthTransactions::new(
-                policy.configuration().clone(),
-                store.clone(),
-            )),
-            exchange,
-            Arc::new(OidcSignIn::new(store.clone())),
-        )
-        .unwrap();
-        let auth = Auth::new(realm, store.clone(), Arc::new(Mail::default()));
-        let app = experimental_apple_web_router(
-            auth.clone(),
-            BrowserConfig::new(origin, false).unwrap(),
-            services.clone(),
-        )
-        .unwrap();
-        Self {
-            app,
-            pool,
-            store,
-            provider,
-            policy,
-            auth,
-            services,
-        }
+        super::composition::create(pool, origin).await
     }
     pub fn realm(&self) -> Uuid {
         self.policy.configuration().realm()
