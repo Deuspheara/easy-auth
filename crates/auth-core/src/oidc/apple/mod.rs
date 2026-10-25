@@ -23,3 +23,10 @@ pub use secret::{AppleClientSecret, AppleClientSecretSigner};
 mod grants;
 #[cfg(feature = "apple-grants")]
 pub use grants::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};
+
+#[cfg(feature = "apple-grants")]
+pub use grants::{
+    AppleGrantAuthorization, AppleGrantAuthorizationCompletion, AppleGrantCapture,
+    AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
+    AppleVerifiedGrant,
+};

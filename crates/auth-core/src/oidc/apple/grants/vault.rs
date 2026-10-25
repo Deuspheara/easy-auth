@@ -1,4 +1,7 @@
-use super::{AppleGrantEnvelope, AppleGrantKey, keys::KeySet, protection};
+use super::{
+    AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, keys::KeySet, payload::StoredGrant,
+    protection,
+};
 use crate::{Error, Result};
 use std::sync::Arc;
 use tokio::sync::Semaphore;
@@ -16,6 +19,14 @@ impl AppleGrantVault {
             keys: Arc::new(KeySet::new(current, retained)?),
             workers: Arc::new(Semaphore::new(MAX_STORAGE_WORKERS)),
         })
+    }
+    pub(super) async fn seal(
+        &self,
+        binding: AppleGrantBinding,
+        payload: StoredGrant,
+    ) -> Result<AppleGrantEnvelope> {
+        self.blocking(move |keys| protection::seal(keys, binding, payload))
+            .await
     }
     pub async fn rewrap(&self, envelope: &AppleGrantEnvelope) -> Result<AppleGrantEnvelope> {
         let envelope = envelope.clone();

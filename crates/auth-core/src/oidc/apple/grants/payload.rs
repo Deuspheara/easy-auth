@@ -19,6 +19,7 @@ pub(super) struct StoredGrant {
     pub version: u8,
     pub kind: GrantTokenKind,
     pub token: String,
+    pub provider_client: String,
     pub access_expires_us: Option<i64>,
 }
 impl StoredGrant {
@@ -27,7 +28,13 @@ impl StoredGrant {
             GrantTokenKind::Refresh => self.access_expires_us.is_none(),
             GrantTokenKind::Access => self.access_expires_us.is_some_and(|v| v > 0),
         };
-        if self.version != 1
+        if self.provider_client.is_empty()
+            || self.provider_client.len() > 1024
+            || !self
+                .provider_client
+                .bytes()
+                .all(|b| (0x20..=0x7e).contains(&b))
+            || self.version != 1
             || self.token.is_empty()
             || self.token.len() > MAX_GRANT_TOKEN_BYTES
             || !self.token.bytes().all(|b| (0x20..=0x7e).contains(&b))

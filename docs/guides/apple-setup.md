@@ -171,3 +171,14 @@ The optional [social management composition](social-linking.md) adds separate
 owner/session-bound web link operations and fresh retained-method local unlink.
 The ordinary `AppleAuthorization` and separate Apple web router stay sign-in-only.
 This is not remote Apple grant revocation, native linking or ordinary activation.
+
+## Protected grant capture component (in progress)
+
+Optional Rust `apple-grants` now provides explicit verified code-result capture,
+protected keys/envelopes and atomic PostgreSQL attachment to the actual resolved
+identity. Select it separately from ordinary Apple authorization/web services.
+Local unlink/deletion queues protected revocation work; neither that queue nor key
+rewrapping confirms revocation at Apple. Worker, retention maintenance and HTTP/
+browser integration remain in development. See the
+[Rust contract](../architecture/api-contract.md#optional-rust-apple-grant-capture-in-progress)
+and [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md).

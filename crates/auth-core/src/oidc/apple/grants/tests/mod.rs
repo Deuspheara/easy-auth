@@ -22,6 +22,7 @@ pub(super) fn payload() -> StoredGrant {
         version: 1,
         kind: GrantTokenKind::Refresh,
         token: "owned-refresh-material".to_owned(),
+        provider_client: "com.example.owned".to_owned(),
         access_expires_us: None,
     }
 }

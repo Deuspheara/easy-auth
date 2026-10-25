@@ -26,13 +26,19 @@ use uuid::Uuid;
 #[derive(Clone)]
 pub struct Postgres {
     pool: PgPool,
+    #[cfg(feature = "apple-grants")]
+    apple_grant_vault: Option<std::sync::Arc<auth_core::AppleGrantVault>>,
 }
 fn unavailable(_: sqlx::Error) -> Error {
     Error::Unavailable
 }
 impl Postgres {
     pub fn new(pool: PgPool) -> Self {
-        Self { pool }
+        Self {
+            pool,
+            #[cfg(feature = "apple-grants")]
+            apple_grant_vault: None,
+        }
     }
     pub async fn migrate(&self) -> Result<()> {
         sqlx::migrate!()

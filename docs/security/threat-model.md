@@ -1,5 +1,16 @@
 # Threat model — alpha design, before credential flows
 
+In-progress optional Apple capture retains credentials only after the same
+initiated response passes signed identity/nonce/source verification. Opaque
+mapped/capture types expose no raw-token upload or proof constructor. Atomic
+final completion encrypts against actual resolved realm/source/client/identity/
+grant binding; the provider client is inside the authenticated payload too.
+Missing vault, audit failure, source disable and original-cap expiry roll back
+local authority and capture together. Local unlink/account erasure queue encrypted
+jobs through a schema trigger; local user/contact/subject data is not copied into
+the ledger. Worker, retention maintenance and real-provider qualification remain
+pending. A job or elapsed access-token lifetime never establishes remote revocation.
+
 Explicit social web linking requires trusted concrete selection, exact-Origin
 closed JSON and four independent host-only private Link cookies per provider.
 Displayed owner UUIDs only reject an unexpected session; original purpose/session

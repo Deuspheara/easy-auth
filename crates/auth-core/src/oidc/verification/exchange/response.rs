@@ -1,3 +1,6 @@
+#[cfg(feature = "apple-grants")]
+mod capture;
+
 use super::super::input::{OidcIdToken, optional};
 use crate::{Error, MAX_OIDC_DOCUMENT_BYTES, Result};
 use serde::Deserialize;

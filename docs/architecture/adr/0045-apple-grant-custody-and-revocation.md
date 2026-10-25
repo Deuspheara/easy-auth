@@ -123,3 +123,23 @@ passing assertions. New responsibilities live in owning Apple grant and PostgreS
 feature modules; refactors remain separate from behavior. Preserve published APIs/
 migrations unless this scoped explicit contract requires an additive extension.
 Review file tree, visibility, transaction/lock order and duplication before closure.
+
+## Capture/ledger engineering checkpoint
+
+Optional Rust capture now shares original callback admission/redemption/signed
+verification and final existing identity/link transactions. Explicit authorization,
+opaque verified/mapped/capture types and sign-in/link use cases require a configured
+vault. Captured material reaches SQL only after bounded encryption against the
+actual resolved identity. Default flows still discard unused credentials. The
+payload includes exact provider client, for worker comparison before dispatch.
+
+Migration0038 queues all captured grants on identity deletion. Ordinary account
+deletion with no vault still erases audit subjects and preserves pending ciphertext/
+minimal binding metadata. Trusted row/version-based rewrap preserves pending
+eligibility of604800 elapsed seconds rather than timezone-dependent calendar
+arithmetic. Queue/worker/expiry contracts are not yet a functioning revoker or
+retention process. The first deletion test's direct SQL correctly hit the audit-
+user foreign key; the corrected case uses actual ordinary account deletion
+preparation/completion without relaxing that constraint. Observed final-audit
+expiry, source-disable, concurrent completion, missing configuration and rollback
+controls accompany actual captured sign-in/link/unlink tests.

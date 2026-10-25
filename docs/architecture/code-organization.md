@@ -1,5 +1,23 @@
 # Code organization
 
+Apple grant capture extends `oidc/apple/grants/` with explicit authorization,
+opaque verified/mapped/capture types and repository use cases. Shared response
+projection, redemption and callback admission were extracted in separate tested
+commits. The response-owned capture projection holds unverified credentials only
+until signed proof passes. Protection stays in core; PostgreSQL completion/link
+transactions call a concrete optional capture hook under existing locks and caps.
+`oauth/identities/apple/` owns ciphertext insertion, trusted vault composition and
+row/version-based rotation. Migration0038 preserves jobs across ordinary unlink/
+deletion without depending on an optional worker.
+
+Core tests use existing actual signers. PostgreSQL cases separate lifecycle,
+atomic faults, schema, observed deadlines/source/concurrency and rotation;
+maintained producers load once. New modules stay below300 lines. Longer ordered
+fixtures/scenarios retain setup, actual waits, negative/positive controls and
+cleanup as size-review exceptions. No SQL/policy/proof constructor/registry or
+new dependency moves into HTTP. Worker qualification remains in progress; no
+unrelated cleanup is deferred.
+
 Explicit Axum social management owns concrete matching services, thin provider
 handlers, closed wire types, original-owner/cookie binding, unlink delegation,
 composition, contract and fixed pages/controllers under `oidc/social/`. Existing

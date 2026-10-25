@@ -50,10 +50,26 @@ pub(super) struct Fixture {
     pub provider: Arc<Provider>,
     pub flow: Arc<AppleAuthorization>,
     pub kind: AppleClientType,
+    #[cfg(feature = "apple-grants")]
+    pub grant_flow: Arc<AppleGrantAuthorization>,
+    #[cfg(feature = "apple-grants")]
+    pub vault: Arc<AppleGrantVault>,
+    #[cfg(feature = "apple-grants")]
+    pub component: Arc<AppleCodeExchange>,
 }
 impl Fixture {
     pub async fn new(pool: PgPool, kind: AppleClientType, jit: OidcJitPolicy) -> Self {
         let (store, realm) = realm(pool.clone()).await;
+        #[cfg(feature = "apple-grants")]
+        let vault = Arc::new(
+            AppleGrantVault::new(
+                AppleGrantKey::new(Uuid::new_v4(), vec![17; 32]).unwrap(),
+                vec![],
+            )
+            .unwrap(),
+        );
+        #[cfg(feature = "apple-grants")]
+        let store = store.with_apple_grant_vault(vault.clone());
         let store = Arc::new(store);
         let now: i64 =
             sqlx::query_scalar("SELECT floor(extract(epoch FROM clock_timestamp()))::bigint")
@@ -94,7 +110,18 @@ impl Fixture {
                     policy.configuration().clone(),
                     store.clone(),
                 )),
-                component,
+                component.clone(),
+            )
+            .unwrap(),
+        );
+        #[cfg(feature = "apple-grants")]
+        let grant_flow = Arc::new(
+            AppleGrantAuthorization::sign_in(
+                Arc::new(OAuthTransactions::new(
+                    policy.configuration().clone(),
+                    store.clone(),
+                )),
+                component.clone(),
             )
             .unwrap(),
         );
@@ -105,6 +132,12 @@ impl Fixture {
             provider,
             flow,
             kind,
+            #[cfg(feature = "apple-grants")]
+            grant_flow,
+            #[cfg(feature = "apple-grants")]
+            vault,
+            #[cfg(feature = "apple-grants")]
+            component,
         }
     }
     pub fn realm(&self) -> Uuid {

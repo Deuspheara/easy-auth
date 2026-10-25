@@ -15,7 +15,14 @@ impl OidcIdentityRepository for Postgres {
         mapped: OidcMappedIdentity,
         session: Verifier,
     ) -> Result<User> {
-        finish(self, mapped, session).await
+        finish(
+            self,
+            mapped,
+            session,
+            #[cfg(feature = "apple-grants")]
+            None,
+        )
+        .await
     }
 }
 
@@ -23,6 +30,7 @@ pub(super) async fn finish(
     store: &Postgres,
     mapped: OidcMappedIdentity,
     session: Verifier,
+    #[cfg(feature = "apple-grants")] capture: Option<auth_core::AppleGrantCapture>,
 ) -> Result<User> {
     let proof = mapped.identity();
     if !matches!(proof.purpose(), OAuthPurpose::SignIn) {
@@ -33,6 +41,10 @@ pub(super) async fn finish(
     let deadline = Deadline::proof(proof.expires_us());
     deadline.check(&mut tx).await?;
     let (user, identity) = ownership::resolve(&mut tx, &mapped).await?;
+    #[cfg(feature = "apple-grants")]
+    if let Some(capture) = capture {
+        super::apple::insert(store, &mut tx, identity, capture).await?;
+    }
     let authenticated_at = proof
         .authenticated_at()
         .map(i64::try_from)

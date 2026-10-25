@@ -210,3 +210,10 @@ pub use oidc::{OidcClientCredential, OidcClientCredentials, OidcClientIdentity, 
 
 #[cfg(feature = "apple-grants")]
 pub use oidc::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};
+
+#[cfg(feature = "apple-grants")]
+pub use oidc::{
+    AppleGrantAuthorization, AppleGrantAuthorizationCompletion, AppleGrantCapture,
+    AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
+    AppleVerifiedGrant,
+};

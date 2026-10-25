@@ -67,3 +67,10 @@ pub use verification::{
 
 #[cfg(feature = "apple-grants")]
 pub use apple::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};
+
+#[cfg(feature = "apple-grants")]
+pub use apple::{
+    AppleGrantAuthorization, AppleGrantAuthorizationCompletion, AppleGrantCapture,
+    AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
+    AppleVerifiedGrant,
+};

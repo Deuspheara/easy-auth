@@ -1,3 +1,5 @@
+#[cfg(feature = "apple-grants")]
+mod capture;
 mod redemption;
 
 use super::{AppleClientSecretSigner, AppleNonceEncoding};

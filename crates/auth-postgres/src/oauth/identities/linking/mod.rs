@@ -13,7 +13,14 @@ impl OidcIdentityLinkRepository for Postgres {
         identity: OidcMappedIdentity,
         current: Verifier,
     ) -> Result<LinkedProvider> {
-        completion::finish(self, identity, current).await
+        completion::finish(
+            self,
+            identity,
+            current,
+            #[cfg(feature = "apple-grants")]
+            None,
+        )
+        .await
     }
     async fn unlink_oidc_identity(
         &self,
@@ -23,4 +30,14 @@ impl OidcIdentityLinkRepository for Postgres {
     ) -> Result<()> {
         unlink::finish(self, realm, current, identity).await
     }
+}
+
+#[cfg(feature = "apple-grants")]
+pub(super) async fn finish_apple_capture(
+    store: &Postgres,
+    mapped: OidcMappedIdentity,
+    current: Verifier,
+    capture: auth_core::AppleGrantCapture,
+) -> Result<LinkedProvider> {
+    completion::finish(store, mapped, current, Some(capture)).await
 }

@@ -12,6 +12,7 @@ pub(super) async fn finish(
     store: &Postgres,
     mapped: OidcMappedIdentity,
     current: Verifier,
+    #[cfg(feature = "apple-grants")] capture: Option<auth_core::AppleGrantCapture>,
 ) -> Result<LinkedProvider> {
     let proof = mapped.identity();
     let (owner, expected_session) = match proof.purpose() {
@@ -50,6 +51,10 @@ pub(super) async fn finish(
     let identity = Uuid::new_v4();
     sqlx::query("INSERT INTO auth_oidc_identities(realm_id,id,connection_id,client_id,issuer,subject,user_id,explicitly_linked) VALUES($1,$2,$3,$4,$5,$6,$7,true)")
         .bind(c.realm()).bind(identity).bind(c.connection()).bind(c.client()).bind(c.issuer()).bind(proof.subject()).bind(owner).execute(&mut *tx).await.map_err(unavailable)?;
+    #[cfg(feature = "apple-grants")]
+    if let Some(capture) = capture {
+        super::super::apple::insert(store, &mut tx, identity, capture).await?;
+    }
     audit::record(
         &mut tx,
         c.realm(),

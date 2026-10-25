@@ -36,6 +36,51 @@ The default Apple schema includes the finite selected-composition enum; this is
 not authority or activation. Scripts drop raw returns before finish and on
 navigation/restoration; no storage, raw rendering or automatic finish retry.
 
+## Optional Rust Apple grant capture (in progress)
+
+Core/PostgreSQL `apple-grants` adds explicit `AppleGrantAuthorization::sign_in` and
+`::linking`, separate from default credential-discarding Apple operations. Link
+registration remains web-only. Begin/cancel/callback admission reuse original
+purpose/private proof/exact return/one-use state/source/deadline checks.
+Completion returns opaque `AppleVerifiedGrant` only after the same response's
+Apple signature/nonce/issuer/audience/source checks pass. Unsigned profile never
+selects an owner. There is no raw-token upload or public proof constructor.
+
+`grant.map(&policy)` consumes the result into `AppleMappedGrant`.
+`AppleGrantSignIn::finish` generates a local session only after final repository
+commit; `AppleGrantLinking::finish` retains the original owner/session and issues
+no session. `AppleGrantRepository` extends shared identity/link transactions with
+atomic encrypted capture. Select explicit protected `AppleGrantVault` on the
+PostgreSQL adapter using `with_apple_grant_vault`; missing configuration returns
+Unavailable and rolls back all local authority. Compiling the feature changes
+neither the normal Apple router nor its selected services.
+
+The repository-only `into_parts` boundary exposes a mapped proof and opaque
+`AppleGrantCapture`, never a raw credential. Its `seal(binding,vault)` requires
+the same realm/source/client. The transaction supplies the identity actually
+resolved under existing locks. Authenticated storage binding includes realm/
+source/client/identity/grant; the encrypted payload also binds the exact provider
+client string. Refresh tokens are preferred. Access-only capture requires a
+positive bounded lifetime conservatively anchored before redemption; this is
+not authentication freshness or an extended proof/session lifetime.
+
+Migration0038 stores only encrypted credentials. A storage trigger moves every
+captured grant into pending revocation atomically on unlink/deletion, including
+ordinary account deletion with no vault selected. Existing freshness, audit
+erasure and session isolation still apply. Jobs retain opaque binding/source IDs,
+not local user/contact/subject columns. Pending eligibility is capped at604800
+elapsed seconds, independent of database timezone; this is not automatic erasure
+or confirmed remote revocation. Worker and retention maintenance remain required
+and unimplemented at this checkpoint.
+
+Trusted `rotate_apple_grant_key(realm,grant_id)` rewraps active/pending/failed rows
+under the configured current storage key using a row lock and version CAS. It
+skips busy/leased/finished rows, preserves binding/deadlines, changes no provider
+token and claims no remote success. Retain explicit old reading keys until
+migration completes; missing keys never select fallback. See
+[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). Full worker/HTTP/browser
+qualification and real-provider/production acceptance remain pending.
+
 ## Optional Rust social identity mutation
 
 Core/PostgreSQL `oidc-linking` exposes `OidcIdentityLinking` and the
