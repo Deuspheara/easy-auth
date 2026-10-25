@@ -192,6 +192,10 @@ recheck them again after network exchange. Account policy, external token signat
 nonce validation, final identity/session atomicity, reviewed egress and real-provider
 checks remain release gates. See [ADR 0013](../architecture/adr/0013-oauth-state-transactions.md).
 
+AUTH-47 tracks current execution, unperformed manual checks and remaining source review in the
+[protocol validation matrix](protocol-validation-matrix.md). Counts and existing
+corpora do not establish protocol compliance or independent approval.
+
 Created 2026-10-18. Not a security audit. Assets: user identity, credential verifiers, active sessions, provider secrets/signing keys, email delivery and audit integrity. Actors: unauthenticated remote attacker, malicious browser origin, malicious configured/unconfigured IdP, compromised mailbox, compromised application/tenant, operator and stolen database/backup. Trust boundaries: browser/HTTP, core/persistence, outbound provider network, SMTP, configuration and application authorization.
 
 | Threat | Required control | Evidence/release gate |
@@ -199,7 +203,7 @@ Created 2026-10-18. Not a security audit. Assets: user identity, credential veri
 | Email account takeover / enumeration | Browser-bound single-use high-entropy proof; generic start response; no email auto-link; email compromise acknowledged | Expiry, mismatch, enumeration-shape and replay tests; stronger methods later |
 | Login CSRF, CSRF, fixation | Exact Origin on every browser POST, HttpOnly host cookies, deliberate SameSite, fresh secret per authentication | Missing/null/wrong Origin, old cookie and duplicate-cookie tests |
 | Session theft/replay | Only verifier in DB, idle+absolute expiry, DB validation, logout/revoke-all; TLS | DB expiry and immediate subsequent-request revocation tests; active bearer theft remains usable until revoked |
-| Refresh theft | Atomic rotation and family reuse detection; secure native storage | Native release blocked pending replay tests |
+| Refresh theft | Atomic rotation and family reuse detection; secure native storage | Core/real-PG reuse, concurrency, final-deadline and isolation tests exist; native OS/storage and release acceptance remain gated |
 | OAuth code injection/mix-up/state or nonce reuse | Connection+client+browser-bound expiring transaction, S256, issuer/nonce/audience/signature checks; atomic consume | M04/M05 wrong-state/nonce/issuer/audience/provider/replay corpus |
 | Open redirect | Exact registered redirect allowlist; never redirect to arbitrary user input | M07 invalid redirect tests |
 | Discovery/metadata SSRF | Explicit admin connections; HTTPS; DNS/IP/port allowlists, no redirects, bounded response, block private/link-local/metadata addresses unless explicit local test policy | M05 DNS rebinding/redirect/private-network tests |

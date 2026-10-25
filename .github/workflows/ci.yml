@@ -68,6 +68,7 @@ jobs:
       - run: python3 scripts/check_saml_source.py
       - run: python3 -m unittest scripts.test_saml_source
       - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --workspace --all-targets -- -D warnings
       - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - run: cargo test --locked --workspace
       - run: cargo test --locked --workspace --all-features
@@ -157,6 +158,18 @@ jobs:
           cargo test --locked -p easy-auth-axum --features saml-web --test browser saml::
       - name: Verify isolated Apple web HTTP boundaries
         run: cargo test --locked -p easy-auth-axum --features apple-web --test browser apple_web
+      - name: Verify social linking without unrelated protocol features
+        run: |
+          cargo test --locked -p easy-auth-core --features google,apple,oidc-linking --lib oidc::
+          cargo test --locked -p easy-auth-postgres --features google,apple,oidc-linking --test lifecycle oidc::linking::
+          cargo test --locked -p easy-auth-axum --features social-linking-web --test browser social::
+      - name: Verify protected Apple grants with isolated feature selection
+        run: |
+          cargo test --locked -p easy-auth-core --features apple-grants --lib oidc::
+          cargo test --locked -p easy-auth-postgres --features apple-grants --test lifecycle oidc::apple::
+          cargo test --locked -p easy-auth-axum --features apple-grants-web --test browser apple_web::
+          cargo test --locked -p easy-auth-axum --features apple-grants-web,social-linking-web --test browser social::
+          cargo test --locked -p easy-auth-server --features apple-grants --lib oidc_http::
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -197,6 +210,58 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features apple-web --example apple-web-browser
           node tests/browser/apple-web/run.cjs
+      - name: Verify owned social linking and separate feature-disabled source control
+        run: |
+          cargo build --locked -p easy-auth-axum --features google-web --example social-source-probe
+          cp target/debug/examples/social-source-probe "$RUNNER_TEMP/easy-auth-social-source-probe"
+          cargo build --locked -p easy-auth-axum --features social-linking-web --example social-web-browser
+          node tests/browser/social/run.cjs
+        env:
+          EASY_AUTH_SOCIAL_SOURCE_PROBE: ${{ runner.temp }}/easy-auth-social-source-probe
+          EASY_AUTH_SOCIAL_WEB_TEST_REPORT: ${{ runner.temp }}/social-browser-${{ github.sha }}.json
+      - name: Verify captured Apple browser lifecycle and feature-disabled account erasure
+        run: |
+          cargo build --locked -p easy-auth-axum --no-default-features --example apple-grant-erasure-probe
+          cp target/debug/examples/apple-grant-erasure-probe "$RUNNER_TEMP/easy-auth-apple-erasure-probe"
+          cargo build --locked -p easy-auth-axum --features social-linking-web,apple-grants-web --example apple-grants-browser
+          node tests/browser/apple-grants/run.cjs
+        env:
+          EASY_AUTH_APPLE_GRANT_ERASURE_PROBE: ${{ runner.temp }}/easy-auth-apple-erasure-probe
+          EASY_AUTH_APPLE_GRANTS_TEST_REPORT: ${{ runner.temp }}/apple-grants-browser-${{ github.sha }}.json
+      - name: Verify both lifecycle receipts identify this checkout
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib, json, os
+          from pathlib import Path
+          profiles = [
+              ("social-browser", 13, "social-web-browser", "easy-auth-social-source-probe"),
+              ("apple-grants-browser", 9, "apple-grants-browser", "easy-auth-apple-erasure-probe"),
+          ]
+          for name, count, fixture, probe in profiles:
+              report = json.loads((Path(os.environ["RUNNER_TEMP"]) / f"{name}-{os.environ['GITHUB_SHA']}.json").read_text())
+              assert report["source_base_revision"] == os.environ["GITHUB_SHA"]
+              assert len(report["cases"]) == count
+              assert all(case["status"] == "passed" for case in report["cases"])
+              cleanup = report["cleanup"]
+              assert cleanup["stopped"] and cleanup["database_removed"]
+              assert not cleanup["emergency_cleanup"] and not cleanup["diagnostic"]
+              assert report["private_tls_files_removed"]
+              for field, binary in [
+                  ("fixture_binary_sha256", Path("target/debug/examples") / fixture),
+                  ("feature_disabled_probe_binary_sha256", Path(os.environ["RUNNER_TEMP"]) / probe),
+              ]:
+                  assert report[field] == hashlib.sha256(binary.read_bytes()).hexdigest()
+          PYTHON
+      - name: Retain sanitized social and Apple lifecycle receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-apple-lifecycle-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/social-browser-${{ github.sha }}.json
+            ${{ runner.temp }}/apple-grants-browser-${{ github.sha }}.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Verify owned SAML HTTPS POST browser flow
         run: |
           cargo build --locked -p easy-auth-axum --features saml-web --example saml-web-browser

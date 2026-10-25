@@ -61,8 +61,8 @@ cargo test --offline --locked -p easy-auth-postgres --features apple-grants --te
 cargo test --offline --locked -p easy-auth-server --all-features oidc_http::
 ```
 
-`DATABASE_URL` selected only the owned disposable PostgreSQL17 container with no
-volumes; no preview database, retained account, passkey or real provider was used.
+`DATABASE_URL` selected only the owned disposable PostgreSQL17 container with its image-created anonymous data volume and automatic removal;
+no host bind or explicitly retained named volume was used; no preview database, retained account, passkey or real provider was used.
 TLS uses fresh owned private certificates/listeners, never system trust changes.
 The TLS wire tests use generated fixture values; actual client-secret signatures
 and captured token encoding are independently asserted by the worker fixtures.
@@ -294,3 +294,14 @@ the authorized next publication step after this receipt; hosted CI success is no
 claimed or awaited, and main-only deployment conditions exclude this feat branch.
 Live Apple acceptance and unaccepted upstream prerequisites remain tracker gates;
 this evidence does not authorize closure, merge, release or deployment.
+
+
+## Resource-description correction — AUTH-47 audit
+
+The earlier phrase “no volumes” was inaccurate. Docker's PostgreSQL image creates
+an anonymous data volume even without an explicit mount. Inspection confirms the
+known owned test container has AutoRemove enabled, no HostConfig bind/explicit
+mounts, one anonymous-labelled data volume and no other container using it. The
+volume was created with this owned fixture. No retained preview/database volume
+was used. This corrects resource wording, not test results or authority policy.
+Docker documents [automatic anonymous-volume cleanup with --rm](https://docs.docker.com/reference/cli/docker/container/run/#clean-up---rm).
