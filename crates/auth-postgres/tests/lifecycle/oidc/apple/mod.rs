@@ -2,6 +2,5 @@ mod atomicity;
 mod binding;
 mod deadline;
 mod lifecycle;
-#[path = "../../../../../../tests/support/apple/provider.rs"]
-mod provider;
+use super::apple_provider as provider;
 mod setup;
