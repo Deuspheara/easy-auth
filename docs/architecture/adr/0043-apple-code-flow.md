@@ -87,6 +87,8 @@ cancellation, CSP/privacy and cleanup. Client IP is not an identity pin.
 Those fixtures grant no authority directly and are not registered Apple/device
 acceptance. Native OS delivery, ordinary activation and grant lifecycle remain
 separate gates. No PR, merge or deployment follows from this experimental adapter.
+The [dated web receipt](../../security/apple-web-verification-2026-10-25.md)
+records local delivery/commit evidence and unperformed registered-provider acceptance.
 
 ## Backend component evidence
 
