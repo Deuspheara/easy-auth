@@ -162,3 +162,26 @@ checks supplement the earlier backend matrix; they do not replace the final
 workspace/security matrix after integration. Genuine owned browser-to-worker,
 migration/disabled-component coverage and live-provider qualification remain
 separate outstanding gates. Ordinary startup schedules no worker/maintenance.
+
+
+## Browser fixture extraction and native capture coverage
+
+The unchanged owned browser fixture lifetime moved separately in `a29ef5c` so the
+new grant journey can reuse its existing database, mail, provider and shutdown
+boundaries. Strict Axum all-feature Clippy passed. The existing13 genuine Chromium
+social journeys passed after rebuilding both the selected fixture and its separate
+capture/linking-disabled probe. Chromium156.0.8078.4 observed normal mailbox proof,
+explicit linking, actual cookie-free cross-site Apple handoff, callback privacy,
+source-session behavior and cleanup. The owned database and private TLS files were
+removed, with no emergency cleanup/diagnostic. This is a refactor regression;
+it does not claim the new captured-grant browser-to-worker journey has run.
+
+One additional real-PG captured native scenario passed for both Plain and Sha256Hex
+nonce modes. It verifies native-only authorization inputs, actual protected code
+redemption and signed proof, stored source/realm/client binding and envelope
+rewrap, wrong signed nonce rejection before another envelope exists, preservation
+of the original session and rejection of native linking. Strict PG all-feature
+all-target Clippy passed. This is backend fixture evidence, with no actual OS
+Authentication Services, registered App ID or live Apple call. Genuine captured
+browser-to-worker, migration/disabled-component coverage and the final integrated
+workspace/security matrix remain outstanding.

@@ -1,5 +1,6 @@
 mod atomicity;
 mod lifecycle;
+mod native;
 mod schema;
 use super::setup::{Attempt, Fixture};
 use auth_core::*;
