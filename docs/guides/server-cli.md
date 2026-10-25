@@ -28,6 +28,9 @@ The minimal settings are `AUTH_REALM_ID` (realm UUID), `DATABASE_URL` (PostgreSQ
 only loopback HTTP/bind/SMTP configuration; production requires HTTPS and SMTP TLS.
 The deployment guide describes [transport and startup policy](../architecture/deployment.md).
 Help is usage information, not a configuration, database or provider health check.
+For a disposable first run, use the [clean-checkout walkthrough](setup-walkthrough.md).
+
+## Startup diagnostics
 
 Malformed values produce setting-specific diagnostics without echoing values.
 Environment settings must be valid Unicode. An invalid-Unicode value now fails
@@ -54,6 +57,15 @@ operators should not use parser/debug messages as a stable machine-readable API.
 | `SMTP_HOST cannot configure a TLS relay` | Check the relay hostname and TLS configuration privately |
 | `<SETTING> must be valid Unicode` | Correct the environment's encoding; do not print the value in reports |
 | `OIDC configuration requires the oidc-web server feature` | Build with `--features oidc-web` only when deliberately configuring the supported OIDC boundary |
+| `unknown AUTH_OIDC setting` / `unknown AUTH_SAML setting` / `unknown AUTH_ISSUER setting` | Correct the setting name against the selected startup contract; no unknown override is accepted |
+| `OIDC requires AUTH_OIDC_ENABLED=true and a complete configuration` | Supply a complete explicit definition, or remove the other OIDC settings when disabling it |
+| `SAML requires AUTH_SAML_ENABLED=true and a complete configuration` | Supply the complete explicit SAML definition, or leave only `AUTH_SAML_ENABLED=false` |
+| `SAML configuration requires the saml-web server feature` | Build the deliberately selected SAML boundary; compiling it does not provision trust |
+| `SAML browser composition requires HTTPS` | Configure the trusted HTTPS public origin; development mode does not relax this provider boundary |
+| `issuer configuration requires the issuer-web server feature` | Build the explicitly selected outbound issuer composition |
+| `issuer signing key input is unavailable or invalid` | Check the protected operator file privately; do not print the path, contents or foreign parser error |
+| `issuer requires an enabled current persisted signing key` | Provision and approve the exact intended key through trusted administration; startup will not enable or repair policy |
+| `issuer signing key does not match the current persisted public key` | Match the protected input to the current persisted key; do not install an old-key fallback |
 
 Startup can run migrations and provision the configured realm. Back up persistent
 data and review the [deployment requirements](../architecture/deployment.md) before
@@ -72,7 +84,7 @@ validation or permission to enable another authentication path.
 | Enterprise OIDC | [Browser settings](oidc-web.md) and [startup contract](../architecture/deployment.md#explicit-oidc-browser-startup); exact HTTPS issuer/callback and explicit client authentication |
 | Google web/native | [Component and acceptance guide](google.md); experimental components/examples do not activate Google in ordinary server startup; registered-provider/OS/lifecycle evidence remains required |
 | Passkeys/custom UI | [Enrollment](passkey-enrollment.md), [sign-in](passkey-authentication.md) and [management/recovery](passkey-management.md); preserve RP/origin, browser proof and stronger-account policy; ordinary activation remains gated |
-| Apple | Not implemented; Apple client-secret, capability, callback/native and grant-lifecycle acceptance remain pending |
+| Apple | [Developer-account preparation](apple-setup.md); adapter, client-secret, callback/native and grant-lifecycle implementation/acceptance remain pending |
 | SAML | Explicit `saml-web` and complete persisted HTTPS trust; [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) waives independent review, which was not performed |
 | Outbound OIDC issuer | Explicit `issuer-web` and protected matching persisted key; [standalone setup and bounded parity](issuer-standalone.md); production release/assurance gates remain separate |
 
@@ -80,3 +92,9 @@ Custom clients use the [public API contract](../architecture/api-contract.md),
 preserving exact Origin, same-browser proof cookies and explicit confirmations.
 Application authorization remains the embedding application's responsibility.
 These CLI checks do not establish production readiness or provider interoperability.
+
+Use [integration selection](provider-setup.md) to choose the provider/native/RP
+boundary and [custom UI integration](custom-ui.md) for first-party pages. The
+normal binary and embedded `configured_application` factory share validation and
+policy. An auth-only `configured_auth` consumer refuses enabled provider/issuer
+settings instead of silently discarding requested routes.

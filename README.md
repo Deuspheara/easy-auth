@@ -69,6 +69,11 @@ not an independently audited implementation.
 
 The binary supports `--help` and `--version` without configuration or database
 access. See [command-line usage and setup diagnostics](docs/guides/server-cli.md).
+The [clean-checkout walkthrough](docs/guides/setup-walkthrough.md) records the
+default development journey; [integration selection](docs/guides/provider-setup.md)
+separates provider/native setup from [custom UI](docs/guides/custom-ui.md) and
+independent relying parties. [Apple preparation](docs/guides/apple-setup.md)
+documents prerequisites without claiming an implemented Apple adapter.
 
 Requirements: Rust 1.95, Docker Compose, and a shell. Development ports: PostgreSQL 59473, SMTP 1025, Mailpit 8025, server 58417 (all loopback).
 

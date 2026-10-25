@@ -1,9 +1,29 @@
 // Only named, committed public guides enter the site. Never glob docs/security.
 export const guides = [
   {
+    source: "docs/guides/setup-walkthrough.md",
+    slug: "setup-walkthrough",
+    title: "Setup walkthrough",
+  },
+  {
     source: "docs/guides/server-cli.md",
     slug: "server-configuration",
     title: "Server configuration",
+  },
+  {
+    source: "docs/guides/provider-setup.md",
+    slug: "provider-setup",
+    title: "Choose an integration",
+  },
+  {
+    source: "docs/guides/custom-ui.md",
+    slug: "custom-ui",
+    title: "Custom UI",
+  },
+  {
+    source: "docs/guides/apple-setup.md",
+    slug: "apple-setup",
+    title: "Apple prerequisites",
   },
   { source: "docs/guides/passwords.md", slug: "passwords", title: "Passwords" },
   {
