@@ -3,12 +3,9 @@ use crate::{
     browser::require_anonymous,
     error::ApiError,
     handlers::{sessions::session_response, source_key},
-    oidc::cookies::{APPLE_SIGN_IN_COOKIES as COOKIES, Transaction},
+    oidc::cookies::APPLE_SIGN_IN_COOKIES as COOKIES,
 };
-use auth_core::{
-    AppleAuthorizationCompletion, AppleAuthorizationResponse, Error, OAuthIntent, OAuthPurpose,
-    Secret,
-};
+use auth_core::{AppleAuthorizationResponse, Error, OAuthIntent, OAuthPurpose, Secret};
 use axum::{
     Extension, Json,
     extract::{
@@ -77,7 +74,10 @@ pub(super) async fn finish(
     if returned.state().verifier() != transaction.state.verifier() {
         return Err(Error::Unauthorized.into());
     }
-    let result = complete(&state, &source_key(source), transaction, returned).await;
+    let result = state
+        .services
+        .complete_sign_in(&source_key(source), transaction, returned)
+        .await;
     let mut response = match result {
         Ok(session) => session_response(&state.base, &session),
         Err(error) => ApiError::from(error).into_response(),
@@ -85,41 +85,6 @@ pub(super) async fn finish(
     COOKIES.clear(&mut response, &state.base.browser);
     Ok(response)
 }
-async fn complete(
-    state: &WebState,
-    source: &str,
-    transaction: Transaction,
-    returned: AppleAuthorizationResponse,
-) -> auth_core::Result<Secret> {
-    let completion = state
-        .services
-        .authorization
-        .finish(
-            &OAuthIntent {
-                browser: &transaction.browser,
-                source,
-                purpose: OAuthPurpose::SignIn,
-            },
-            &transaction.state,
-            transaction.proof,
-            state.services.policy.configuration().redirect(),
-            returned,
-        )
-        .await?;
-    let identity = match completion {
-        AppleAuthorizationCompletion::Verified { identity, .. } => *identity,
-        AppleAuthorizationCompletion::Denied => return Err(Error::Unauthorized),
-        AppleAuthorizationCompletion::ProviderFailure => return Err(Error::Unavailable),
-    };
-    // Unsigned initial profile is deliberately not passed into mapping/commit.
-    let (_, session) = state
-        .services
-        .sign_in
-        .finish(state.services.policy.map(identity)?)
-        .await?;
-    Ok(session)
-}
-
 #[utoipa::path(post,path="/v1/apple/sign-in/cancel",request_body=AppleCancelInput,
     responses((status=204,description="Owned pending operation cancelled; session retained"),(status=400),(status=401),(status=403),(status=413),(status=415),(status=429),(status=503),(status=504)))]
 pub(super) async fn cancel(

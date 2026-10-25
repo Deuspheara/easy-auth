@@ -3,14 +3,8 @@ use super::{
     routing::WebState,
     types::*,
 };
-use crate::{
-    error::ApiError,
-    handlers::source_key,
-    oidc::cookies::{APPLE_LINK_COOKIES as COOKIES, Transaction},
-};
-use auth_core::{
-    AppleAuthorizationCompletion, AppleAuthorizationResponse, Error, OAuthIntent, Secret,
-};
+use crate::{error::ApiError, handlers::source_key, oidc::cookies::APPLE_LINK_COOKIES as COOKIES};
+use auth_core::{AppleAuthorizationResponse, Error, OAuthIntent, Secret};
 use axum::{
     Json,
     extract::{
@@ -81,15 +75,16 @@ pub(super) async fn finish(
     if returned.state().verifier() != transaction.state.verifier() {
         return Err(Error::Unauthorized.into());
     }
-    let result = complete(
-        &state,
-        &source_key(source),
-        transaction,
-        purpose,
-        &current,
-        returned,
-    )
-    .await;
+    let result = state
+        .services
+        .complete_apple_link(
+            &source_key(source),
+            transaction,
+            purpose,
+            &current,
+            returned,
+        )
+        .await;
     let mut response = match result {
         Ok(()) => StatusCode::NO_CONTENT.into_response(),
         Err(error) => ApiError::from(error).into_response(),
@@ -97,42 +92,6 @@ pub(super) async fn finish(
     COOKIES.clear(&mut response, &state.base.browser);
     Ok(response)
 }
-async fn complete(
-    state: &WebState,
-    source: &str,
-    transaction: Transaction,
-    purpose: auth_core::OAuthPurpose,
-    current: &Secret,
-    returned: AppleAuthorizationResponse,
-) -> auth_core::Result<()> {
-    let completion = state
-        .services
-        .apple_link
-        .finish(
-            &OAuthIntent {
-                browser: &transaction.browser,
-                source,
-                purpose,
-            },
-            &transaction.state,
-            transaction.proof,
-            state.services.apple.policy().configuration().redirect(),
-            returned,
-        )
-        .await?;
-    let identity = match completion {
-        AppleAuthorizationCompletion::Verified { identity, .. } => *identity,
-        AppleAuthorizationCompletion::Denied => return Err(Error::Unauthorized),
-        AppleAuthorizationCompletion::ProviderFailure => return Err(Error::Unavailable),
-    };
-    state
-        .services
-        .linking
-        .finish(state.services.apple.policy().map(identity)?, current)
-        .await?;
-    Ok(())
-}
-
 #[utoipa::path(post,path="/v1/account/apple-link/cancel",request_body=SocialLinkCancelInput,
     responses((status=204,description="Original bound link cancelled; session retained"),(status=400),(status=401),(status=403),(status=413),(status=415),(status=429),(status=503),(status=504)))]
 pub(super) async fn cancel(
