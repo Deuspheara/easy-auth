@@ -90,6 +90,9 @@ pub use saml::{
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 
+#[cfg(feature = "apple")]
+pub use oidc::{AppleClientSecret, AppleClientSecretSigner};
+
 #[cfg(feature = "google")]
 pub use oidc::{
     GoogleAccountDeletionAuthorization, GoogleAuthorization, GoogleAuthorizationCompletion,

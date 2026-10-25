@@ -1,4 +1,8 @@
+#[cfg(feature = "apple")]
+mod apple;
 mod documents;
+#[cfg(feature = "apple")]
+pub use apple::{AppleClientSecret, AppleClientSecretSigner};
 #[cfg(feature = "google")]
 mod google;
 #[cfg(feature = "google")]
