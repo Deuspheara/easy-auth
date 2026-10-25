@@ -9,6 +9,10 @@ use crate::handlers::email::{__path_finish, __path_start};
 use crate::handlers::health::{__path_health, __path_ready};
 use crate::handlers::passwords::{__path_enroll_password, __path_password_login};
 use crate::handlers::passwords::{PasswordEnrollmentInput, PasswordLoginInput};
+use crate::handlers::providers::{
+    __path_linked_providers, LinkedProviderResponse, LinkedProvidersResponse,
+    ProviderCursorResponse, ProviderProtocol,
+};
 use crate::handlers::recovery::PasswordResetInput;
 use crate::handlers::recovery::{__path_finish_password_reset, __path_start_password_reset};
 use crate::handlers::sessions::listing::{
@@ -43,6 +47,7 @@ use utoipa::OpenApi;
         session,
         logout,
         list_sessions,
+        linked_providers,
         revoke_session,
         revoke_all_sessions
     ),
@@ -59,6 +64,10 @@ use utoipa::OpenApi;
         UserResponse,
         SessionResponse,
         SessionListResponse,
+        LinkedProviderResponse,
+        LinkedProvidersResponse,
+        ProviderCursorResponse,
+        ProviderProtocol,
         RevokeSessionInput,
         RevokeAllInput
     ))

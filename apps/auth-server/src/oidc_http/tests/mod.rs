@@ -2,8 +2,8 @@ mod cache;
 mod cold;
 mod lookup;
 mod tls_fixture;
-#[cfg(feature = "oidc-verification")]
+#[cfg(any(feature = "oidc-verification", feature = "oidc-client"))]
 mod token;
-#[cfg(feature = "oidc-verification")]
+#[cfg(any(feature = "oidc-verification", feature = "oidc-client"))]
 mod token_fixture;
 mod transport;

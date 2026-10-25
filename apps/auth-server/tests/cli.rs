@@ -15,7 +15,8 @@ fn help_does_not_require_configuration_or_database_access() {
         let help = String::from_utf8(output.stdout).unwrap();
         assert!(help.starts_with("Usage: easy-auth"));
         assert!(help.contains("AUTH_REALM_ID"));
-        assert!(help.contains("SAML is unavailable"));
+        assert!(help.contains("SAML and outbound OIDC require explicit build features"));
+        assert!(help.contains("Compiling a feature does not establish security approval"));
     }
 }
 

@@ -6,12 +6,23 @@ const {client,request,finishBody}=require('./browser.cjs');
 async function run(fixture,provider,proxy,browser,origin,redirect) {
   const results=[];
   const view=await client(browser,origin,provider.issuer);
-  let calls=0;
+  let calls=0,primaryFailure;
   async function record(name,action) {
     console.log(JSON.stringify({case:name,status:'running'}));
     let facts;
     try{facts=await action();}catch(error){error.caseName=name;throw error;}
     results.push({name,status:'passed',...facts});console.log(JSON.stringify({case:name,status:'passed'}));
+  }
+  async function bootstrapCallback(authorization) {
+    const before=proxy.capturedCallbacks();
+    proxy.allowCallback(redirect);
+    try {
+      // Redirected browser requests need not re-enter Playwright routing. Keep
+      // the real DNS/TLS path and select only the owned bootstrap document sink.
+      const result=await callback(browser,authorization,provider,redirect,undefined,true);
+      assert.equal(proxy.capturedCallbacks(),before+1,'actual owned TLS callback capture');
+      return result;
+    } finally {proxy.allowCallback(null);}
   }
   async function status(deleted,pending) {
     const value=await fixture.command('status');
@@ -33,7 +44,7 @@ async function run(fixture,provider,proxy,browser,origin,redirect) {
   try {
     await record('keycloak-http-real-provider-session-bootstrap',async()=>{
       const start=await fixture.command('begin');assert.equal(start.result,'started');
-      const returned=await callback(browser,start.authorization,provider,redirect);
+      const returned=await bootstrapCallback(start.authorization);
       const issued=await fixture.command('finish',{callback:returned});
       assert.equal(issued.result,'authenticated');assert.equal(issued.local_contact_absent,true);assert.equal(issued.post_delta,1);
       assert.equal((await fixture.command('replay_state')).result,'unauthorized');
@@ -99,7 +110,7 @@ async function run(fixture,provider,proxy,browser,origin,redirect) {
     });
     await record('keycloak-http-deletion-cooldown-rejects-fresh-bootstrap-proof',async()=>{
       const start=await fixture.command('begin');assert.equal(start.result,'started');
-      const returned=await callback(browser,start.authorization,provider,redirect);
+      const returned=await bootstrapCallback(start.authorization);
       const rejected=await fixture.command('finish',{callback:returned});
       assert.equal(rejected.result,'unauthorized');assert.equal(rejected.post_delta,1);
       for(const value of Object.values(rejected.verified_proof))assert.equal(value,true);
@@ -107,8 +118,12 @@ async function run(fixture,provider,proxy,browser,origin,redirect) {
       await status(true,0);
       return {fresh_signed_proof:rejected.verified_proof,live_cooldown:true,local_authority_remains_absent:true};
     });
+    assert.equal(proxy.capturedCallbacks(),2,'only the two bootstrap callbacks use the capture sink');
     assert.deepEqual(proxy.facts,{posts:5,token_responses:4,signature_mutations:0,token_replays:0});
     return results;
-  } finally {await view.close();}
+  } catch(error) {primaryFailure=error;throw error;}
+  finally {
+    try {await view.close();} catch(error) {if(!primaryFailure)throw error;primaryFailure.cleanupValidationFailure=true;}
+  }
 }
 module.exports={run};

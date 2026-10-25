@@ -15,5 +15,8 @@ pub use google::{GoogleWebServices, experimental_google_web_router, google_web_o
 #[cfg(feature = "oidc-web")]
 pub use web::{OidcWebServices, oidc_web_openapi, oidc_web_router};
 
-#[cfg(all(feature = "oidc-web", feature = "saml-web"))]
+#[cfg(all(
+    feature = "oidc-web",
+    any(feature = "saml-web", feature = "issuer-native-web")
+))]
 pub(crate) use web::{attach, clear_proofs};

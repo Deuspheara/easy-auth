@@ -10,6 +10,11 @@ publish.workspace = true
 workspace = true
 
 [features]
+oidc-client = ["oidc-verification", "issuer-clients"]
+issuer-native-refresh = ["issuer-token-management"]
+issuer-token-management = ["issuer-signing"]
+issuer-signing = ["issuer-codes", "dep:josekit", "dep:openssl", "dep:serde_json"]
+issuer-codes = ["issuer-clients"]
 issuer-clients = ["dep:url"]
 saml-identities = ["saml-verification"]
 saml-verification = ["saml-certificates", "saml-rs/crypto-aws-lc", "dep:time"]

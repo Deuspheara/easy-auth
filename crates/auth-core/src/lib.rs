@@ -17,12 +17,16 @@ mod oidc;
 mod passkeys;
 mod password;
 mod ports;
+mod providers;
 #[cfg(feature = "saml-requests")]
 mod saml;
 mod secret;
 mod sessions;
 
-pub use audit::AuditEvent;
+pub use audit::{
+    AuditEvent, IssuerNativeCredentialAction, IssuerNativeCredentialEvent,
+    IssuerNativeCredentialKind,
+};
 pub use auth::Auth;
 pub use email::normalize_email;
 pub use error::{Error, Result};
@@ -62,6 +66,10 @@ pub use passkeys::{
 };
 pub use password::{Password, PasswordService};
 pub use ports::{EmailDelivery, Repository};
+pub use providers::{
+    LINKED_PROVIDER_PAGE_SIZE, LinkedProvider, LinkedProviderCursor, LinkedProviderPage,
+    ProviderKind,
+};
 #[cfg(feature = "saml-requests")]
 pub use saml::{
     MAX_SAML_PENDING_PER_CONNECTION, SAML_REQUEST_LIFETIME_SECONDS, SamlBrowserProof,
@@ -111,7 +119,77 @@ pub use saml::{
     SamlDeletionRequests, SamlDeletionVerifier, SamlPreparedDeletion, SamlVerifiedDeletion,
 };
 
+#[cfg(feature = "issuer-codes")]
+pub use issuer::{
+    ISSUER_AUTHORIZATION_LIFETIME_SECONDS, ISSUER_CODE_LIFETIME_SECONDS,
+    ISSUER_TOKEN_ATTEMPTS_PER_MINUTE, ISSUER_TOKEN_RATE_WINDOW_SECONDS, IssuerAuthority,
+    IssuerAuthorization, IssuerAuthorizationDestination, IssuerAuthorizationInput,
+    IssuerAuthorizationPreview, IssuerAuthorizationRepository, IssuerAuthorizationRequest,
+    IssuerAuthorizationReturn, IssuerAuthorizationStart, IssuerCodeRedemption, IssuerConsentProof,
+    IssuerGrantData, IssuerPkceVerifier, IssuerRedeemedCode, IssuerTokenError, IssuerTokenResult,
+    MAX_ISSUER_PENDING_PER_OWNER, MAX_ISSUER_PENDING_PER_REALM, MAX_ISSUER_TOKEN_SOURCES_PER_REALM,
+};
 #[cfg(feature = "issuer-clients")]
 pub use issuer::{
-    IssuerClientKind, IssuerClientRegistration, MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
+    IssuerClientAuthentication, IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile,
+    MAX_ISSUER_REDIRECT_BYTES, MAX_ISSUER_REDIRECTS,
 };
+
+#[cfg(feature = "issuer-token-management")]
+pub use issuer::{
+    IssuerAccessData, IssuerActiveAccess, IssuerPresentedToken, IssuerTokenManagement,
+    IssuerTokenStatusRepository, IssuerTokenStatusRequest,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    ISSUER_NATIVE_SCOPE, IssuerNativeRefreshPolicy, MAX_NATIVE_REFRESH_IDLE_SECONDS,
+    MAX_NATIVE_REFRESH_LIFETIME_SECONDS,
+};
+
+#[cfg(feature = "issuer-signing")]
+pub use issuer::{
+    ISSUER_ID_TOKEN_LIFETIME_SECONDS, ISSUER_KEY_PROPAGATION_SECONDS, IssuerDiscoveryDocument,
+    IssuerJwksDocument, IssuerKeyPublication, IssuerMetadata, IssuerMetadataRepository,
+    IssuerPublicKey, IssuerSignedCode, IssuerSigningKey, IssuerSigningSnapshot, IssuerTokenIssuer,
+    IssuerTokenPreparationData, IssuerTokenRepository, IssuerTokens, MAX_ISSUER_PUBLISHED_KEYS,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    IssuerNativeAuthorization, IssuerNativeAuthorizationDestination,
+    IssuerNativeAuthorizationInput, IssuerNativeAuthorizationPreparation,
+    IssuerNativeAuthorizationPreview, IssuerNativeAuthorizationRepository,
+    IssuerNativeAuthorizationRequest, IssuerNativeAuthorizationStart, IssuerNativeConsentData,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    IssuerClientTokens, IssuerNativeSignedCode, IssuerNativeTokenCommit, IssuerNativeTokenIssuer,
+    IssuerNativeTokenPreparationData, IssuerNativeTokenRepository, IssuerNativeTokens,
+    MAX_ISSUER_NATIVE_FAMILIES_PER_OWNER_CLIENT,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    ISSUER_NATIVE_ACCESS_LIFETIME_SECONDS, IssuerNativeCredentialRequest, IssuerNativeRefresh,
+    IssuerNativeRefreshData, IssuerNativeRefreshOutcome, IssuerNativeRefreshRepository,
+    IssuerNativeRotatedTokens, IssuerNativeRotationRequest,
+};
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::MAX_ISSUER_NATIVE_REFRESH_GENERATION;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub use issuer::{
+    IssuerNativeAccessData, IssuerNativeActiveAccess, IssuerNativeConsumerPolicy,
+    IssuerNativeIntrospection, IssuerNativeIntrospectionRepository,
+};
+
+#[cfg(feature = "oidc-client")]
+pub use oidc::{
+    OidcClient, OidcClientAuthorization, OidcClientConfiguration, OidcClientError, OidcClientResult,
+};
+
+#[cfg(feature = "oidc-client")]
+pub use oidc::{OidcClientCredential, OidcClientCredentials, OidcClientIdentity, OidcClientTokens};

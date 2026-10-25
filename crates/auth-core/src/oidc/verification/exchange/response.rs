@@ -30,7 +30,7 @@ impl OidcTokenResponse {
             body,
         })
     }
-    pub(super) fn id_token(self) -> Result<OidcIdToken> {
+    pub(in crate::oidc) fn json(self) -> Result<TokenResponseJson> {
         let mime = self
             .content_type
             .as_deref()
@@ -47,24 +47,33 @@ impl OidcTokenResponse {
         {
             return Err(Error::Unavailable);
         }
-        if matches!(self.status, 400 | 401) {
+        Ok(TokenResponseJson {
+            status: self.status,
+            body: self.body,
+        })
+    }
+    pub(super) fn id_token(self) -> Result<OidcIdToken> {
+        let response = self.json()?;
+        if matches!(response.status, 400 | 401) {
             #[derive(Deserialize)]
             struct Failure {
                 error: String,
             }
             let failure: Failure =
-                serde_json::from_slice(&self.body).map_err(|_| Error::Unavailable)?;
-            return Err(if self.status == 400 && failure.error == "invalid_grant" {
-                Error::Unauthorized
-            } else {
-                Error::Unavailable
-            });
+                serde_json::from_slice(&response.body).map_err(|_| Error::Unavailable)?;
+            return Err(
+                if response.status == 400 && failure.error == "invalid_grant" {
+                    Error::Unauthorized
+                } else {
+                    Error::Unavailable
+                },
+            );
         }
-        if self.status != 200 {
+        if response.status != 200 {
             return Err(Error::Unavailable);
         }
         let mut wire: Success =
-            serde_json::from_slice(&self.body).map_err(|_| Error::Unavailable)?;
+            serde_json::from_slice(&response.body).map_err(|_| Error::Unavailable)?;
         if wire.error.is_some()
             || !wire.token_type.eq_ignore_ascii_case("Bearer")
             || !valid_token(&wire.access_token)
@@ -74,6 +83,10 @@ impl OidcTokenResponse {
         }
         OidcIdToken::parse(std::mem::take(&mut wire.id_token))
     }
+}
+pub(in crate::oidc) struct TokenResponseJson {
+    pub status: u16,
+    pub body: Zeroizing<Vec<u8>>,
 }
 impl fmt::Debug for OidcTokenResponse {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

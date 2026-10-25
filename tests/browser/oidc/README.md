@@ -204,3 +204,17 @@ Keycloak/browser cases through the shared startup configuration and real public
 sign-in/session/logout/deletion routes in standalone and embedded compositions.
 It has no fixture session-bootstrap endpoint. Owned TLS/source-copy limitations
 remain explicit; it supplements rather than replaces these original backend cases.
+
+### Bootstrap callback delivery
+
+The HTTP-deletion suite captures its two library-bootstrap callbacks at the exact
+owned TLS proxy URI, then clears that selection before exercising the real
+application deletion callback and JavaScript. Browser redirect chains can reach
+the network without a second route interception; see the [routing limitation](https://playwright.dev/docs/api/class-page#page-route).
+The collector requires both the observed return and the controlled document within
+the existing deadline. The sink is GET-only, uses no-store/no-referrer/CSP headers,
+and the suite checks exactly two network captures. It renders no authority and
+changes no signature, nonce, state, PKCE, provider, session or deletion check.
+Failure diagnostics contain only categorical request facts. Teardown preserves the
+primary case failure and always closes the browser context. No raw return URL,
+credential, browser error text or message body is printed.

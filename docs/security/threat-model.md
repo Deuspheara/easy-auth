@@ -1,5 +1,48 @@
 # Threat model — alpha design, before credential flows
 
+The [reference UI](../architecture/adr/0042-reference-account-ui.md) consumes only
+selected-interface booleans and current account policy metadata. Compiled features,
+contact email, view query and UI visibility grant no method, fresh proof or fallback.
+The closed presentation selector hides unselected methods; inbox/resend follows an
+actual start on this page and uses only the in-memory email. No query supplies a
+resend address or recovery proof. Explicit resend retains existing admission limits. Issuer/
+label text never becomes markup or a navigation target. Existing HTTP and storage
+checks remain authoritative after every click. Password inputs are cleared after
+attempts/navigation; native errors retain fixed categories, and credential POSTs
+are never automatically retried. Navigation aborts and view generations reject
+late rendering, with current-owner checks before sensitive actions. This does not
+create a browser-wide atomic account epoch. Fixed template style insertion uses
+only the exact CSP-allowlisted combined Basecoat/token/layout stylesheet hash; style attributes, other inline
+styles, third-party resources and embedded frames remain denied. Explicit form
+POST methods prevent GET-query credential leakage if module initialization fails.
+Explicit passkey management can offer native reauthentication only after the API
+rejects freshness. Confirmation explains normal logout of this browser; cancellation
+preserves its session. The new assertion is account-bound to the confirmed owner,
+with current view/owner checks before logout and an actual same-owner session read
+after the single finish. Only inventory GET follows successful verification; no
+credential completion retry or weaker fallback is introduced. Return-to-page
+metadata reads avoid active operations, discard stale views and clear unfinished
+forms on observed owner change; browser-wide account switching is still not atomic.
+Optional Motion mini loads independently of authentication and only animates
+committed view wrappers. Owned handles cancel on view/account invalidation and
+pagehide; completion cleans individual opacity/transform CSSOM properties without
+restoring a style attribute. Reduced motion/forced colors retain static content.
+No animation, completion callback or timer establishes authentication or moves
+focus. Real-browser CSP checks remain required for each selected library version.
+The fixed licensed Inter asset is served locally with same-origin font permission;
+there is no remote font origin, runtime palette input or new script permission.
+
+The read-only linked-provider inventory in [ADR0041](../architecture/adr/0041-linked-provider-inventory.md)
+uses the existing source-aware active-caller transaction and configured realm.
+Only the locked owner's public identity UUID, protocol and immutable issuer are
+projected; subjects, provider claims, email, credentials and verifiers stay private.
+The protocol-plus-UUID cursor cannot select another owner or realm. Metadata does
+not establish current trust, enable a source, link identities or grant a fallback.
+Final retained-session deadline checks and rollback remain mandatory after the
+read; current source disable/revocation rejects old caller proof. UI output must
+use text, with no issuer-derived navigation or HTML. Public password-service
+presence is composition metadata, never permission to use a weaker method.
+
 Current SAML activation policy: [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.
@@ -663,14 +706,246 @@ backend and independent approval still gate normal activation.
 
 ## Gated outbound issuer metadata
 
-AUTH-37's separate optional registration component accepts only trusted canonical
-HTTPS web-client definitions. Full current realm/client/revision/redirect/sector/
+The explicit native extension keeps web constructors HTTPS-only and admits HTTP
+only for public native clients on canonical literal127.0.0.1/::1 callbacks. Only
+ports vary; exact interface/path remain registered and later code redemption must
+bind the actual complete URI. Admission cannot prove listener ownership, genuine
+app identity or PKCE. Native sectors isolate each realm/client instead of sharing
+loopback IP sectors. Public identification grants nothing. Typed Basic input hashes
+a canonical Secret and PostgreSQL validates the registered method and credential
+under the full exact enabled definition lock; stale/disabled/wrong/cross-realm
+credentials reject without authority or fallback. A successful standalone check
+must never replace checks inside an eventual code transaction. Migration0028
+preserves legacy web trust, disable, credentials, subjects and sessions; actual
+code/consent/token, other native profiles and M07 release evidence remain required.
+See [ADR0034](../architecture/adr/0034-issuer-native-registration-and-authentication.md).
+
+AUTH-37's separate optional registration component accepts trusted canonical HTTPS
+web definitions and the explicit public native profile above. Full current realm/client/revision/redirect/sector/
 authentication/credential policy is locked before an owner key; disable and stale
 snapshots reject even after waits. Only existing realm owners receive stable random
-hostname-sector subjects. Same-host clients intentionally share the OIDC sector;
+sector subjects. Same-host web clients intentionally share the OIDC sector;
 cross-host/realm mappings are distinct. No local UUID/email/provider subject is
 exposed as the outbound subject. Account erasure cascades mappings. Random stored
 UUIDs use existing randomness, with no new cryptographic scheme. A mapping or
 registered client is not consent, authenticated-client or token authority. No issuer
 route/startup path is enabled. AUTH-32 and M07 production prerequisites, real client
 authentication/consent/PKCE/issuance/key/conformance work remain open.
+
+## Optional outbound consent/code component
+
+`issuer-codes` requires explicit fresh-owner consent under exact private browser,
+handle and preview UUID binding. Preparation grants no authority. Mandatory S256,
+current registered client authentication, exact actual redirect (including native
+port), issuer/realm/revision and source-aware initiating session bind one-use code
+consumption. Public identification cannot replace PKCE; an old or disabled upstream
+source cannot authorize a downstream code. Actual authentication time is retained,
+not inferred from fresh issuance. Original300second consent/60second code and
+session/freshness caps survive waits; the final database-clock check rolls back all
+state/subject/audit writes on expiry. Separate committed bounded source admission
+precedes even unknown-client lookup. Invalid credentials/grants do not mask storage
+failure. Account erasure removes local codes/mappings and deidentifies their audit
+attribution in the owning transaction, preserving other realms.
+
+This optional component returns no signed token, HTTP endpoint or normal startup
+activation. The future browser boundary must bind Origin/private cookies and exact
+preview confirmation, and token transport must authenticate actual client input
+without ambient-cookie fallback. Signing/key/audience, refresh, native storage and
+interoperability remain release work. See
+[ADR0035](../architecture/adr/0035-issuer-consent-and-authorization-codes.md).
+
+The optional HTTPS consent transport requires the same trusted root issuer/browser
+origin and realm. GET renders only fixed content; explicit Origin-bound POSTs create
+a preview and later approve/deny. Private HttpOnly browser/handle cookies, the actual
+fresh session, an operation cookie and the exact displayed preview UUID bind the
+choice. An old tab cannot approve a newer cookie-selected request. Read-only resume
+revalidates all original/current source/owner/caps without granting or extending
+anything. Storage failure preserves retry proofs; unusable recovery and local session
+replacement clear transport state. The fixed script scrubs query/fragment, uses text
+rendering, stores no protocol data in web storage and drops/aborts on navigation or
+restoration. A browser abort cannot undo an already committed SQL decision. This
+consent-only experimental embedding mounts no token endpoint and establishes no
+signed issuance, full OAuth/OIDC interoperability or outbound production approval.
+See [ADR0036](../architecture/adr/0036-issuer-https-consent-delivery.md).
+
+## Explicit native offline policy
+
+The optional `issuer-native-refresh` component currently persists configuration,
+not refresh authority. New policies default disabled and bind exact realm/HTTPS
+issuer/full public native client revision, independent policy revision and bounded
+absolute/idle seconds. Changed client/policy snapshots fail closed; reconfiguration
+preserves operator disable and stale enable cannot restore an old definition.
+Client-before-policy locking linearizes configuration/check/disable; read-only
+loading is not authorization. A distinct persisted offline client profile makes
+older or feature-disabled loaders refuse rather than silently downgrade it.
+Configuration-aware builds also refuse that offline profile in existing online
+request, preparation/decision/redemption and core grant-validation paths; recognizing
+configuration cannot authorize interpreting a future offline grant as online consent.
+Migration0033 creates no consent, subject, session or token. The eventual separate
+offline consent must preserve original source/session absolute caps and must not
+reinterpret the old online approval, code, cookie freshness or idle deadline as
+long-lived authority. Family rotation/reuse/lifecycle and native delivery remain
+unimplemented acceptance requirements; configuration alone does not close them.
+
+## Optional signed issuer component
+
+Explicit native consent library operations require exact offline scope and consent
+prompt, current enabled native policy/client, actual fresh initiating session and
+private browser/handle/authorization bindings. Migration0034 marks only new native
+rows and binds immutable proposed lifetime/source caps to their full realm/issuer/
+client/revision/owner/session tuple. Approval uses current source/owner/session and
+original caps, existing typed actual-owner-session authorization audit and a final
+clock after every write/wait. Default online code paths still refuse the profile
+and marker. Policy disable prevents approval but permits bound pending cancellation;
+revision changes never widen a proposal. Account erasure cascades native consent.
+No refresh credential or extended access is issued yet. A trusted UI must still
+present preview and obtain explicit owner confirmation; a prompt input alone proves
+no human action. Native HTTP delivery and refresh lifecycle acceptance remain open.
+
+The explicit `issuer-signing`/`issuer-web` extensions use pinned josekit/OpenSSL
+RS256 with bounded validated operator input and allowlisted public JWK output.
+Optional Unix loading checks the opened regular owner-only file and refuses final
+symlinks; trusted parent directories, ownership and secret distribution remain
+operator responsibilities. Native library copies are not claimed erased. No default
+key, request-selected algorithm, private SQL/JSON output or old-key fallback exists.
+Current active key/revision, immutable key IDs, bounded prepublication/overlap and
+explicit disable prevent metadata reconfiguration from granting signing authority.
+Emergency removal cannot revoke keys already cached by consumers.
+
+Native signing holds no SQL locks. Its opaque staged result grants nothing until
+the final exact client/key/source/owner/session/code snapshot and all original caps
+are checked again, access hash/code scrub/audit are written and the final clock
+check commits. Replay and storage/expiry/policy failures return no staged credential.
+The issued audience is the registered client; subject is the random pairwise sector
+mapping, never an email/local owner/provider ID. Original auth_time is retained;
+issuance cannot manufacture authentication freshness or MFA. Current conservative
+expiry is bounded by the original60second code and session/freshness/key windows.
+
+Only the dedicated token POST omits browser Origin enforcement. It accepts explicit
+public identity or registered Basic authentication plus code/exact actual redirect/
+S256, with strict closed bounded form/percent/duplicate/header parsing. Ambient
+cookies never authenticate it. Actual transport ConnectInfo selects admission;
+missing peer data fails closed and forwarding headers cannot reset limits. Local
+cookie/consent routes retain their existing Origin/private-proof boundary. Opaque
+access credentials cannot authenticate a local session or grant application roles.
+Owner erasure cascades local ledger/code/subject rows but cannot erase a previously
+issued self-contained ID token or downstream application session. The conservative
+expiry bounds that snapshot; immediate offline revocation/sign-out propagation is
+not provided.
+
+Real-PG, HTTP, sequential ordinary rollover and in-process existing-RP cases provide
+bounded implementation evidence. They do not establish independent review, external
+RP conformance, native secure storage or production approval. The owned healthy TLS
+browser/client runner is separate evidence. No adversarial cryptographic/XML
+producer or custom signature-concurrency experiment is part of this increment.
+See [ADR0037](../architecture/adr/0037-issuer-signing-and-final-issuance.md).
+
+Optional access management authenticates the current exact confidential Basic client
+before returning introspection metadata and binds all storage to realm/issuer/client.
+Public identity/cookies never authenticate introspection. Unknown/foreign/inactive
+input discloses no claims; wrong credentials/storage faults are not inactive success.
+Retained key/namespace/source/owner/session/code/original-cap checks and a final clock
+after waits prevent stale or extended active results. Inspection does not touch idle
+time. Explicit possession revocation can only reduce matching token authority and
+cannot clear an earlier revocation timestamp. It can run after logout/source expiry
+without inventing owner authority, altering local sessions or revoking another audience.
+
+The HTTP extension retains the bounded strict client form/Basic/no-store boundary,
+requires actual socket peer admission, ignores forwarding headers and accepts no
+ambient-cookie authority. Local cookie endpoints keep Origin enforcement. A presented
+token retains only the existing standard credential hash, with no new cryptographic
+scheme. This access-only increment creates no refresh/offline authority, remotely
+erases no ID token/app session and does not complete native/M07/production gates.
+See [ADR0038](../architecture/adr/0038-native-token-lifecycle.md).
+
+## Native refresh delegation boundary
+
+Explicit approved offline consent creates separate bounded authority, never an
+extension of online code/cookie freshness or an upgrade of old openid consent.
+Current source/account method, original authentication/session, revocation,
+client/policy/key and source absolute bounds remain mandatory on rotation. Refresh
+cannot update cookie time or mint new ID tokens. One-use spend/rotation/audit is
+atomic; old hash reuse permanently revokes the family/all descendant access before
+invalid_grant. Concurrent use has no grace fallback. Final clock checks the old idle
+deadline after writes/waits. Unknown or foreign possession cannot select another
+realm/issuer/client; public client IDs remain insufficient for introspection.
+Audit/storage failures return errors and roll back, never a false successful
+grant/revocation. HTTP human confirmation and owned native/browser/storage
+integration remain unverified.
+
+## Native confirmation HTTP boundary
+
+The optional native consent transport retains actual Origin, session and private
+browser/handle/selector checks; query/prompt/DOM markers cannot grant authority. GET
+creates no state and fixed pages scrub queries; shared JS retains correlation only in
+memory, uses textContent and navigates only to the server-validated return. The
+displayed fixed offline expiry/idle is never recomputed from request data.
+Native/online share a private cookie slot, cannot overwrite an active operation, and
+cannot approve each other’s row kinds. Current source/owner/freshness/policy and
+final DB clock remain mandatory. No token/refresh HTTP authority or native
+interoperability is inferred from consent tests.
+
+## Native wire and consumer boundary
+
+An explicit mixed native endpoint uses one core admission before registered-profile
+selection; it cannot fall through after a failed native/online grant. Actual current
+credentials/PKCE, client/native policy/key/source/owner/session/code/consent and
+original caps still bind commit. Refresh carries only opaque one-use credentials, no
+new ID token or cookie time. Strict shared decoding/actual peer remain mandatory;
+hints, browser cookies and public native IDs confer no consumer authentication.
+Bounded owned browser/real TCP callback tests check state/issuer, PKCE, production
+signature, rotation/replay/cleanup and privacy using unchanged producers. Actual
+OIDC/SAML cases preserve authentication provenance and current source denial. Native
+authenticated audience-authorized resource consumption uses the explicit policy
+below and cannot be replaced with local-session acceptance. Production platform storage and broader
+interoperability remain explicit requirements.
+
+## Native consumer authentication and disclosure
+
+The separate optional native inspection path requires current confidential Basic
+credentials plus an exact enabled persisted consumer-to-native-audience policy.
+Public identification, token possession and browser cookies confer no consumer
+authentication. Schema installation and HTTP composition enable no policy. Full
+current consumer/audience definitions and policy revisions prevent stale permission
+reuse; disable remains reduction-only after client changes.
+
+All client pair locks precede policy/key/source/owner/session/family/access locks in
+deterministic immutable-ID order. Snapshots choose paths, not authority. Actual
+credential comparison precedes even unknown/inactive results. Final database time
+after all waits bounds native access/family idle/absolute lifetime. Existing provider
+source guards and original authentication remain mandatory without imposing cookie
+freshness or extending cookie time. Family replay/revocation and key/policy/session
+disable prevent active disclosure. Infrastructure errors never become inactive
+success. Active claims expose only pairwise metadata to the explicitly authorized
+consumer; inactive responses disclose no reason. Native audience metadata never
+becomes a local identity/session or application business permission. ADR0039 records
+the explicit endpoint, scope and limits.
+
+## Independent relying-party SDK boundary
+
+The optional `oidc-client` operation requires exact trusted issuer/client/return,
+S256, private state/nonce and response issuer before a one-attempt code exchange.
+Strict callback encoding/duplicates/fixed query, originating service identity and
+wall-clock plus monotonic deadlines prevent ambiguous or stale callbacks from
+selecting a token request. Shared bounded discovery/JWKS and RS256 claim validation
+produce only RP metadata, with no public local-session/provider-proof conversion.
+Native refresh consumes the presented generation, makes one POST and returns no new
+identity or authentication time. Applications must atomically replace generations
+in protected per-user storage and restart authorization after ambiguous outcomes;
+Rust ownership cannot stop deliberately copying an exposed secret. The trusted HTTP
+ports must use the existing reviewed HTTPS/DNS restrictions and shared budget;
+there is no production private-address or local-CA fallback. Local client/standalone
+parity and independent assurance remain separate acceptance gates. See ADR0040.
+
+## Configured issuer and provider composition
+
+Default-off issuer startup validates complete trusted HTTPS/protected-file settings
+and exact current enabled persisted key/public material in the chosen realm/issuer.
+It cannot provision, repair or re-enable issuer policy. Later key/client/source/
+owner/policy changes are still checked by the existing final issuance/rotation
+transactions. Combined inbound-provider attachment checks each source's realm and
+HTTPS callback and applies cleanup around all selected routes. It supplies no new
+provider or signing authority. Native consumer inspection remains separately
+selected and requires exact persisted authenticated-reader permission. Owned
+executable/embedded/SMTP/browser/client parity is implementation evidence, not
+public-root TLS, certification, independent review or live-production approval.

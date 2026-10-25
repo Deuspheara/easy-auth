@@ -562,6 +562,92 @@
         }
       }
     },
+    "/v1/account/providers": {
+      "get": {
+        "tags": [],
+        "operationId": "linked_providers",
+        "parameters": [
+          {
+            "name": "after_kind",
+            "in": "query",
+            "description": "Supply both cursor fields from the preceding page, or neither.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ProviderProtocol"
+            }
+          },
+          {
+            "name": "after_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped public linked issuers, ordered by protocol then UUID; no subjects, claims or credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedProvidersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/email/finish": {
       "post": {
         "tags": [],
@@ -2557,6 +2643,52 @@
         },
         "additionalProperties": false
       },
+      "LinkedProviderResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "issuer"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "issuer": {
+            "type": "string",
+            "description": "Immutable linked issuer; this is not current trust or activation status."
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ProviderProtocol"
+          }
+        }
+      },
+      "LinkedProvidersResponse": {
+        "type": "object",
+        "required": [
+          "providers"
+        ],
+        "properties": {
+          "next": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProviderCursorResponse"
+              }
+            ]
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedProviderResponse"
+            },
+            "maxItems": 50
+          }
+        }
+      },
       "PasskeyAuthenticationFinishInput": {
         "type": "object",
         "required": [
@@ -2752,6 +2884,29 @@
         },
         "additionalProperties": false
       },
+      "ProviderCursorResponse": {
+        "type": "object",
+        "required": [
+          "kind",
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ProviderProtocol"
+          }
+        }
+      },
+      "ProviderProtocol": {
+        "type": "string",
+        "enum": [
+          "oidc",
+          "saml"
+        ]
+      },
       "RelyingParty": {
         "type": "object",
         "required": [
@@ -2857,9 +3012,14 @@
           "id",
           "realm_id",
           "email",
-          "display_name"
+          "display_name",
+          "authentication_policy"
         ],
         "properties": {
+          "authentication_policy": {
+            "type": "string",
+            "description": "mailbox, passkey_required or provider_required; current method/freshness still governs APIs."
+          },
           "display_name": {
             "type": [
               "string",

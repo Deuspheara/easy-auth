@@ -22,8 +22,8 @@ pub(super) async fn bridge(
     // Reuse core input bounds; this parse is explicitly not signature validation.
     SamlPostResponse::parse(input.response.clone())?;
     Secret::parse(input.relay.clone())?;
-    Ok(Html(format!(
-        "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Authentication</title><body><p id=\"status\" role=\"status\">Continuing authentication…</p><form id=\"delivery\"><input type=\"hidden\" name=\"SAMLResponse\" value=\"{}\"><input type=\"hidden\" name=\"RelayState\" value=\"{}\"></form><script src=\"/saml/delivery.js\" defer></script></body></html>",
+    Ok(crate::pages::document(&format!(
+        include_str!("delivery.html"),
         attribute(&input.response),
         attribute(&input.relay)
     )))

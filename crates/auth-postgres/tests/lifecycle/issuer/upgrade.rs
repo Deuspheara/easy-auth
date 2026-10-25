@@ -43,6 +43,14 @@ async fn issuer_migration_preserves_existing_account_and_session_rows(pool: PgPo
     .unwrap();
     assert_eq!(before, after);
     assert_eq!(sessions, after_sessions);
+    // Finish later additive schema before using today's adapter; retain the
+    // historical 0027 account/session assertions above unchanged.
+    for migration in sqlx::migrate!("./migrations")
+        .iter()
+        .filter(|m| m.version > 27)
+    {
+        sqlx::raw_sql(&migration.sql).execute(&pool).await.unwrap();
+    }
     let c = store
         .configure_issuer_client(&public(realm, Uuid::new_v4(), "https://app.example/cb"))
         .await

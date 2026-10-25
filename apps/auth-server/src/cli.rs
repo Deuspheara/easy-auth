@@ -16,14 +16,15 @@ Setup:
   AUTH_BIND        Listener address (default: 127.0.0.1:8080)
   AUTH_DEVELOPMENT Explicit true for loopback-only HTTP/development SMTP
 
-Configure SMTP and optional password/OIDC settings through the environment.
+Configure SMTP and optional password/provider/issuer settings through the environment.
 The binary does not load .env files. Help/version do not validate configuration,
 connect to PostgreSQL, run migrations, or start a listener.
 
 Setup and provider status:
   https://github.com/Deuspheara/easy-auth/blob/main/docs/guides/server-cli.md
 
-SAML is unavailable; unfinished providers are not enabled by these options.
+SAML and outbound OIDC require explicit build features, complete trusted settings
+and persisted policy. Compiling a feature does not establish security approval.
 ";
 
 pub(super) enum Command {

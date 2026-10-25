@@ -11,6 +11,9 @@ mod passwords;
 #[path = "configuration/saml/mod.rs"]
 pub(crate) mod saml;
 
+#[path = "configuration/issuer/mod.rs"]
+pub(crate) mod issuer;
+
 use auth_axum::BrowserConfig;
 use auth_core::Auth;
 use auth_postgres::Postgres;
@@ -30,6 +33,9 @@ pub(crate) struct Parameters {
 /// Auth-only compatibility API. Explicit provider browser settings require the
 /// shared application factory so older consumers cannot silently drop them.
 pub async fn configured_auth() -> StartupResult<(Auth, BrowserConfig, SocketAddr)> {
+    if issuer::read()?.enabled() {
+        return Err("issuer browser settings require configured_application".into());
+    }
     saml::read()?.require_disabled()?;
     if oidc::read()?.enabled() {
         return Err("OIDC browser settings require configured_application".into());

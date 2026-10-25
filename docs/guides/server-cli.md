@@ -73,8 +73,8 @@ validation or permission to enable another authentication path.
 | Google web/native | [Component and acceptance guide](google.md); experimental components/examples do not activate Google in ordinary server startup; registered-provider/OS/lifecycle evidence remains required |
 | Passkeys/custom UI | [Enrollment](passkey-enrollment.md), [sign-in](passkey-authentication.md) and [management/recovery](passkey-management.md); preserve RP/origin, browser proof and stronger-account policy; ordinary activation remains gated |
 | Apple | Not implemented; Apple client-secret, capability, callback/native and grant-lifecycle acceptance remain pending |
-| SAML | No production verifier, ACS or metadata startup option; [dependency gate](../research/protocol-dependencies.md) and independent security validation remain open |
-| Outbound OIDC issuer | No issuer endpoints; [gated client metadata](issuer-clients.md) does not activate an authorization server |
+| SAML | Explicit `saml-web` and complete persisted HTTPS trust; [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) waives independent review, which was not performed |
+| Outbound OIDC issuer | Explicit `issuer-web` and protected matching persisted key; [standalone setup and bounded parity](issuer-standalone.md); production release/assurance gates remain separate |
 
 Custom clients use the [public API contract](../architecture/api-contract.md),
 preserving exact Origin, same-browser proof cookies and explicit confirmations.

@@ -1,5 +1,5 @@
 use crate::{Postgres, unavailable};
-use auth_core::{Error, IssuerClientKind, IssuerClientRegistration, Result};
+use auth_core::{Error, IssuerClientKind, IssuerClientRegistration, IssuerRedirectProfile, Result};
 use sqlx::{Postgres as Pg, Transaction};
 use uuid::Uuid;
 
@@ -7,6 +7,22 @@ fn authentication(client: &IssuerClientRegistration) -> &'static str {
     match client.kind() {
         IssuerClientKind::Public => "none",
         IssuerClientKind::ConfidentialBasic => "client_secret_basic",
+    }
+}
+fn redirect_profile(client: &IssuerClientRegistration) -> Result<&'static str> {
+    match client.redirect_profile() {
+        IssuerRedirectProfile::WebExact => Ok("web_exact"),
+        IssuerRedirectProfile::NativeLoopback => Ok("native_loopback"),
+        IssuerRedirectProfile::NativeRefreshLoopback => {
+            #[cfg(feature = "issuer-native-refresh")]
+            {
+                Ok("native_refresh_loopback")
+            }
+            #[cfg(not(feature = "issuer-native-refresh"))]
+            {
+                Err(Error::Unavailable)
+            }
+        }
     }
 }
 impl Postgres {
@@ -17,6 +33,7 @@ impl Postgres {
         input: &IssuerClientRegistration,
     ) -> Result<IssuerClientRegistration> {
         let client = input.reconfigured();
+        let profile = redirect_profile(&client)?;
         let mut tx = self.pool.begin().await.map_err(unavailable)?;
         sqlx::query(
             "INSERT INTO auth_issuer_sectors(realm_id,host) VALUES ($1,$2) ON CONFLICT DO NOTHING",
@@ -28,16 +45,17 @@ impl Postgres {
         .map_err(unavailable)?;
         sqlx::query(
             r#"
-            INSERT INTO auth_issuer_clients(realm_id,id,revision,sector,redirect_uris,authentication,secret_verifier)
-            VALUES ($1,$2,$3,$4,$5,$6,$7)
+            INSERT INTO auth_issuer_clients(realm_id,id,revision,sector,redirect_uris,authentication,secret_verifier,redirect_profile)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
             ON CONFLICT (realm_id,id) DO UPDATE SET
-                (revision,sector,redirect_uris,authentication,secret_verifier) =
+                (revision,sector,redirect_uris,authentication,secret_verifier,redirect_profile) =
                 (EXCLUDED.revision,EXCLUDED.sector,EXCLUDED.redirect_uris,
-                 EXCLUDED.authentication,EXCLUDED.secret_verifier)
+                 EXCLUDED.authentication,EXCLUDED.secret_verifier,EXCLUDED.redirect_profile)
             "#,
         ).bind(client.realm()).bind(client.client()).bind(client.revision())
             .bind(client.sector()).bind(client.redirects()).bind(authentication(&client))
             .bind(client.secret_verifier().map(|v| v.to_vec()))
+            .bind(profile)
             .execute(&mut *tx).await.map_err(unavailable)?;
         tx.commit().await.map_err(unavailable)?;
         Ok(client)
@@ -86,6 +104,7 @@ pub(super) async fn lock(
         SELECT enabled FROM auth_issuer_clients WHERE realm_id=$1 AND id=$2 AND revision=$3
             AND sector=$4 AND redirect_uris=$5 AND authentication=$6
             AND secret_verifier IS NOT DISTINCT FROM $7
+            AND redirect_profile=$8
             AND consent='explicit' AND subject_type='pairwise' FOR UPDATE
         "#,
     )
@@ -96,6 +115,7 @@ pub(super) async fn lock(
     .bind(client.redirects())
     .bind(authentication(client))
     .bind(client.secret_verifier().map(|v| v.to_vec()))
+    .bind(redirect_profile(client)?)
     .fetch_optional(&mut **tx)
     .await
     .map_err(unavailable)?;

@@ -1,5 +1,68 @@
 # Code organization
 
+The initial Basecoat integration extracted `theme.js` (existing preference projection) and
+`presentation-motion.js` (optional interpolation/owned cancellation). The fixed
+Vega stylesheet and mini ESM output live in `pages/vendor/`; `tools/reference-ui/`
+prepares exact package inputs and licenses without workspace source scanning.
+Native page/feature controllers still own requests, proofs, focus and confirmation.
+The screen/state and component mapping is in
+[the modernization record](../design/reference-ui-modernization.md).
+
+Reference presentation keeps trusted boolean capability projection, fixed style
+insertion and static asset routing in separate `pages/` Rust modules. Browser
+`client.js` composes the view; `signin.js`, `account.js` and `passkeys.js` own their
+forms/reads. `account-view.js` owns account identity/policy presentation and panels;
+`inventory-rows.js` and `passkey-row.js` render named inventory objects, retaining
+captured key versions and checks with their actions. `passkey-reauth.js` owns only
+the deliberate existing logout/account-bound prompt sequence. `auth-screens.js`
+owns the closed anonymous presentation selector; `view.js` owns busy/focus/dialog
+and nonessential success notification presentation. The existing
+navigation-safe request/native-prompt operations are shared byte-for-byte through
+`browser-operations.js`; the original recovery resource URL remains supported.
+Feature page modules retain callback selection, escaped transport data and
+protocol confirmation. Their fixed HTML shares the stylesheet without adding
+external resources or broad CSP style permission. Browser modules remain below 200
+lines; the fixed HTML document keeps its native forms and capability-gated
+views together without a template framework (a reviewed size exception); the form-binding function deliberately keeps its short explicit endpoint/
+input/result handlers together as a reviewed function-size exception. No business
+policy, SQL, verifier or public proof constructor moves into presentation.
+
+The compact authentication adaptation has one semantic JSON value source and a
+small deterministic CSS alias generator, checked in CI. Rendering combines the
+generated aliases with the owning control/layout stylesheet under one exact hash.
+Licensed local Inter and its notice use fixed static asset routes. No frontend
+framework, universal component abstraction or second palette is introduced.
+The per-key row separates inline rename editing from the captured-version remove
+action. Both keep owner/view checks immediately beside protected requests; no
+public proof constructor or shared persistence rule moves into rendering.
+
+Reference browser acceptance separates owned process lifecycle, exact-recipient
+mail delivery, appearance, focused-screen navigation, mailbox/account flow, native passkey flow, usability
+and post-provider account observations in named modules. Longer ordered mailbox
+and native-device scenarios deliberately retain genuine setup, UI observations
+and final effects together; they are test-function size exceptions. No runner
+collects private source inventories or persists browser proof/state. Reusable
+post-provider assertions run within existing genuine provider suites. No unrelated
+cleanup is deferred.
+
+Keyboard navigation and closed-dialog focus assertions live in their own
+`keyboard.cjs` module, called from the genuine mailbox flow; they introduce no
+authentication fixture or persistence policy. Lost-focus restoration stays in
+`view.js`, beside operation cleanup and page-lifecycle checks.
+
+Reference account inventory keeps public projection/cursor types in core
+`providers.rs` and the use case in `auth/providers.rs`. PostgreSQL
+`sessions/linked_providers.rs` owns the source-aware caller transaction and fixed
+owner/realm query; the transaction visibly retains final deadline/commit. Axum
+`handlers/providers.rs` owns only closed query/response DTOs and delegation.
+No identity grant, linking framework, new crate, dependency or schema is added.
+Real-PG tests separate paging/isolation, observed revocation and fault rollback;
+existing normal provider fixtures verify actual source-bound sessions. Reusable
+trusted metadata setup and the single existing lock observer stay in test support.
+Inventory implementation files remain below 110 lines. Longer ordered HTTP privacy
+and compound-cursor scenarios keep genuine setup, observations and positive/
+negative controls together as test-function size exceptions. No cleanup is deferred.
+
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.
@@ -85,6 +148,64 @@ For every change, review:
 The approximate 300-line file and 50-line function thresholds in AGENTS.md trigger this review. Generated files and published migrations are not extraction targets. A cohesive transaction may be longer; explain that decision rather than splitting it across opaque helpers. Formatting, linting and tests complement this review and cannot replace it.
 
 ## Implemented layout
+
+Explicit native consent owns input, validated facts, port and service in core
+`issuer/tokens/native/consent/`. PostgreSQL `issuer/codes/native/` owns sidecar
+preparation/state/decisions and composes shared pending admission/insert and locked
+approval/audit operations. The behavior-preserving request/decision/approval
+extractions precede this extension. Caller-owned transactions keep client/policy,
+source/owner/session/pending/sidecar order and final clock visible. Default online
+guards remain independent. Tests separate lifecycle, bindings, isolation, storage,
+observed ordering and migration/restart. New source/test files stay below300lines;
+longer ordered transactions/scenarios preserve invariants as function-size
+exceptions. No HTTP policy copy, generic framework, new dependency or deferred cleanup.
+
+Native offline configuration extends core `issuer/tokens/native/` with bounded
+policy and PostgreSQL `issuer/native_refresh/` with scoped configuration/current
+policy locking. It reuses existing native redirect and full-client policy; no HTTP
+handler, crate entry file or local-session validator gains persistence or offline
+authority. Tests separate configuration, isolation/storage, observed ordering and
+historical migration preservation. All new modules remain below300lines; ordered
+negative/positive and migration scenarios retain their invariants as function-size
+exceptions. Configuration creates no tokens, owner audit or public proof API.
+
+Access management extends core `issuer/tokens/` with presented-input, validated
+projection, port and use case; PostgreSQL `issuer/tokens/` owns candidate/state,
+revocation and the visible introspection transaction. Retained verification-key
+locking remains in `issuer/signing/verification.rs`. Axum `issuer_web/management/`
+owns closed form/wire types, thin handlers and explicit route/contract composition.
+Shared strict form decoding and base contract composition are extracted separately
+from behavior, as is the existing token client admission name. Feature tests split
+credential/namespace, lifecycle, policy, observed database ordering and migration
+responsibilities. No generic token/provider framework or public proof constructor
+is introduced. New modules stay below300lines. Longer visible transactions and
+ordered negative/healthy scenarios retain lock/cap/rollback evidence together.
+Native refresh families have separate owning modules described below; keep their
+different authority model outside these access-only transaction entry points.
+
+Issuer signing keeps key/publication/metadata and concrete staged issuance in core
+`issuer/signing/`; PostgreSQL registry/metadata and final preparation/completion live
+in the corresponding owning folder. Shared code redemption state retains source/
+owner/lock policy. Axum `issuer_web/` separates strict form/Basic parsing, finite
+wire types/errors, metadata, token handlers and trusted composition; consent pages
+reuse the existing feature. Server `issuer_key` owns only trusted protected-file
+input. Tests separate registry/migrations, ordinary sequential rollover, policy/
+expiry/erasure and wire/RP scenarios. No generic signer, provider framework, public
+proof constructor, SQL in HTTP or new crate is added. Longer final issuance and
+ordered RP/rollover tests keep their invariant sequence visible; new files stay
+under300lines. Owned browser/client fixtures reuse existing TLS/database/process
+support, with only healthy production outputs. No unrelated cleanup is deferred.
+
+Issuer registration keeps native URL admission in core `issuer/native.rs` and
+typed request credentials in `issuer/authentication.rs`, separate from registration
+and unchanged web redirects. PostgreSQL `issuer/authentication.rs` owns only the
+current-client transaction/credential check, with a private transaction-scoped
+comparison for future redemption; `loading.rs` validates persisted definition
+restoration without raw secrets or provisioning. Tests separate native policy, ordinary credentials,
+observed lock waits, actual erasure and historical migration preservation. Every
+new source/test file stays below300lines; ordered negative/positive and migration
+cases retain their invariant sequence as function-size review exceptions. No new
+dependency, generic client framework, HTTP/persistence policy copy or deferred cleanup.
 
 AUTH-52 splits the original accumulating implementation files and test suites into these owning modules:
 
@@ -985,3 +1106,163 @@ orchestration keeps source identity, selected graph/package, test invocation and
 post-test freeze checks together for review. All new modules stay under300lines;
 full graph receipts are deliberate generated-evidence size exceptions. No generic
 resource framework, protocol policy copy, new runtime dependency or proof API.
+
+AUTH-38 keeps request/PKCE/response policy, repository port, orchestration and opaque
+result under core `issuer/codes/`. PostgreSQL `issuer/codes/` separates preparation,
+explicit decisions, redemption, state loading, database clock and committed abuse
+admission. Each authority transaction remains visible from its first lock through
+final clock and commit. `sessions/authorization.rs` composes the unchanged existing
+source-aware fresh-owner rules; it does not copy them. Subject allocation was
+extracted in a separate structural commit before reuse inside approval.
+
+Feature tests separate lifecycle, bindings, credentials, admission, observed
+orderings/final write deadlines, storage constraints, rollback/erasure and migration.
+OIDC/SAML source cases stay beside their existing ordinary producers without a new
+signature fixture or production proof constructor. A focused historical issuer
+fixture under `tests/support/` uses only original pre-0029 audit columns. New modules
+stay below300lines. Longer ordered transactions and negative/positive test scenarios
+retain lock/write/rollback or lifecycle evidence together as size exceptions; no
+transaction is hidden behind a generic helper, visibility widened or unrelated
+cleanup deferred.
+
+AUTH-38's explicit Axum consent transport owns routing/composition, closed schemas,
+thin POST handlers, fixed pages/script, private-cookie hygiene and contract in
+`issuer_consent/`. Core's read-only preview uses the existing repository port;
+PostgreSQL reuses decision locking without allocating or mutating authority. No
+source/freshness/persistence policy moves into handlers. Feature HTTP tests separate
+boundaries, lifecycle, recovery and contracts. The owned browser example separates
+resource lifecycle from router/fixture composition and imports existing test mail,
+owned database/process and TLS helpers unchanged. Its inbox is confined to that
+explicit example. New files stay below300lines; longer ordered acceptance/transaction
+functions retain evidence and cleanup together as size exceptions. No generic
+provider framework, widened production internals or unrelated cleanup is added.
+
+## Native family implementation
+
+Core `issuer/signing/issuance/native_code/` owns concrete initial signing/proof
+validation, sharing the existing private signing engine.
+`issuer/tokens/native/family/` owns credential policy, ports, orchestration and
+committed output. PostgreSQL `issuer/native_refresh/issuance/` and `family/` keep
+separate source-aware preparation/completion and rotation/reduction transactions;
+`sessions/delegation.rs` composes existing source/owner rules for the explicit
+offline grant without changing cookie validation. Shared ordinary signing test setup
+moved separately to `tests/support/issuer_tokens.rs`; family cases are
+feature/invariant modules. No new dependency, generic signer, public proof
+constructor or unrelated cleanup. Longer visible transactions and ordered scenarios
+are function-size exceptions; modules stay below300lines.
+
+## Native confirmation transport
+
+Native consent owns closed wire types, thin handlers, fixed page, contract and
+explicit composition under issuer_native_consent/. It reuses the existing private
+cookie transport and finite browser consent mechanics rather than duplicating them.
+No source/account/expiry/SQL policy moves into HTTP. Existing cookie
+binding/page/root composition and unchanged ordinary HTTP issuer fixture were
+extracted in a separate structural commit; fixture imports are local to each feature
+so isolated builds remain warning-free. New tests separate lifecycle,
+protocol/body/cookie boundaries, contract/composition, real realm isolation and audit
+rollback. Modules remain below300lines; ordered negative/positive scenarios retain
+their invariant sequence as function-size exceptions. No unrelated cleanup or generic
+framework.
+
+## Native wire ownership
+
+Core native_code/registered.rs and native/family/registered.rs own finite
+registered-operation selection after one committed admission. Private admitted
+helpers preserve concrete signing/reduction checks. Axum issuer_web/native/ separates
+services, routing, strict input, token outputs, metadata/UI selection, revocation and
+contract. It shares existing Basic/form/status/cookie/browser boundaries; no
+persistence or source/account policy moves to HTTP. Genuine test setup and owned
+example composition were extracted in separate structural commits; the existing
+ordinary signer is unchanged. New source/test modules stay below300lines. Longer
+ordered scenarios retain invariants as documented function-size exceptions; no
+generic framework, dependency, new proof/crypto constructor or unrelated cleanup.
+
+## Native consumer ownership
+
+Core `issuer/tokens/native/consumer/` separates trusted policy, repository facts,
+sealed metadata and admitted use case. It reuses the existing bounded access
+projection without turning metadata into a local session. PostgreSQL
+`issuer/native_refresh/consumer/` owns administrative provisioning and deterministic
+consumer/audience client ordering; `family/inspection/` owns candidate access state
+and the read-only current-policy/source/family transaction. Original family policy
+restoration inputs were named in a separately verified structural commit. No SQL
+or account/source policy moves into HTTP.
+
+Axum's named native introspection handler reuses strict status input and the closed
+metadata DTO. An explicit builder selects the route and corresponding live contract;
+ordinary online inspection remains separate. Tests separate provisioning, lifecycle,
+key/policy, realm/audience isolation, migration and observed database waits. Existing
+normal provider cases verify source provenance through the same new inspection path.
+All new modules remain below300lines. Longer ordered transaction/scenario functions
+keep current credentials, locks, original caps, waits, final clock and valid controls
+visible together as size-review exceptions. No speculative abstraction, new crate,
+public proof constructor, duplicated policy or unrelated cleanup is deferred.
+
+The independent core RP client lives in `oidc/verification/client/`: immutable
+configuration, private pending state, callback admission, authorization/completion,
+finite errors, opaque credentials, bounded wire responses and native rotation have
+separate responsibilities. The existing concrete signature worker, validated claim
+context, document retrieval and token wire primitives were extracted in preceding
+behavior-preserving commits. The public document facade still requires current
+provider configuration; only the private SDK context uses immutable RP settings.
+Named client tests reuse the existing normal signer and transport producer. No new
+crate, crypto implementation, proof constructor or runtime dependency is added.
+New modules remain below300lines; ordered completion/claim scenarios keep their
+security sequence visible as function-size exceptions. Standalone work is separate.
+
+Configured issuer startup adds focused `configuration/issuer/` parsing/settings and
+`application/issuer.rs` composition, with real-PG startup tests in its named folder.
+Application entry files compose only. The optional HTTP provider attachment belongs
+to `issuer_web/native/providers.rs`; it reuses provider attach/cleanup and contracts,
+without duplicating handlers or policy. Owned standalone acceptance separates
+provisioning, process lifetime and SDK IPC, reusing existing database/TLS/HTTP and
+normal maintained key producers. New modules remain under300lines. Longer ordered
+startup/fixture/test scenarios retain resource ownership and invariant sequence as
+function-size exceptions; no unrelated cleanup is deferred.
+
+Owned issuer rollover acceptance keeps the unchanged maintained key producer and
+protected-file lifetime in `issuer-client-acceptance/key_input.rs`, extracted and
+verified separately. Provisioning owns the single prepublished replacement and
+retained file; process dispatch owns explicit restart, client operations own no
+administration, and `issuer-standalone/rollover.cjs` owns the sequential independent
+before/after checks. All remain bounded test-only modules under300lines, with no
+production configuration or crypto change. The actual policy interval and genuine
+reauthentication stay visible; no SQL clock/ready-at rewriting is introduced.
+
+The existing owned OIDC callback collector keeps request observation, controlled
+document completion, categorical diagnostics and context cleanup in one bounded
+lifetime. Its longer function is a reviewed fixture ownership exception. The HTTP
+case module scopes bootstrap-only TLS capture separately from actual deletion UI;
+no production proof constructor, network allowlist expansion, timeout increase or
+crypto behavior is introduced. Existing assertions remain and new sink-count and
+document checks strengthen the transport evidence.
+
+## Account presentation refinement
+
+`settings-search.js` owns only fixed searchable destinations and accessible result
+controls; `account-search.js` invokes existing account navigation. `feedback.js`
+owns field validation display and the stable contextual status node outside
+replaceable inventories. Existing operation controllers retain authorization,
+requests, proofs and generation checks. Recovery's `view.js` owns operation
+presentation/restoration; `setup-view.js` and `claim-view.js` own guided rendering,
+while `setup.js` and `recover.js` retain the explicit endpoint/native-prompt
+sequences. No use case, SQL, schema or authentication policy moved. Modules remain
+under 160 lines; the existing ordered form-binding/controller sequences remain
+reviewed function-size exceptions.
+
+The fixed asset builder adds only the installed Basecoat runtime and Popover
+controller. The runtime observes additions/removals; no forced reinitialization,
+second help controller or inline event handlers are introduced. The native checkbox
+indicator replaces Vega's data-image mask under the unchanged restrictive CSP.
+
+The ordered reference-browser refinement scenario keeps responsive/theme/zoom,
+help keyboard behavior and validation observations together against real served
+pages; its function-size exception avoids splitting one coherent browser journey.
+
+The supplied-design adaptation changes only page composition and focused recovery
+view rendering. Step titles/completed markers remain in existing recovery view
+modules, while existing operation controllers retain requests and proof handling.
+Cancellation disclosures wrap the existing named forms instead of creating new
+handlers. The shared application stylesheet remains below 200 lines; no new
+framework, transport adapter or component-controller abstraction is introduced.

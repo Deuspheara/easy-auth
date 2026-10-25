@@ -65,12 +65,7 @@ impl OidcAuthorizationUrl {
         }
         let mut url =
             url::Url::parse(discovery.authorization_endpoint()).map_err(|_| Error::Unavailable)?;
-        if url.query_pairs().any(|(key, _)| {
-            key.chars().any(char::is_control)
-                || RESERVED.contains(&key.to_ascii_lowercase().as_str())
-        }) {
-            return Err(Error::Unavailable);
-        }
+        validate_endpoint(&url)?;
         let mut accepted = vec!["openid"];
         accepted.extend(scopes.iter().copied().filter(|value| *value != "openid"));
         url.query_pairs_mut()
@@ -94,4 +89,13 @@ impl fmt::Debug for OidcAuthorizationUrl {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("OidcAuthorizationUrl([REDACTED])")
     }
+}
+
+pub(in crate::oidc) fn validate_endpoint(url: &url::Url) -> Result<()> {
+    if url.query_pairs().any(|(key, _)| {
+        key.chars().any(char::is_control) || RESERVED.contains(&key.to_ascii_lowercase().as_str())
+    }) {
+        return Err(Error::Unavailable);
+    }
+    Ok(())
 }

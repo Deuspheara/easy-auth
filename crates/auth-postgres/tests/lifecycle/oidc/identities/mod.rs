@@ -10,4 +10,9 @@ mod session_waits;
 mod sessions;
 mod setup;
 
+#[cfg(feature = "issuer-codes")]
+mod issuer_codes;
 mod startup;
+
+#[cfg(feature = "issuer-native-refresh")]
+mod issuer_native;

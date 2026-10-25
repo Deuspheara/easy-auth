@@ -1,5 +1,14 @@
 # Domain model
 
+`LinkedProvider` is public owner-scoped inventory metadata: identity UUID,
+closed OIDC/SAML kind and immutable linked issuer. `LinkedProviderCursor` orders
+protocol plus UUID, and `LinkedProviderPage` bounds results to 50. These are not
+verified identity/session proofs or current provider trust. Only normal active
+session validation selects the owner and realm; no subject, provider claim,
+credential or local secret is projected. No entity/table is added and no identity
+can be linked or removed through this read. See
+[ADR0041](adr/0041-linked-provider-inventory.md).
+
 A realm is an authentication security partition; it is not a workspace/business organization. A registered client belongs to a realm and has exact redirects, origin policy and audience. The first slice binds one realm per server/router in trusted configuration; no request body may select it.
 
 User has an opaque random UUID, realm, optional verified email, optional display label and an explicit authentication policy. Migration 0009 preserves existing mailbox identities and allows email-free passkey-required users; see the [optional-mailbox guide](../guides/optional-mailbox.md). A label never identifies or authorizes an account. Email policy initially supports a conservative ASCII mailbox and canonicalizes case consistently; no plus/dot rewriting. This product policy can conflate case-sensitive local parts and must be explicit. Email change now requires a fresh session and separate confirmation of both current and proposed mailboxes, preserves the user ID and revokes sessions. Optional OIDC identity records are unique by (realm, connection, local client, exact issuer, subject), with bytewise issuer/subject equality; matching emails never merge users. Provider-only JIT users have null contact and explicit provider_required policy, with source/revision-bound oidc sessions and optional original provider authentication time. Planned linking must prove the current fresh session and a new provider transaction. Unlinking must preserve a usable credential/recovery path. Merges are disabled until separately reviewed.
@@ -33,7 +42,7 @@ VerificationChallenge holds only token/browser verifiers, email/purpose and expi
 
 Session holds a public opaque ID, user+realm composite FK, SHA-256 verifier of a random 256-bit secret, created/last-seen/absolute expiry and revocation state. Browser receives the secret only in HttpOnly cookie. Lookup validates idle and absolute limits in the same database operation. Revocation takes effect on the next database validation; already-authorized in-flight operations can complete. Sensitive operations use separate authenticated_at provenance; rotation does not reset it. Legacy sessions require fresh sign-in after migration 0004. Application-specific transaction semantics remain the consumer’s responsibility. Active inventory exposes only owned public UUID/time metadata through bounded cursor pages. Fresh-authenticated individual/all-session revocation is implemented; revoke-all serializes with session issuance and cancels outstanding proofs. See [session guide](../guides/sessions.md).
 
-Refresh/token families are separate future native/OAuth entities: short access lifetimes, atomic refresh rotation, family replay detection and OS secure storage. JWT expiration is not revocation. SigningKey records public metadata and protected key reference; never put plaintext private keys into logs/config dumps. AuditEvent is a closed set of committed lifecycle facts with bounded kinds and opaque user/actor/affected-session references. Version 1 shapes and composite foreign keys enforce ownership; there is no arbitrary payload, token, verifier or email field. Deletion clears every subject/session reference. Historical version 0 attribution remains explicitly unknown. See the [audit guide](../guides/audit-events.md).
+Native refresh/token families are separate optional issuer entities: short access lifetimes, atomic refresh rotation, family replay detection and OS secure storage. JWT expiration is not revocation. SigningKey records public metadata and protected key reference; never put plaintext private keys into logs/config dumps. AuditEvent is a closed set of committed lifecycle facts with bounded kinds and opaque user/actor/affected-session references. Version 1 shapes and composite foreign keys enforce ownership; there is no arbitrary payload, token, verifier or email field. Deletion clears every subject/session reference. Historical version 0 attribution remains explicitly unknown. See the [audit guide](../guides/audit-events.md).
 
 The optional passkey boundary persists RP-scoped verified credential state and
 short-lived enrollment and authentication transactions. Experimental HTTP enrollment
@@ -203,6 +212,16 @@ mapping grants no consent, session or token authority; account erasure cascades 
 [ADR0026](adr/0026-outbound-client-registration.md) and the
 [component guide](../guides/issuer-clients.md) describe limits. M07 remains gated.
 
+`IssuerRedirectProfile` distinguishes unchanged exact HTTPS web metadata from
+explicit public native loopback metadata. Native sector identifiers are isolated
+per realm/client, not shared by local IP, and request-specific ports do not mutate
+registration. Migration0028 defaults old clients to `web_exact` and closes native
+rows to public authentication and their own sector. `IssuerClientAuthentication`
+is request data, not a proof: its Basic constructor hashes a canonical Secret,
+while current method/credential/configuration checks stay atomic in PostgreSQL.
+No consent, code, token or user authority follows. See
+[ADR0034](adr/0034-issuer-native-registration-and-authentication.md).
+
 
 `SamlAttribute` is optional verified provider data inside the opaque SAML proof,
 with exact scalar Name/NameFormat/value records, bounded by input/XML limits,
@@ -213,3 +232,107 @@ registration remain ownership authority. AuthnInstant is the established event,
 not new Response/Assertion issuance; stored sessions and deletion freshness use
 that original signed time. [ADR 0028](adr/0028-saml-attribute-and-authentication-facts.md)
 records these gated contracts and the unchanged verifier/clock boundary.
+
+The optional outbound issuer authorization has a distinct realm/issuer/client
+revision, exact actual callback, private browser/handle hashes, S256 challenge,
+nonce/state and initiating source-aware owner/session. Explicit approval allocates
+the existing pairwise sector subject and one short-lived hash-only code; one atomic
+redemption scrubs correlation data. Original authentication time and all original/
+current caps remain authoritative through the final transaction write. These are
+not inbound identities, local sessions, application permissions or signed tokens.
+Typed issuer audit references bind the exact client/operation/owner/session tuple;
+confirmed owner erasure deidentifies them before cascading operation/subject rows.
+See [ADR0035](adr/0035-issuer-consent-and-authorization-codes.md).
+
+Read-only issuer consent recovery returns only the original public preview UUID,
+client, actual return URI and expiry after the same fresh current source/owner/
+session checks. It allocates no subject/code and never extends the operation.
+The HTTP operation cookie is a selector, not an owner or authorization proof;
+explicit decisions must also match the displayed preview UUID and both private
+proofs. Local session replacement clears transport state without claiming to undo
+an already committed code decision. See [ADR0036](adr/0036-issuer-https-consent-delivery.md).
+
+Optional signed issuance adds a distinct realm/issuer public-key registry with full
+revision, explicit active selection, publication/sign/verification windows and
+operator disable. Private operator keys have no persistence/public projection.
+`IssuerSigningSnapshot` is configuration data; only the concrete signer constructs
+the opaque staged `IssuerSignedCode`. Final current-policy/code/owner checks commit
+the ledger before wire credentials exist. Migration0031 binds hash-only access rows
+to the full authorization/client/owner/session/pairwise-subject tuple and public key;
+owner erasure cascades these rows. Access credentials and ID tokens are neither
+local sessions nor application permissions. Original authentication time and all
+earliest original caps survive signing. See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md).
+
+Optional `IssuerTokenManagement` inspects/revokes the existing access ledger without
+creating a local session or extending any grant. `IssuerPresentedToken` retains only
+the existing SHA-256 credential verifier for bounded opaque input. An active result
+projects only the consuming confidential client's pairwise/issuer/audience/time
+metadata after current source/owner/session/key/client and original-cap checks.
+Migration0032 adds permanent nullable access revoked_at_us; repeated/foreign/unknown
+revocation cannot restore or widen authority. Public possession can reduce only its
+matching credential, but does not authenticate an introspection consumer. Refresh
+families/delegation use separate optional authority described in
+[ADR0038](adr/0038-native-token-lifecycle.md).
+
+Optional `IssuerNativeRefreshPolicy` is trusted configuration only: exact authority,
+full offline-capable native client, independent revision and bounded absolute/idle
+seconds. Migration0033 creates initially disabled realm/issuer/client policy rows
+and a distinct native profile; older loaders refuse that profile. Full locked
+definition checks and revision changes preserve disable and reject stale policy.
+An eventual original consent grant is capped by its captured source/session
+absolute expiry; configuration cannot create consent, refresh authority or extend
+cookie freshness/idle. Native confirmation transport and family library are separate implemented components;
+bounded owned native browser/wire acceptance is implemented by the explicit native
+composition. SDK/standalone and production acceptance remain separate.
+
+Migration0034 adds a native marker on new explicit operations and a full-tuple
+proposed-consent sidecar: original policy/client revisions, preparation time,
+source/session absolute cap, fixed grant expiry and idle bound. Actual approval
+time is separate and matches the original code approval audit. No historical online
+authorization is upgraded. `IssuerNativeAuthorization` validates an explicit
+offline request and safe display metadata; its opaque Start has no public proof
+constructor. Core/SQL default online paths still refuse native operations. Consent
+approval creates no refresh family, local session or extended access credential;
+confirmation HTTP/UI is a separate optional transport; the family lifecycle is
+described below. The separate explicit native wire component includes bounded owned
+browser/real-loopback acceptance.
+
+## Native refresh family
+
+A distinct native family retains the exact approved
+realm/issuer/client/revision/policy/owner/original-session/subject tuple, original
+method/authentication time, immutable proposed/source absolute cap, bounded rolling
+idle and generation. Only hashes of one-use refresh credentials persist; spent
+generations remain replay detectors. Native access generations remain separate from
+LocalSession. Typed code/refresh/access actor facts carry no fabricated actor-session
+authentication. Erasure deidentifies audit before cascades; credential reduction
+cannot restore authority. See ADR0038.
+
+## Native audience consumers
+
+`IssuerNativeConsumerPolicy` is trusted operator configuration binding exact
+current confidential Basic consumer and distinct public native audience definitions
+under one realm/issuer. Its independent revision and disabled initial persistence
+create no consent or authentication. Disable/reconfiguration invalidates stale
+snapshots; explicit enable requires both current clients and the saved policy.
+Migration0036 stores configuration only and preserves previous credentials.
+
+`IssuerNativeIntrospection` combines actual consumer authentication with that exact
+permission, current native/source/owner/session/family/generation/key and final
+lifetime checks. `IssuerNativeAccessData` is repository input;
+`IssuerNativeActiveAccess` is sealed validated pairwise metadata, without local
+owner/session/raw credential projection. Its audience remains the native client,
+separate from the authenticated consumer. No cookie, local session, authentication
+time or application permission is created. Optional transport is described in
+[ADR0039](adr/0039-native-introspection-consumers.md).
+
+## Independent relying-party state
+
+`OidcClientAuthorization` owns a single private state/nonce/S256 operation, bound to
+an immutable service instance, exact return and original monotonic/wall-clock caps.
+It is consumed even on denial or an ambiguous code exchange. `OidcClientIdentity`
+is verified pairwise RP metadata with its own expiry, never an `OAuthExchange`,
+provider completion identity, local session or business permission. Native rotation
+returns only opaque access/refresh credentials and conservative expiries; it cannot
+renew that identity or manufacture authentication time. Credential exposure/storage
+is a distinct trusted application boundary. See [ADR0040](adr/0040-independent-oidc-client-and-standalone.md).

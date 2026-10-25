@@ -14,5 +14,5 @@ pub use deletion::SamlAccountDeletionWebServices;
 pub use routing::experimental_saml_web_router;
 pub use services::SamlWebServices;
 
-#[cfg(feature = "oidc-web")]
+#[cfg(any(feature = "oidc-web", feature = "issuer-native-web"))]
 pub(crate) use routing::{attach, web_contract};

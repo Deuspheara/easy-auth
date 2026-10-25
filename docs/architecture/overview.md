@@ -1,5 +1,28 @@
 # Architecture
 
+The optional server `issuer-web` composition now uses the same configured factory
+for executable and embedded delivery. Explicit HTTPS/key settings must match the
+current enabled persisted signing key; startup neither provisions nor enables
+issuer policy. Selected inbound providers retain their own checks around the same
+issuer handlers. Independent Rust `oidc-client` operations produce RP metadata,
+never local-session/provider completion proofs. Owned PostgreSQL/SMTP/TLS/browser,
+Node and Rust acceptance checks bounded standalone/embedded parity; final gates and
+broader production/assurance work remain separate. See [ADR0040](adr/0040-independent-oidc-client-and-standalone.md)
+and [standalone setup](../guides/issuer-standalone.md). Older staged descriptions
+below remain historical where superseded by this explicit composition.
+
+AUTH-40's optional core/PostgreSQL `issuer-native-refresh` now adds explicit
+initially disabled native policy configuration. Exact issuer/realm/client revisions,
+bounded lifetimes and ordered full-definition checks create no consent or token.
+Separate native consent-library operations now retain fixed proposed/source caps
+and genuine fresh-owner/private bindings through code/audit commit. Native
+family issuance/rotation/reuse revocation are implemented in the library. Native
+confirmation, native token/refresh HTTP and bounded actual native browser acceptance
+are implemented separately below. Explicit authenticated native consumers follow
+[ADR0039](adr/0039-native-introspection-consumers.md); SDK/standalone and production
+acceptance remain separate.
+See [ADR0038](adr/0038-native-token-lifecycle.md).
+
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.
@@ -29,7 +52,21 @@ Arrows into core denote compile-time dependency, not a network RPC. Runtime core
 
 Inbound OIDC clients and SAML SPs resolve verified external identities. Outbound OIDC issuer/client registration is a distinct module and release gate; no discovery endpoint is advertised until implemented and tested. Secrets are never part of public user/session DTOs.
 
+The existing opt-in outbound issuer metadata now includes explicit public native
+loopback registration and current registered-method/credential validation. Exact
+HTTPS web defaults and inbound provider policy remain separate. Native sectors
+are per realm/client; accepted port variation never replaces retaining the exact
+actual return in the future code flow. No issuer endpoint or token grant follows.
+[ADR0034](adr/0034-issuer-native-registration-and-authentication.md) records this boundary.
+
 See domain-model, auth-flows, api-contract, deployment and the threat model. Authentication release is blocked on the six method categories, issuer interoperability and security review, even if alpha email works.
+
+The explicit crate-only issuer now has signed issuance, discovery/JWKS and key
+rotation under [ADR0037](adr/0037-issuer-signing-and-final-issuance.md). Separate optional
+access revocation/authenticated introspection extends that existing short-lived
+ledger under [ADR0038](adr/0038-native-token-lifecycle.md). Native HTTP/browser and
+independent SDK/standalone acceptance and normal outbound activation remain gated;
+metadata, local sessions and application permissions stay distinct.
 
 [ADR 0021](adr/0021-saml-verification-and-approval.md) records the SAML verifier
 recommendation and separate implementation, test, review and independent-approval
@@ -234,3 +271,17 @@ prepared under [ADR 0029](adr/0029-gated-saml-server-composition.md). The source
 activation check remains closed before database loading, and disabled normal
 startup mounts no SAML routes. Trusted startup loading is read-only and cannot
 re-enable or reconfigure an existing provider. Security approval remains separate.
+
+## Native wire profile
+
+Explicit issuer-native-web now composes native/online code, native refresh,
+registered cleanup and current legacy confidential introspection. One core source
+admission selects one current registration profile; all selected operation
+checks/transactions remain. Owned Chromium/real TCP loopback/separate HTTPS PKCE
+acceptance and genuine OIDC/SAML delegation cases are implemented. Explicit
+audience-authorized confidential consumption of native access uses the separate
+opt-in policy/endpoint in [ADR0039](adr/0039-native-introspection-consumers.md);
+public native IDs cannot authenticate it. Default standalone/outbound activation and
+broader SDK/standards gates remain. See the
+[native guide](../guides/issuer-native.md) and
+[ADR0038](adr/0038-native-token-lifecycle.md).

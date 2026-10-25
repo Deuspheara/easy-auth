@@ -2,13 +2,14 @@
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
-async function callback(browser, authorization, provider, redirect, mutation) {
+async function callback(browser, authorization, provider, redirect, mutation, captureAtProxy=false) {
   const url = new URL(authorization);
   if (mutation==='nonce') url.searchParams.set('nonce',crypto.randomBytes(32).toString('base64url'));
   if (mutation==='pkce') url.searchParams.set('code_challenge',crypto.randomBytes(32).toString('base64url'));
   assert.equal(url.origin,new URL(provider.issuer).origin);
   const context=await browser.newContext({ignoreHTTPSErrors:true});
   let captured,unexpected=0,pageErrors=0;
+  const unexpectedKinds=[];
   let stage='provider_navigation',page;
   const received=new Promise(resolve=>{captured=resolve;});
   try {
@@ -17,9 +18,27 @@ async function callback(browser, authorization, provider, redirect, mutation) {
       const base=new URL(target);base.search='';
       if (base.href===redirect) {
         captured(target.href);
-        await route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Owned callback captured</title>'});
+        if(captureAtProxy){await route.continue();return;}
+        await route.fulfill({status:200,contentType:'text/html',headers:{
+          'Cache-Control':'no-store','Referrer-Policy':'no-referrer',
+          'Content-Security-Policy':"default-src 'none'"
+        },body:'<!doctype html><title>Owned callback captured</title>'});
       } else if (target.origin===url.origin) await route.continue();
-      else {unexpected+=1;await route.abort();}
+      else {
+        unexpected+=1;
+        if(unexpectedKinds.length<4)unexpectedKinds.push({
+          callback_origin:target.origin===new URL(redirect).origin,
+          callback_path:target.pathname===new URL(redirect).pathname,
+          application_callback_script:target.pathname==='/oidc/account-delete.js',
+          fragment:target.hash!=="",favicon:target.pathname==='/favicon.ico',
+          document:route.request().resourceType()==='document',
+          script:route.request().resourceType()==='script',
+          navigation:route.request().isNavigationRequest(),
+          code:target.searchParams.has('code'),state:target.searchParams.has('state'),
+          error:target.searchParams.has('error'),get:route.request().method()==='GET'
+        });
+        await route.abort();
+      }
     });
     page=await context.newPage();
     page.on('pageerror',()=>{pageErrors+=1;});
@@ -41,12 +60,15 @@ async function callback(browser, authorization, provider, redirect, mutation) {
     stage='provider_submit';
     await page.locator('#kc-login').click();
     stage='provider_callback';
-    const result=await Promise.race([received,new Promise((_,reject)=>{
+    const result=await Promise.race([Promise.all([
+      received,
+      page.waitForFunction(()=>document.title==='Owned callback captured',null,{timeout:15000})
+    ]),new Promise((_,reject)=>{
       const timer=setTimeout(()=>reject(new Error('owned callback timeout')),15000);timer.unref();
     })]);
-    assert.equal(unexpected,0,'browser may contact only the owned provider and intercepted callback');
+    assert.equal(unexpected,0,'browser may contact only the owned provider and controlled callback');
     assert.equal(pageErrors,0,'working provider browser fixture');
-    return result;
+    return result[0];
   } catch(error) {
     const facts=page?await page.evaluate(()=>({
       login_form:!!document.querySelector('#kc-form-login'),
@@ -64,7 +86,7 @@ async function callback(browser, authorization, provider, redirect, mutation) {
     })).catch(()=>({page_unavailable:true})):{};
     const locationFacts=page?{provider_origin:new URL(page.url()).origin===url.origin,
       callback_origin:new URL(page.url()).origin===new URL(redirect).origin}:{};
-    console.log(JSON.stringify({browser_fixture_diagnostic:{stage,unexpected,pageErrors,...locationFacts,...facts}}));
+    console.log(JSON.stringify({browser_fixture_diagnostic:{stage,unexpected,unexpectedKinds,pageErrors,...locationFacts,...facts}}));
     error.stageName=stage;throw error;
   }
   finally {await context.close();}

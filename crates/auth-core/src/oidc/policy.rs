@@ -36,6 +36,9 @@ pub(super) struct Policy {
 }
 impl Policy {
     pub(super) fn new(connection: &OAuthConnection, origins: &[&str]) -> Result<Self> {
+        Self::for_issuer(connection.issuer(), origins)
+    }
+    pub(super) fn for_issuer(issuer: &str, origins: &[&str]) -> Result<Self> {
         if origins.is_empty() || origins.len() > MAX_ORIGINS {
             return Err(Error::InvalidInput);
         }
@@ -54,11 +57,9 @@ impl Policy {
         }
         let policy = Self {
             origins: accepted,
-            issuer: connection.issuer().to_owned(),
+            issuer: issuer.to_owned(),
         };
-        policy
-            .endpoint(connection.issuer())
-            .map_err(|_| Error::InvalidInput)?;
+        policy.endpoint(issuer).map_err(|_| Error::InvalidInput)?;
         Ok(policy)
     }
     pub(super) fn discovery_url(&self) -> Result<Url> {

@@ -79,6 +79,39 @@ jobs:
         run: |
           cargo test --locked -p easy-auth-core --features issuer-clients issuer::
           cargo test --locked -p easy-auth-postgres --features issuer-clients --test lifecycle issuer::
+      - name: Verify issuer codes without optional provider backends
+        run: |
+          cargo test --locked -p easy-auth-core --features issuer-codes issuer::
+          cargo test --locked -p easy-auth-postgres --features issuer-codes --test lifecycle issuer_codes
+      - name: Verify isolated issuer HTTPS consent boundary
+        run: cargo test --locked -p easy-auth-axum --features issuer-consent-web --test browser issuer_consent
+      - name: Verify isolated signed issuer and client token transport
+        run: |
+          cargo test --locked -p easy-auth-core --features issuer-signing issuer::
+          cargo test --locked -p easy-auth-postgres --features issuer-signing --test lifecycle issuer_signing
+          cargo test --locked -p easy-auth-axum --features issuer-web --test browser issuer_web
+          cargo test --locked -p easy-auth-server --features issuer-signing issuer_key::
+      - name: Verify isolated native consent, issuance and refresh families
+        run: |
+          cargo test --locked -p easy-auth-postgres --features issuer-clients,auth-core/issuer-native-refresh --test lifecycle issuer::native_refresh_unavailable
+          cargo test --locked -p easy-auth-core --features issuer-native-refresh issuer::tokens::native
+          cargo test --locked -p easy-auth-postgres --features issuer-native-refresh --test lifecycle issuer_native_refresh
+          cargo check --locked -p easy-auth-axum --features issuer-native-consent-web
+          cargo test --locked -p easy-auth-axum --features issuer-native-consent-web,issuer-web --test browser issuer_native_consent
+          cargo test --locked -p easy-auth-axum --features issuer-native-web --test browser issuer_native_web
+      - name: Verify isolated access revocation and authenticated introspection
+        run: |
+          cargo test --locked -p easy-auth-core --features issuer-token-management issuer::tokens
+          cargo test --locked -p easy-auth-postgres --features issuer-token-management --test lifecycle token_status
+          cargo test --locked -p easy-auth-axum --features issuer-token-management-web --test browser issuer_web
+      - name: Verify independent Rust client and configured issuer startup
+        run: |
+          cargo test --locked -p easy-auth-core --features oidc-client oidc::verification::tests::client
+          cargo test --locked -p easy-auth-server --features issuer-web,oidc-client application::issuer
+          cargo test --locked -p easy-auth-server --features issuer-web,oidc-client configuration::issuer
+          cargo test --locked -p easy-auth-server --features oidc-client oidc_http::
+          cargo check --locked -p easy-auth-axum --features issuer-native-web,oidc-web
+          cargo check --locked -p easy-auth-axum --features issuer-native-web,saml-web
       - name: Verify OIDC without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping
@@ -129,6 +162,22 @@ jobs:
         working-directory: tests/browser/passkeys
       - run: npx --no-install playwright install --with-deps chromium
         working-directory: tests/browser/passkeys
+      - name: Verify owned issuer HTTPS consent and browser recovery
+        run: |
+          cargo build --locked -p easy-auth-axum --features issuer-consent-web --example issuer-consent-browser
+          node tests/browser/issuer-consent/run.cjs
+      - name: Verify owned signed issuer browser and separate HTTPS client
+        run: |
+          cargo build --locked -p easy-auth-axum --features issuer-web --example issuer-web-browser
+          node tests/browser/issuer-web/run.cjs
+      - name: Verify owned native issuer browser, loopback and refresh lifecycle
+        run: |
+          cargo build --locked -p easy-auth-axum --features issuer-native-web --example issuer-web-browser
+          node tests/browser/issuer-native/run.cjs
+      - name: Verify actual standalone and embedded issuer client parity
+        run: |
+          cargo build --locked -p easy-auth-server --features issuer-web,oidc-client --bin easy-auth --example issuer-client-acceptance
+          node tests/browser/issuer-standalone/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs
       - name: Verify owned Google desktop browser return
         run: |
@@ -183,6 +232,11 @@ jobs:
       - run: node tests/browser/passkeys/attachment/run.cjs
       - run: cargo build --locked -p easy-auth-server --example passkey-recovery-browser --features experimental-passkey-recovery
       - run: node tests/browser/passkeys/recovery/run.cjs
+      - name: Verify reference account UI with real PostgreSQL, SMTP and native passkeys
+        run: |
+          python3 scripts/reference_ui_tokens.py --check
+          node --experimental-vm-modules tests/browser/reference-ui/inventory-pagination.cjs
+          node tests/browser/reference-ui/run.cjs
       - run: cargo build --locked -p easy-auth-server --bin easy-auth
       - run: python3 scripts/smoke_recovery_notice.py
         env:

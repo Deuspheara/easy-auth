@@ -1,8 +1,8 @@
 use axum::{http::header, response::Html};
 
 #[utoipa::path(get,path="/saml/sign-in",responses((status=200,body=String,content_type="text/html")))]
-pub(super) async fn sign_in() -> Html<&'static str> {
-    Html(include_str!("signin.html"))
+pub(super) async fn sign_in() -> Html<String> {
+    crate::pages::document(include_str!("signin.html"))
 }
 pub(super) async fn sign_in_script() -> impl axum::response::IntoResponse {
     (

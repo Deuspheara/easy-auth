@@ -1,6 +1,12 @@
+#[cfg(feature = "issuer-native-refresh")]
+pub(crate) mod issuer_native_families;
 pub(crate) mod legacy;
+#[cfg(feature = "issuer-codes")]
+pub(crate) mod legacy_attribution;
 #[cfg(feature = "oauth-transactions")]
 pub(crate) mod legacy_oauth;
+#[path = "../../../../tests/support/postgres/linked_providers.rs"]
+pub(crate) mod linked_provider_records;
 #[cfg(any(feature = "saml-identities", feature = "google"))]
 #[path = "../../../../tests/support/postgres/observation.rs"]
 pub(crate) mod observation;
@@ -50,14 +56,14 @@ pub(crate) async fn reset_proof(store: &Postgres, realm: Uuid, email: &str) -> (
     (token, browser)
 }
 
-#[cfg(all(
-    feature = "issuer-clients",
-    not(any(feature = "saml-identities", feature = "google"))
-))]
+#[cfg(not(any(feature = "saml-identities", feature = "google")))]
 #[path = "../../../../tests/support/postgres/locks.rs"]
 pub(crate) mod lock_observation;
-#[cfg(all(
-    feature = "issuer-clients",
-    any(feature = "saml-identities", feature = "google")
-))]
+#[cfg(any(feature = "saml-identities", feature = "google"))]
 pub(crate) use observation as lock_observation;
+
+#[cfg(feature = "issuer-signing")]
+pub(crate) mod issuer_tokens;
+
+#[cfg(feature = "issuer-native-refresh")]
+pub(crate) mod issuer_native_consumers;

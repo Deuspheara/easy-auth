@@ -15,11 +15,11 @@ const MAX_VALUE_BYTES: usize = 2048;
 #[utoipa::path(get, path = "/oidc/callback",
     params(("state"=String,Query),("code"=String,Query),("iss"=Option<String>,Query),("session_state"=Option<String>,Query)),
     responses((status=200,body=String,content_type="text/html",description="Fixed bridge selected only by unique state cookie match; no consumption, session or deletion. Invalid/provider-error queries receive fixed failure content.")))]
-pub(super) async fn bridge(RawQuery(query): RawQuery, headers: HeaderMap) -> Html<&'static str> {
+pub(super) async fn bridge(RawQuery(query): RawQuery, headers: HeaderMap) -> Html<String> {
     match select(query.as_deref(), &headers) {
         Some(Bridge::SignIn) => pages::sign_in_page().await,
         Some(Bridge::Deletion) => deletion::callback_page().await,
-        None => Html(include_str!("error.html")),
+        None => crate::pages::document(include_str!("error.html")),
     }
 }
 enum Bridge {

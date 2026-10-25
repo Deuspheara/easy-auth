@@ -10,6 +10,11 @@ publish.workspace = true
 workspace = true
 
 [features]
+issuer-native-web = ["issuer-token-management-web", "issuer-native-consent-web"]
+issuer-native-consent-web = ["issuer-consent-web", "auth-core/issuer-native-refresh", "auth-postgres/issuer-native-refresh"]
+issuer-token-management-web = ["issuer-web", "auth-core/issuer-token-management", "auth-postgres/issuer-token-management"]
+issuer-web = ["issuer-consent-web", "auth-core/issuer-signing", "auth-postgres/issuer-signing", "dep:base64", "dep:zeroize"]
+issuer-consent-web = ["auth-core/issuer-codes", "auth-postgres/issuer-codes"]
 saml-web = ["auth-core/saml-identities", "auth-postgres/saml-identities"]
 google-web = ["oidc-web", "auth-core/google"]
 oidc-web = ["oidc-account-deletion"]
@@ -22,6 +27,8 @@ passkey-recovery-setup = ["passkey-management"]
 passkey-recovery = ["passkey-recovery-setup"]
 
 [dependencies]
+base64 = { workspace = true, optional = true }
+zeroize = { workspace = true, optional = true }
 auth-core.workspace = true
 axum.workspace = true
 serde.workspace = true
@@ -108,3 +115,13 @@ required-features = ["saml-web"]
 name = "saml-keycloak-browser"
 path = "examples/saml-keycloak-browser/main.rs"
 required-features = ["saml-web"]
+
+[[example]]
+name = "issuer-consent-browser"
+path = "examples/issuer-consent-browser/main.rs"
+required-features = ["issuer-consent-web"]
+
+[[example]]
+name = "issuer-web-browser"
+path = "examples/issuer-web-browser/main.rs"
+required-features = ["issuer-web"]

@@ -7,3 +7,5 @@
 .DS_Store
 /tests/browser/passkeys/node_modules/
 /tests/browser/passkeys/results/local/
+
+/tools/reference-ui/node_modules/

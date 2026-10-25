@@ -22,6 +22,8 @@ mod oidc;
 mod passkeys;
 #[path = "lifecycle/passwords.rs"]
 mod passwords;
+#[path = "lifecycle/providers.rs"]
+mod providers;
 #[path = "lifecycle/recovery.rs"]
 mod recovery;
 #[cfg(feature = "saml-requests")]
@@ -39,3 +41,15 @@ mod identity;
 #[cfg(feature = "issuer-clients")]
 #[path = "lifecycle/issuer/mod.rs"]
 mod issuer;
+
+#[cfg(feature = "issuer-codes")]
+#[path = "lifecycle/issuer_codes/mod.rs"]
+mod issuer_codes;
+
+#[cfg(feature = "issuer-signing")]
+#[path = "lifecycle/issuer_signing/mod.rs"]
+mod issuer_signing;
+
+#[cfg(feature = "issuer-native-refresh")]
+#[path = "lifecycle/issuer_native_refresh/mod.rs"]
+mod issuer_native_refresh;

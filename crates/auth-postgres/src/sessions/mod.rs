@@ -1,4 +1,13 @@
+#[cfg(feature = "issuer-codes")]
+mod authorization;
+#[cfg(feature = "issuer-native-refresh")]
+mod delegation;
+#[cfg(feature = "issuer-native-refresh")]
+pub(crate) use delegation::DelegatedSessionSnapshot;
+mod linked_providers;
 mod listing;
+#[cfg(feature = "issuer-codes")]
+pub(crate) use authorization::{FreshSessionAuthorization, FreshSessionSnapshot};
 mod logout;
 #[cfg(feature = "oidc-identities")]
 mod oidc;

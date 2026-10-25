@@ -1,5 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
+const {providerAccount} = require('../reference-ui/provider.cjs');
 
 async function run(browser, origin) {
   const context = await browser.newContext({ignoreHTTPSErrors: true});
@@ -80,6 +81,7 @@ async function run(browser, origin) {
     await check('google-actual-signed-nonce-rejection', async () => {await returned('signin', 'wrong_nonce'); await finish('signin', 401); assert.equal(await profile(), 401);});
     await check('google-signed-code-commits-session-only-after-confirmation', async () => {
       await returned('signin', 'normal'); assert.equal(await profile(), 401); await finish('signin', 204); assert.equal(await profile(), 200);
+      await providerAccount(page, origin, 'https://accounts.google.com', 'oidc');
     });
     await check('google-ambient-session-cannot-switch-account', async () => {
       await page.goto(origin + '/google/sign-in'); const before = providerRequests;

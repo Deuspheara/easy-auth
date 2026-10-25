@@ -10,8 +10,12 @@ mod contract;
 mod email;
 #[path = "browser/passwords.rs"]
 mod passwords;
+#[path = "browser/providers.rs"]
+mod providers;
 #[path = "browser/recovery.rs"]
 mod recovery;
+#[path = "browser/reference_ui.rs"]
+mod reference_ui;
 
 #[path = "browser/sessions/mod.rs"]
 mod sessions;
@@ -47,3 +51,19 @@ mod google_web;
 #[cfg(feature = "saml-web")]
 #[path = "browser/saml/mod.rs"]
 mod saml;
+
+#[cfg(feature = "issuer-consent-web")]
+#[path = "browser/issuer_consent/mod.rs"]
+mod issuer_consent;
+
+#[cfg(feature = "issuer-web")]
+#[path = "browser/issuer_web/mod.rs"]
+mod issuer_web;
+
+#[cfg(all(feature = "issuer-native-consent-web", feature = "issuer-web"))]
+#[path = "browser/issuer_native_consent/mod.rs"]
+mod issuer_native_consent;
+
+#[cfg(feature = "issuer-native-web")]
+#[path = "browser/issuer_native_web/mod.rs"]
+mod issuer_native_web;

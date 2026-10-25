@@ -1,7 +1,13 @@
+#[cfg(all(feature = "issuer-native-consent-web", feature = "issuer-web"))]
+pub(crate) mod issuer_native;
+#[cfg(feature = "issuer-web")]
+pub(crate) mod issuer_web;
 mod mail;
 #[cfg(feature = "oidc-account-deletion")]
 pub(crate) mod oidc_provider;
 pub(crate) use mail::Mail;
+#[path = "../../../../tests/support/postgres/linked_providers.rs"]
+pub(crate) mod linked_provider_records;
 
 use auth_core::{Auth, PasswordService};
 use auth_postgres::Postgres;

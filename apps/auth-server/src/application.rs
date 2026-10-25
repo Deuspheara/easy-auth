@@ -8,6 +8,10 @@ mod routing;
 #[path = "application/saml.rs"]
 mod saml;
 
+#[cfg(feature = "issuer-web")]
+#[path = "application/issuer.rs"]
+mod issuer;
+
 use crate::configuration;
 use auth_axum::BrowserConfig;
 use auth_core::Auth;
@@ -26,6 +30,11 @@ pub struct ConfiguredApplication {
 pub async fn configured_application() -> Result<ConfiguredApplication, Box<dyn std::error::Error>> {
     let oidc_settings = configuration::oidc::read()?;
     let parameters = configuration::parameters()?;
+    let issuer_settings = configuration::issuer::read()?;
+    #[cfg(feature = "issuer-web")]
+    let issuer_prepared = issuer_settings.prepare(parameters.realm, &parameters.browser)?;
+    #[cfg(not(feature = "issuer-web"))]
+    let _ = issuer_settings;
     #[cfg(feature = "oidc-web")]
     let oidc_prepared = match oidc_settings {
         configuration::oidc::Configuration::Disabled => None,
@@ -51,10 +60,17 @@ pub async fn configured_application() -> Result<ConfiguredApplication, Box<dyn s
         Some(prepared) => Some(saml::services(repository.clone(), prepared).await?),
         None => None,
     };
+    #[cfg(feature = "issuer-web")]
+    let issuer_services = match issuer_prepared {
+        Some(prepared) => Some(issuer::services(repository.clone(), prepared).await?),
+        None => None,
+    };
     drop(repository);
     let router = routing::router(
         auth.clone(),
         parameters.browser.clone(),
+        #[cfg(feature = "issuer-web")]
+        issuer_services,
         #[cfg(feature = "oidc-web")]
         oidc_services,
         #[cfg(feature = "saml-web")]

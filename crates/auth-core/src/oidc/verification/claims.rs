@@ -6,6 +6,14 @@ use zeroize::Zeroize;
 pub(super) const MAX_TOKEN_AGE_SECONDS: u64 = 300;
 const MAX_SUBJECT_BYTES: usize = 255;
 const MAX_EMAIL_ATTRIBUTE_BYTES: usize = 320;
+/// Internal expected facts only, never a public identity/exchange constructor.
+/// Each owning flow still establishes its own authority before validation.
+pub(super) struct ClaimContext<'a> {
+    pub issuer: &'a str,
+    pub client: &'a str,
+    pub nonce: &'a Secret,
+    pub expires_us: i64,
+}
 #[derive(Deserialize)]
 #[serde(untagged)]
 enum Audience {
@@ -50,14 +58,32 @@ impl Claims {
         policy: &OidcVerificationPolicy,
         now_us: i64,
     ) -> Result<()> {
-        if now_us >= exchange.expires_us() {
+        self.validate_context(
+            &ClaimContext {
+                issuer: exchange.configuration().issuer(),
+                client: exchange.configuration().provider_client(),
+                nonce: exchange.proof().nonce(),
+                expires_us: exchange.expires_us(),
+            },
+            policy,
+            now_us,
+        )
+    }
+
+    pub(super) fn validate_context(
+        &self,
+        expected: &ClaimContext<'_>,
+        policy: &OidcVerificationPolicy,
+        now_us: i64,
+    ) -> Result<()> {
+        if now_us >= expected.expires_us {
             return Err(Error::Unauthorized);
         }
         self.validate_times(now_us)?;
-        self.validate_audiences(exchange.configuration().provider_client(), policy)?;
+        self.validate_audiences(expected.client, policy)?;
         self.validate_attributes()?;
-        if self.iss != exchange.configuration().issuer()
-            || Secret::parse(self.nonce.clone())?.verifier() != exchange.proof().nonce().verifier()
+        if self.iss != expected.issuer
+            || Secret::parse(self.nonce.clone())?.verifier() != expected.nonce.verifier()
         {
             return Err(Error::Unauthorized);
         }

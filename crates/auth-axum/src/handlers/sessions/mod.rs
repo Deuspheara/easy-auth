@@ -49,6 +49,7 @@ pub(crate) async fn session(
         realm_id: user.realm_id,
         email: user.email,
         display_name: user.display_name,
+        authentication_policy: user.authentication_policy,
     })
     .into_response())
 }

@@ -4,6 +4,7 @@ mod email;
 mod email_attachment;
 mod notifications;
 mod passwords;
+mod providers;
 mod recovery;
 mod sessions;
 
@@ -39,6 +40,10 @@ impl Auth {
     pub fn with_passwords(mut self, passwords: Arc<PasswordService>) -> Self {
         self.passwords = Some(passwords);
         self
+    }
+    /// Trusted composition metadata only; this does not authorize password use.
+    pub fn passwords_enabled(&self) -> bool {
+        self.passwords.is_some()
     }
     pub async fn ready(&self) -> Result<()> {
         self.repository.ready().await

@@ -206,3 +206,26 @@ binary public-root positive TLS test, production-provider/native-app matrix, ind
 audit or conformance/readiness claim. Normal binary startup/refusal and SMTP checks
 remain separate evidence. Default activation, linking, upstream-provider lifecycle,
 SAML, outbound issuer and broader release gates are unaffected.
+
+## Independent Rust client and configured issuer parity (AUTH-41)
+
+The optional SDK performs actual discovery, S256/state/nonce correlation, exact
+response issuer/callback and bounded RS256 verification without issuer cookies.
+An owned runner exercises the real executable and configured embedded factory
+with identical settings, PostgreSQL, SMTP, browser consent and separate Node/Rust
+clients. Both check normal production-issued tokens, code replay refusal, bound
+denial with no POST, access/local-session separation, browser privacy and logout,
+exercise the actual SDK native loopback/refresh and post-logout denial,
+then remove owned databases, recipient mail and private files. Real-PG startup
+checks also refuse missing/disabled/foreign/mismatched keys without provisioning.
+Selected-provider contract/realm checks retain the mixed native issuer profile.
+[Setup and exact scope](issuer-standalone.md), [SDK contract](oidc-client.md) and
+[ADR0040](../architecture/adr/0040-independent-oidc-client-and-standalone.md) separate
+bounded acceptance from broader assurance. Hosted CI and final verification receipts
+are recorded per exact commit; this prose is not certification or production approval.
+
+The owned issuer suite also verifies one ordinary operator-directed rollover in
+both modes after the actual prepublication interval and genuine new sign-in.
+Independent Node and Rust clients verify before/after; retained old-key overlap
+and wrong trusted audience expectation use unchanged normal production tokens.
+This closes that local M07 evidence gap without timing shortcuts or crypto fixtures.

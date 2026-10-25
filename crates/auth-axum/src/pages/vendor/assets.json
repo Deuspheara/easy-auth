@@ -1,0 +1,14 @@
+{
+  "basecoat.css": {
+    "bytes": 236766,
+    "sha256": "e6354ef1e99adc94257e579507f18cb00307a08cc2b976deb320368eb7c28e70"
+  },
+  "motion.js": {
+    "bytes": 8444,
+    "sha256": "e982f450826da656e45f34dc3c4e8c318580221545ad6d00c06d893ac5fba8dd"
+  },
+  "basecoat-popover.js": {
+    "bytes": 4010,
+    "sha256": "cb5f7b17c33c7bc3f0499f263325c173efe9bdff6ce173472d85ef2cc7a9e703"
+  }
+}

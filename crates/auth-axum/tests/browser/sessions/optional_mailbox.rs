@@ -28,7 +28,13 @@ async fn email_free_session_has_explicit_null_contact_and_safe_sensitive_routes(
     let value = json(response).await;
     assert_eq!(
         value,
-        serde_json::json!({"id":user,"realm_id":realm,"email":null,"display_name":"Person <label>"})
+        serde_json::json!({
+            "id": user,
+            "realm_id": realm,
+            "email": null,
+            "display_name": "Person <label>",
+            "authentication_policy": "passkey_required"
+        })
     );
     assert_eq!(
         get(&app, "/v1/sessions", &cookie).await.status(),

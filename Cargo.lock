@@ -881,6 +881,7 @@ dependencies = [
  "utoipa",
  "uuid",
  "webauthn-authenticator-rs",
+ "zeroize",
 ]
 
 [[package]]
@@ -941,6 +942,7 @@ dependencies = [
  "hyper-util",
  "josekit",
  "lettre",
+ "libc",
  "open",
  "rcgen",
  "reqwest",

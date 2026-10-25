@@ -6,7 +6,36 @@ trusted persisted configuration and every protocol/security check remain require
 Earlier source-disabled stage descriptions below are superseded only as to
 activation policy; their assurance gaps remain unverified, not independently approved.
 
+## Linked-provider inventory
 
+GET `/v1/account/providers` validates the normal current session and returns
+`{providers:[{id,kind,issuer}],next:{kind,id}|null}`. Each page contains at most 50
+records ordered by `kind` (`oidc` before `saml`) then UUID. Continue with both
+`after_kind` and `after_id` from `next`, or omit both. Unknown/duplicate fields,
+unsupported kinds and partial/malformed cursors return 400. Missing, duplicated,
+expired, revoked or current-source-invalid session proof returns 401. Storage
+unavailability remains 503; the normal boundary timeout remains 504.
+
+No request field selects a realm, user or provider source. Subjects, claims,
+email, credentials and verifier material are excluded. Issuer metadata describes
+the linked identity; it is neither current enabled/trusted status nor permission
+to sign in, link, unlink or delete. The response uses the existing no-store,
+no-referrer and browser security headers. See
+[ADR0041](adr/0041-linked-provider-inventory.md). Existing repository adapters
+without this optional read return Unavailable rather than an invented empty list.
+
+## Reference presentation metadata
+
+`/v1/session` additionally returns the existing core `authentication_policy`
+string (`mailbox`, `passkey_required` or `provider_required`). This is current
+account metadata, not authentication-method or freshness proof. The root reference
+page advertises only boolean capabilities for the actually selected router and
+password service; URL fields cannot activate a method. Read-only inventory and
+all protected mutations retain the same backend authority checks. See
+[the reference client](../guides/reference-ui.md) and
+[ADR0042](adr/0042-reference-account-ui.md).
+
+## Existing authentication contracts
 The opt-in core/PostgreSQL `saml-requests` Rust component adds no HTTP route or
 OpenAPI operation. `SamlRegistration::unsigned_redirect` selects the explicit
 outgoing profile; `SamlTransactions::start` persists browser-bound request state
@@ -569,6 +598,18 @@ or authorization. Existing session/inbound federation contracts are unchanged.
 See [the guide](../guides/issuer-clients.md); actual authorize/token/consent and
 interoperability remain required before an outbound issuer can be enabled.
 
+The same feature now adds explicit public native loopback registration through
+`IssuerClientRegistration::public_native_loopback`, a closed `IssuerRedirectProfile`
+and typed `IssuerClientAuthentication` inputs. Web defaults remain exact HTTPS.
+Native port admission fixes literal address/path and grants no listener ownership;
+eventual code redemption must retain the exact actual redirect. The PostgreSQL
+credential-validation method checks current enabled configuration and method/secret
+without issuing authority or an authenticated-client proof. No HTTP/OpenAPI shape
+changes. `load_issuer_client` restores validated enabled metadata and its revision
+without requiring a raw secret or mutating configuration; subsequent authority still
+requires current transactional checks. See
+[ADR0034](adr/0034-issuer-native-registration-and-authentication.md).
+
 
 ## Gated SAML verified attribute facts
 
@@ -593,3 +634,232 @@ with one base and combined contract for engineering tests. It preserves their
 exact HTTPS callbacks, realm checks, Origin boundaries and private proof cookies.
 [ADR 0029](adr/0029-gated-saml-server-composition.md) records trusted provisioning and
 read-only restart semantics; ADR0032 supersedes its separate approval requirement.
+
+### Optional issuer authorization-code component
+
+With `issuer-codes`, `IssuerAuthorization` composes a trusted `IssuerAuthority` and
+`IssuerAuthorizationRepository`. `prepare` takes the actual session/browser Secrets
+and `IssuerAuthorizationInput` (client, code response type, exact actual URI, openid,
+state, nonce and S256 challenge). Its start exposes a private handle and public
+preview UUID, client/destination and original expiry. Neither creates authority.
+`approve`/`cancel` require the initiating session, private browser/handle and that
+exact preview UUID. Only validated registered destinations receive code/state/iss
+or access_denied/state/iss. HTTP must independently enforce private cookie/Origin/
+explicit confirmation and never select owner/realm from these wire fields.
+
+`redeem` takes typed public/Basic client input, canonical code Secret, actual exact
+URI, `IssuerPkceVerifier` and a trusted network-source string. Source is an abuse key,
+never a body-selected credential. The repository atomically checks current client/
+source/session, PKCE and original code binding, consumes once and records audit.
+`IssuerTokenError` separates InvalidClient, InvalidGrant, RateLimited and Unavailable.
+The opaque `IssuerRedeemedCode` contains internal identity/caps for a later signing
+layer, grants no new local session and is not a wire token. Internal owner/session
+IDs must never be serialized as `sub`. No HTTP endpoint or startup feature is
+introduced by this core/PostgreSQL increment. See
+[ADR0035](adr/0035-issuer-consent-and-authorization-codes.md).
+
+### Optional issuer HTTPS consent delivery
+
+`issuer-consent-web` adds only the explicit HTTPS root-origin
+`experimental_issuer_consent_router` and `issuer_consent_openapi` composition.
+Default routes and standalone startup do not mount it. Fixed GET `/oidc/authorize`
+and `/oidc/authorize.js` are non-authoritative. Origin-bound closed JSON POSTs:
+
+| Path | Input | Result |
+| --- | --- | --- |
+| `/v1/oidc/consent/prepare` | Exact code request members, `client_id` | Public preview UUID/client/actual URI/original expiry; private proof cookies |
+| `/v1/oidc/consent/resume` | Empty object | Revalidated existing pending preview; no grant or expiry extension |
+| `/v1/oidc/consent/approve` | `authorization` preview UUID | Validated callback with one code/state/iss |
+| `/v1/oidc/consent/cancel` | `authorization` preview UUID | Validated callback with access_denied/state/iss only |
+
+Every operation requires the actual fresh source-aware initiating session. Resume/
+decisions additionally require exact private browser/handle and public operation
+selector cookies; decision JSON must match that selector. Invalid/expired authority
+returns401; malformed input400, Origin403, oversized body413, media415, admission429,
+storage503 and timeout504 remain distinct. No unvalidated redirect receives a
+protocol error. Resume clears permanently unusable proofs on401, preserving them
+on503; failed decisions cannot clear another preview's cookies. There is no token
+endpoint or unsigned token response. See [ADR0036](adr/0036-issuer-https-consent-delivery.md).
+
+### Optional signed issuer transport
+
+`issuer-web` adds `IssuerWebServices` and `experimental_issuer_web_router`, extending
+the consent composition above. Supply the identical realm and exact HTTPS root
+issuer/browser origin, separate token/metadata repository ports and explicit protected
+keys. Default routes and standalone startup do not activate an issuer.
+
+| Method/path | Contract |
+| --- | --- |
+| GET `/.well-known/openid-configuration` | Exact issuer/endpoints; code/query, openid, S256, pairwise, RS256, none/Basic only |
+| GET `/oidc/jwks` | At most four enabled retained public RSA verification keys; no private/certificate/key URL members |
+| POST `/oidc/token` | Closed form authorization_code/code/redirect_uri/code_verifier and optional client_id; maximum8192bytes |
+
+Metadata accepts no query-selected realm/issuer. Token POST requires one form content
+type (optional UTF-8 charset), no encoding/query, strict percent/UTF-8 decoding and
+no decoded duplicate or unknown members. Public client_id is explicit; confidential
+clients use one Basic header with separately form-encoded identifier/secret. Header
+and optional body identities must agree. No client_secret_post, refresh, userinfo,
+client assertion, cookie authentication or anonymous fallback is supported.
+
+Mount the router using actual socket `ConnectInfo<SocketAddr>`. Missing peer data
+returns503; Forwarded/X-Forwarded-For cannot change the bounded admission source.
+The token endpoint accepts native/server POSTs without Origin or local cookies;
+existing consent/session endpoints retain their original Origin checks.
+
+Success returns access_token, token_type=Bearer, expires_in, id_token and scope=openid
+only after final committed issuance. The opaque access credential grants no local
+session or application permission and has no userinfo/introspection API in this
+increment. ID tokens contain exact iss/aud/sub/nonce/iat/exp/auth_time; original
+code/session/key caps bound expiry to at most60seconds in the current profile.
+Responses use no-store/no-cache and set no session cookies. Finite errors are
+invalid_request (400/413/415), invalid_client (401 with Basic challenge), invalid_grant
+(400), unsupported_grant_type (400), or temporarily_unavailable (429/503/504).
+See [ADR0037](adr/0037-issuer-signing-and-final-issuance.md) and
+[the component guide](../guides/issuer-signing.md) for trust and evidence limits.
+
+### Optional token status and revocation
+
+`issuer-token-management-web` and `experimental_issuer_token_management_web_router`
+explicitly add POST `/oidc/introspect` and `/oidc/revoke` to the same trusted HTTPS
+root issuer/realm. `issuer_token_management_openapi` merges their concrete schemas.
+Default issuer/server routes remain unchanged; native families use separate library operations described below and are not
+advertised by this access-only router.
+
+Closed4096byte form bodies accept token and optional client_id/token_type_hint,
+with the same strict percent/media/duplicate/query rules as token issuance. Presented
+opaque input is bounded to1024printable ASCII bytes; unknown valid formats still
+require actual current-client authentication before an inactive result. Hints are
+ignored and confer no type/namespace authority. Actual socket ConnectInfo is required;
+no Cookie/Origin/forwarded-header authority is accepted. Public possession can revoke
+its matching token, but introspection requires current confidential Basic and the
+exact same audience. Header/body client IDs must agree; client_secret_post rejects.
+
+Introspection200 is either only active=false or active=true with iss/aud/client_id/
+pairwise-sub/iat/exp/token_type/scope. It contains no owner/session/nonce/raw credential
+or hash. Unknown/foreign/revoked/inactive tokens disclose no claims; client failure401
+and infrastructure failure503 remain errors. Revocation200 has no body and reveals
+no existence/replay distinction. Shared no-store/no-cache,401Basic challenge and
+400/413/415/429/503/504 finite failures apply. Neither operation grants a local session
+or application permissions. See [ADR0038](adr/0038-native-token-lifecycle.md) and
+[the guide](../guides/issuer-token-management.md) for exact lifecycle and pending scope.
+
+### Native offline policy configuration
+
+`issuer-native-refresh` in core/PostgreSQL exposes trusted provisioning: `public_native_refresh_loopback`, `IssuerNativeRefreshPolicy`, and
+`configure_issuer_native_refresh_policy`, `enable_issuer_native_refresh_policy`,
+`disable_issuer_native_refresh_policy`, `load_issuer_native_refresh_policy` and
+`check_issuer_native_refresh_policy`. New saved policy is disabled; enable needs
+the exact current full policy and enabled client. Replacement rotates revision and
+preserves disable. Load/check return configuration facts, never authentication or
+consent. Absolute1second–7days and idle1second–24hours/at most absolute are enforced.
+Policy provisioning alone introduces no HTTP endpoint or startup activation. Default
+online authorization still accepts only openid. Separate native consent and native
+wire components below supply offline_access and token/refresh delivery explicitly.
+`supports_online_authorization` is a configuration capability query, not a proof.
+It is false for the new offline profile: default request/SQL code operations and
+core grant validation refuse that profile, including future rows written by a newer
+native implementation. Existing ordinary web/native code behavior is preserved.
+
+Separate core/PostgreSQL `IssuerNativeAuthorization` now supplies explicit native
+`prepare`/`preview`/`approve`/`cancel` operations through
+`IssuerNativeAuthorizationRepository`. `IssuerNativeAuthorizationInput` wraps the
+usual fields plus exact prompt=consent and requires exact openid offline_access.
+Actual session/browser/handle bindings remain mandatory. Safe preview exposes
+client/return/consent deadline/original proposed grant expiry/idle seconds; it grants
+nothing. Approval returns only the existing code/state/iss callback after atomic
+consent/code/actual-owner-session audit. Native cancellation can clean pending state
+after policy disable. Default online APIs and signer refuse native operation rows.
+Migration0034 adds only a native marker and full-tuple immutable proposed-consent
+sidecar; old rows remain online. Separate components below supply native consent
+HTTP/UI and wire responses/discovery. Default standalone activation stays gated.
+An untrusted prompt string is never explicit owner-confirmation proof.
+
+## Native family library operations
+
+`IssuerNativeTokenIssuer::exchange` uses separate approved native consent and returns
+initial short ID/access plus opaque refresh credentials after atomic commit.
+`IssuerNativeRefresh::refresh` returns only newly rotated opaque access/refresh
+credentials; no ID token or local session. `revoke` reduces the matching native
+family. Exact current client/source/owner/session, immutable consent caps, typed
+credential audit and final clock apply. Migration0035 preserves online rows. Public
+native IDs cannot authenticate introspection. Library operations alone mount no HTTP
+route; explicit native wire composition and owned browser acceptance are described
+below. See [ADR0038](adr/0038-native-token-lifecycle.md) and the
+[native guide](../guides/issuer-native.md) for lifetime/quota/replay semantics.
+
+## Native consent HTTP component
+
+The explicit issuer-native-consent-web router adds GET /oidc/native/authorize and
+POST /v1/oidc/native/consent/{prepare,resume,approve,cancel}, preserving ordinary
+consent routes. Native input is closed and requires exact prompt=consent/openid
+offline_access. Preview adds original grant_expires_at_us and idle_seconds. Exact
+same-Origin/current session/private operation bindings,16KiB JSON bound, shared
+cookie hygiene and existing core/PG final transaction checks apply. Distinct
+operation IDs and closed schemas are generated by issuer_native_consent_openapi. No
+token/refresh/revocation/discovery is mounted by this component. See the
+issuer-token-management guide and ADR0038.
+
+## Native token and cleanup HTTP
+
+Optional issuer-native-web adds explicit mixed-profile code/refresh/revocation
+composition. Native token input is the closed union of existing authorization-code
+fields and grant_type=refresh_token/refresh_token/client_id?/scope?. Refresh scope is
+absent or exactly the original openid offline_access. Initial native response has the
+existing ID/access plus refresh_token/refresh_expires_in/scope; refresh has no
+id_token. Online responses keep five fields. All three concrete response schemas are
+closed. One admitted configuration snapshot selects one core operation, never a retry
+after failure. Scope mismatch returns invalid_scope400. Actual peer/strict bounded
+form/query/auth/no-store rules remain. Only this discovery adds
+refresh_token/offline_access; default metadata stays unchanged. Native revocation
+selects matching current registered-method reduction and ignores hint as authority.
+Explicit native resource-consumer introspection uses the separate policy/endpoint
+below; public native IDs/cookies/tokens cannot authenticate it. See the
+[native guide](../guides/issuer-native.md) and
+[ADR0038](adr/0038-native-token-lifecycle.md).
+
+## Native audience consumers
+
+`IssuerNativeConsumerPolicy` binds exact same-realm confidential consumer and native
+public audience definitions to one trusted issuer. Configure/enable/disable/load
+use `configure_issuer_native_consumer`, `enable_issuer_native_consumer`,
+`disable_issuer_native_consumer` and `load_issuer_native_consumer`. Initial policy
+is disabled; current full definitions and exact saved revision are mandatory.
+Migration0036 adds only consumer configuration and preserves previous token rows.
+
+`IssuerNativeIntrospection::introspect_access` uses
+`IssuerNativeIntrospectionRepository`, actual Basic authentication, committed source
+admission and separate native source/family lifetime checks. Only sealed
+`IssuerNativeActiveAccess` projects validated metadata; it grants no local session.
+Call `IssuerNativeWebServices::with_native_introspection(repository)` to add POST
+`/oidc/native/introspect`; otherwise route/schema are absent. Explicit live contract
+is `issuer_native_consumer_openapi`. Existing online introspection is unchanged.
+Closed4KiB status forms/current Basic/body ID/actual peer/no-cookie fallback and
+finite no-store failures are shared. Output uses the existing closed active/inactive
+shape, native aud/client_id and openid offline_access scope. Invalid credentials401;
+unknown/foreign/inactive/unauthorized only active=false; storage faults503.
+See [ADR0039](adr/0039-native-introspection-consumers.md) and the
+[native guide](../guides/issuer-native.md) for ordering and lifetime semantics.
+
+## Independent Rust relying-party client
+
+The optional core `oidc-client` API exposes `OidcClientConfiguration`, `OidcClient`,
+one-use `OidcClientAuthorization`, finite `OidcClientError`, verified
+`OidcClientIdentity`, `OidcClientTokens` and opaque `OidcClientCredential`/
+`OidcClientCredentials`. `authorize`/`complete` retain private S256/state/nonce
+correlation and verify actual discovery and RS256 tokens. Native `refresh` consumes
+one credential and returns credentials only. These are library contracts, not
+new local HTTP endpoints or session proofs. Bounded configured standalone/embedded parity and remaining assurance limits
+are documented separately. See [the SDK guide](../guides/oidc-client.md) and
+[ADR0040](adr/0040-independent-oidc-client-and-standalone.md).
+
+## Explicit configured issuer delivery
+
+Server `issuer-web` plus complete `AUTH_ISSUER_ENABLED=true` HTTPS/protected matching
+key settings selects the existing mixed web/native issuer handlers in the shared
+configured application. Default-off and unsupported/partial settings fail closed.
+Startup reads the current enabled realm/issuer/public-key registration and performs
+no issuer enable or provisioning writes. Optional native inspection requires
+`AUTH_ISSUER_NATIVE_INTROSPECTION_ENABLED=true` and the existing exact persisted
+consumer policy. Selected inbound providers extend the same router/contract and
+retain their own realm/source/proof-cleanup rules. No new token schema, grant or
+local-session authority is introduced. [Setup and acceptance limits](../guides/issuer-standalone.md).

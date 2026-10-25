@@ -7,8 +7,15 @@ mod federation;
 #[cfg(all(feature = "oidc-web", feature = "saml-web"))]
 pub use federation::experimental_oidc_saml_web_router;
 mod handlers;
+#[cfg(feature = "issuer-consent-web")]
+mod issuer_consent;
+#[cfg(feature = "issuer-native-consent-web")]
+mod issuer_native_consent;
+#[cfg(feature = "issuer-web")]
+mod issuer_web;
 #[cfg(feature = "oidc-account-deletion")]
 mod oidc;
+mod pages;
 #[cfg(feature = "passkey-enrollment")]
 mod passkeys;
 mod router;
@@ -50,4 +57,25 @@ pub use passkeys::{experimental_passkey_recovery_setup_router, passkey_recovery_
 #[cfg(feature = "passkey-recovery")]
 pub use passkeys::{
     PasskeyRecoveryServices, experimental_passkey_recovery_router, passkey_recovery_openapi,
+};
+
+#[cfg(feature = "issuer-consent-web")]
+pub use issuer_consent::{experimental_issuer_consent_router, issuer_consent_openapi};
+
+#[cfg(feature = "issuer-web")]
+pub use issuer_web::{IssuerWebServices, experimental_issuer_web_router, issuer_web_openapi};
+#[cfg(feature = "issuer-token-management-web")]
+pub use issuer_web::{
+    experimental_issuer_token_management_web_router, issuer_token_management_openapi,
+};
+
+#[cfg(feature = "issuer-native-consent-web")]
+pub use issuer_native_consent::{
+    experimental_issuer_native_consent_router, issuer_native_consent_openapi,
+};
+
+#[cfg(feature = "issuer-native-web")]
+pub use issuer_web::{
+    IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_consumer_openapi,
+    issuer_native_web_openapi,
 };

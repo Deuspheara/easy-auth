@@ -1,5 +1,37 @@
 # Protocol dependency assessment
 
+The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
+uses native browser modules/WebAuthn and fixed included HTML/CSS. The presentation
+now pins Basecoat CSS 1.1.0 and optional Motion mini 14.6.0, prepared with
+esbuild 0.28.2. It adds no server frontend runtime, remote font/image or advisory
+ignore. Versions, licenses, integrity, sizes and exact regeneration live in the
+[modernization record](../design/reference-ui-modernization.md).
+The maintainer-requested compact design bundles the unmodified Inter 4.1 variable
+font under SIL OFL 1.1 with its notice. Its fixed local route and SHA-256 provenance
+are recorded in the [design contract](../design/reference-ui.md). A stdlib-only
+script checks generated semantic CSS aliases; it is not a server dependency.
+The stylesheet hash check uses the existing OpenSSL/base64 dev dependencies;
+the browser still uses existing reviewed protocol implementations and original
+native options. Full browser/device/accessibility evidence is recorded separately,
+not inferred from dependency reuse or a source/format check.
+
+AUTH-43's read-only linked-provider inventory and password-service presence
+projection add no dependency, verifier, network client, cryptographic fixture,
+provider activation or migration. Existing source/session validation and SQL
+transaction policy remain authoritative. Public inventory is not a verified
+identity or current provider trust; [ADR0041](../architecture/adr/0041-linked-provider-inventory.md)
+records that boundary. Advisory/license and exact-source CI gates remain unchanged.
+
+AUTH-39's optional outbound signer reuses the pinned josekit0.10.3/OpenSSL0.10.81
+graph from ADR0015 with an explicit RS256-only profile. It introduces no new crypto
+implementation or advisory exception. This reuse and internal RP evidence are not
+an independent audit of outbound issuance. Optional Unix protected-file loading
+uses only safe `OpenOptionsExt` with NOFOLLOW/NONBLOCK constants from the already
+locked libc0.2.191 (MIT OR Apache-2.0); no unsafe application code or libc syscall
+wrapper is introduced. Cargo.lock adds direct feature edges only, with no package
+or version change. Current advisory/license results must be rerun for this source.
+[ADR0037](../architecture/adr/0037-issuer-signing-and-final-issuance.md) records limits.
+
 Current SAML activation policy: [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.
@@ -82,6 +114,18 @@ is not interoperability evidence.
 Baselines: [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700), [RFC 8252](https://www.rfc-editor.org/rfc/rfc8252), [OIDC Core](https://openid.net/specs/openid-connect-core-1_0.html), [Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html), [WebAuthn Level 3](https://www.w3.org/TR/webauthn-3/), [OASIS SAML specifications](https://www.oasis-open.org/standard/saml/), [OWASP SAML guidance](https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html), [NIST 800-63B-4](https://pages.nist.gov/800-63-4/sp800-63b.html).
 
 ## Resolved first-slice dependency evidence
+
+AUTH-37's explicit native issuer/client credential extension introduces no new
+dependency, cryptographic primitive or inbound protocol engine. Existing URL
+canonicalization, Secret/SHA-256 and database verifier comparison are reused.
+No secret is retained in registration or request Debug, and no verifier-input
+constructor permits treating a stored hash as a presented credential. Native
+public port admission follows RFC8252's loopback profile while exact actual-return,
+S256, consent and token authority remain obligations of the future code transaction.
+This component is not full native/issuer conformance or production approval;
+[ADR0034](../architecture/adr/0034-issuer-native-registration-and-authentication.md)
+records the explicit profile and limits. Existing advisory/license gates remain
+unsuppressed.
 
 The 2026-10-18 full-lockfile cargo-audit run reports RUSTSEC-2023-0071 in rsa 0.9.10, resolved for SQLx's inactive optional MySQL path. `cargo tree -i rsa --target all` and `cargo tree -i sqlx-mysql --target all` show no compiled dependency. Cargo metadata's resolver nodes include optional inactive packages and must not alone be used as build-reachability evidence. `scripts/audit.py` retains the full-lockfile finding and independently derives all-platform normal/build/dev compiled reachability on every CI run; any compiled advisory is fatal. cargo-deny provides a second graph-based check. No global RSA advisory ignore is configured. Adding an OIDC/JOSE feature must rerun and review this gate.
 
@@ -308,3 +352,11 @@ crypto primitive or remote sector-document client. Stored random sector/owner UU
 follow the OIDC Core section8.1 GUID method. Reviewed signing/claims, client-auth
 protocol handling, real consent, conformance and M07 prerequisites remain gates;
 [ADR0026](../architecture/adr/0026-outbound-client-registration.md) bounds the slice.
+
+AUTH-38's optional `issuer-codes` uses the already-selected URL, UUID, existing
+Secret/randomness, SHA-256/base64, zeroize and SQLx dependencies. No version, license,
+algorithm, crypto/native verifier or advisory exception changes. S256 uses the
+existing digest implementation and the previously used published RFC7636 vector;
+no custom signature or XML fixture is introduced. The code component does not
+establish an outbound JWT/signing dependency decision, conformance or independent
+approval. AUTH-39 and M07 still require their own actual evidence.

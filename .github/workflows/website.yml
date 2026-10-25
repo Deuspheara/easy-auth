@@ -42,12 +42,13 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - name: Upload verified static site
-        if: github.repository == 'Deuspheara/easy-auth' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        # Verification still runs when a merge explicitly suppresses deployment.
+        if: github.repository == 'Deuspheara/easy-auth' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && !contains(github.event.head_commit.message, '[skip website deployment]')
         uses: actions/upload-pages-artifact@v4
         with:
           path: website/dist
   deploy:
-    if: github.repository == 'Deuspheara/easy-auth' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.repository == 'Deuspheara/easy-auth' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && !contains(github.event.head_commit.message, '[skip website deployment]')
     needs: website
     runs-on: ubuntu-latest
     timeout-minutes: 10
