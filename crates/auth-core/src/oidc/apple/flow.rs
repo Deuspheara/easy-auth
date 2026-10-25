@@ -1,10 +1,12 @@
+mod admission;
+pub(super) use admission::Admission;
+
 use super::{
-    AppleAuthorizationOutcome, AppleAuthorizationRequest, AppleAuthorizationResponse,
-    AppleCodeExchange, AppleInitialProfile,
+    AppleAuthorizationRequest, AppleAuthorizationResponse, AppleCodeExchange, AppleInitialProfile,
 };
 use crate::{
-    Error, OAuthBrowserProof, OAuthCallback, OAuthConnection, OAuthIntent, OAuthPurpose,
-    OAuthStart, OAuthTransactions, Result, Secret, VerifiedOidcIdentity,
+    Error, OAuthBrowserProof, OAuthConnection, OAuthIntent, OAuthPurpose, OAuthStart,
+    OAuthTransactions, Result, Secret, VerifiedOidcIdentity,
 };
 use std::sync::Arc;
 
@@ -98,47 +100,30 @@ impl AppleAuthorization {
         actual_redirect: &str,
         response: AppleAuthorizationResponse,
     ) -> Result<AppleAuthorizationCompletion> {
-        self.purpose.require(&intent.purpose)?;
-        let (state, outcome) = response.into_parts();
-        if state.verifier() != expected_state.verifier()
-            || actual_redirect != self.transactions.redirect()
+        match self
+            .admit_callback(intent, expected_state, proof, actual_redirect, response)
+            .await?
         {
-            return Err(Error::Unauthorized);
-        }
-        let completion = match outcome {
-            AppleAuthorizationOutcome::Code {
+            Admission::Code {
+                exchange,
                 code,
                 initial_profile,
             } => {
-                let exchange = self
-                    .transactions
-                    .consume(
-                        intent,
-                        &state,
-                        proof,
-                        OAuthCallback {
-                            redirect: actual_redirect,
-                            issuer: None,
-                        },
-                    )
-                    .await?;
                 let identity = match self.purpose {
-                    ExpectedPurpose::SignIn => self.exchange.exchange(exchange, code).await?,
+                    ExpectedPurpose::SignIn => self.exchange.exchange(*exchange, code).await?,
                     #[cfg(feature = "oidc-linking")]
-                    ExpectedPurpose::Link => self.exchange.exchange_linking(exchange, code).await?,
+                    ExpectedPurpose::Link => {
+                        self.exchange.exchange_linking(*exchange, code).await?
+                    }
                 };
-                return Ok(AppleAuthorizationCompletion::Verified {
+                Ok(AppleAuthorizationCompletion::Verified {
                     identity: Box::new(identity),
                     initial_profile,
-                });
+                })
             }
-            AppleAuthorizationOutcome::Denied => AppleAuthorizationCompletion::Denied,
-            AppleAuthorizationOutcome::ProviderFailure => {
-                AppleAuthorizationCompletion::ProviderFailure
-            }
-        };
-        self.transactions.cancel(intent, &state, &proof).await?;
-        Ok(completion)
+            Admission::Denied => Ok(AppleAuthorizationCompletion::Denied),
+            Admission::ProviderFailure => Ok(AppleAuthorizationCompletion::ProviderFailure),
+        }
     }
 
     pub async fn cancel(
