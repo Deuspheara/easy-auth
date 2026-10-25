@@ -2,7 +2,7 @@
 import {providerRow, sessionRow} from "/ui/inventory-rows.js";
 import {updateMethodsVisibility} from "/ui/account-view.js";
 import {request} from "/ui/browser-operations.js";
-import {element, announce, notify, errorMessage, paragraph, date, run, confirmAction, submit} from "/ui/view.js";
+import {cancelPresentation, element, announce, notify, errorMessage, paragraph, date, run, confirmAction, submit} from "/ui/view.js";
 
 let generation = 0;
 let nextProviders = null;
@@ -11,6 +11,7 @@ let requireCurrent;
 let refresh;
 
 export function resetAccount() {
+  cancelPresentation();
   generation += 1;
   nextProviders = null;
   nextSessions = null;

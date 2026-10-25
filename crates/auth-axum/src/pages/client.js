@@ -4,19 +4,25 @@ import {element, announce, notify, run, clearSecrets, errorMessage} from "/ui/vi
 import {showAuthScreen} from "/ui/auth-screens.js";
 import {bindSignIn, finishEmail} from "/ui/signin.js";
 import {bindAccount, resetAccount, loadProviders, loadSessions} from "/ui/account.js";
-import {verifyPasskey} from "/ui/passkey-reauth.js";
+import {verifyPasskey, resumePasskeyManagement} from "/ui/passkey-reauth.js";
 import {renderAccount, bindAccountViews, resetAccountPanels, showAccountPanel} from "/ui/account-view.js";
 import {bindPasskeys, loadPasskeys} from "/ui/passkeys.js";
+
+import {bindAccountSearch} from "/ui/account-search.js";
+import {settingsDestinations} from "/ui/settings-search.js";
 
 const caps = JSON.parse(element("capabilities").value);
 let initialView = new URLSearchParams(location.search).get("view");
 if (initialView === "inbox") initialView = "email";
 let revision = 0;
 let owner = null;
+let requestedSetting = new URLSearchParams(location.search).get("setting");
+const search = bindAccountSearch();
 
 function signedOut() {
   announce("");
   owner = null;
+  search.update([]);
   revision += 1;
   resetAccount();
   resetAccountPanels();
@@ -43,6 +49,7 @@ async function refresh() {
   const previousOwner = owner;
   owner = null;
   resetAccount();
+  search.update([]);
   element("account").hidden = true;
   let user;
   try { user = await request("/v1/session"); }
@@ -57,6 +64,18 @@ async function refresh() {
   owner = user.id;
   renderAccount(user, caps);
   await Promise.all([loadProviders(), loadSessions()]);
+  if (stamp === revision) {
+    const destinations = settingsDestinations(user, caps).filter(item => item.id !== "providers" || !element("providers-card").hidden);
+    search.update(destinations);
+    if (resumePasskeyManagement(user)) {
+      showAccountPanel("passkeys");
+      await loadPasskeys(caps);
+    }
+    if (requestedSetting) {
+      const selected = requestedSetting; requestedSetting = null;
+      if (destinations.some(item => item.id === selected)) search.open(selected);
+    }
+  }
   return stamp === revision ? user : null;
 }
 
@@ -94,7 +113,7 @@ for (const node of document.querySelectorAll("[data-cap]")) node.hidden = caps[n
 element("other-methods").hidden = !["passkeySignin", "google", "oidc", "saml"].some(name => caps[name] === true);
 bindAccountViews();
 bindAccount(refreshForAction, requireCurrent);
-bindPasskeys(refreshKeys, requireCurrent, caps, () => verifyPasskey(refresh, signedOut, requireCurrent));
+bindPasskeys(refreshKeys, requireCurrent, caps, () => verifyPasskey(signedOut, requireCurrent, caps));
 bindSignIn(refresh, requireCurrent, caps);
 for (const id of ["refresh-account", "check-session"]) {
   element(id).addEventListener("click", () => {
@@ -114,20 +133,6 @@ for (const id of ["logout", "clear-session"]) {
     }, "Signing out…");
   });
 }
-const colorPreference = matchMedia("(prefers-color-scheme: dark)");
-function themeLabel() {
-  const dark = document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && colorPreference.matches);
-  const label = dark ? "Use light theme" : "Use dark theme";
-  element("theme").setAttribute("aria-label", label);
-  element("theme").title = label;
-  return dark;
-}
-element("theme").addEventListener("click", () => {
-  document.documentElement.dataset.theme = themeLabel() ? "light" : "dark";
-  themeLabel();
-});
-themeLabel();
-colorPreference.addEventListener("change", themeLabel);
 window.addEventListener("pagehide", signedOut);
 window.addEventListener("pageshow", event => {
   if (event.persisted) {

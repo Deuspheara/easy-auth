@@ -12,7 +12,7 @@ attempts/navigation; native errors retain fixed categories, and credential POSTs
 are never automatically retried. Navigation aborts and view generations reject
 late rendering, with current-owner checks before sensitive actions. This does not
 create a browser-wide atomic account epoch. Fixed template style insertion uses
-only the exact CSP-allowlisted combined token/control stylesheet hash; style attributes, other inline
+only the exact CSP-allowlisted combined Basecoat/token/layout stylesheet hash; style attributes, other inline
 styles, third-party resources and embedded frames remain denied. Explicit form
 POST methods prevent GET-query credential leakage if module initialization fails.
 Explicit passkey management can offer native reauthentication only after the API
@@ -23,6 +23,12 @@ after the single finish. Only inventory GET follows successful verification; no
 credential completion retry or weaker fallback is introduced. Return-to-page
 metadata reads avoid active operations, discard stale views and clear unfinished
 forms on observed owner change; browser-wide account switching is still not atomic.
+Optional Motion mini loads independently of authentication and only animates
+committed view wrappers. Owned handles cancel on view/account invalidation and
+pagehide; completion cleans individual opacity/transform CSSOM properties without
+restoring a style attribute. Reduced motion/forced colors retain static content.
+No animation, completion callback or timer establishes authentication or moves
+focus. Real-browser CSP checks remain required for each selected library version.
 The fixed licensed Inter asset is served locally with same-origin font permission;
 there is no remote font origin, runtime palette input or new script permission.
 

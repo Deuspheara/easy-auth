@@ -24,7 +24,7 @@ async function screens(page, origin) {
         await page.evaluate(() => document.fonts.ready);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
-          await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+          await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
             view + '-' + scheme + '-' + width + '.png'), fullPage: true});
         }
       }

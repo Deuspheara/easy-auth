@@ -1,4 +1,5 @@
 "use strict";
+import {fieldError} from "/ui/feedback.js";
 import {request, assertKey, createKey, accountId} from "/ui/browser-operations.js";
 import {showAuthScreen} from "/ui/auth-screens.js";
 import {element, announce, notify, submit, run, clearSecrets} from "/ui/view.js";
@@ -30,6 +31,7 @@ export function bindSignIn(refresh, requireCurrent, caps) {
   submit("password-form", async () => {
     try {
       await request("/v1/password/login", {email: element("login-email").value, password: element("login-password").value});
+      clearSecrets();
       await confirmedSession(refresh);
       notify("Signed in.");
     } finally { clearSecrets(); }
@@ -64,7 +66,8 @@ export function bindSignIn(refresh, requireCurrent, caps) {
     const proposed = password.value;
     if (proposed !== confirm.value) {
       confirm.setCustomValidity("Enter the same password in both fields.");
-      confirm.reportValidity();
+      fieldError(confirm, "Enter the same password in both fields.");
+      confirm.focus();
       announce("Enter the same password in both fields.");
       return;
     }

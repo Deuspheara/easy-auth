@@ -1,0 +1,7 @@
+{
+  "name": "easy-auth-reference-assets",
+  "private": true,
+  "type": "module",
+  "scripts": {"build": "node build.mjs"},
+  "devDependencies": {"basecoat-css": "1.1.0", "motion": "14.6.0", "esbuild": "0.28.2"}
+}

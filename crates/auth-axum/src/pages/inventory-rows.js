@@ -3,8 +3,8 @@ import {actionButton, paragraph, activity} from "/ui/view.js";
 
 function objectRow(title, description) {
   const row = document.createElement("li");
-  row.className = "object-row";
-  const copy = document.createElement("div");
+  row.className = "item object-row";
+  const copy = document.createElement("section");
   copy.className = "object-copy";
   const heading = document.createElement("h3");
   heading.textContent = title;
@@ -32,6 +32,7 @@ export function sessionRow(session, revoke) {
   if (session.current) {
     const badge = document.createElement("span");
     badge.className = "badge";
+    badge.dataset.variant = "secondary";
     badge.textContent = "Current";
     row.querySelector("h3").append(" ", badge);
   } else {

@@ -1,47 +1,5 @@
 {
-  "design_id": "engineering-workspace-ui-v1-auth-adaptation",
-  "color_modes": {
-    "light": {
-      "surface.app": "#FFFFFF",
-      "surface.nav": "#F7F8FA",
-      "surface.panel": "#FFFFFF",
-      "surface.raised": "#FFFFFF",
-      "surface.hover": "#F5F6F8",
-      "surface.selected": "#EFF1F5",
-      "text.primary": "#18202B",
-      "text.secondary": "#414B59",
-      "text.muted": "#5B6472",
-      "text.disabled": "#8B929D",
-      "border.subtle": "#E8EAEE",
-      "border.control": "#7D8795",
-      "accent": "#245EC7",
-      "focus": "#245EC7",
-      "button.primary.background": "#202733",
-      "button.primary.foreground": "#FFFFFF",
-      "status.failure.foreground": "#AC2735",
-      "status.neutral.background": "#EEF1F5"
-    },
-    "dark": {
-      "surface.app": "#141518",
-      "surface.nav": "#101114",
-      "surface.panel": "#18191D",
-      "surface.raised": "#202125",
-      "surface.hover": "#1D1E22",
-      "surface.selected": "#23252B",
-      "text.primary": "#F0F2F5",
-      "text.secondary": "#BDC4CF",
-      "text.muted": "#A2ACBA",
-      "text.disabled": "#667181",
-      "border.subtle": "#2B2D33",
-      "border.control": "#7F8B9C",
-      "accent": "#91B7FF",
-      "focus": "#91B7FF",
-      "button.primary.background": "#E9EDF2",
-      "button.primary.foreground": "#1B1F25",
-      "status.failure.foreground": "#FF9CA8",
-      "status.neutral.background": "#292F38"
-    }
-  },
+  "design_id": "basecoat-vega-open-design-reference",
   "dimensions": {
     "space.1": 4,
     "space.2": 8,
@@ -58,9 +16,9 @@
     "radius.dialog": 12,
     "row.compact.min": 36,
     "row.two-line.min": 52,
-    "control.desktop.min": 32,
-    "control.input.min": 36,
-    "control.touch.min": 48,
+    "control.desktop.min": 44,
+    "control.input.min": 44,
+    "control.touch.min": 44,
     "radius.workspace": 16,
     "radius.tab": 16
   },
@@ -68,18 +26,18 @@
     "family": "Inter, system-ui, sans-serif",
     "mono_family": "ui-monospace, SFMono-Regular, Consolas, monospace",
     "metadata": {
-      "size": 12,
-      "line_height": 16,
+      "size": 13,
+      "line_height": 21,
       "weight": 400
     },
     "chrome": {
-      "size": 13,
+      "size": 14,
       "line_height": 20,
       "weight": 500
     },
     "body": {
       "size": 14,
-      "line_height": 20,
+      "line_height": 22,
       "weight": 400
     },
     "prose": {
@@ -88,9 +46,9 @@
       "weight": 400
     },
     "section": {
-      "size": 13,
-      "line_height": 20,
-      "weight": 500
+      "size": 16,
+      "line_height": 23,
+      "weight": 600
     },
     "title": {
       "size": 18,
@@ -98,9 +56,33 @@
       "weight": 500
     },
     "page": {
-      "size": 28,
-      "line_height": 36,
-      "weight": 600
+      "size": 30,
+      "line_height": 37,
+      "weight": 650
     }
+  },
+  "semantic_colors": {
+    "surface.app": "background",
+    "surface.nav": "sidebar",
+    "surface.panel": "card",
+    "surface.raised": "popover",
+    "surface.hover": "accent",
+    "surface.selected": "secondary",
+    "text.primary": "foreground",
+    "text.secondary": "foreground",
+    "text.muted": "muted-foreground",
+    "text.disabled": "muted-foreground",
+    "border.subtle": "border",
+    "border.control": "input",
+    "focus": "foreground",
+    "button.primary.background": "primary",
+    "button.primary.foreground": "primary-foreground",
+    "status.failure.foreground": "destructive",
+    "status.neutral.background": "muted",
+    "link": "foreground"
+  },
+  "component_tokens": {
+    "font-sans": "font-family",
+    "font-heading": "font-family"
   }
 }

@@ -7,58 +7,58 @@
 <!-- reference-style -->
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a><main id="main" tabindex="-1">
-<h1>Account recovery</h1>
-<p>A recovery code helps you get back into your account if you lose access to all your passkeys. Save it now while you can still sign in. If you need it later, use it with your account ID to request a replacement passkey; recovery includes a waiting period.</p>
-<p>This reference client is experimental. Recovery policy and device support still require independent review before ordinary activation.</p>
-<p>Keep multiple working passkeys when possible. A saved code is a bearer secret: anyone who steals it can request recovery. It is not phishing resistant. Save it offline, separately from your passkeys. Confirmation cannot prove you retained an offline copy.</p>
-<form id="signin-form">
-<h2>Sign in freshly with a passkey</h2>
-<label for="account">Public account ID</label> <input id="account" required autocomplete="off" spellcheck="false">
-<button type="submit">Sign in with key</button>
-</form>
-<p>Signed-in account ID: <output id="owner">Not signed in</output>. Retain this ID with your offline code; a code-preparation ID is a different identifier.</p>
-<form id="prepare-form">
-<h2>Configure or replace a saved code</h2>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar"><div class="header-inner"><a class="brand" href="/"><svg class="brand-logo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" color="#fff" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18.7088 3.49534C16.8164 2.55382 14.5008 2 11.9999 2C9.49904 2 7.18344 2.55382 5.2911 3.49534C4.36312 3.95706 3.89913 4.18792 3.44954 4.91378C2.99994 5.63965 2.99994 6.34248 2.99994 7.74814V11.2371C2.99994 16.9205 7.54229 20.0804 10.173 21.4338C10.9066 21.8113 11.2734 22 11.9999 22C12.7264 22 13.0932 21.8113 13.8269 21.4338C16.4576 20.0804 20.9999 16.9205 20.9999 11.2371L20.9999 7.74814C20.9999 6.34249 20.9999 5.63966 20.5503 4.91378C20.1007 4.18791 19.6367 3.95706 18.7088 3.49534Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/><path d="M11.9999 11C13.1045 11 13.9999 10.1046 13.9999 9C13.9999 7.89543 13.1045 7 11.9999 7C10.8954 7 9.99994 7.89543 9.99994 9C9.99994 10.1046 10.8954 11 11.9999 11ZM11.9999 11V13.5M13.9999 16H12.9999C12.4477 16 11.9999 15.5523 11.9999 15V13.5M11.9999 13.5H13.4999" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>easy-auth</a><button id="theme" class="btn" data-variant="ghost" type="button" aria-label="Use dark theme" data-size="icon"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg></button></div></header><main id="main" tabindex="-1">
+<a class="companion-back btn" data-variant="ghost" href="/">← Account</a>
+<h1 tabindex="-1">Account recovery</h1>
+<p>Save a recovery code before you lose access to your passkeys.</p>
+<p class="recovery-note">Experimental recovery. Save your code offline, separately from your passkeys. Anyone with the code can request recovery.</p>
+<span class="popover recovery-help"><button type="button" class="btn" data-variant="ghost" aria-label="More about recovery codes" aria-expanded="false" aria-controls="setup-help">ⓘ</button><span id="setup-help" data-popover aria-hidden="true" data-align="start">Recovery is not phishing resistant and includes a waiting period. Policy and device support still require independent review. Keep multiple working passkeys when possible.</span></span><ol class="recovery-steps" aria-label="Recovery steps"><li data-step="0"><span class="step-number" aria-hidden="true">1</span><span>Verify access</span></li><li data-step="1"><span class="step-number" aria-hidden="true">2</span><span>Prepare code</span></li><li data-step="2"><span class="step-number" aria-hidden="true">3</span><span>Save and confirm</span></li><li data-step="3"><span class="step-number" aria-hidden="true">4</span><span>Complete</span></li></ol><p id="step-summary" class="muted"></p>
+<form id="signin-form" class="recovery-step" data-setup-step="0"><fieldset class="fieldset"><legend data-variant="legend">Sign in freshly with a passkey</legend>
+<div class="field"><label class="label" for="account">Public account ID</label> <input id="account" required autocomplete="off" spellcheck="false" class="input"></div>
+<button type="submit" class="btn">Sign in with key</button>
+<button id="use-session" type="button" class="btn" data-variant="secondary">Continue with current sign-in</button>
+<p class="muted">The server still checks fresh passkey access before preparing a code.</p>
+</fieldset></form>
+
+<form id="prepare-form" class="recovery-step" data-setup-step="1" hidden><fieldset class="fieldset"><legend data-variant="legend">Configure or replace a saved code</legend>
 <p>Preparing does not invalidate your confirmed code. Confirmation replaces it and cancels older recovery requests. A genuinely fresh passkey sign-in is required.</p>
-<label>
-<input id="prepare-consent" type="checkbox" required> I will save the public account ID and code offline, separately from my passkeys.</label>
+<div class="field" data-orientation="horizontal"><input id="prepare-consent" type="checkbox" class="input" required><label class="label" for="prepare-consent">I will save the public account ID and code offline, separately from my passkeys.</label></div>
 <p>
-<button type="submit">Prepare a new code</button>
+<button type="submit" class="btn">Prepare a new code</button>
 </p>
-</form>
-<section id="kit" hidden>
+</fieldset></form>
+<section id="kit" class="recovery-step" data-setup-step="2" hidden>
 <h2>Save this code now</h2>
 <p>This value is shown once. Do not email it or put it in a URL. If it is lost before confirmation, prepare another code.</p>
-<label for="saved-code">New saved code</label>
-<textarea id="saved-code" readonly autocomplete="off" spellcheck="false" rows="2" cols="48">
+<label class="label" for="saved-code">New saved code</label>
+<textarea id="saved-code" readonly autocomplete="off" spellcheck="false" rows="2" cols="48" class="textarea">
 </textarea>
-<form id="confirm-form">
+<button id="prepare-again" type="button" class="btn" data-variant="secondary">Prepare another code</button>
+<form id="confirm-form"><fieldset class="fieldset">
+<div class="field"><label class="label" for="reentered-code">Reenter the offline copy</label> <input id="reentered-code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43" class="input"></div>
+<div class="field" data-orientation="horizontal"><input id="saved-consent" type="checkbox" class="input" required><label class="label" for="saved-consent">I retained the public account ID and this code offline.</label></div>
 <p>
-<label for="reentered-code">Reenter the offline copy</label> <input id="reentered-code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43">
+<button type="submit" class="btn">Confirm saved code</button>
 </p>
-<label>
-<input id="saved-consent" type="checkbox" required> I retained the public account ID and this code offline.</label>
-<p>
-<button type="submit">Confirm saved code</button>
-</p>
-</form>
+</fieldset></form>
 </section>
-<form id="cancel-form">
-<h2>Stop a recovery request</h2>
+<section class="recovery-step" data-setup-step="3" hidden><h2>Recovery code saved</h2><p>Keep your account ID and confirmed code offline. You cannot retrieve the code here later.</p><a class="btn" href="/">Return to account</a></section>
+<dl class="recovery-facts"><div><dt>Account ID</dt><dd><output id="owner">Not signed in</output></dd></div><div><dt>Setup status</dt><dd><span id="setup-state" class="badge">Verify access</span></dd></div></dl>
+<details class="recovery-cancellation"><summary>Cancel or stop recovery</summary><form id="cancel-form"><fieldset class="fieldset"><legend data-variant="legend">Stop a recovery request</legend>
 <p>If you received an unexpected alert, a genuinely fresh working-key sign-in can cancel your current request without its ID. The request's code remains unusable; configure a new code afterward.</p>
-<label>
-<input id="cancel-consent" type="checkbox" required> Cancel the current request; I understand its code will remain consumed.</label>
+<div class="field" data-orientation="horizontal"><input id="cancel-consent" type="checkbox" class="input" required><label class="label" for="cancel-consent">Cancel the current request; I understand its code will remain consumed.</label></div>
 <p>
-<button type="submit">Cancel current recovery</button>
+<button type="submit" class="btn">Cancel current recovery</button>
 </p>
-</form>
-<p id="status" role="status" aria-live="polite">
+</fieldset></form></details>
+<p id="status" role="status" aria-live="polite" class="alert">
 </p>
 <p>
 <a href="/passkey-recovery">Recover with a saved code</a>
 </p>
 </main>
+<script defer src="/ui/basecoat-popover.js"></script>
 <script type="module" src="/passkey-recovery/setup.js">
 </script>
 </body>

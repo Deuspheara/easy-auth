@@ -1,5 +1,13 @@
 # Code organization
 
+The initial Basecoat integration extracted `theme.js` (existing preference projection) and
+`presentation-motion.js` (optional interpolation/owned cancellation). The fixed
+Vega stylesheet and mini ESM output live in `pages/vendor/`; `tools/reference-ui/`
+prepares exact package inputs and licenses without workspace source scanning.
+Native page/feature controllers still own requests, proofs, focus and confirmation.
+The screen/state and component mapping is in
+[the modernization record](../design/reference-ui-modernization.md).
+
 Reference presentation keeps trusted boolean capability projection, fixed style
 insertion and static asset routing in separate `pages/` Rust modules. Browser
 `client.js` composes the view; `signin.js`, `account.js` and `passkeys.js` own their
@@ -13,8 +21,8 @@ navigation-safe request/native-prompt operations are shared byte-for-byte throug
 `browser-operations.js`; the original recovery resource URL remains supported.
 Feature page modules retain callback selection, escaped transport data and
 protocol confirmation. Their fixed HTML shares the stylesheet without adding
-external resources or broad CSP style permission. Browser modules remain at or below 150
-lines; the fixed168line HTML document keeps its native forms and capability-gated
+external resources or broad CSP style permission. Browser modules remain below 200
+lines; the fixed HTML document keeps its native forms and capability-gated
 views together without a template framework (a reviewed size exception); the form-binding function deliberately keeps its short explicit endpoint/
 input/result handlers together as a reviewed function-size exception. No business
 policy, SQL, verifier or public proof constructor moves into presentation.
@@ -1229,3 +1237,32 @@ case module scopes bootstrap-only TLS capture separately from actual deletion UI
 no production proof constructor, network allowlist expansion, timeout increase or
 crypto behavior is introduced. Existing assertions remain and new sink-count and
 document checks strengthen the transport evidence.
+
+## Account presentation refinement
+
+`settings-search.js` owns only fixed searchable destinations and accessible result
+controls; `account-search.js` invokes existing account navigation. `feedback.js`
+owns field validation display and the stable contextual status node outside
+replaceable inventories. Existing operation controllers retain authorization,
+requests, proofs and generation checks. Recovery's `view.js` owns operation
+presentation/restoration; `setup-view.js` and `claim-view.js` own guided rendering,
+while `setup.js` and `recover.js` retain the explicit endpoint/native-prompt
+sequences. No use case, SQL, schema or authentication policy moved. Modules remain
+under 160 lines; the existing ordered form-binding/controller sequences remain
+reviewed function-size exceptions.
+
+The fixed asset builder adds only the installed Basecoat runtime and Popover
+controller. The runtime observes additions/removals; no forced reinitialization,
+second help controller or inline event handlers are introduced. The native checkbox
+indicator replaces Vega's data-image mask under the unchanged restrictive CSP.
+
+The ordered reference-browser refinement scenario keeps responsive/theme/zoom,
+help keyboard behavior and validation observations together against real served
+pages; its function-size exception avoids splitting one coherent browser journey.
+
+The supplied-design adaptation changes only page composition and focused recovery
+view rendering. Step titles/completed markers remain in existing recovery view
+modules, while existing operation controllers retain requests and proof handling.
+Cancellation disclosures wrap the existing named forms instead of creating new
+handlers. The shared application stylesheet remains below 200 lines; no new
+framework, transport adapter or component-controller abstraction is introduced.

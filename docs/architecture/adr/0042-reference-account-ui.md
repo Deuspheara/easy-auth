@@ -43,9 +43,11 @@ account-switch guarantee; database bindings and current authority remain decisiv
 
 Separate identity/security overview from focused management panels and developer
 diagnostics. Empty provider lists do not invent linking. Sensitive key inventory
-remains deliberate. A genuine inventory401 may initiate an explicit confirmation
-that replaces this browser’s session through normal logout and account-bound
-WebAuthn start/finish. Cancel does not log out; there is no automatic credential
+remains deliberate. An inventory401 displays a Verify access action; opening the
+page alone never initiates sign-out. That action offers explicit confirmation,
+then uses normal logout and an account-bound sign-in form with the selected public
+account ID. A fresh Continue click starts native WebAuthn. Same-owner completion
+returns to management; the inventory endpoint still checks authentication freshness. Cancel does not log out; there is no automatic credential
 completion retry or weaker fallback. Recheck owner/view before logout and require
 the actual refreshed owner to match before reading inventory. Existing core/SQL
 freshness and credential restrictions remain authoritative.
@@ -61,23 +63,24 @@ Refresh ordinary metadata on visible-page return, coalescing return events and
 avoiding active operations. Reset unfinished forms on an observed owner change.
 Keep only current/other status and genuine relative activity on session rows;
 raw timestamps and immutable provider/public IDs belong in advanced details.
-Nonessential success feedback expires after eight seconds, while failures and
-confirmation instructions remain available. No location/device inference is added.
+Success feedback, failures and confirmation instructions persist inline until
+replaced by the next operation. No location/device inference is added.
 
 ## Style and accessibility boundary
 
 The maintainer's revised visual direction follows the
 [authentication design contract](../../design/reference-ui.md): compact centered
 sign-in and flat account settings, semantic tokens, locally bundled Inter and
-equal OS-driven light/dark themes. The subsequent owner correction uses one
-420px sign-in column and focused password, registration and help URLs. The closed
+equal OS-driven light/dark themes. The owner-approved supplied-design composition
+uses a 400px anonymous authentication/reset column and a 660px account/recovery
+column, with focused password, registration and help URLs. The closed
 view selector is presentation only, bounded by selected capabilities. The inbox
 state follows an actual email-start response and explicit resend uses the original
 in-memory input and unchanged API limits. Direct inbox navigation returns to sign-in.
 Normal page navigation retains existing cancellation and password clearing. The earlier aurora candidate was rejected and
 is superseded; it is not a visual acceptance baseline.
 
-Permit only the exact combined token/control stylesheets' SHA-256 hash in CSP. Keep default-src
+Permit only the exact combined Basecoat/token/layout stylesheets' SHA-256 hash in CSP. Keep default-src
 none, same-origin scripts/connect/forms, base denial and frame denial. Explicitly
 deny style attributes; add neither unsafe-inline nor a broad stylesheet origin.
 Permit same-origin font loading for the fixed licensed Inter asset; no external
@@ -103,3 +106,32 @@ WCAG certification, physical-device coverage, provider registration acceptance o
 production approval. Recovery remains selected only through its existing explicit
 experimental composition. SAML's ADR0032 waiver does not establish independent
 review or close residual assurance. No protocol/trust/lifecycle policy is relaxed.
+
+
+## Components, search and recovery
+
+Basecoat CSS 1.1.0 Vega supplies component styling; Motion mini 14.6.0 supplies
+optional, cancellable presentation effects. esbuild 0.28.2 prepares fixed local
+assets without application-source scanning or a production Node runtime. The
+local shield-and-key icon retains its license. Basecoat runtime plus its Popover
+controller support supplementary help; application/native controllers retain
+confirmation and focus ownership.
+
+The account uses open Profile, Security and Sessions groups with padded Items.
+Local Input Group/Kbd search offers only permitted fixed destinations and never
+searches personal information or fetches sensitive inventory for decoration.
+Back precedes search and the focused heading. Field errors are associated with
+their inputs; operation errors/results persist beside their actions.
+
+Recovery setup and lost-access recovery retain distinct routes, numbered steps,
+server-labelled facts and task-specific titles. Existing-session selection does
+not prove fresh authentication. Cancellation remains explicit in labelled native
+disclosures; consent and consequences remain beside each decision. Readiness,
+expiry and completion remain server-authoritative, without polling or retries.
+
+The supplied design's prototype adapter, invented response flags and broader
+CSP suggestions were not adopted. Only application layout, accessibility and
+strict-CSP exceptions augment Vega: local Inter, responsive text wrapping, 44px
+action targets, visible forced-color focus, stronger input boundaries, native
+modal geometry and a native checkbox indicator instead of blocked data images.
+The current design guide supersedes earlier visual candidates.

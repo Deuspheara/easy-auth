@@ -1,8 +1,11 @@
 # Protocol dependency assessment
 
 The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
-uses native browser modules/WebAuthn and fixed included HTML/CSS. It adds no
-server frontend runtime, remote font/image, runtime package version or advisory ignore.
+uses native browser modules/WebAuthn and fixed included HTML/CSS. The presentation
+now pins Basecoat CSS 1.1.0 and optional Motion mini 14.6.0, prepared with
+esbuild 0.28.2. It adds no server frontend runtime, remote font/image or advisory
+ignore. Versions, licenses, integrity, sizes and exact regeneration live in the
+[modernization record](../design/reference-ui-modernization.md).
 The maintainer-requested compact design bundles the unmodified Inter 4.1 variable
 font under SIL OFL 1.1 with its notice. Its fixed local route and SHA-256 provenance
 are recorded in the [design contract](../design/reference-ui.md). A stdlib-only

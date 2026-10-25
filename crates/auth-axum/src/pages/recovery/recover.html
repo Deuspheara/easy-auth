@@ -7,64 +7,61 @@
 <!-- reference-style -->
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a><main id="main" tabindex="-1">
-<h1>Recover passkeys with a saved code</h1>
-<p>Experimental reference client; independent policy review and device evidence are still required. No mailbox/password fallback or automatic identity lookup is available.</p>
-<p>A code is reserved once for this browser. Keep this browser and its cookies for the whole wait. A lost cookie, cancelled request or expired request may require a working key to configure new proof. Your existing keys stay usable during the wait.</p>
-<p>The minimum wait is 24 hours and the request expires after seven days. With a verified contact, the wait begins only after SMTP acceptance, not proof you read the alert. Without a verified contact there is no independent email alert. A prolonged delivery outage can prevent completion before expiry.</p>
-<button id="logout" type="button">Sign out in this browser before recovery</button>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar"><div class="header-inner"><a class="brand" href="/"><svg class="brand-logo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" color="#fff" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18.7088 3.49534C16.8164 2.55382 14.5008 2 11.9999 2C9.49904 2 7.18344 2.55382 5.2911 3.49534C4.36312 3.95706 3.89913 4.18792 3.44954 4.91378C2.99994 5.63965 2.99994 6.34248 2.99994 7.74814V11.2371C2.99994 16.9205 7.54229 20.0804 10.173 21.4338C10.9066 21.8113 11.2734 22 11.9999 22C12.7264 22 13.0932 21.8113 13.8269 21.4338C16.4576 20.0804 20.9999 16.9205 20.9999 11.2371L20.9999 7.74814C20.9999 6.34249 20.9999 5.63966 20.5503 4.91378C20.1007 4.18791 19.6367 3.95706 18.7088 3.49534Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/><path d="M11.9999 11C13.1045 11 13.9999 10.1046 13.9999 9C13.9999 7.89543 13.1045 7 11.9999 7C10.8954 7 9.99994 7.89543 9.99994 9C9.99994 10.1046 10.8954 11 11.9999 11ZM11.9999 11V13.5M13.9999 16H12.9999C12.4477 16 11.9999 15.5523 11.9999 15V13.5M11.9999 13.5H13.4999" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>easy-auth</a><button id="theme" class="btn" data-variant="ghost" type="button" aria-label="Use dark theme" data-size="icon"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg></button></div></header><main id="main" tabindex="-1">
+<a class="companion-back btn" data-variant="ghost" href="/?view=help">← Sign-in help</a>
+<h1 tabindex="-1">Recover passkeys with a saved code</h1>
+<p>Use the account ID and recovery code you saved earlier.</p>
+<p class="recovery-note">Experimental recovery. Keep this browser and its cookies throughout the wait. A reserved code cannot be reused.</p>
+<span class="popover recovery-help"><button type="button" class="btn" data-variant="ghost" aria-label="More about recovery limits" aria-expanded="false" aria-controls="claim-help">ⓘ</button><span id="claim-help" data-popover aria-hidden="true" data-align="start">Recovery has a minimum 24-hour wait and expires after seven days. With a verified contact, waiting begins after SMTP acceptance, not proof of reading. Without one there is no independent email alert. A delivery outage can prevent completion. Existing keys remain usable during the wait; browser loss may require a working key to configure new proof. No mailbox/password fallback or identity lookup is available.</span></span><ol class="recovery-steps" aria-label="Recovery steps"><li data-step="0"><span class="step-number" aria-hidden="true">1</span><span>Start or resume</span></li><li data-step="1"><span class="step-number" aria-hidden="true">2</span><span>Waiting</span></li><li data-step="2"><span class="step-number" aria-hidden="true">3</span><span>Replacement key</span></li><li data-step="3"><span class="step-number" aria-hidden="true">4</span><span>Complete</span></li></ol><p id="step-summary" class="muted"></p>
+<div id="claim-entry" class="recovery-step">
+<dl class="recovery-facts"><div><dt>Minimum wait</dt><dd>24 hours</dd></div><div><dt>Request lifetime</dt><dd>7 days</dd></div></dl>
+<button id="logout" type="button" class="btn">Sign out in this browser before recovery</button>
 <p>Do this explicitly if a session cookie exists, including an expired one. Recovery never silently switches your signed-in account.</p>
-<label for="account">Retained public account ID</label> <input id="account" autocomplete="off" spellcheck="false" required>
-<form id="start-form">
-<h2>Start a request</h2>
-<label for="code">Saved code</label> <input id="code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43">
+<div class="field"><label class="label" for="account">Retained public account ID</label> <input id="account" autocomplete="off" spellcheck="false" required class="input"></div>
+<form id="start-form"><fieldset class="fieldset"><legend data-variant="legend">Start a request</legend>
+<div class="field"><label class="label" for="code">Saved code</label> <input id="code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43" class="input"></div>
 <p>
-<label>
-<input id="consume-consent" type="checkbox" required> Reserve this code once in this browser. I understand the delay, lack of email-free alerts, expiry and browser-loss limits.</label>
+<div class="field" data-orientation="horizontal"><input id="consume-consent" type="checkbox" class="input" required><label class="label" for="consume-consent">Reserve this code once in this browser. I understand the delay, lack of email-free alerts, expiry and browser-loss limits.</label></div>
 </p>
-<button type="submit">Start recovery request</button>
-</form>
-<p>
-<button id="resume" type="button">Resume this browser's request</button> Use this after a reload or a lost start response. No code reentry is needed.</p>
-<section id="claim" hidden>
+
+</fieldset></form>
+<div role="group" aria-label="Recovery request actions" class="button-group"><button type="submit" form="start-form" class="btn">Start recovery request</button><button id="resume" type="button" class="btn" data-variant="outline">Resume this browser's request</button></div><p class="muted">Resume after a reload or lost start response. No code reentry is needed.</p>
+</div>
+<section id="claim" class="recovery-step" hidden>
 <h2>Current request</h2>
-<p id="timing">
-</p>
-<p id="notification">
-</p>
-<button id="refresh" type="button">Refresh status</button>
+<dl class="recovery-facts"><div><dt>Account ID</dt><dd id="claim-owner"></dd></div><div><dt>Status</dt><dd><span id="claim-state" class="badge"></span></dd></div><div><dt>Earliest completion</dt><dd id="claim-earliest"></dd></div><div><dt>Expires</dt><dd id="claim-expiry"></dd></div><div><dt>Notification</dt><dd id="claim-notification"></dd></div></dl>
+<p id="timing" class="sr-only"></p><p id="notification" class="sr-only"></p>
+<button id="refresh" type="button" class="btn">Refresh status</button>
 <p>Refresh manually; frequent attempts are limited. Device time cannot authorize recovery.</p>
-<form id="browser-cancel-form">
-<label>
-<input id="browser-cancel-consent" type="checkbox" required> Cancel this request permanently; the code stays consumed.</label>
-<button type="submit">Cancel this browser's request</button>
-</form>
-<form id="replace-form">
-<h2>Install a replacement passkey</h2>
+<details class="recovery-cancellation"><summary>Cancel this browser’s request</summary><form id="browser-cancel-form"><fieldset class="fieldset">
+<div class="field" data-orientation="horizontal"><input id="browser-cancel-consent" type="checkbox" class="input" required><label class="label" for="browser-cancel-consent">Cancel this request permanently; the code stays consumed.</label></div>
+<button type="submit" class="btn">Cancel this browser's request</button>
+</fieldset></form></details>
+<form id="replace-form" hidden><fieldset class="fieldset"><legend data-variant="legend">Install a replacement passkey</legend>
 <p>Creating a key alone does not finish recovery. Complete the separate verification prompt. Committed completion invalidates all previous account passkeys and sessions.</p>
-<label>
-<input id="replace-consent" type="checkbox" required> Replace previous keys and sessions after proving the new key.</label>
+<div class="field" data-orientation="horizontal"><input id="replace-consent" type="checkbox" class="input" required><label class="label" for="replace-consent">Replace previous keys and sessions after proving the new key.</label></div>
 <p>
-<button id="replace" type="submit" disabled>Create and verify replacement key</button>
+<button id="replace" type="submit" disabled class="btn">Create and verify replacement key</button>
 </p>
-</form>
+</fieldset></form>
 </section>
-<form id="code-cancel-form">
-<h2>Stop an unexpected request with your retained code</h2>
+<section id="recovery-complete" class="recovery-step" hidden><h2>Recovery complete</h2><p>Previous passkeys and sessions were invalidated. Use your replacement key to sign in and configure a new recovery code.</p><a class="btn" href="/passkey-recovery/setup">Configure a new saved code</a></section>
+<details class="recovery-cancellation"><summary>Stop an unexpected request with your retained code</summary><form id="code-cancel-form"><fieldset class="fieldset"><legend data-variant="legend">Stop an unexpected request with your retained code</legend>
 <p>This works from another anonymous browser and cancels only. It cannot transfer a request, sign you in or reopen a code. Never send the code by email.</p>
-<label for="cancel-code">Retained code</label> <input id="cancel-code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43">
+<div class="field"><label class="label" for="cancel-code">Retained code</label> <input id="cancel-code" type="password" required autocomplete="off" spellcheck="false" minlength="43" maxlength="43" class="input"></div>
 <p>
-<label>
-<input id="code-cancel-consent" type="checkbox" required> Cancel the current request; this code will remain unusable.</label>
+<div class="field" data-orientation="horizontal"><input id="code-cancel-consent" type="checkbox" class="input" required><label class="label" for="code-cancel-consent">Cancel the current request; this code will remain unusable.</label></div>
 </p>
-<button type="submit">Cancel with retained code</button>
-</form>
-<p id="status" role="status" aria-live="polite">
+<button type="submit" class="btn">Cancel with retained code</button>
+</fieldset></form></details>
+<p id="status" role="status" aria-live="polite" class="alert">
 </p>
 <p>
 <a href="/passkey-recovery/setup">Sign in with a working or replacement key, configure a new code, or cancel with a key</a>
 </p>
 </main>
+<script defer src="/ui/basecoat-popover.js"></script>
 <script type="module" src="/passkey-recovery/recover.js">
 </script>
 </body>

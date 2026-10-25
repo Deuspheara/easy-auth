@@ -1,4 +1,6 @@
 'use strict';
+const {captureScreen} = require('./capture.cjs');
+const {settingsSearch} = require('./refinement.cjs');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const {accountKeyboard} = require('./keyboard.cjs');
@@ -16,9 +18,19 @@ async function passwordLogin(page, origin, email, password) {
   await page.getByRole('link', {name: 'Use a password instead', exact: true}).click();
   await page.locator('#login-email').fill(email);
   await page.locator('#login-password').fill(password);
-  await page.getByRole('button', {name: 'Sign in with password', exact: true}).click();
-  await signedIn(page);
-  assert.equal(await page.locator('#login-password').inputValue(), '');
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route('**/v1/account/providers', async route => {
+    const response = await route.fetch();
+    await held;
+    await route.fulfill({response});
+  }, {times: 1});
+  try {
+    await page.getByRole('button', {name: 'Sign in with password', exact: true}).click();
+    await signedIn(page);
+    assert.equal(await page.locator('#login-password').inputValue(), '', 'password clears before delayed ancillary inventory finishes');
+  } finally { release(); }
+  await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'));
 }
 async function emailLogin(page, origin, email, mail) {
   await page.goto(origin);
@@ -73,7 +85,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
         await page.emulateMedia({colorScheme: scheme});
         for (const width of [320, 1440]) {
           await page.setViewportSize({width, height: 1000});
-          await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+          await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
             'inbox-' + scheme + '-' + width + '.png'), fullPage: true});
         }
       }
@@ -90,6 +102,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
 
     stage = 'password-enrollment';
     await page.getByRole('button', {name: 'Manage password', exact: true}).click();
+    await captureScreen(page, 'password-setup');
     await page.locator('#new-password').fill(password);
     await page.locator('#confirm-password').fill(password);
     await page.getByRole('button', {name: 'Set up password', exact: true}).click();
@@ -98,6 +111,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
     assert.equal(await page.locator('#confirm-password').inputValue(), '');
 
     await page.getByRole('button', {name: '← Account', exact: true}).click();
+    await settingsSearch(page);
     stage = 'session-revocation';
     await passwordLogin(other, origin, email, password);
     await page.getByRole('button', {name: 'Account details', exact: true}).click();
@@ -128,6 +142,7 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await page.locator('#reset-request').click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('If this mailbox has a password'));
     await page.goto(await mail.link(email, origin, 'Password reset request', '/reset'));
+    await captureScreen(page, 'password-reset');
     await page.locator('#password').fill(replacement);
     await page.locator('#confirm').fill(replacement);
     await page.locator('#save').click();
@@ -144,12 +159,14 @@ async function mailboxFlow(browser, origin, mail, guard) {
     await emailLogin(page, origin, lifecycleEmail, mail);
     await page.getByRole('button', {name: 'Account details', exact: true}).click();
     await page.getByRole('button', {name: 'Change email address', exact: true}).click();
+    await captureScreen(page, 'email-change-form');
     await page.locator('#new-email').fill(changedEmail);
     await page.getByRole('button', {name: 'Send both confirmation links', exact: true}).click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check both email inboxes.'));
     for (const address of [lifecycleEmail, changedEmail]) {
       changeAddress += 1;
       await page.goto(await mail.link(address, origin, 'Confirm email change', '/email-change'));
+      await captureScreen(page, 'email-change-confirmation');
       await page.locator('#confirm').click();
       await page.waitForFunction(() => /This address is confirmed|Email changed\./.test(document.getElementById('status').textContent));
     }
@@ -158,10 +175,12 @@ async function mailboxFlow(browser, origin, mail, guard) {
     stage = 'account-deletion';
     await page.getByRole('button', {name: 'Account details', exact: true}).click();
     await page.getByRole('button', {name: 'Delete account', exact: true}).click();
+    await captureScreen(page, 'account-deletion-request');
     await page.locator('#delete-confirmation').fill('delete my account');
     await page.getByRole('button', {name: 'Request deletion confirmation', exact: true}).click();
     await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Deletion was requested.'));
     await page.goto(await mail.link(changedEmail, origin, 'Confirm account deletion', '/account-delete'));
+    await captureScreen(page, 'account-deletion-confirmation');
     await page.locator('#confirmation').fill('delete my account');
     await page.locator('#confirm').click();
     await page.waitForFunction(() => document.getElementById('status').textContent === 'Authentication account deleted.');

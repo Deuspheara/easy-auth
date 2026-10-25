@@ -11,7 +11,7 @@ use std::time::Duration;
 use uuid::Uuid;
 
 // Only the exact fixed reference stylesheet may supply inline styles.
-const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-aq2W00wAxseuRONwhU9OEmUQEYDOzLqApkm4Gwm40Is='; style-src-attr 'none'";
+const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; style-src 'sha256-mrh6CimstRLBArnA3GtEFuIhGV93ne7xr/K73HnM/uY='; style-src-attr 'none'";
 
 pub(crate) async fn boundary(
     State(state): State<AppState>,
@@ -133,7 +133,8 @@ mod reference_style_tests {
     #[test]
     fn inline_style_permission_matches_only_the_fixed_reference_stylesheet() {
         let stylesheet = format!(
-            "{}{}",
+            "{}{}{}",
+            include_str!("../pages/vendor/basecoat.css"),
             include_str!("../pages/tokens.css"),
             include_str!("../pages/reference.css")
         );

@@ -1,5 +1,6 @@
 "use strict";
-import {element, clearSecrets} from "/ui/view.js";
+import {clearFeedback} from "/ui/feedback.js";
+import {cancelPresentation, present, element, clearSecrets} from "/ui/view.js";
 
 const screens = {
   email: ["Welcome back", "Sign in to your account"],
@@ -15,8 +16,11 @@ export function showAuthScreen(caps, requested = "email") {
   let name = Object.hasOwn(screens, requested) ? requested : "email";
   const capability = screens[name][2];
   if (capability && caps[capability] !== true) name = "email";
+  cancelPresentation();
+  clearFeedback();
   clearSecrets();
   for (const node of document.querySelectorAll("[data-auth-screen]")) node.hidden = node.dataset.authScreen !== name;
   element("heading").textContent = screens[name][0];
   element("intro").textContent = screens[name][1];
+  present(document.querySelector(`[data-auth-screen="${name}"]`));
 }

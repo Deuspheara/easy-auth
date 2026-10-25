@@ -7,12 +7,13 @@ async function accountLayout(page, email) {
   assert.equal(await page.locator('.brand').count(), 1);
   assert.equal(await page.locator('.topbar .brand').isVisible(), true);
   assert.equal(await page.locator('#avatar').textContent(), 'AM');
-  assert.equal(await page.locator('#signin-methods > h2').textContent(), 'Security');
+  assert.equal(await page.locator('#signin-methods h2').textContent(), 'Security');
   assert.equal(await page.locator('#revoke-all').isVisible(), false, 'bulk sign-out belongs in management');
   assert.equal(await page.locator('.current-session #logout').isVisible(), true);
   assert.equal(await page.locator('#passkeys-summary').textContent(), 'View and manage registered passkeys',
     'returning to the account does not invent or retain sensitive inventory');
   await page.setViewportSize({width: 320, height: 844});
+  assert.equal(await page.locator('.profile-row').evaluate(node => { const avatar = node.querySelector('.row-icon').getBoundingClientRect(); const arrow = node.querySelector('.chevron').getBoundingClientRect(); return Math.abs(avatar.y + avatar.height / 2 - arrow.y - arrow.height / 2) < 2; }), true, 'mobile profile chevron stays aligned with its icon');
   const compact = await page.locator('#identity-email').evaluate(node => ({
     full: node.textContent, clipped: node.scrollWidth > node.clientWidth,
     overflow: getComputedStyle(node).textOverflow
@@ -32,7 +33,7 @@ async function accountLayout(page, email) {
       await page.emulateMedia({colorScheme: scheme});
       for (const width of [320, 1440]) {
         await page.setViewportSize({width, height: 1000});
-        await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+        await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
           'profile-' + scheme + '-' + width + '.png'), fullPage: true});
       }
     }
@@ -52,7 +53,7 @@ async function accountLayout(page, email) {
       await page.emulateMedia({colorScheme: scheme});
       for (const width of [320, 1440]) {
         await page.setViewportSize({width, height: 1000});
-        await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+        await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
           'sessions-' + scheme + '-' + width + '.png'), fullPage: true});
       }
     }

@@ -23,12 +23,14 @@ async function cancellations(browser, origin, mail, ownerWithContact, startPage)
           await page.locator('#account').fill(owner.id);
           await page.getByRole('button', {name: 'Sign in with key', exact: true}).click();
           await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Passkey sign-in complete.'));
+          await page.locator('details:has(#cancel-form) > summary').click();
           await page.locator('#cancel-consent').check();
           await page.getByRole('button', {name: 'Cancel current recovery', exact: true}).click();
           await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Current recovery cancelled.'));
           assert.equal((await profile(page)).id, owner.id);
           await mail.recoveryEvent(address, 'cancelled');
         } else if (kind === 'browser') {
+          await page.locator('details:has(#browser-cancel-form) > summary').click();
           await page.locator('#browser-cancel-consent').check();
           await page.getByRole('button', {name: "Cancel this browser's request", exact: true}).click();
           await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Request cancelled.'));
@@ -37,6 +39,7 @@ async function cancellations(browser, origin, mail, ownerWithContact, startPage)
           const peer = await browser.newContext();
           try {
             const other = await peer.newPage();await other.goto(origin + '/passkey-recovery');
+            await other.locator('details:has(#code-cancel-form) > summary').click();
             await other.locator('#account').fill(owner.id);await other.locator('#cancel-code').fill(code);
             await other.locator('#code-cancel-consent').check();
             await other.getByRole('button', {name: 'Cancel with retained code', exact: true}).click();

@@ -1,7 +1,8 @@
 # Reference account browser acceptance
 
 Use the documented loopback PostgreSQL and Mailpit development services and set
-`DATABASE_URL`. Reuse the locked browser dependencies; no new package is required:
+`DATABASE_URL`. Reuse the locked browser dependencies. UI preparation is documented separately in
+[the modernization record](../../../docs/design/reference-ui-modernization.md):
 
 ```sh
 npm ci --ignore-scripts --prefix tests/browser/passkeys
@@ -67,5 +68,23 @@ fallback and selected provider deletion. Google uses its existing owned transpor
 this is not manual real-Google registration acceptance. Existing recovery cases
 remain a separate full regression suite. No physical-device, accessibility audit,
 independent SAML review, protocol certification or production-readiness claim.
-The compact design remains a visual candidate until the owner reviews the rendered
-views. Passing tests and regenerated captures do not approve a visual baseline.
+The owner approved the rendered design and verification journey on 2026-10-25.
+That visual decision is separate from the automated verification recorded here.
+
+
+The Motion module probes real Axum CSP through completion, overlapping effects,
+cancellation, removal, reduced-motion changes, forced colors and missing optional
+module loading. All genuine-flow contexts count CSP violations from initial load.
+Persistent feedback replaces the earlier eight-second success notification; the
+native account scenario asserts the accepted sign-in result remains available.
+
+Optional screenshot review now also captures the focused account forms, search
+results, add/rename/remove passkey screens and genuine email/reset/deletion
+confirmations through `capture.cjs`. Set `EASY_AUTH_UI_SCREENSHOT_DIR` to an
+existing local directory for this runner and the recovery runner. The helper
+captures both themes at 320px and 1440px, restores the original viewport/theme,
+and masks nonempty password and recovery-code fields. Capture names are fixed;
+no proof URL, browser state or secret is included in the manifest or filename.
+Recovery captures cover verification, preparation, masked offline-code saving,
+confirmation, waiting, server-authorized replacement and completion. These are
+local review artifacts, not owner approval or configured-provider coverage.

@@ -1,4 +1,5 @@
 'use strict';
+const {captureScreen} = require('../../reference-ui/capture.cjs');
 const assert = require('node:assert/strict');
 const {withAuthenticator, post} = require('../browser.cjs');
 const {profile, assertion, startLogin} = require('../assertions.cjs');
@@ -69,7 +70,9 @@ async function runPages(browser, origin, mail, prepareClock) {
     let stage = 'signup';
     try {
       await withAuthenticator(browser, origin, undefined, transport, async ({page, context, cdp, authenticatorId}) => {
-        let pageErrors = 0;page.on('pageerror', () => {pageErrors += 1;});
+        let pageErrors = 0, cspViolations = 0;page.on('pageerror', () => {pageErrors += 1;});
+        await page.exposeFunction('recordRecoveryCsp', () => { cspViolations += 1; });
+        await page.addInitScript(() => document.addEventListener('securitypolicyviolation', () => window.recordRecoveryCsp()));
         const {owner, address} = await ownerWithContact(browser, page, context, mail, origin, index, verified);
         stage = 'reference_setup';
         const code = await setupCode(page, origin, owner.id, {navigation: index === 0});
@@ -91,8 +94,22 @@ async function runPages(browser, origin, mail, prepareClock) {
         assert.equal(originalTiming.notification_required, verified);
         await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Original request resumed'));
         assert.equal(await page.locator('#replace').isDisabled(), true);
+        assert.equal(await page.locator('#claim-state').textContent(), 'Waiting');
+        assert.equal(await page.locator('#claim-owner').textContent(), owner.id);
+        if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR && index === 0) {
+          const path = require('node:path');
+          for (const scheme of ['light', 'dark']) {
+            await page.emulateMedia({colorScheme: scheme});
+            for (const width of [320, 1440]) {
+              await page.setViewportSize({width, height: 1000});
+              await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, `recovery-waiting-${scheme}-${width}.png`), fullPage: true});
+            }
+          }
+        }
         if (index === 0) {
-          // A modified button is no authority: the server must still reject early completion.
+          // Revealing a future step and enabling its button grants no authority.
+          assert.equal(await page.locator('#replace-form').isHidden(), true);
+          await page.locator('#replace-form').evaluate(form => { form.hidden = false; });
           await page.locator('#replace-consent').check();
           await page.locator('#replace').evaluate(button => { button.disabled = false; });
           await page.locator('#replace').click();
@@ -112,6 +129,7 @@ async function runPages(browser, origin, mail, prepareClock) {
         assert.equal(readyTiming.expires_at_ms, originalTiming.expires_at_ms, 'clock fixture cannot extend original expiry');
         assert.equal(readyTiming.ready, true);
         await page.waitForFunction(() => !document.getElementById('replace').disabled);
+        if (index === 0) await captureScreen(page, 'recovery-replacement-ready');
         stage = 'replacement_native_create_and_assert';
         if (index === 3) await page.route('**/v1/passkeys/recovery/replacement/finish', async route => {
           assert.equal((await route.fetch()).status(), 204);
@@ -122,6 +140,7 @@ async function runPages(browser, origin, mail, prepareClock) {
         await page.locator('#replace-consent').check();
         await page.locator('#replace').click();
         await page.waitForFunction(lost => document.getElementById('status').textContent.startsWith(lost ? 'The operation was not confirmed.' : 'Recovery complete.'), index === 3);
+        if (index === 0) await captureScreen(page, 'recovery-complete');
         if (verified) await mail.recoveryEvent(address, 'completed');
         assert.equal(Date.now() - oldIssued < 110000, true, 'test infrastructure: old proof remains within its original two-minute lifetime');
         assert.equal((await post(page, '/v1/passkeys/authentication/finish', {transaction_id: oldPending.transaction_id, credential: oldProof})).status, 401, 'old genuine signed proof cannot survive replacement');
@@ -131,6 +150,7 @@ async function runPages(browser, origin, mail, prepareClock) {
         const current = await profile(page);assert.equal(current.id, owner.id);assert.equal(current.email === (verified ? address : null), true);
         if (verified) await mail.recoveryEvent(address, 'changed', 2);
         await storageIsEmpty(page);
+        assert.equal(cspViolations, 0, 'recovery controls preserve CSP');
         assert.equal(pageErrors, 0, 'no unhandled page errors');
       });
     } catch (error) {error.caseName = name; error.stageName = stage; throw error;}

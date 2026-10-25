@@ -1,5 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
+const {emailLimits} = require('./email-limits.cjs');
 
 async function usability(browser, origin, mail, guard) {
   const context = await browser.newContext();
@@ -37,6 +38,7 @@ async function usability(browser, origin, mail, guard) {
     assert.equal(await page.locator('#email-resend').isEnabled(), true);
     assert.equal(await page.locator('#heading').evaluate(node => node === document.activeElement), true);
     await page.unroute('**/v1/email/start');
+    await emailLimits(page);
 
     await page.getByRole('link', {name: 'Use another email or sign-in method', exact: true}).click();
     await page.getByRole('link', {name: 'Use a password instead', exact: true}).click();
@@ -73,7 +75,7 @@ async function usability(browser, origin, mail, guard) {
     assert.equal(await page.locator('#status').textContent(), '');
     assert.equal(await page.locator('#account').isVisible(), false);
     return {selected_methods_only: true, autocomplete: true, genuine_request_busy: true,
-      keyboard_inbox_resend: true, offline_error_clears_password: true, no_false_signin: true, ephemeral_theme: true, navigation_discards_old_result: true};
+      keyboard_inbox_resend: true, real_resend_limit: true, offline_error_clears_password: true, no_false_signin: true, ephemeral_theme: true, navigation_discards_old_result: true};
   } finally { release?.(); await context.close(); }
 }
 module.exports = {usability};

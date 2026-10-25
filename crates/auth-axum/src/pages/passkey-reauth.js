@@ -1,22 +1,38 @@
 "use strict";
-import {request, assertKey} from "/ui/browser-operations.js";
-import {confirmAction} from "/ui/view.js";
+import {request} from "/ui/browser-operations.js";
+import {confirmAction, element, announce} from "/ui/view.js";
+import {showAuthScreen} from "/ui/auth-screens.js";
 import {currentView, requireView} from "/ui/account.js";
 
-// The API remains authoritative about freshness. Never retry a credential finish.
-// Replacing this browser's session is explicit; other sessions are not revoked.
-export async function verifyPasskey(refresh, signedOut, requireCurrent) {
+let verificationOwner = null;
+window.addEventListener("pagehide", () => { verificationOwner = null; });
+
+// Reuse ordinary account-bound sign-in from a fresh, explicit button click.
+// No native prompt is chained to closing a dialog or to signing out.
+export async function verifyPasskey(signedOut, requireCurrent, caps) {
   const user = await requireCurrent();
   const current = currentView();
-  if (!await confirmAction("Verify to manage passkeys?", "For your security, this browser will be signed out before your device asks for this account’s passkey. Other sessions stay signed in. Cancel to keep your current sign-in.", "Verify with passkey")) return false;
+  if (!await confirmAction("Verify to manage passkeys?", "This browser will be signed out. Then choose Continue with your passkey to verify this account. Other sessions stay signed in. Cancel to keep your current sign-in.", "Sign out and continue")) return false;
   await requireCurrent();
   requireView(current);
   await request("/v1/logout", {});
   signedOut();
-  const started = await request("/v1/passkeys/authentication/start", {mode: "account_bound", account_id: user.id});
-  const credential = await assertKey(started.options);
-  await request("/v1/passkeys/authentication/finish", {transaction_id: started.transaction_id, credential});
-  const verified = await refresh();
-  if (!verified || verified.id !== user.id) throw Object.assign(new Error("Account changed"), {name: "PageChangedError"});
+  showAuthScreen(caps, "account-passkey");
+  verificationOwner = user.id;
+  element("passkey-account").value = user.id;
+  element("heading").textContent = "Verify your passkey";
+  element("intro").textContent = "Continue with a passkey for the account you were managing.";
+  announce("This browser is signed out. Choose Continue with your passkey to open your device prompt.");
+  element("account-passkey-form").querySelector('button[type="submit"]').focus();
+  return "pending";
+}
+
+// A loaded session only selects presentation. The inventory endpoint still
+// checks the real authentication method/freshness before revealing credentials.
+export function resumePasskeyManagement(user) {
+  if (!verificationOwner) return false;
+  const expected = verificationOwner;
+  verificationOwner = null;
+  if (user.id !== expected) throw Object.assign(new Error("Account changed"), {name: "PageChangedError"});
   return true;
 }

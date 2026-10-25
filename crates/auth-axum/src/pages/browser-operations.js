@@ -54,11 +54,11 @@ export function failure(error) {
   if (error.status === 401) return "Not authorized. Sign in freshly with a working key, or explicitly sign out before anonymous recovery. Check the account ID and browser binding; no weaker fallback is available.";
   if (error.status === 429) return "Too many attempts. Wait before trying again; do not start another claim or clear this browser's cookies.";
   if (error.name === "PageChangedError") return "The page changed while the operation was in progress. Resume in this browser; no sign-in or recovery is confirmed here.";
-  if (error.name === "PasskeyPromptError") return promptMessage(error);
+  if (error.name === "PasskeyPromptError") return `${passkeyPromptMessage(error)} Nothing here confirms sign-in or recovery. Resume status, or sign in with the new key if completion may have succeeded.`;
   if (error.name === "AbortError") return "The request was interrupted. Keep this browser and resume status; no sign-in or recovery is confirmed here.";
   return "The operation was not confirmed. Keep this browser and retry carefully. If a recovery finish response was lost, try normal sign-in with the new key.";
 }
-function promptMessage(error) {
+export function passkeyPromptMessage(error) {
   const operation = error.operation === "creation" ? "creation" : "verification";
   let result;
   switch (error.reason) {
@@ -68,7 +68,7 @@ function promptMessage(error) {
     case "security": result = "was rejected by browser security"; break;
     default: result = "failed before a usable credential response";
   }
-  return `Passkey ${operation} ${result}. Nothing here confirms sign-in or recovery. Resume status, or sign in with the new key if completion may have succeeded.`;
+  return `Passkey ${operation} ${result}.`;
 }
 async function nativePrompt(operation, action) {
   try { return await duringPage(action); }

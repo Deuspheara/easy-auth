@@ -21,6 +21,7 @@ async function cancelSignout(page) {
     await page.getByRole('dialog').waitFor({state: 'visible'});
     assert.equal(await page.getByRole('button', {name: 'Cancel', exact: true})
       .evaluate(node => node === document.activeElement), true);
+    if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) await page.screenshot({animations: 'disabled', path: require('node:path').join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'destructive-confirmation.png'), fullPage: true});
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]') &&
       document.activeElement === document.getElementById('revoke-all'));
@@ -46,6 +47,9 @@ async function accountKeyboard(page) {
   await page.keyboard.press('Enter');
   assert.equal(await page.locator('#heading').textContent(), 'Profile');
   assert.equal(await page.locator('#heading').evaluate(node => node === document.activeElement), true);
+  await page.keyboard.press('Shift+Tab');
+  assert.equal(await page.locator('#settings-query').evaluate(node => node === document.activeElement), true,
+    'search follows return navigation above the title');
   await page.keyboard.press('Shift+Tab');
   assert.equal(await page.locator('#account-back').evaluate(node => node === document.activeElement), true,
     'return navigation above the title remains reachable');

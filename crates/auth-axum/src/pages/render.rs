@@ -6,7 +6,8 @@ pub(crate) fn document(template: &str) -> Html<String> {
     Html(template.replace(
         "<!-- reference-style -->",
         &format!(
-            "<style>{}{}</style>",
+            "<style>{}{}{}</style><script type=\"module\" src=\"/ui/theme.js\"></script>",
+            include_str!("vendor/basecoat.css"),
             include_str!("tokens.css"),
             include_str!("reference.css")
         ),

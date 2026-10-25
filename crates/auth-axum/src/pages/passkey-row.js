@@ -11,11 +11,17 @@ function renameForm(key, current, requireCurrent, refresh) {
   const label = document.createElement("label");
   label.textContent = "Passkey name";
   const input = document.createElement("input");
+  input.className = "input";
+  const field = document.createElement("div");
+  field.className = "field";
+  label.className = "label";
+  input.id = "key-name-" + key.id;
+  label.htmlFor = input.id;
   input.value = key.label;
   input.required = true;
   input.maxLength = 256;
   input.autocomplete = "off";
-  label.append(input);
+  field.append(label, input);
   const save = actionButton("Save name", async () => {
     if (!input.reportValidity()) return;
     await requireCurrent();
@@ -25,7 +31,7 @@ function renameForm(key, current, requireCurrent, refresh) {
     notify("Passkey name updated.");
   });
   save.setAttribute("aria-label", "Save name for " + key.label);
-  form.append(label, save);
+  form.append(field, save);
   form.addEventListener("submit", event => { event.preventDefault(); save.click(); });
   return {form, edit: () => { form.hidden = !form.hidden; if (!form.hidden) input.focus(); }};
 }
@@ -33,8 +39,8 @@ function renameForm(key, current, requireCurrent, refresh) {
 export function keyRow(key, current, requireCurrent, refresh) {
   const row = document.createElement("li");
   const heading = document.createElement("div");
-  heading.className = "object-row";
-  const copy = document.createElement("div");
+  heading.className = "item object-row";
+  const copy = document.createElement("section");
   copy.className = "object-copy";
   const title = document.createElement("h3");
   title.textContent = key.label;

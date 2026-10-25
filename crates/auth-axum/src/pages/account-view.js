@@ -1,5 +1,6 @@
 "use strict";
-import {element, clearSecrets} from "/ui/view.js";
+import {clearFeedback} from "/ui/feedback.js";
+import {cancelPresentation, present, element, clearSecrets} from "/ui/view.js";
 
 let panel = "overview";
 let allowed = new Set(["overview", "details", "sessions"]);
@@ -7,12 +8,14 @@ const descriptions = {overview: "Your profile and security settings.", sessions:
 const titles = {overview: "Account", sessions: "Sessions", details: "Profile", passkeys: "Passkeys", password: "Password sign-in"};
 
 export function showAccountPanel(requested, focus = true) {
+  cancelPresentation();
+  clearFeedback();
   panel = allowed.has(requested) ? requested : "overview";
   for (const node of document.querySelectorAll("[data-account-panel]")) node.hidden = node.dataset.accountPanel !== panel;
   element("account-back").hidden = panel === "overview";
   element("heading").textContent = titles[panel];
   element("intro").textContent = descriptions[panel];
-  if (focus) element("heading").focus();
+  if (focus) { element("heading").focus(); present(document.querySelector(`[data-account-panel="${panel}"]`)); }
 }
 
 export function resetAccountPanels() {
@@ -36,7 +39,7 @@ export function bindAccountViews() {
       const form = element(button.dataset.reveal);
       form.hidden = !form.hidden;
       button.setAttribute("aria-expanded", String(!form.hidden));
-      if (!form.hidden) form.querySelector("input").focus();
+      if (!form.hidden) { form.querySelector("input").focus(); present(form, true); }
     });
   }
 }

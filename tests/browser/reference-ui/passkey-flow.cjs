@@ -1,5 +1,8 @@
 'use strict';
+const {captureScreen} = require('./capture.cjs');
 const assert = require('node:assert/strict');
+const {settingsSearch} = require('./refinement.cjs');
+const {contrast} = require('./presentation.cjs');
 const {withAuthenticator} = require('../passkeys/browser.cjs');
 const {accountLayout} = require('./account-layout.cjs');
 
@@ -22,6 +25,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Account created. Your passkey is ready.'));
       assert.notEqual(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
       assert.equal(await page.locator('#password-enrollment').isVisible(), false);
+      await settingsSearch(page, false);
       await page.locator('#refresh-passkeys').click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 1);
       assert.equal(await page.locator('#passkeys-summary').textContent(), '1 registered passkey');
@@ -30,10 +34,18 @@ async function passkeyFlow(browser, origin, mail, guard) {
         await page.evaluate(() => document.fonts.ready);
         for (const scheme of ['light', 'dark']) {
           await page.emulateMedia({colorScheme: scheme});
+        const colors = await page.evaluate(() => {
+          const heading = document.querySelector('#current-session h3');
+          const badge = heading.querySelector('.badge');
+          return {heading: getComputedStyle(heading).color, page: getComputedStyle(document.body).backgroundColor,
+            badge: getComputedStyle(badge).color, surface: getComputedStyle(badge).backgroundColor};
+        });
+        assert.equal(contrast(colors.heading, colors.page) >= 4.5, true, 'session heading theme contrast');
+        assert.equal(contrast(colors.badge, colors.surface) >= 4.5, true, 'current badge theme contrast');
           for (const width of [320, 1440]) {
             await page.setViewportSize({width, height: 1000});
             assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-            await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
+            await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR,
               'passkeys-' + scheme + '-' + width + '.png'), fullPage: true});
           }
         }
@@ -46,6 +58,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
         isUserVerified: true, automaticPresenceSimulation: true
       }});
       await page.locator('#add-passkey').click();
+      await captureScreen(page, 'passkey-add');
       await page.locator('#key-label').fill('Reference spare');
       await page.getByRole('button', {name: 'Add a passkey', exact: true}).click();
       await page.waitForFunction(() => document.querySelectorAll('#passkeys > li').length === 2);
@@ -53,12 +66,14 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await cdp.send('WebAuthn.setAutomaticPresenceSimulation', {authenticatorId, enabled: true});
       const spare = page.locator('#passkeys > li').filter({has: page.getByText('Reference spare', {exact: true})});
       await spare.getByRole('button', {name: 'Rename Reference spare', exact: true}).click();
+      await captureScreen(page, 'passkey-rename');
       await spare.getByLabel('Passkey name', {exact: true}).fill('Reference renamed');
       await spare.getByRole('button', {name: 'Save name for Reference spare', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent === 'Passkey name updated.');
       assert.equal(await page.getByRole('button', {name: 'Remove Reference renamed', exact: true}).isVisible(), true);
       await page.getByRole('button', {name: 'Remove Reference renamed', exact: true}).click();
       await page.getByRole('dialog').waitFor({state: 'visible'});
+      await captureScreen(page, 'passkey-removal-confirmation');
       await page.keyboard.press('Escape');
       await page.getByRole('dialog').waitFor({state: 'hidden'});
       assert.equal(await page.locator('#passkeys > li').count(), 2);
@@ -72,10 +87,12 @@ async function passkeyFlow(browser, origin, mail, guard) {
       await page.getByRole('button', {name: 'Account details', exact: true}).click();
       await page.getByRole('button', {name: 'Add contact email', exact: true}).click();
       const email = mail.recipient(3);
+      await captureScreen(page, 'contact-email-form');
       await page.locator('#contact-email').fill(email);
       await page.getByRole('button', {name: 'Send contact confirmation', exact: true}).click();
       await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Check your contact email'));
       await page.goto(await mail.link(email, origin, 'Confirm contact email', '/email-attach'));
+      await captureScreen(page, 'contact-email-confirmation');
       await page.locator('#confirm').click();
       await page.waitForFunction(() => document.getElementById('status').textContent.startsWith('Contact email confirmed.'));
       assert.equal(new URL(page.url()).hash, '');
@@ -99,16 +116,24 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.notEqual(await page.locator('#mailbox-actions').getAttribute('hidden'), null);
       await page.waitForFunction(() => document.querySelectorAll('#sessions > li').length === 1 &&
         document.getElementById('providers-card').dataset.loaded === 'true');
-      await page.waitForFunction(() => document.getElementById('status').textContent === '');
+      assert.equal(await page.locator('#status').textContent(), 'Signed in with a passkey.', 'confirmed feedback remains inline');
       await page.evaluate(() => document.fonts.ready);
       for (const scheme of ['light', 'dark']) {
         await page.emulateMedia({colorScheme: scheme});
+        const colors = await page.evaluate(() => {
+          const heading = document.querySelector('#current-session h3');
+          const badge = heading.querySelector('.badge');
+          return {heading: getComputedStyle(heading).color, page: getComputedStyle(document.body).backgroundColor,
+            badge: getComputedStyle(badge).color, surface: getComputedStyle(badge).backgroundColor};
+        });
+        assert.equal(contrast(colors.heading, colors.page) >= 4.5, true, 'session heading theme contrast');
+        assert.equal(contrast(colors.badge, colors.surface) >= 4.5, true, 'current badge theme contrast');
         for (const width of [320, 1440]) {
           await page.setViewportSize({width, height: 1000});
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
           if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
             const path = require('node:path');
-            await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + scheme + '-' + width + '.png'), fullPage: true});
+            await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + scheme + '-' + width + '.png'), fullPage: true});
           }
         }
         await page.setViewportSize({width: 320, height: 844});
@@ -116,7 +141,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         if (process.env.EASY_AUTH_UI_SCREENSHOT_DIR) {
           const path = require('node:path');
-          await page.screenshot({path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + scheme + '-320-text200.png'), fullPage: true});
+          await page.screenshot({animations: 'disabled', path: path.join(process.env.EASY_AUTH_UI_SCREENSHOT_DIR, 'account-' + scheme + '-320-text200.png'), fullPage: true});
         }
         await page.evaluate(() => { document.documentElement.style.removeProperty('font-size'); });
       }

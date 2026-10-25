@@ -43,7 +43,7 @@ Profile details use labelled name/email fields and keep account deletion separat
 Account recovery explains how a saved code can help when all passkeys are lost;
 save it before losing access. Recovery still requires the account ID, its waiting
 period and the existing experimental composition.
-Select the identity row for profile details, or a security row for password,
+Select Personal information for profile details, or a security row for password,
 passkey or recovery management. A passkey count follows a successful explicit
 inventory read; unknown inventory and recovery status are not guessed.
 Long email addresses truncate in the overview and wrap in full in profile details.
@@ -57,7 +57,7 @@ check are available in **Account details → Advanced developer details**.
 Metadata refreshes after actions and when returning to the visible page; it avoids
 interrupting active operations and resets unfinished forms when an owner change is
 observed. Failures expose retry; healthy views have no manual refresh control.
-Success notifications expire after eight seconds. Errors and confirmation-link
+Success feedback remains inline until the next operation replaces it. Errors and confirmation-link
 instructions remain visible. Only other sessions have an individual revoke action;
 this browser’s sign-out and confirmed sign-out everywhere are separate.
 Keyboard users can open Profile and Sessions and return to the account heading.
@@ -84,9 +84,17 @@ reauthenticated deletion are presented separately. This string does not prove
 freshness or the authentication method. Existing backend restrictions remain
 authoritative, including genuine fresh passkey proof and another proven key for
 key removal. Choose **Manage passkeys** to retrieve
-this sensitive inventory explicitly. If the server requires fresh passkey proof,
-confirm native verification: this browser signs out and asks for the same account’s
-passkey, then returns to management. Other sessions stay signed in; Cancel leaves
+this sensitive inventory explicitly. Opening the page never initiates sign-out.
+If the server requires fresh passkey proof, use **Verify access**, then confirm
+native verification: this browser signs out and opens the account-bound sign-in
+form with the same public account ID. Choose **Continue with your passkey** to
+open the device prompt from a fresh click. A successful same-owner sign-in returns
+to management; the inventory endpoint still checks fresh authentication. Failed
+prompts keep the selected account available for an explicit retry with a new
+server challenge. Adding a key does not upgrade the current
+session's authentication method. An accepted addition is confirmed even when
+fresh verification is still needed to display the inventory. Other sessions stay
+signed in; Cancel leaves
 the current sign-in intact. Failed or interrupted finish is never automatically
 retried. Account-bound owner checks and normal APIs remain authoritative. No weaker recovery is selected after a rejection.
 
@@ -103,9 +111,11 @@ are cleared on completion/navigation; callback and recovery proofs keep their
 existing transport and lifetime rules. No browser storage or third-party resource
 is added. Themes follow the OS; the root light/dark toggle is temporary for the
 current page. The compact, neutral presentation uses a locally bundled Inter
-font, semantic tokens and native controls. There is no decorative animation.
+font, semantic tokens and Basecoat native controls. Optional Motion provides brief
+view/supporting entrances; reduced motion, forced colors or module failure retain
+the static usable presentation. See the [asset and state record](../design/reference-ui-modernization.md).
 See the [authentication design contract](../design/reference-ui.md) for the
-adaptation and the separate, pending visual approval.
+adaptation and the recorded owner approval.
 
 ## Verification and limits
 
@@ -120,7 +130,7 @@ temporary theme, empty browser storage and no external request or page error.
 Light/dark layouts pass measured contrast and 320/390/768/1024/1280/1440px reflow;
 both sign-in and account views pass 320px/200% text. Local Inter loading is checked.
 Anonymous and authenticated light/dark mobile/desktop layouts were inspected
-locally. The revised compact design remains pending the owner's visual decision.
+locally. The owner approved the rendered design and verification journey on 2026-10-25.
 Contrast and reflow targets follow [WCAG text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
 and [reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html). Those targets
 are not a completed accessibility audit or assistive-device certification.
@@ -141,3 +151,25 @@ account policy metadata and the exact stylesheet hash permission. Existing stric
 CSP, no-store/no-referrer, Origin, HttpOnly cookies and current-source checks remain.
 SAML independent review was waived under ADR0032, not performed; manual provider,
 physical-device and production assurance remain separate.
+
+## Settings search and recovery presentation
+
+Signed-in account screens and recovery setup offer local account-settings search.
+Use Cmd+K on macOS or Ctrl+K elsewhere to focus it; Escape clears results. Search
+uses fixed destination labels/synonyms and current server composition/account
+policy, without searching personal data or fetching credential/session inventories.
+It is absent on anonymous authentication and lost-access recovery pages.
+
+Account and recovery pages use a 660px maximum column; anonymous authentication
+and password reset use 400px. Both retain responsive gutters and consistent Back
+controls. Recovery setup separates verifying access,
+preparing a code, saving/confirming and completion. An existing session can be
+selected explicitly, but that does not establish fresh passkey authentication:
+preparation still requires acceptance by the existing server policy. Lost-access
+recovery separates start/resume, waiting, replacement and completion. Dates and
+readiness are server facts; there is no automatic polling or timer-based authority.
+
+Field errors appear below the input; action errors and persistent results appear
+beside the relevant action. Optional information buttons expose supplementary
+help; essential recovery consequences and consent remain visible. Navigation
+clears stale feedback and pending recovery code display.
