@@ -35,7 +35,7 @@ pub(super) async fn start(
     let source = source_key(source);
     let start = state
         .services
-        .authorization
+        .operation
         .begin(&OAuthIntent {
             browser: &browser,
             source: &source,
@@ -105,7 +105,7 @@ pub(super) async fn cancel(
     let source = source_key(source);
     let result = state
         .services
-        .authorization
+        .operation
         .cancel(
             &OAuthIntent {
                 browser: &transaction.browser,

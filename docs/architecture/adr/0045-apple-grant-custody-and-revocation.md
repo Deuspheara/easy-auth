@@ -171,3 +171,30 @@ client's certificate rejection before the server had recorded its second failure
 its corrected observer waits for the actual handshake count without changing the
 certificate assertion. HTTP/browser integration and full ticket acceptance remain
 in progress. These fixtures do not establish a registered Apple revocation result.
+
+
+## Explicit web capture selection checkpoint
+
+Axum `apple-grants-web` now selects captured sign-in through
+`AppleWebServices::new_with_grants` and, when social linking is also selected,
+captured linking through `SocialWebServices::new_with_apple_grants`. Each private
+closed selector pairs its concrete authorization with the matching final core
+operation. Existing builders retain credential discard. Construction preserves
+web registration/source/realm matching; missing repository protection rejects the
+final commit with503 rather than selecting fallback.
+
+Completion orchestration moved out of HTTP handlers in a separate tested commit.
+The selected paths retain existing Origin/private-cookie/purpose/nonce/one-use
+checks, state-only UI selection, cross-site cookie-free handoff and explicit owner
+confirmation. Public routes, DTOs, scripts and contracts acquire no credential
+field or worker endpoint. Unlink remains local and queues protected work atomically;
+the explicitly composed background worker/maintenance remain separate lifetimes.
+
+HTTP tests now exercise actual signed selected capture/link completion, absent
+protection, nonce/realm/concurrent callback controls, disable/audit rollback,
+source-session unlink restrictions and the complete local unlink-to-worker path.
+An initial multi-fixture setup reused one registered callback across realms and
+correctly failed the existing global unique redirect constraint with Unavailable.
+Fixtures now use distinct origins or separate owned test databases; no constraint,
+authorization assertion or source binding was relaxed. Genuine browser-to-worker
+qualification and migration/disabled-component coverage remain outstanding.

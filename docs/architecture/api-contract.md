@@ -55,6 +55,24 @@ PostgreSQL adapter using `with_apple_grant_vault`; missing configuration returns
 Unavailable and rolls back all local authority. Compiling the feature changes
 neither the normal Apple router nor its selected services.
 
+Axum `apple-grants-web` supplies explicit
+`AppleWebServices::new_with_grants(policy,transactions,exchange,sign_in)` using
+`AppleGrantSignIn`. Together with `social-linking-web`,
+`SocialWebServices::new_with_apple_grants` selects the matching Apple transactions,
+exchange and `AppleGrantLinking`, retaining ordinary Google and local unlink
+services. Source/policy/realm and web-only registration checks apply at construction.
+The existing `new` builders still discard credentials even with capture compiled.
+The selected grant services require the same protected PostgreSQL vault at final
+commit; absence returns503 without a normal-flow fallback.
+
+No HTTP route, body, public token field or browser script is added. The selected
+flows retain original Origin, private cookies, purpose, state-only presentation,
+cross-site handoff, explicit confirmation and one-use callback checks. Grant data
+stays behind signed proof and atomic encryption; a successful finish never returns
+provider credentials. Local unlink queues every captured grant atomically and
+returns before provider I/O. Selecting these services schedules no worker or
+maintenance; operators must explicitly compose both.
+
 The repository-only `into_parts` boundary exposes a mapped proof and opaque
 `AppleGrantCapture`, never a raw credential. Its `seal(binding,vault)` requires
 the same realm/source/client. The transaction supplies the identity actually
@@ -78,7 +96,7 @@ under the configured current storage key using a row lock and version CAS. It
 skips busy/leased/finished rows, preserves binding/deadlines, changes no provider
 token and claims no remote success. Retain explicit old reading keys until
 migration completes; missing keys never select fallback. See
-[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). HTTP/browser integration and real-provider/production acceptance remain pending.
+[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). Genuine browser-to-worker qualification and real-provider/production acceptance remain pending.
 
 `AppleGrantRevoker::new` selects one immutable Apple source, the shared protected
 `Arc<AppleClientSecretSigner>`, vault, repository and checked HTTPS adapters.

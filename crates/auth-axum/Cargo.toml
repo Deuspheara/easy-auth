@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+apple-grants-web = ["apple-web", "auth-core/apple-grants", "auth-postgres/apple-grants"]
 social-linking-web = ["google-web", "apple-web", "auth-core/oidc-linking", "auth-postgres/oidc-linking"]
 issuer-native-web = ["issuer-token-management-web", "issuer-native-consent-web"]
 issuer-native-consent-web = ["issuer-consent-web", "auth-core/issuer-native-refresh", "auth-postgres/issuer-native-refresh"]

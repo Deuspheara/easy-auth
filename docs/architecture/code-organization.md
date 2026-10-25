@@ -1,3 +1,15 @@
+Explicit Axum Apple capture extends owning `apple/authorization.rs` and
+`social/apple_authorization.rs` with closed concrete service selection; completion
+orchestration lives in named completion modules after separate extraction. Default
+builders keep discard behavior. The longer dual-path completion functions keep
+original intent/proof, verified result classification and matching core commit
+visible together as function-size exceptions; no HTTP policy/SQL/crypto or generic
+provider abstraction is added. Apple fixture construction was extracted separately
+before extension. Selected HTTP suites separate lifecycle, atomic faults and worker
+composition, reusing the maintained signing producer. New modules stay below300
+lines. Browser/migration qualification remains in progress; no unrelated cleanup
+is deferred.
+
 # Code organization
 
 Apple grant capture extends `oidc/apple/grants/` with explicit authorization,

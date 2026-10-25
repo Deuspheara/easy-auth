@@ -182,7 +182,14 @@ rewrapping confirms revocation at Apple. Explicit Rust revocation workers and th
 server HTTPS adapter now process leased jobs with bounded retries. Configure the
 same protected signer and retained storage keys; schedule realm maintenance even
 when no source worker is running. Expired unconfirmed material is erased only by
-maintenance, never reported as successful revocation. HTTP/browser integration
-remains in development; ordinary startup selects none of these services. See the
+maintenance, never reported as successful revocation. For explicit web capture, select Axum `apple-grants-web` and construct
+`AppleWebServices::new_with_grants` with the matching `AppleGrantSignIn` repository.
+For account linking also select `social-linking-web` and use
+`SocialWebServices::new_with_apple_grants`. The ordinary `new` builders continue
+discarding credentials. Missing vault configuration fails the final local commit;
+it never selects the ordinary flow as fallback. Existing cookies, consent pages,
+Origin and cross-site delivery rules stay authoritative. These builders schedule
+no worker or maintenance. Genuine browser-to-worker qualification remains in
+development; ordinary startup selects none of these services. See the
 [Rust contract](../architecture/api-contract.md#optional-rust-apple-grant-capture-in-progress)
 and [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md).

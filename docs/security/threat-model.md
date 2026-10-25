@@ -16,8 +16,11 @@ prevent stale acknowledgment; lost responses retry after bounded backoff. Errors
 retain ciphertext with finite categories, never raw provider details. Explicit
 bounded realm maintenance erases expired unconfirmed ciphertext and later terminal
 metadata; it must be scheduled even without active source workers. No automatic
-TTL or real-provider qualification is established. HTTP/browser integration remains
-pending. A job or elapsed token lifetime never establishes remote revocation.
+TTL or real-provider qualification is established. Explicit Axum capture/link selection keeps matching concrete authorization and
+final commit services together; default builders still discard credentials.
+Missing protection cannot select fallback, and raw grants never reach HTTP output.
+Original cookies, purpose, Origin, cross-site delivery and local owner checks remain
+unchanged. Genuine browser-to-worker qualification remains pending. A job or elapsed token lifetime never establishes remote revocation.
 
 Explicit social web linking requires trusted concrete selection, exact-Origin
 closed JSON and four independent host-only private Link cookies per provider.

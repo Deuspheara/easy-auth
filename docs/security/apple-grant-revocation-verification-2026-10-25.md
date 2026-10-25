@@ -120,3 +120,45 @@ together as justified function-size exceptions. Published migration0038 is uncha
 No unrelated cleanup is deferred. Development uses the isolated checkout; all73
 protected original files retain exact bytes/change set and the original index is
 empty.
+
+
+## Explicit HTTP capture/link checkpoint
+
+Separate completion extraction `5cb0125` passed strict Axum all-feature Clippy and
+all30 preexisting Apple/social HTTP cases. Apple fixture constructor extraction
+`4b09c0b` also passed those cases before adding custody selection to the fixture.
+The extraction's initial compile checks found missing moved imports (`Secret`,
+`PgPool`, `Mail`); they were corrected without suppression or assertion changes.
+
+Axum `apple-grants-web` now exposes `AppleWebServices::new_with_grants` and, with
+social linking selected, `SocialWebServices::new_with_apple_grants`. Private closed
+selectors pair concrete authorization/commit services. Default builders retain
+discard behavior; no new route/DTO/script, credential upload or worker endpoint is
+introduced. Existing purpose, owner, Origin, private cookie, one-use callback,
+nonce/source/realm and final database boundaries remain authoritative. Missing
+vault returns503 and rolls back instead of falling back to an ordinary commit.
+
+This HTTP selection freeze passed formatting and strict Axum all-target/all-feature
+Clippy, all221 HTTP cases with real owned PostgreSQL (0 failed/ignored), and strict
+Axum Clippy plus17 Apple/13 social cases with only `social-linking-web` selected,
+without capture. Ten new cases verify default discard with capture compiled,
+explicit signed capture including repeated grants, no-vault rejection, foreign
+realm/private proof and concurrent callback isolation, signed bad nonce, actual
+provider-post disable, audit rollback, link/sign-in-to-local-unlink-to-worker,
+provider error/backoff visibility and retained-local-session isolation.
+
+The first10-case increment originally contained9 tests:6 passed and3 fixture setup
+failed with Unavailable. Those tests attempted a second realm registration with
+the first realm's exact callback. Migration0016 intentionally makes redirect URI
+globally unique. Distinct origins and separate owned SQLx databases now preserve
+that boundary; the split control produces10 passing cases. No assertion, redirect
+constraint, protocol policy or feature gate was relaxed. No provider code/secret
+or raw diagnostics are recorded here.
+
+New source modules stay below100 lines and fixtures below200. The longer two-path
+completion methods retain original intent/proof, verified classification and
+matching core commit together as reviewed function-size exceptions. These HTTP
+checks supplement the earlier backend matrix; they do not replace the final
+workspace/security matrix after integration. Genuine owned browser-to-worker,
+migration/disabled-component coverage and live-provider qualification remain
+separate outstanding gates. Ordinary startup schedules no worker/maintenance.

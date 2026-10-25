@@ -6,7 +6,29 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 pub(super) async fn create(pool: PgPool, origin: &str) -> Fixture {
-    let store = Arc::new(Postgres::new(pool.clone()));
+    compose(pool, origin, Custody::Discard).await
+}
+#[cfg(feature = "apple-grants-web")]
+pub(super) async fn with_grants(
+    pool: PgPool,
+    origin: &str,
+    vault: Option<Arc<AppleGrantVault>>,
+) -> Fixture {
+    compose(pool, origin, Custody::Capture(vault)).await
+}
+enum Custody {
+    Discard,
+    #[cfg(feature = "apple-grants-web")]
+    Capture(Option<Arc<AppleGrantVault>>),
+}
+async fn compose(pool: PgPool, origin: &str, custody: Custody) -> Fixture {
+    let store = Postgres::new(pool.clone());
+    #[cfg(feature = "apple-grants-web")]
+    let store = match &custody {
+        Custody::Capture(Some(vault)) => store.with_apple_grant_vault(vault.clone()),
+        _ => store,
+    };
+    let store = Arc::new(store);
     store.migrate().await.unwrap();
     let realm = Uuid::new_v4();
     store.ensure_realm(realm).await.unwrap();
@@ -46,15 +68,25 @@ pub(super) async fn create(pool: PgPool, origin: &str) -> Fixture {
         )
         .unwrap(),
     );
-    let services = AppleWebServices::new(
-        policy.clone(),
-        Arc::new(OAuthTransactions::new(
-            policy.configuration().clone(),
-            store.clone(),
-        )),
-        exchange,
-        Arc::new(OidcSignIn::new(store.clone())),
-    )
+    let transactions = Arc::new(OAuthTransactions::new(
+        policy.configuration().clone(),
+        store.clone(),
+    ));
+    let services = match custody {
+        Custody::Discard => AppleWebServices::new(
+            policy.clone(),
+            transactions,
+            exchange,
+            Arc::new(OidcSignIn::new(store.clone())),
+        ),
+        #[cfg(feature = "apple-grants-web")]
+        Custody::Capture(_) => AppleWebServices::new_with_grants(
+            policy.clone(),
+            transactions,
+            exchange,
+            Arc::new(AppleGrantSignIn::new(store.clone())),
+        ),
+    }
     .unwrap();
     let auth = Auth::new(realm, store.clone(), Arc::new(Mail::default()));
     let app = experimental_apple_web_router(

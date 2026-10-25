@@ -32,6 +32,8 @@ pub(super) struct Fixture {
     pub google_services: GoogleWebServices,
     pub apple_services: AppleWebServices,
     pub services: SocialWebServices,
+    #[cfg(feature = "apple-grants-web")]
+    pub apple_signer: Arc<AppleClientSecretSigner>,
 }
 pub(super) struct Attempt {
     pub cookie: String,

@@ -1,3 +1,4 @@
+mod authorization;
 mod completion;
 mod contract;
 mod delivery;

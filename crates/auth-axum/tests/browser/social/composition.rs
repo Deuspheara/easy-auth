@@ -7,7 +7,28 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 pub(super) async fn create(pool: sqlx::PgPool) -> Fixture {
-    let store = Arc::new(Postgres::new(pool.clone()));
+    compose(pool, Custody::Discard).await
+}
+#[cfg(feature = "apple-grants-web")]
+pub(super) async fn with_grants(
+    pool: sqlx::PgPool,
+    vault: Option<Arc<AppleGrantVault>>,
+) -> Fixture {
+    compose(pool, Custody::Capture(vault)).await
+}
+enum Custody {
+    Discard,
+    #[cfg(feature = "apple-grants-web")]
+    Capture(Option<Arc<AppleGrantVault>>),
+}
+async fn compose(pool: sqlx::PgPool, custody: Custody) -> Fixture {
+    let store = Postgres::new(pool.clone());
+    #[cfg(feature = "apple-grants-web")]
+    let store = match &custody {
+        Custody::Capture(Some(vault)) => store.with_apple_grant_vault(vault.clone()),
+        _ => store,
+    };
+    let store = Arc::new(store);
     store.migrate().await.unwrap();
     let realm = Uuid::new_v4();
     store.ensure_realm(realm).await.unwrap();
@@ -66,12 +87,13 @@ pub(super) async fn create(pool: sqlx::PgPool) -> Fixture {
             .await
             .unwrap();
     let (apple, signer) = apple_provider::Provider::new(now as u64);
+    let signer = Arc::new(signer);
     let apple_exchange = Arc::new(
-        AppleCodeExchange::new(
+        AppleCodeExchange::with_shared_signer(
             apple_policy.configuration().clone(),
             store.clone(),
             store.clone(),
-            signer,
+            signer.clone(),
             AppleClientType::Web,
             apple.clone(),
             apple.clone(),
@@ -95,23 +117,48 @@ pub(super) async fn create(pool: sqlx::PgPool) -> Fixture {
         Arc::new(OidcAccountDeletion::new(store.clone())),
     )
     .unwrap();
-    let apple_services = AppleWebServices::new(
-        apple_policy.clone(),
-        apple_transactions.clone(),
-        apple_exchange.clone(),
-        sign_in,
-    )
-    .unwrap();
-    let services = SocialWebServices::new(
-        google_services.clone(),
-        apple_services.clone(),
-        Arc::new(
-            GoogleIdentityLinkAuthorization::new_session_age(google_transactions, google_exchange)
-                .unwrap(),
+    let apple_services = match &custody {
+        Custody::Discard => AppleWebServices::new(
+            apple_policy.clone(),
+            apple_transactions.clone(),
+            apple_exchange.clone(),
+            sign_in,
         ),
-        Arc::new(AppleIdentityLinkAuthorization::new(apple_transactions, apple_exchange).unwrap()),
-        Arc::new(OidcIdentityLinking::new(store.clone())),
-    )
+        #[cfg(feature = "apple-grants-web")]
+        Custody::Capture(_) => AppleWebServices::new_with_grants(
+            apple_policy.clone(),
+            apple_transactions.clone(),
+            apple_exchange.clone(),
+            Arc::new(AppleGrantSignIn::new(store.clone())),
+        ),
+    }
+    .unwrap();
+    let google_link = Arc::new(
+        GoogleIdentityLinkAuthorization::new_session_age(google_transactions, google_exchange)
+            .unwrap(),
+    );
+    let linking = Arc::new(OidcIdentityLinking::new(store.clone()));
+    let services = match custody {
+        Custody::Discard => SocialWebServices::new(
+            google_services.clone(),
+            apple_services.clone(),
+            google_link,
+            Arc::new(
+                AppleIdentityLinkAuthorization::new(apple_transactions, apple_exchange).unwrap(),
+            ),
+            linking,
+        ),
+        #[cfg(feature = "apple-grants-web")]
+        Custody::Capture(_) => SocialWebServices::new_with_apple_grants(
+            google_services.clone(),
+            apple_services.clone(),
+            google_link,
+            apple_transactions,
+            apple_exchange,
+            Arc::new(AppleGrantLinking::new(store.clone())),
+            linking,
+        ),
+    }
     .unwrap();
     let mail = Arc::new(Mail::default());
     let auth = Auth::new(realm, store.clone(), mail.clone());
@@ -134,5 +181,7 @@ pub(super) async fn create(pool: sqlx::PgPool) -> Fixture {
         google_services,
         apple_services,
         services,
+        #[cfg(feature = "apple-grants-web")]
+        apple_signer: signer,
     }
 }

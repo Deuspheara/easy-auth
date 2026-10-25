@@ -1,5 +1,6 @@
 mod actor;
 mod apple;
+mod apple_authorization;
 mod apple_completion;
 mod contract;
 mod google;

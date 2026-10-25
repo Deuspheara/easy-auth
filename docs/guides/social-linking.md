@@ -84,3 +84,24 @@ Google/Apple interoperability, Apple grant lifecycle, ordinary activation,
 independent review or production readiness. See the [Google](google.md) and
 [Apple](apple-setup.md) acceptance limits. The SAML waiver and outbound OIDC release
 gate remain unchanged.
+
+
+## Optional protected Apple grant selection
+
+The separate Axum `apple-grants-web` feature adds
+`AppleWebServices::new_with_grants` for Apple sign-in and
+`SocialWebServices::new_with_apple_grants` for Apple linking. Supply matching core
+grant services backed by the PostgreSQL adapter with an explicit protected vault.
+The original `new` builders continue discarding provider credentials. Capture
+failure cannot silently fall back to local success without protection.
+
+The existing confirmation/cookie/Origin and retained-method unlink rules still
+apply. Successful local unlink queues captured Apple grants without waiting on
+Apple; it does not claim remote success or erase pending credentials. Explicit
+workers and realm maintenance own eventual revocation/expiry. They are not
+scheduled by selecting HTTP services. No credential upload, raw grant output,
+worker route or new application permission is introduced. See the
+[Apple grant contract](../architecture/api-contract.md#optional-rust-apple-grant-capture-in-progress)
+and [lifecycle limits](account-lifecycle.md#experimental-apple-capture-and-pending-revocation).
+Owned genuine browser-to-worker and registered-provider qualification remain
+separate; default startup and release gates are unchanged.
