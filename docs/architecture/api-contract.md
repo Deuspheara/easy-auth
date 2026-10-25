@@ -1,5 +1,16 @@
 # HTTP contract v1
 
+The optional Rust-only Apple boundary exposes `AppleClientSecretSigner`,
+`AppleCodeExchange` and `AppleAuthorization` behind core/PostgreSQL `apple`.
+Preparation returns private proof separately from public web/native request
+inputs. Strict form decoding is untrusted; completion requires the retained
+operation/private proof and actual trusted dedicated backend return. Success
+returns the existing opaque verified identity, with unsigned first-consent profile
+separate; mapping/final session commit retain existing contracts. No new ordinary
+HTTP path, JSON DTO, cookie, OpenAPI operation or `AUTH_APPLE_*` setting is added.
+This component does not establish native OS or cross-site HTTP delivery. See the
+[Apple guide](../guides/apple-setup.md) and [ADR0043](adr/0043-apple-code-flow.md).
+
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.

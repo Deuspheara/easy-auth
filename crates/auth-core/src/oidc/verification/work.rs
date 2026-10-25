@@ -33,10 +33,20 @@ impl SignatureWork {
     }
 }
 
+#[cfg(feature = "oidc-client")]
 pub(super) async fn attempt(
     token: &OidcIdToken,
     document: OidcJwksDocument,
     lease: Arc<OwnedSemaphorePermit>,
+) -> Result<Attempt> {
+    attempt_for_profile(token, document, lease, false).await
+}
+
+pub(super) async fn attempt_for_profile(
+    token: &OidcIdToken,
+    document: OidcJwksDocument,
+    lease: Arc<OwnedSemaphorePermit>,
+    apple: bool,
 ) -> Result<Attempt> {
     let token = token.0.clone();
     tokio::task::spawn_blocking(move || {
@@ -50,7 +60,11 @@ pub(super) async fn attempt(
         let (payload, _) = josekit::jws::deserialize_compact(token.as_bytes(), verifier.as_ref())
             .map_err(|_| Error::Unauthorized)?;
         let payload = Zeroizing::new(payload);
-        let claims = serde_json::from_slice(&payload).map_err(|_| Error::Unauthorized)?;
+        let claims: Box<Claims> =
+            serde_json::from_slice(&payload).map_err(|_| Error::Unauthorized)?;
+        // Preserve generic OIDC's original signed-type failure before the final
+        // repository check; only the explicit Apple verifier accepts text flags.
+        claims.validate_email_flag_type(apple)?;
         Ok(Attempt::Claims(claims))
     })
     .await

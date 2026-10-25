@@ -91,7 +91,12 @@ pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 
 #[cfg(feature = "apple")]
-pub use oidc::{AppleClientSecret, AppleClientSecretSigner};
+pub use oidc::{
+    AppleAuthorization, AppleAuthorizationCompletion, AppleAuthorizationOutcome,
+    AppleAuthorizationRequest, AppleAuthorizationResponse, AppleAuthorizationStart,
+    AppleClientSecret, AppleClientSecretSigner, AppleClientType, AppleCodeExchange,
+    AppleInitialProfile, AppleNonceEncoding,
+};
 
 #[cfg(feature = "google")]
 pub use oidc::{

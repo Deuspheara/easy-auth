@@ -11,7 +11,7 @@ current account still decide which operations are usable.
 | Enterprise OIDC login | Server `oidc-web`, `configured_application` | [OIDC browser guide](oidc-web.md); exact HTTPS callback and explicit client authentication |
 | SAML organization login | Server `saml-web`, `configured_application` | [SAML guide](saml.md); already-provisioned matching policy and active approved pins |
 | Google web/desktop experiment | Explicit library/example composition | [Google guide](google.md); ordinary server startup does not select Google |
-| Apple login | Planned | [Apple preparation](apple-setup.md); no Apple adapter or startup contract exists |
+| Apple login | Experimental backend `apple` component | [Apple guide](apple-setup.md); ordinary routes, OS adapters and registered-provider acceptance remain gated |
 | Passkeys and recovery | Explicit experimental constructors | [Passkey guide](passkey-management.md); physical-device and recovery assurance remain separate |
 | An independent relying party | Outbound `issuer-web` plus the separate RP client | [Issuer setup](issuer-standalone.md); each RP owns its callback and application session |
 | Your own same-origin pages | Existing selected HTTP APIs | [Custom UI guide](custom-ui.md); changing presentation grants no authority |

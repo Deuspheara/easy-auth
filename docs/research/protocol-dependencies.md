@@ -1,5 +1,22 @@
 # Protocol dependency assessment
 
+AUTH-24's optional Apple component reuses pinned josekit0.10.3/OpenSSL0.10.81:
+established P-256 key import/ES256 compact JWS for fixed client secrets and the
+existing RS256 verification worker for Apple identity tokens. No dependency or
+lockfile version changes, custom cryptographic primitive or generic provider
+framework. Native signing jobs retain bounded capacity through cancellation;
+operator PEM/output buffers zeroize but dependency copies are not claimed erased.
+Apple metadata observed2026-10-25 advertises client_secret_post/RS256, not S256 or
+response-issuer support. The explicit dedicated-return/signed-nonce profile is
+separate from unchanged Google/generic requirements. The Apple REST index now
+links its client-secret guidance to the shared AccountOrganizationalDataSharing
+page; identity guidance's algorithm wording conflicts with current discovery, so
+no algorithm alias/fallback is inferred. Exact primary links and profile decisions
+are in [ADR0043](../architecture/adr/0043-apple-code-flow.md).
+Owned signing/PG fixtures establish component behavior, not actual Apple console,
+OS, provider rotation or lifecycle qualification. Existing license/advisory/native
+risks, outbound release gate and SAML waiver limits remain unchanged.
+
 The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
 uses native browser modules/WebAuthn and fixed included HTML/CSS. The presentation
 now pins Basecoat CSS 1.1.0 and optional Motion mini 14.6.0, prepared with

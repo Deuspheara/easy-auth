@@ -1,5 +1,20 @@
 # Code organization
 
+Apple's optional core feature lives in `oidc/apple/`: protected key import,
+fixed client-secret issuance, nonce encoding, code exchange, authorization inputs,
+callback decoding, unsigned profile and orchestration each own one responsibility.
+The existing verifier retains signature workers, typed claims and opaque proof
+construction. Only an explicit private Apple profile admits signed text email
+flags/native nonce encoding; generic/Google behavior stays closed. No public proof
+constructor, SQL policy in handlers, new crate or provider framework is added.
+PostgreSQL adds no implementation or migration: its Apple feature composes existing
+ports. Named core/PG Apple suites own the new scenarios; provider fixtures use the
+maintained JOSE producer. New modules remain below200 lines. Longer ordered tests
+keep setup, actual waits, negative assertions and valid controls together as reviewed
+function-size exceptions. The slightly longer key/service constructors and
+sign-in completion keep explicit policy validation, bounded native work and the
+one-use consume/cancel decision visible together; no unrelated cleanup is deferred.
+
 The initial Basecoat integration extracted `theme.js` (existing preference projection) and
 `presentation-motion.js` (optional interpolation/owned cancellation). The fixed
 Vega stylesheet and mini ESM output live in `pages/vendor/`; `tools/reference-ui/`

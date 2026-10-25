@@ -2,7 +2,12 @@
 mod apple;
 mod documents;
 #[cfg(feature = "apple")]
-pub use apple::{AppleClientSecret, AppleClientSecretSigner};
+pub use apple::{
+    AppleAuthorization, AppleAuthorizationCompletion, AppleAuthorizationOutcome,
+    AppleAuthorizationRequest, AppleAuthorizationResponse, AppleAuthorizationStart,
+    AppleClientSecret, AppleClientSecretSigner, AppleClientType, AppleCodeExchange,
+    AppleInitialProfile, AppleNonceEncoding,
+};
 #[cfg(feature = "google")]
 mod google;
 #[cfg(feature = "google")]

@@ -52,7 +52,7 @@ impl OidcTokenResponse {
             body: self.body,
         })
     }
-    pub(super) fn id_token(self) -> Result<OidcIdToken> {
+    pub(in crate::oidc) fn id_token(self) -> Result<OidcIdToken> {
         let response = self.json()?;
         if matches!(response.status, 400 | 401) {
             #[derive(Deserialize)]

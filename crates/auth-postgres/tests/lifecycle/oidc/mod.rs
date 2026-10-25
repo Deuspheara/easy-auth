@@ -1,3 +1,5 @@
+#[cfg(feature = "apple")]
+mod apple;
 mod binding;
 #[cfg(feature = "google")]
 mod google;

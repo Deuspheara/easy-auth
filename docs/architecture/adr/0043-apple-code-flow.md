@@ -54,6 +54,33 @@ the separate AUTH-26 scope; ordinary activation cannot strand provider-only user
 
 ## Evidence and remaining work
 
+The implemented optional backend now composes that signer with exact Apple
+discovery/endpoints, client_secret_post and RS256 code-result verification. A
+private verifier profile admits Apple's exact boolean/text email flag encodings
+and explicitly selected native plain/SHA256-hex nonce convention. Generic/Google
+still reject text flags at their original signed-parsing stage and retain S256.
+Apple's documented token contract supplies no code_verifier; this new explicit
+profile uses signed nonce/code-injection defense and dedicated return/private
+state binding, rather than silently switching generic policy after a failure.
+No interoperability or general protocol-compliance claim follows.
+
+`AppleAuthorization` aligns the exact transaction and code-component snapshots.
+Preparation returns public web form-post/native authorization inputs separately
+from original private proof. Completion verifies retained state/actual dedicated
+backend route before consuming/cancelling; native delivery itself remains with a
+future reviewed OS adapter. First-consent profile is bounded unsigned presentation,
+separate from the existing opaque verified identity. Missing later profile is not
+an identity failure or a signal to overwrite data. Ordinary routers are unchanged.
+Changing client kind/nonce policy requires trusted reconfiguration, a fresh
+connection revision and replacement services; never choose it per request.
+
+PostgreSQL's Apple feature only composes existing state/mapping/session ports.
+It adds no storage implementation or migration. Owned signed/real-DB tests cover
+one-use/private/browser/route binding, code request credentials, no email linking,
+JIT denial, returning subjects, realm isolation, concurrent consume/subject commit,
+audit rollback, source disable during token I/O and observed final-wait expiry.
+These fixtures establish local behavior, not Apple registration/OS/key acceptance.
+
 Required evidence includes fixed-key independent JWT verification, key/window/
 rotation controls, signed Apple token negatives, real PostgreSQL isolation and
 one-use/concurrency, and actual registered Apple web/native checks. Offline signed

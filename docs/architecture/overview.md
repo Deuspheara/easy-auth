@@ -1,5 +1,14 @@
 # Architecture
 
+The optional core/PostgreSQL `apple` component now supplies protected ES256 client
+secrets, explicit web/native code redemption, a dedicated nonce-bound Apple RS256
+profile and shared sign-in preparation/completion. It reuses the existing opaque
+OAuth/identity/session and realm-scoped PostgreSQL boundaries. Initial consent
+names remain unsigned presentation; email never links accounts. Ordinary Apple
+HTTP/OS adapters, registered-provider qualification and grant lifecycle are not
+activated. [ADR0043](adr/0043-apple-code-flow.md) and the
+[Apple guide](../guides/apple-setup.md) record exact scope and remaining gates.
+
 The optional server `issuer-web` composition now uses the same configured factory
 for executable and embedded delivery. Explicit HTTPS/key settings must match the
 current enabled persisted signing key; startup neither provisions nor enables

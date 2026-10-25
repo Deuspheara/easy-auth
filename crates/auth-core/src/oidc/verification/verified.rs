@@ -35,8 +35,9 @@ impl VerifiedOidcIdentity {
             subject: claims.sub.clone(),
             issued_at: claims.iat,
             authenticated_at: claims.auth_time,
-            email: claims.email.clone(),
-            email_verified: claims.email.is_some() && claims.email_verified == Some(true),
+            email: claims.email.clone().filter(|value| !value.is_empty()),
+            email_verified: claims.email.as_ref().is_some_and(|value| !value.is_empty())
+                && claims.email_verified(),
             #[cfg(feature = "oidc-identities")]
             name: claims.name.clone(),
             #[cfg(feature = "oidc-identities")]

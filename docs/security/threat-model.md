@@ -1,5 +1,36 @@
 # Threat model — alpha design, before credential flows
 
+The optional Apple backend signs only fixed ES256 team/client/audience claims
+from one protected P-256 key with a finite operator window. Five-minute secrets
+are capped at key retirement; signing capacity remains owned through cancellation.
+No arbitrary signing endpoint, default key, retired-key fallback or raw diagnostic
+is exposed. Native library memory copies are not claimed erased.
+
+The explicit Apple profile fixes issuer/endpoints/Post authentication and RS256,
+retains private browser/state/nonce/source/client/realm/revision and original caps,
+and requires an actually verified signed nonce after one-use code redemption.
+Its documented provider-specific wire contract does not pretend to offer S256;
+generic OIDC/Google retain that requirement. Native raw/SHA256-hex convention and
+web/native kind are immutable trusted composition, never inferred from a token or
+selected by a callback. Changing that policy requires trusted reconfiguration,
+a new revision and replacement services. A native code result is not proof of
+OS delivery; actual Authentication Services and registered-client checks remain.
+
+Only the Apple profile accepts exact signed boolean/text verification flags and
+missing/empty managed email. Generic/Google reject text at the original signed
+parsing stage. Unsigned initial names stay separate from identity/mapping, require
+text rendering and may disappear on later consent. No email matching, invented
+freshness, stronger-account fallback or local authority follows from presentation.
+A front-channel token cannot replace initiated backend code exchange. Final mapped
+identity/session commit still rechecks policy/subject/deadline under existing locks.
+
+No ordinary Apple route or session-cookie policy is changed. A future form-post
+bridge must retain actual dedicated delivery, bounded body and same-origin final
+completion without weakening ordinary cookies. Linking/deletion remain rejected
+by this sign-in component. Grant custody/revocation, real web/native acceptance
+and a usable account lifecycle remain required before activation. See
+[ADR0043](../architecture/adr/0043-apple-code-flow.md).
+
 The [reference UI](../architecture/adr/0042-reference-account-ui.md) consumes only
 selected-interface booleans and current account policy metadata. Compiled features,
 contact email, view query and UI visibility grant no method, fresh proof or fallback.

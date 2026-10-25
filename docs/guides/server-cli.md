@@ -84,7 +84,7 @@ validation or permission to enable another authentication path.
 | Enterprise OIDC | [Browser settings](oidc-web.md) and [startup contract](../architecture/deployment.md#explicit-oidc-browser-startup); exact HTTPS issuer/callback and explicit client authentication |
 | Google web/native | [Component and acceptance guide](google.md); experimental components/examples do not activate Google in ordinary server startup; registered-provider/OS/lifecycle evidence remains required |
 | Passkeys/custom UI | [Enrollment](passkey-enrollment.md), [sign-in](passkey-authentication.md) and [management/recovery](passkey-management.md); preserve RP/origin, browser proof and stronger-account policy; ordinary activation remains gated |
-| Apple | [Developer-account preparation](apple-setup.md); adapter, client-secret, callback/native and grant-lifecycle implementation/acceptance remain pending |
+| Apple | [Experimental backend and account preparation](apple-setup.md); no startup contract or ordinary routes; actual web/native and grant-lifecycle acceptance remain pending |
 | SAML | Explicit `saml-web` and complete persisted HTTPS trust; [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) waives independent review, which was not performed |
 | Outbound OIDC issuer | Explicit `issuer-web` and protected matching persisted key; [standalone setup and bounded parity](issuer-standalone.md); production release/assurance gates remain separate |
 

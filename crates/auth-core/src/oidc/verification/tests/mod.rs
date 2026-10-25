@@ -1,3 +1,5 @@
+#[cfg(feature = "apple")]
+mod apple;
 mod attributes;
 mod boundaries;
 mod exchange;

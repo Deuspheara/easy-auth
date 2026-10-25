@@ -1,5 +1,13 @@
 # Domain model
 
+Apple's opt-in backend uses the existing exact-issuer external OIDC subject
+namespace and `provider_required` account/session provenance. Apple is a provider,
+not a new storage protocol or email-based owner key. Unsigned initial profile,
+relay email and signed verification flags grant no contact/linking authority.
+Native request nonce convention is trusted immutable composition; token issuance
+never supplies authentication freshness. Existing JIT/current-source/deadline/
+atomic-commit rules remain. No schema change is introduced by this component.
+
 `LinkedProvider` is public owner-scoped inventory metadata: identity UUID,
 closed OIDC/SAML kind and immutable linked issuer. `LinkedProviderCursor` orders
 protocol plus UUID, and `LinkedProviderPage` bounds results to 50. These are not
