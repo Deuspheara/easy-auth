@@ -1,5 +1,6 @@
 mod atomicity;
 mod lifecycle;
+mod migration;
 mod native;
 mod schema;
 use super::setup::{Attempt, Fixture};

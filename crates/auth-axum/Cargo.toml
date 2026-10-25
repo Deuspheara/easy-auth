@@ -150,3 +150,11 @@ required-features = ["social-linking-web"]
 [[example]]
 name = "social-source-probe"
 required-features = ["google-web"]
+
+[[example]]
+name = "apple-grants-browser"
+required-features = ["apple-grants-web", "social-linking-web"]
+
+[[example]]
+name = "apple-grant-erasure-probe"
+path = "examples/apple-grant-erasure-probe/main.rs"

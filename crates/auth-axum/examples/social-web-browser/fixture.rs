@@ -16,6 +16,10 @@ mod mail;
 #[path = "server.rs"]
 mod server;
 
+#[cfg(feature = "apple-grants-web")]
+#[path = "grants/mod.rs"]
+mod grants;
+
 use std::io::Write;
 type FixtureResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -28,7 +32,11 @@ fn send(value: serde_json::Value) -> FixtureResult<()> {
     Ok(())
 }
 
-pub(super) async fn run() -> FixtureResult<()> {
+pub(super) async fn run(capture: bool) -> FixtureResult<()> {
+    #[cfg(not(feature = "apple-grants-web"))]
+    if capture {
+        return Err("capture fixture not compiled".into());
+    }
     let arguments: Vec<_> = std::env::args().skip(1).collect();
     if arguments
         .first()
@@ -50,7 +58,12 @@ pub(super) async fn run() -> FixtureResult<()> {
     // through owned cleanup, including a parent that closes its output pipe early.
     let result = async {
         send(serde_json::json!({"database":name}))?;
-        server::run(&database.pool, origin.origin().ascii_serialization()).await
+        server::run(
+            &database.pool,
+            origin.origin().ascii_serialization(),
+            capture,
+        )
+        .await
     }
     .await;
     database.close().await?;

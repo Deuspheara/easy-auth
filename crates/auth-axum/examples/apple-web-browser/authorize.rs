@@ -58,12 +58,15 @@ async fn prepare(
     match case.as_str() {
         "denied" => returned.push(("error", "user_cancelled_authorize".to_owned())),
         "provider_failure" => returned.push(("error", "server_error".to_owned())),
-        "normal" | "wrong_nonce" | "bad_form" | "profile" => {
+        "normal" | "wrong_nonce" | "bad_form" | "profile" | "other_subject" => {
             let now: i64 =
                 sqlx::query_scalar("SELECT floor(extract(epoch FROM clock_timestamp()))::bigint")
                     .fetch_one(&source.pool)
                     .await?;
             let mut claims = json!({"iss":ISSUER,"aud":CLIENT,"sub":"owned-apple-browser","iat":now,"exp":now+120,"nonce":nonce.expose()});
+            if case == "other_subject" {
+                claims["sub"] = json!("owned-other-apple-browser");
+            }
             if case == "wrong_nonce" {
                 claims["nonce"] = json!(Secret::generate()?.expose());
             }

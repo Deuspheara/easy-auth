@@ -12,13 +12,32 @@ pub(super) struct Application {
     pub realm: Uuid,
     pub google: Arc<google_provider::Provider>,
     pub apple: Arc<apple_provider::Provider>,
+    #[cfg(feature = "apple-grants-web")]
+    pub custody: Option<Arc<super::grants::Fixture>>,
 }
 pub(super) async fn create(
     pool: &PgPool,
     origin: &str,
     mail: Arc<Mail>,
+    capture: bool,
 ) -> FixtureResult<Application> {
-    let store = Arc::new(Postgres::new(pool.clone()));
+    #[cfg(not(feature = "apple-grants-web"))]
+    if capture {
+        return Err("capture fixture not compiled".into());
+    }
+    let store = Postgres::new(pool.clone());
+    #[cfg(feature = "apple-grants-web")]
+    let vault = if capture {
+        Some(super::grants::vault()?)
+    } else {
+        None
+    };
+    #[cfg(feature = "apple-grants-web")]
+    let store = match &vault {
+        Some(vault) => store.with_apple_grant_vault(vault.clone()),
+        None => store,
+    };
+    let store = Arc::new(store);
     store.migrate().await?;
     let realm = Uuid::new_v4();
     store.ensure_realm(realm).await?;
@@ -71,11 +90,12 @@ pub(super) async fn create(
             .fetch_one(pool)
             .await?;
     let (apple, signer) = apple_provider::Provider::new(now as u64);
-    let apple_exchange = Arc::new(AppleCodeExchange::new(
+    let signer = Arc::new(signer);
+    let apple_exchange = Arc::new(AppleCodeExchange::with_shared_signer(
         apple_policy.configuration().clone(),
         store.clone(),
         store.clone(),
-        signer,
+        signer.clone(),
         AppleClientType::Web,
         apple.clone(),
         apple.clone(),
@@ -96,25 +116,65 @@ pub(super) async fn create(
         sign_in.clone(),
         Arc::new(OidcAccountDeletion::new(store.clone())),
     )?;
-    let apple_services = AppleWebServices::new(
-        apple_policy.clone(),
-        apple_transactions.clone(),
-        apple_exchange.clone(),
-        sign_in,
-    )?;
-    let services = SocialWebServices::new(
-        google_services,
-        apple_services,
-        Arc::new(GoogleIdentityLinkAuthorization::new_session_age(
-            google_transactions,
-            google_exchange,
-        )?),
-        Arc::new(AppleIdentityLinkAuthorization::new(
-            apple_transactions,
-            apple_exchange,
-        )?),
-        Arc::new(OidcIdentityLinking::new(store.clone())),
-    )?;
+    #[cfg(feature = "apple-grants-web")]
+    let custody = vault
+        .map(|vault| {
+            super::grants::Fixture::new(
+                pool.clone(),
+                realm,
+                apple_policy.configuration().clone(),
+                signer,
+                vault,
+                store.clone(),
+                apple.clone(),
+            )
+        })
+        .transpose()?;
+    let google_link = Arc::new(GoogleIdentityLinkAuthorization::new_session_age(
+        google_transactions,
+        google_exchange,
+    )?);
+    let linking = Arc::new(OidcIdentityLinking::new(store.clone()));
+    #[cfg(feature = "apple-grants-web")]
+    let selected = if capture {
+        let apple_services = AppleWebServices::new_with_grants(
+            apple_policy.clone(),
+            apple_transactions.clone(),
+            apple_exchange.clone(),
+            Arc::new(AppleGrantSignIn::new(store.clone())),
+        )?;
+        Some(SocialWebServices::new_with_apple_grants(
+            google_services.clone(),
+            apple_services,
+            google_link.clone(),
+            apple_transactions.clone(),
+            apple_exchange.clone(),
+            Arc::new(AppleGrantLinking::new(store.clone())),
+            linking.clone(),
+        )?)
+    } else {
+        None
+    };
+    #[cfg(not(feature = "apple-grants-web"))]
+    let selected: Option<SocialWebServices> = None;
+    let services = match selected {
+        Some(services) => services,
+        None => SocialWebServices::new(
+            google_services,
+            AppleWebServices::new(
+                apple_policy.clone(),
+                apple_transactions.clone(),
+                apple_exchange.clone(),
+                sign_in,
+            )?,
+            google_link,
+            Arc::new(AppleIdentityLinkAuthorization::new(
+                apple_transactions,
+                apple_exchange,
+            )?),
+            linking,
+        )?,
+    };
     let app = easy_auth_axum::experimental_social_web_router(
         Auth::new(realm, store, mail),
         BrowserConfig::new(origin, false)?,
@@ -136,5 +196,7 @@ pub(super) async fn create(
         realm,
         google,
         apple,
+        #[cfg(feature = "apple-grants-web")]
+        custody,
     })
 }

@@ -1,6 +1,6 @@
 # ADR 0045: Protected Apple grant custody and retry-safe disconnect
 
-Date:2026-10-25. Status: design and implementation in progress for AUTH-26.
+Date:2026-10-25. Status: opt-in implementation; local integrated qualification in progress for AUTH-26.
 No ordinary activation, registered-provider acceptance, production qualification,
 independent approval, PR, merge or deployment is authorized by this decision.
 
@@ -198,3 +198,35 @@ correctly failed the existing global unique redirect constraint with Unavailable
 Fixtures now use distinct origins or separate owned test databases; no constraint,
 authorization assertion or source binding was relaxed. Genuine browser-to-worker
 qualification and migration/disabled-component coverage remain outstanding.
+
+
+## Owned browser and upgrade qualification
+
+The dedicated `apple-grants-browser` example explicitly selects protected capture
+for both web sign-in/linking and a configured offline revocation port. It reuses
+the existing owned database/mail/TLS lifetime and unchanged maintained signing
+producer. Nine genuine Chromium scenarios verify normal mailbox ownership,
+cookie-free cross-site handoff, signed nonce rejection, explicit confirmation,
+protected repeated capture, retained-factor unlink/source-session invalidation,
+finite configuration failure, actual database backoff and confirmed ciphertext
+erasure. Existing browser flows remain unselected under the original example.
+Fixture-only routes expose aggregate counts and one preconfigured worker, not a
+credential upload, key/source/endpoint selector or public authentication shortcut.
+
+A separately built default-feature-disabled erasure probe only accepts a random
+owned loopback database. It uses ordinary repository account-deletion preparation/
+completion with the genuine fixture mailbox session and generated bound verifiers;
+it compares the original ciphertext/key/source binding internally, confirms owner/
+audit-subject erasure and requires pending work to survive. The selected worker
+then confirms revocation. This is a persistence check, not browser/mail deletion
+confirmation or a waiver of existing account-deletion authority.
+
+The real-PG migration case applies schemas through0037, establishes actual signed
+web/native identities and sessions, snapshots all affected existing rows, then
+applies unchanged0038. Rows remain identical and no credential is fabricated for
+historical identities. Old sessions remain valid and new explicit capture resolves
+the original owner without affecting the other realm. No migration is rewritten.
+
+No real Apple endpoint, registration or OS delivery is qualified by these fixtures.
+The remote redemption/local commit crash gap, explicit maintenance scheduling,
+retained decryption keys and all upstream/live-provider release gates remain.

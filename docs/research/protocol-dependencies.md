@@ -1,5 +1,18 @@
 # Protocol dependency assessment
 
+AUTH-26's optional protected Apple custody/worker reuses locked
+josekit0.10.3/OpenSSL0.10.81 for internal fixed `dir` + `A256GCM` storage envelopes
+and existing protected ES256 client secrets. This adds no inbound JWE trust,
+custom AEAD/signature implementation, package/version, license rule or advisory
+exception; Cargo.lock is unchanged. Native-library/parser copies are not claimed
+zeroized beyond owned wrappers. The concrete revocation transport reuses locked
+reqwest0.13.5/rustls0.23.46 with existing pinned address, hostname/certificate,
+resource, redirect/proxy/retry controls. Dependency reuse still requires current
+compiled-graph advisory and all-feature license checks. The explicit profile and
+[primary Apple contract](../architecture/adr/0045-apple-grant-custody-and-revocation.md)
+remain separate from real provider/OS acceptance and independent security review.
+Owned browser/PG/TLS fixtures establish only their recorded implementation scope.
+
 AUTH-25's optional linking boundary reuses existing Google/Apple/OAuth/JOSE and
 PostgreSQL primitives; no dependency/version or custom cryptographic primitive is
 introduced. Fixed Google `select_account` is a documented account-choice request,

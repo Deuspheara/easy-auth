@@ -189,7 +189,13 @@ For account linking also select `social-linking-web` and use
 discarding credentials. Missing vault configuration fails the final local commit;
 it never selects the ordinary flow as fallback. Existing cookies, consent pages,
 Origin and cross-site delivery rules stay authoritative. These builders schedule
-no worker or maintenance. Genuine browser-to-worker qualification remains in
-development; ordinary startup selects none of these services. See the
+no worker or maintenance. Owned Chromium qualification covers actual selected link/sign-in capture,
+retained-factor unlink, provider failure, database backoff and confirmed erasure.
+A separately compiled capture/linking-disabled probe preserves encrypted work
+through ordinary account erasure. These are offline provider fixtures; actual
+Apple registration, OS behavior and live revocation remain unverified. Ordinary
+startup selects none of these services. Reproduction and exact limits are in the
+[owned browser suite](../../tests/browser/apple-grants/README.md) and
+[verification record](../security/apple-grant-revocation-verification-2026-10-25.md). See the
 [Rust contract](../architecture/api-contract.md#optional-rust-apple-grant-capture-in-progress)
 and [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md).

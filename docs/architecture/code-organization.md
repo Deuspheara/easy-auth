@@ -7,8 +7,14 @@ visible together as function-size exceptions; no HTTP policy/SQL/crypto or gener
 provider abstraction is added. Apple fixture construction was extracted separately
 before extension. Selected HTTP suites separate lifecycle, atomic faults and worker
 composition, reusing the maintained signing producer. New modules stay below300
-lines. Browser/migration qualification remains in progress; no unrelated cleanup
-is deferred.
+lines. Owned grant-browser fixtures separate shared lifetime, concrete composition,
+protected worker port, aggregate observations and fixture-only controls. A separate
+capture/linking-disabled probe separates bounded owned input, ordinary repository
+erasure and internal ciphertext comparison. Browser cases reuse existing journey
+and producer modules. Migration tests preserve real existing web/native sessions
+across the additive schema. Longer trusted constructors and ordered browser/
+migration cases retain actual setup, original controls and cleanup together as
+function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
@@ -32,8 +38,8 @@ worker orchestration; PostgreSQL `apple/revocation/` separates claims, locked
 completion, maintenance and port delegation. Server transport shares protected
 form construction with an explicit private response profile; ordinary OIDC JSON
 assertions stay unchanged. New tests separate actual lease recovery, observed
-waits, binding/configuration, lifecycle and owned TLS responses. HTTP/browser
-integration remains in progress; no unrelated cleanup is deferred.
+waits, binding/configuration, lifecycle and owned TLS responses. Explicit HTTP/browser
+integration now has owned qualification; real-provider gates remain open. No unrelated cleanup is deferred.
 
 Explicit Axum social management owns concrete matching services, thin provider
 handlers, closed wire types, original-owner/cookie binding, unlink delegation,

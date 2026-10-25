@@ -65,6 +65,9 @@ Schedule `maintain_apple_grants(realm)` for every configured realm: after604800
 elapsed seconds it erases unconfirmed ciphertext, and after another604800 seconds
 removes terminal metadata, in bounded batches. Expiry is not remote success;
 pending eligibility alone does not delete ciphertext. Explicit Axum capture/link selection now queues these jobs through the same local
-lifecycle. Genuine browser-to-worker and live Apple verification remain pending. See the [Apple guide](apple-setup.md) and
+lifecycle. Owned browser-to-worker checks and a separate capture/linking-disabled erasure
+probe verify protected queue preservation and eventual fixture confirmation.
+Real Apple verification remains pending; see the
+[verification record](../security/apple-grant-revocation-verification-2026-10-25.md). See the [Apple guide](apple-setup.md) and
 [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md). Existing
 normal server startup does not select this component.

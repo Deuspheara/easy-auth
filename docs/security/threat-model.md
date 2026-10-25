@@ -20,7 +20,11 @@ TTL or real-provider qualification is established. Explicit Axum capture/link se
 final commit services together; default builders still discard credentials.
 Missing protection cannot select fallback, and raw grants never reach HTTP output.
 Original cookies, purpose, Origin, cross-site delivery and local owner checks remain
-unchanged. Genuine browser-to-worker qualification remains pending. A job or elapsed token lifetime never establishes remote revocation.
+unchanged. Owned Chromium/PG checks now exercise both selected paths through local unlink,
+finite provider failure, actual backoff and confirmed erasure; a separately built
+capture/linking-disabled probe preserves ciphertext through ordinary repository
+account erasure. These checks use offline provider ports and establish no live
+Apple registration, OS delivery or provider revocation. A job or elapsed token lifetime never establishes remote revocation.
 
 Explicit social web linking requires trusted concrete selection, exact-Origin
 closed JSON and four independent host-only private Link cookies per provider.

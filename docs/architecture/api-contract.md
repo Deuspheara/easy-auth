@@ -96,7 +96,10 @@ under the configured current storage key using a row lock and version CAS. It
 skips busy/leased/finished rows, preserves binding/deadlines, changes no provider
 token and claims no remote success. Retain explicit old reading keys until
 migration completes; missing keys never select fallback. See
-[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). Genuine browser-to-worker qualification and real-provider/production acceptance remain pending.
+[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). Owned genuine Chromium-to-worker qualification now covers both selected capture
+paths, local unlink, provider failure, actual backoff/erasure and ordinary account
+erasure in a separately compiled capture/linking-disabled probe. This is offline
+provider fixture evidence; real-provider/production acceptance remains pending.
 
 `AppleGrantRevoker::new` selects one immutable Apple source, the shared protected
 `Arc<AppleClientSecretSigner>`, vault, repository and checked HTTPS adapters.

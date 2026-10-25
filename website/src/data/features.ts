@@ -66,7 +66,7 @@ export const features = [
     mark: "◦",
     status: "Component",
     description:
-      "Experimental verified code flow and explicit web composition. Registration, grant lifecycle and ordinary activation remain gated.",
+      "Experimental code/web flow, explicit linking and protected grant revocation. Real Apple acceptance and ordinary activation remain gated.",
     href: "/docs/guides/apple-setup/",
     featured: false,
   },

@@ -103,5 +103,8 @@ scheduled by selecting HTTP services. No credential upload, raw grant output,
 worker route or new application permission is introduced. See the
 [Apple grant contract](../architecture/api-contract.md#optional-rust-apple-grant-capture-in-progress)
 and [lifecycle limits](account-lifecycle.md#experimental-apple-capture-and-pending-revocation).
-Owned genuine browser-to-worker and registered-provider qualification remain
-separate; default startup and release gates are unchanged.
+Nine owned Chromium cases now qualify the selected capture-to-unlink-to-worker
+path, actual backoff and separate feature-disabled erasure preservation. This is
+offline provider evidence; registered-provider qualification, default startup and
+release gates are unchanged. See the
+[verification record](../security/apple-grant-revocation-verification-2026-10-25.md).

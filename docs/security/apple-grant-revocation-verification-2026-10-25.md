@@ -185,3 +185,68 @@ all-target Clippy passed. This is backend fixture evidence, with no actual OS
 Authentication Services, registered App ID or live Apple call. Genuine captured
 browser-to-worker, migration/disabled-component coverage and the final integrated
 workspace/security matrix remain outstanding.
+
+
+## Integrated owned browser, erasure and upgrade checkpoint
+
+Nine captured-grant Chromium cases passed with Nodev26.0.0 and
+Chromium156.0.8078.4. They use actual normal mailbox proof, cross-site
+cookie-free Apple return, explicit link/sign-in confirmation, signed nonce
+rejection and protected repeated capture. Retained-factor unlink immediately
+invalidates only the removed-source session and queues both grants before any
+provider dispatch. A real invalid_client fixture response retains ciphertext;
+the other job can complete, while the original retries only after actual database
+backoff. Confirmed completion erases ciphertext/key IDs, preserving the original
+local session. No timestamp, policy or assertion was shortened to pass.
+
+The separately compiled `--no-default-features` erasure probe refuses capture/
+linking-selected builds and only accepts the exact random owned loopback database.
+Its compiler feature graph contains no apple-grants, oidc-linking or social-linking
+selection. Actual compiler-derived flags are returned with finite results. Using
+a genuine second mailbox owner/session and a distinct signed Apple subject, it
+runs ordinary repository deletion preparation/completion with generated bound
+verifiers, checks owner/session/identity/audit-subject erasure and internally
+compares the original protected ciphertext/key/source/binding bytes. One pending
+grant survives; the configured worker then confirms it. The original other owner
+and session stay intact. This is a feature-disabled persistence probe, not a
+browser/mail deletion confirmation or public authority shortcut.
+
+The exact final fixture counts were users1, identities0, sessions2, audit7,
+pending OAuth0, Apple code posts/signatures4, Google posts/signatures0, completed
+grants3, encrypted grants0 and worker attempts/calls4. Normal shutdown removed the
+owned database and private TLS material, without emergency cleanup or diagnostics.
+The fixture port verifies actual protected ES256 client-secret signatures and
+fixed endpoint/client/token/hint, while actual production TLS has separate tests.
+No real Apple token/revocation endpoint, registration or OS delivery was contacted.
+
+Frozen browser fixture SHA256:
+`61f00e81387ca5d40ad995f02d9d5e89f104e369bfef48c1643c4746412c727a`.
+Frozen feature-disabled probe SHA256:
+`750120fee2e03024de9d9fefbe5345b68f3f048e4edc0f8123d50f306266fe7e`.
+The parent receipt's source base is `bfb79ddfcc79fc6fe58b1913f91eba122ed41e9f` plus its
+recorded complete source hashes. Every recorded source file and both frozen
+binaries were checked against current bytes before commit; no stale binary or
+unrelated source is represented as this acceptance. Full local JSON/command
+artifacts remain outside the repository; no credential/callback is published.
+
+Original capture-unselected browser regressions also passed after this extension:
+13 social cases (including a separately built linking-disabled source probe) and
+11 Apple cases. Both cleaned up their owned databases/TLS. Strict Axum all-target
+Clippy passed with all features and with only social-linking-web selected.
+
+The real-PG0037-to0038 upgrade case passed: actual signed web/native existing
+identities/sessions and source/policy/audit/user rows remain byte-for-byte equal
+as JSON values across unchanged additive0038. No historical grant is fabricated;
+old sessions still work and new explicit capture resolves the original web owner,
+leaving the native realm untouched. Strict PG all-feature all-target Clippy passed.
+Initial fixture Clippy rejected a private routes reexport (E0364/E0603); visibility
+was limited to the common fixture parent, with no production API widened.
+
+New modules stay below300 lines. Shared fixture lifetime was extracted separately;
+new worker observations/controls, protected port and feature-disabled probe inputs/
+erasure/internal comparison live in named modules. Longer trusted constructors
+and ordered real browser/migration cases keep setup, original controls, actual
+waits and cleanup together as size-review exceptions. No unrelated refactor,
+custom cryptography, dependency change or proof seeder is introduced. Remaining
+local work is the final integrated workspace/security/documentation matrix and
+push. Registered-provider/production acceptance remains deferred and gated.
