@@ -71,3 +71,10 @@ mod issuer_native_consent;
 #[cfg(feature = "issuer-native-web")]
 #[path = "browser/issuer_native_web/mod.rs"]
 mod issuer_native_web;
+
+#[cfg(feature = "apple-web")]
+#[path = "../../../tests/support/apple/provider.rs"]
+mod apple_provider;
+#[cfg(feature = "google-web")]
+#[path = "../../../tests/support/google/provider.rs"]
+mod google_provider;

@@ -4,6 +4,5 @@ mod boundary;
 mod completion;
 mod contract;
 mod delivery;
-#[path = "../../../../../tests/support/apple/provider.rs"]
-mod provider;
+use crate::apple_provider as provider;
 mod setup;
