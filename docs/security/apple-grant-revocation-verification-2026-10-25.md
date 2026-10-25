@@ -1,12 +1,15 @@
 # Apple revocation engineering checkpoint — 2026-10-25
 
-AUTH-26 remains In Progress. This record covers the explicit Rust worker,
-PostgreSQL leases/maintenance and server HTTPS adapter. HTTP/browser capture
-selection and genuine browser-to-worker acceptance remain unfinished. Registered
-Apple web/native, real credentials, console/key rotation and live revocation are
-explicitly deferred; no production qualification or independent approval follows.
-The AUTH-24/AUTH-25 acceptance dependencies remain release gates, as do outbound
-OIDC and the existing SAML waiver limits. No PR, merge or deployment is included.
+AUTH-26 remains In Progress for deferred prerequisite/registered-provider acceptance.
+The opt-in engineering scope now has local qualification: protected capture/key
+rotation, atomic unlink/account-erasure queueing, leased retry-safe revocation,
+explicit maintenance and web capture/link composition. Nine owned Chromium cases,
+a separately built feature-disabled erasure probe and real-PG upgrade coverage
+supplement the final workspace/security matrix below. Registered Apple web/native,
+console/key rotation, actual OS delivery and live revocation remain deferred.
+No production qualification, independent approval, PR, merge or deployment follows.
+AUTH-24/AUTH-25 acceptance dependencies, outbound OIDC and SAML waiver limits remain.
+Earlier checkpoint sections retain their original scoped results and limitations.
 
 ## Source and behavior
 
@@ -224,7 +227,7 @@ Frozen browser fixture SHA256:
 Frozen feature-disabled probe SHA256:
 `750120fee2e03024de9d9fefbe5345b68f3f048e4edc0f8123d50f306266fe7e`.
 The parent receipt's source base is `bfb79ddfcc79fc6fe58b1913f91eba122ed41e9f` plus its
-recorded complete source hashes. Every recorded source file and both frozen
+recorded source-file hashes. Every recorded source file and both frozen
 binaries were checked against current bytes before commit; no stale binary or
 unrelated source is represented as this acceptance. Full local JSON/command
 artifacts remain outside the repository; no credential/callback is published.
@@ -250,3 +253,44 @@ waits and cleanup together as size-review exceptions. No unrelated refactor,
 custom cryptography, dependency change or proof seeder is introduced. Remaining
 local work is the final integrated workspace/security/documentation matrix and
 push. Registered-provider/production acceptance remains deferred and gated.
+
+
+## Final local validation
+
+Exact runtime/source integration commit:
+`d58b596eb8e3a1c157cfb934c106e07ca2db8d95`.
+The follow-up changes only this receipt and one README phrase distinguishing
+browser navigation from native OS delivery; no implementation, test logic, schema,
+manifest or dependency changes after the frozen code qualification.
+
+Passed with the existing macOS build settings and owned disposable PostgreSQL:
+
+- `cargo fmt --all --check`.
+- Strict default and all-feature workspace/all-target Clippy with `-D warnings`.
+- Default workspace:128 passed,0 failed/ignored.
+- All-feature workspace:1150 primary passed,0 failed/ignored.1151 pass reports
+  include one logging-isolation child rerun. HTTP221, core181, PostgreSQL651,
+  server68, plus the existing unit/desktop/issuer integration targets.
+- Nine captured-grant Chromium cases;13 capture-unselected social and11 Apple
+  browser regressions. All owned database/TLS cleanup confirmed.
+- SAML source guard and reference UI token check; compiled-graph advisory audit
+  and all-feature dependency/license/source policy. No lockfile/version/exception
+  change. These are automated checks, not independent security approval.
+- Scoped integration source/doc secret scan:31 changed files, no leaks. Full
+  AUTH-26 history from AUTH-25 base through the integration commit:14 commits,
+  redacted secret scan, no leaks. Final receipt history is also checked before push.
+- Website normal format check from its own working directory,7 source tests,
+ 0 Astro errors/warnings/hints,27 built pages, and genuine rendered interactions,
+ search, mobile layout,26 routes/451 anchors with no runtime errors. The initial
+ root-CWD formatting invocation could not resolve prettier-plugin-astro; the
+ ordinary website command succeeded without changing formatting assertions.
+
+Every required local command completed successfully. The final verification
+artifacts are retained outside the repository; no provider key, token, cookie,
+callback or raw diagnostic is published. The original73 protected files retain
+exact bytes/change set and their original index is empty. Retained preview,
+accounts/passkeys and unrelated source were not used or changed. Branch push is
+the authorized next publication step after this receipt; hosted CI success is not
+claimed or awaited, and main-only deployment conditions exclude this feat branch.
+Live Apple acceptance and unaccepted upstream prerequisites remain tracker gates;
+this evidence does not authorize closure, merge, release or deployment.

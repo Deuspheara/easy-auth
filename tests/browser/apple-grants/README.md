@@ -19,7 +19,7 @@ Rebuild the erasure probe without features immediately before the selected fixtu
 it refuses to operate when capture/linking is selected. The probe additionally
 requires the exact random `easy_auth_oidc_` database prefix and loopback host.
 
-Nine cases exercise actual native browser navigation, private/cross-site cookie
+Nine cases exercise actual browser navigation, private/cross-site cookie
 boundaries, normal mailbox owner proof, signed Apple nonce rejection, explicit
 link/sign-in capture, retained-factor unlink, immediate local source-session
 invalidation, configuration failure, actual database backoff, confirmed ciphertext
