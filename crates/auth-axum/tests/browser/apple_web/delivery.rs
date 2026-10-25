@@ -2,6 +2,33 @@ use super::setup::*;
 use sqlx::PgPool;
 
 #[sqlx::test]
+async fn apple_literal_form_markup_is_attribute_escaped_before_browser_parsing(pool: PgPool) {
+    let f = Fixture::new(pool).await;
+    let a = f.start().await;
+    // A hostile HTTP sender need not use the browser's percent encoder. Exercise
+    // literal JSON quotes/markup through the actual route and core form parser.
+    let raw = format!(
+        r#"{}&user={{"name":{{"firstName":"<script>owned-literal</script>"}}}}"#,
+        f.issue(&a, json!({}), None).await
+    );
+    let r = f.bridge(&raw, "").await;
+    assert_eq!(r.status(), 200);
+    no_session(&r);
+    let html = text(r).await;
+    assert!(html.contains("&lt;script&gt;owned-literal&lt;/script&gt;"));
+    assert!(html.contains("&quot;firstName&quot;"));
+    assert!(!html.contains("<script>owned-literal"));
+    assert_eq!(f.facts().await, (0, 0, 0, 0, 1));
+    assert_eq!(f.provider.posts.load(Ordering::SeqCst), 0);
+    assert_eq!(
+        f.post("finish", json!({"response":raw}), &a.cookie)
+            .await
+            .status(),
+        204
+    );
+}
+
+#[sqlx::test]
 async fn apple_delivery_never_reads_proofs_or_consumes_state(pool: PgPool) {
     let f = Fixture::new(pool).await;
     let a = f.start().await;
