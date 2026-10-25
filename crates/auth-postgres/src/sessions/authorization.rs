@@ -2,7 +2,7 @@
 use super::ownership::Owner;
 use crate::{deadlines::Deadline, unavailable};
 use auth_core::{Error, Result, Verifier};
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{PgExecutor, Postgres, Transaction};
 use uuid::Uuid;
 
 /// Read before opening the transaction; this snapshot only selects lock order.
@@ -20,9 +20,13 @@ pub(crate) struct FreshSessionAuthorization {
     pub(crate) deadline: Deadline,
 }
 impl FreshSessionSnapshot {
-    pub(crate) async fn load(pool: &PgPool, realm: Uuid, current: Verifier) -> Result<Self> {
+    pub(crate) async fn load(
+        executor: impl PgExecutor<'_>,
+        realm: Uuid,
+        current: Verifier,
+    ) -> Result<Self> {
         Ok(Self {
-            owner: Owner::load(pool, realm, current).await?,
+            owner: Owner::load(executor, realm, current).await?,
             realm,
             current,
         })
