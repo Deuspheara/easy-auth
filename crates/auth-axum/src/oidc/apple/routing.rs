@@ -31,17 +31,24 @@ pub fn experimental_apple_web_router(
     browser: BrowserConfig,
     services: AppleWebServices,
 ) -> Result<Router> {
-    let configuration = services.policy.configuration();
-    if auth.realm() != configuration.realm()
-        || !browser.origin().starts_with("https://")
-        || configuration.redirect() != format!("{}{CALLBACK_PATH}", browser.origin())
-    {
-        return Err(Error::InvalidInput);
-    }
     let base = AppState {
         auth: auth.clone(),
         browser: browser.clone(),
     };
+    let routes = routes(base.clone(), services)?;
+    Ok(configured_router(auth, browser, apple_web_openapi())
+        .merge(routes)
+        .layer(middleware::from_fn_with_state(base, clear_revoked)))
+}
+
+pub(in crate::oidc) fn routes(base: AppState, services: AppleWebServices) -> Result<Router> {
+    let configuration = services.policy.configuration();
+    if base.auth.realm() != configuration.realm()
+        || !base.browser.origin().starts_with("https://")
+        || configuration.redirect() != format!("{}{CALLBACK_PATH}", base.browser.origin())
+    {
+        return Err(Error::InvalidInput);
+    }
     let protected = Router::new()
         .route("/v1/apple/sign-in/start", post(signin::start))
         .route("/v1/apple/sign-in/finish", post(signin::finish))
@@ -57,13 +64,11 @@ pub fn experimental_apple_web_router(
             base.clone(),
             post_delivery_boundary,
         ));
-    Ok(configured_router(auth, browser, apple_web_openapi())
-        .merge(protected.merge(delivery).with_state(WebState {
-            base: base.clone(),
-            services,
-        }))
-        .layer(middleware::from_fn_with_state(base, clear_revoked)))
+    Ok(protected
+        .merge(delivery)
+        .with_state(WebState { base, services }))
 }
+
 async fn clear_revoked(State(base): State<AppState>, request: Request, next: Next) -> Response {
     let mut response = next.run(request).await;
     clear_revoked_proofs(&mut response, &base.browser, &[&APPLE_SIGN_IN_COOKIES]);
