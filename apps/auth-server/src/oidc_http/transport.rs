@@ -14,6 +14,10 @@ const MAX_IN_FLIGHT_OPERATIONS: usize = 4;
 #[path = "token.rs"]
 mod token;
 
+#[cfg(feature = "apple-grants")]
+#[path = "apple_revocation.rs"]
+mod apple_revocation;
+
 /// Shared concrete metadata transport. Clone/share one adapter across configured
 /// connections; no HTTP API, provider credential or permissive development mode.
 #[derive(Clone)]

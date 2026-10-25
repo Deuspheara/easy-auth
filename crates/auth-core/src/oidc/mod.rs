@@ -74,3 +74,10 @@ pub use apple::{
     AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
     AppleVerifiedGrant,
 };
+
+#[cfg(feature = "apple-grants")]
+pub use apple::{
+    AppleGrantRevocationJob, AppleGrantRevocationRepository, AppleGrantRevoker,
+    AppleRevocationConfirmation, AppleRevocationFailure, AppleRevocationHttp,
+    AppleRevocationOutcome, AppleRevocationRequest, AppleRevocationResponse,
+};

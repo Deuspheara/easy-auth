@@ -59,8 +59,12 @@ subject erasure without requiring an active vault or waiting for Apple. A schema
 trigger detaches captured grants into pending jobs instead of cascading away the
 material needed for revocation. Jobs retain only protected credentials and minimal
 opaque source/binding IDs; they do not copy the local user/contact/provider-subject
-columns. Local deletion is not confirmed remote revocation. The worker and
-retention-maintenance path are still in development; pending eligibility alone
-does not delete ciphertext. See the [Apple guide](apple-setup.md) and
+columns. Local deletion is not confirmed remote revocation. Explicit Rust workers
+can now revoke queued grants with leased retries and finite failure states.
+Schedule `maintain_apple_grants(realm)` for every configured realm: after604800
+elapsed seconds it erases unconfirmed ciphertext, and after another604800 seconds
+removes terminal metadata, in bounded batches. Expiry is not remote success;
+pending eligibility alone does not delete ciphertext. HTTP/browser integration
+and live Apple verification remain pending. See the [Apple guide](apple-setup.md) and
 [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md). Existing
 normal server startup does not select this component.

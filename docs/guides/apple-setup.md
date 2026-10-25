@@ -178,7 +178,11 @@ Optional Rust `apple-grants` now provides explicit verified code-result capture,
 protected keys/envelopes and atomic PostgreSQL attachment to the actual resolved
 identity. Select it separately from ordinary Apple authorization/web services.
 Local unlink/deletion queues protected revocation work; neither that queue nor key
-rewrapping confirms revocation at Apple. Worker, retention maintenance and HTTP/
-browser integration remain in development. See the
+rewrapping confirms revocation at Apple. Explicit Rust revocation workers and the
+server HTTPS adapter now process leased jobs with bounded retries. Configure the
+same protected signer and retained storage keys; schedule realm maintenance even
+when no source worker is running. Expired unconfirmed material is erased only by
+maintenance, never reported as successful revocation. HTTP/browser integration
+remains in development; ordinary startup selects none of these services. See the
 [Rust contract](../architecture/api-contract.md#optional-rust-apple-grant-capture-in-progress)
 and [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md).

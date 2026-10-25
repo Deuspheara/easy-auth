@@ -122,4 +122,5 @@ async fn link(f: &Fixture, owner: &User, current: &Secret, subject: &str) -> Lin
         .unwrap()
 }
 mod deadlines;
+mod revocation;
 mod rotation;

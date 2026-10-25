@@ -137,9 +137,37 @@ Migration0038 queues all captured grants on identity deletion. Ordinary account
 deletion with no vault still erases audit subjects and preserves pending ciphertext/
 minimal binding metadata. Trusted row/version-based rewrap preserves pending
 eligibility of604800 elapsed seconds rather than timezone-dependent calendar
-arithmetic. Queue/worker/expiry contracts are not yet a functioning revoker or
-retention process. The first deletion test's direct SQL correctly hit the audit-
+arithmetic. The separately implemented worker/maintenance checkpoint below supersedes the
+earlier queue-only limitation. The first deletion test's direct SQL correctly hit the audit-
 user foreign key; the corrected case uses actual ordinary account deletion
 preparation/completion without relaxing that constraint. Observed final-audit
 expiry, source-disable, concurrent completion, missing configuration and rollback
 controls accompany actual captured sign-in/link/unlink tests.
+
+
+## Explicit worker and HTTPS engineering checkpoint
+
+Core now supplies the concrete source-bound worker, protected form and opaque
+post-response confirmation. PostgreSQL commits one60-second lease before I/O,
+limits attempts to8, preserves original7-day eligibility and checks current lease/
+generation/time after lock and write waits. Failure backoff begins at30 seconds;
+exhausted attempts stay visibly failed. Confirmed empty200 erases ciphertext;
+expiry instead records unconfirmed expired state. Bounded maintenance processes
+64 rows per phase and purges terminal metadata after another7 days. Invocation is
+required, including for disabled/inactive sources; ordinary startup adds no worker.
+
+The signer is shared explicitly with code exchange, including its existing native
+worker bound. The concrete server adapter reuses the existing protected form POST,
+TLS, checked address and operation limits. A private response profile permits an
+absent Content-Type only for empty200, caps revocation bodies at16KiB and leaves
+normal OIDC document/token JSON assertions intact. No redirect, transport retry,
+proxy, cookie, TLS bypass or provider error text reaches public output.
+
+Owned fixtures verify actual client-secret signatures/form fields and real-PG
+lease/retry/local-session behavior. Private TLS scenarios exercise actual POST,
+empty replies, bounded errors, malformed envelopes, declared/chunked oversize,
+timeout and certificate/hostname negatives. The initial TLS test observed the
+client's certificate rejection before the server had recorded its second failure;
+its corrected observer waits for the actual handshake count without changing the
+certificate assertion. HTTP/browser integration and full ticket acceptance remain
+in progress. These fixtures do not establish a registered Apple revocation result.

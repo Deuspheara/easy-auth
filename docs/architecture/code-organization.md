@@ -15,8 +15,13 @@ atomic faults, schema, observed deadlines/source/concurrency and rotation;
 maintained producers load once. New modules stay below300 lines. Longer ordered
 fixtures/scenarios retain setup, actual waits, negative/positive controls and
 cleanup as size-review exceptions. No SQL/policy/proof constructor/registry or
-new dependency moves into HTTP. Worker qualification remains in progress; no
-unrelated cleanup is deferred.
+new dependency moves into HTTP. Core `grants/revocation/` separates protected jobs, request/response, ports and
+worker orchestration; PostgreSQL `apple/revocation/` separates claims, locked
+completion, maintenance and port delegation. Server transport shares protected
+form construction with an explicit private response profile; ordinary OIDC JSON
+assertions stay unchanged. New tests separate actual lease recovery, observed
+waits, binding/configuration, lifecycle and owned TLS responses. HTTP/browser
+integration remains in progress; no unrelated cleanup is deferred.
 
 Explicit Axum social management owns concrete matching services, thin provider
 handlers, closed wire types, original-owner/cookie binding, unlink delegation,

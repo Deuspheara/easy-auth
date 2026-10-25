@@ -1,3 +1,6 @@
+#[cfg(feature = "apple-grants")]
+mod revocation;
+
 use super::key::SigningKey;
 use crate::{Error, OidcClientAuthentication, OidcClientSecret, Result};
 use std::{fmt, sync::Arc, time::Duration};

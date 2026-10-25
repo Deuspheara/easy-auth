@@ -56,6 +56,8 @@ pub(super) struct Fixture {
     pub vault: Arc<AppleGrantVault>,
     #[cfg(feature = "apple-grants")]
     pub component: Arc<AppleCodeExchange>,
+    #[cfg(feature = "apple-grants")]
+    pub signer: Arc<AppleClientSecretSigner>,
 }
 impl Fixture {
     pub async fn new(pool: PgPool, kind: AppleClientType, jit: OidcJitPolicy) -> Self {
@@ -77,6 +79,7 @@ impl Fixture {
                 .await
                 .unwrap();
         let (provider, signer) = Provider::new(now as u64);
+        let signer = Arc::new(signer);
         let client = Uuid::new_v4();
         let c = OAuthConnection::new(
             realm,
@@ -93,11 +96,11 @@ impl Fixture {
             .with_jit(jit);
         let policy = store.configure_oidc_identity_policy(&policy).await.unwrap();
         let component = Arc::new(
-            AppleCodeExchange::new(
+            AppleCodeExchange::with_shared_signer(
                 policy.configuration().clone(),
                 store.clone(),
                 store.clone(),
-                signer,
+                signer.clone(),
                 kind,
                 provider.clone(),
                 provider.clone(),
@@ -138,6 +141,8 @@ impl Fixture {
             vault,
             #[cfg(feature = "apple-grants")]
             component,
+            #[cfg(feature = "apple-grants")]
+            signer,
         }
     }
     pub fn realm(&self) -> Uuid {

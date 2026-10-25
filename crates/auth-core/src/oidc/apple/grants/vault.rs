@@ -28,6 +28,14 @@ impl AppleGrantVault {
         self.blocking(move |keys| protection::seal(keys, binding, payload))
             .await
     }
+    pub(super) async fn open_for_revocation(
+        &self,
+        envelope: &AppleGrantEnvelope,
+    ) -> Result<StoredGrant> {
+        let envelope = envelope.clone();
+        self.blocking(move |keys| protection::open(keys, &envelope))
+            .await
+    }
     pub async fn rewrap(&self, envelope: &AppleGrantEnvelope) -> Result<AppleGrantEnvelope> {
         let envelope = envelope.clone();
         self.blocking(move |keys| {

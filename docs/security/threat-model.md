@@ -8,8 +8,16 @@ grant binding; the provider client is inside the authenticated payload too.
 Missing vault, audit failure, source disable and original-cap expiry roll back
 local authority and capture together. Local unlink/account erasure queue encrypted
 jobs through a schema trigger; local user/contact/subject data is not copied into
-the ledger. Worker, retention maintenance and real-provider qualification remain
-pending. A job or elapsed access-token lifetime never establishes remote revocation.
+the ledger. Explicit workers claim finite source-scoped leases before network I/O,
+compare authenticated provider-client binding, reuse the protected signer and send
+only to fixed Apple HTTPS through the reviewed pinned/TLS adapter. Only empty200
+can produce an opaque confirmation. Final lease/version/time checks after waits
+prevent stale acknowledgment; lost responses retry after bounded backoff. Errors
+retain ciphertext with finite categories, never raw provider details. Explicit
+bounded realm maintenance erases expired unconfirmed ciphertext and later terminal
+metadata; it must be scheduled even without active source workers. No automatic
+TTL or real-provider qualification is established. HTTP/browser integration remains
+pending. A job or elapsed token lifetime never establishes remote revocation.
 
 Explicit social web linking requires trusted concrete selection, exact-Origin
 closed JSON and four independent host-only private Link cookies per provider.
@@ -20,7 +28,7 @@ delivery remains cookie/storage-free. Unique state hints prevent ambiguous UI;
 callback-aware cancellation prevents stale pages clearing newer proof. Scripts
 remove/scrub returns, fence late responses across navigation/restoration, discard
 raw input before finish and never retry credential completion. Local unlink remains
-distinct from unimplemented remote Apple grant revocation.
+distinct from the explicitly selected background Apple grant revocation component.
 
 Explicit social linking uses a separate Link purpose and original fresh owner/
 session with a signed nonce-bound provider result; matching email/profile never

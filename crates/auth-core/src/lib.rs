@@ -217,3 +217,10 @@ pub use oidc::{
     AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
     AppleVerifiedGrant,
 };
+
+#[cfg(feature = "apple-grants")]
+pub use oidc::{
+    AppleGrantRevocationJob, AppleGrantRevocationRepository, AppleGrantRevoker,
+    AppleRevocationConfirmation, AppleRevocationFailure, AppleRevocationHttp,
+    AppleRevocationOutcome, AppleRevocationRequest, AppleRevocationResponse,
+};

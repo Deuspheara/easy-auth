@@ -70,16 +70,51 @@ ordinary account deletion with no vault selected. Existing freshness, audit
 erasure and session isolation still apply. Jobs retain opaque binding/source IDs,
 not local user/contact/subject columns. Pending eligibility is capped at604800
 elapsed seconds, independent of database timezone; this is not automatic erasure
-or confirmed remote revocation. Worker and retention maintenance remain required
-and unimplemented at this checkpoint.
+or confirmed remote revocation. Explicit maintenance is required; this timestamp
+is not a database TTL.
 
 Trusted `rotate_apple_grant_key(realm,grant_id)` rewraps active/pending/failed rows
 under the configured current storage key using a row lock and version CAS. It
 skips busy/leased/finished rows, preserves binding/deadlines, changes no provider
 token and claims no remote success. Retain explicit old reading keys until
 migration completes; missing keys never select fallback. See
-[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). Full worker/HTTP/browser
-qualification and real-provider/production acceptance remain pending.
+[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). HTTP/browser integration and real-provider/production acceptance remain pending.
+
+`AppleGrantRevoker::new` selects one immutable Apple source, the shared protected
+`Arc<AppleClientSecretSigner>`, vault, repository and checked HTTPS adapters.
+`run_once()` claims one eligible job before network I/O. The PostgreSQL claim has
+an exclusive60-second lease/version and at most8 attempts. An expired lease can
+be reclaimed; stale workers cannot acknowledge or reschedule its replacement.
+The30-second attempt decrypts against the stored binding, compares the encrypted
+provider client, issues a fresh client secret and resolves only
+`https://appleid.apple.com/auth/revoke`. Disabling sign-in does not discard pending
+revocation or reenable authentication. No user/session lock spans network I/O.
+
+`AppleRevocationHttp` receives a protected, redacted form request, never an uploaded
+ID token or a caller-selected endpoint. Server `apple-grants` selects the existing
+`OidcHttps` implementation with normal certificate/hostname verification, checked
+address pinning and shared bounded operations. It uses no proxy, redirect, cookie,
+automatic retry or raw diagnostics. Its dedicated16KiB response profile permits
+an absent Content-Type only for actually empty200; ordinary OIDC responses still
+require their original JSON profile. Core accepts only empty200 as confirmation;
+nonempty200 and400 invalid_grant do not become success. Errors retain finite
+transport/provider/configuration/unavailable categories.
+
+Only an opaque worker-created `AppleRevocationConfirmation` can request repository
+completion. Exact realm/source/client/job/lease/version and authoritative clock
+checks after row/write waits precede commit. Confirmed completion erases ciphertext
+and key ID. Failure retains ciphertext and schedules capped exponential backoff
+starting at30 seconds; exhausting8 attempts remains a visible failed state. A lost
+successful response can be retried idempotently after backoff; no local session is
+created, refreshed or revoked by this worker.
+
+Trusted `maintain_apple_grants(realm)` processes at most64 rows per phase with
+`SKIP LOCKED`: erase expired pending/leased/failed ciphertext, classify exhausted
+expired leases, then remove terminal metadata after another604800 elapsed seconds.
+It returns the number expired, not the number confirmed. Claims invoke maintenance
+for their realm; an operator must also schedule it for inactive sources/realms and
+repeat bounded batches as necessary. Without invocation no automatic purge occurs.
+Normal startup does not schedule or select this component.
 
 ## Optional Rust social identity mutation
 

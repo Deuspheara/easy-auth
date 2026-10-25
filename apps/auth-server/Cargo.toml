@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+apple-grants = ["oidc-verification", "auth-core/apple-grants", "auth-postgres/apple-grants"]
 issuer-web = ["issuer-signing", "auth-postgres/issuer-native-refresh", "auth-axum/issuer-native-web"]
 oidc-client = ["oidc-egress", "auth-core/oidc-client"]
 issuer-signing = ["auth-core/issuer-signing", "dep:libc"]
