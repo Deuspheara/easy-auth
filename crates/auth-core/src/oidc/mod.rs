@@ -64,3 +64,6 @@ pub use verification::{
 pub use verification::{
     OidcClientCredential, OidcClientCredentials, OidcClientIdentity, OidcClientTokens,
 };
+
+#[cfg(feature = "apple-grants")]
+pub use apple::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};

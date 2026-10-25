@@ -18,3 +18,8 @@ pub use flow::{AppleAuthorization, AppleAuthorizationCompletion, AppleAuthorizat
 pub use nonce::AppleNonceEncoding;
 pub use profile::AppleInitialProfile;
 pub use secret::{AppleClientSecret, AppleClientSecretSigner};
+
+#[cfg(feature = "apple-grants")]
+mod grants;
+#[cfg(feature = "apple-grants")]
+pub use grants::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};

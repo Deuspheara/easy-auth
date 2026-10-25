@@ -391,3 +391,25 @@ existing digest implementation and the previously used published RFC7636 vector;
 no custom signature or XML fixture is introduced. The code component does not
 establish an outbound JWT/signing dependency decision, conformance or independent
 approval. AUTH-39 and M07 still require their own actual evidence.
+
+
+## AUTH-26 protected Apple storage envelope (in progress,2026-10-25)
+
+The optional core `apple-grants` storage foundation reuses locked josekit0.10.3 /
+OpenSSL `dir` + `A256GCM` compact envelopes. No new package/version, algorithm
+implementation, trust root, license or advisory exception is introduced. This is
+an internal at-rest format, separate from the inbound signature-only profile
+recorded above; inbound JWE authentication remains unsupported. Pinned source
+inspection confirms exact header selection occurs before decryption/compression.
+Every extra/compression/alternate-profile member is rejected, including validly
+encrypted negative fixtures. Associated realm/source/client/identity/grant UUIDs
+are authenticated; no raw provider subject/email is added to clear metadata.
+
+Trusted explicit storage keys are bounded and distinct from ES256 signing keys.
+Unknown IDs do not trigger key-by-trial/current-key fallback. Owned raw key/plaintext
+buffers zeroize, but native/parser internal copies are not claimed erased. Tests
+exercise rotation/retirement, tag/context tampering, bounds/redaction and native
+work retaining its capacity after async waiter cancellation. This foundation is
+not yet a captured grant ledger, revocation worker, ordinary activation or real
+Apple acceptance. [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md)
+records the remaining integration, persistence, retry and operational requirements.
