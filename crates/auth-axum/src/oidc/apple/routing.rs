@@ -1,4 +1,4 @@
-use super::{AppleWebServices, apple_web_openapi, delivery, pages, signin};
+use super::{AppleWebServices, apple_web_openapi, delivery, operation, pages, signin};
 use crate::{
     Auth, BrowserConfig,
     browser::{boundary, post_delivery_boundary},
@@ -50,6 +50,7 @@ pub(in crate::oidc) fn routes(base: AppState, services: AppleWebServices) -> Res
         return Err(Error::InvalidInput);
     }
     let protected = Router::new()
+        .route("/v1/apple/return-operation", post(operation::operation))
         .route("/v1/apple/sign-in/start", post(signin::start))
         .route("/v1/apple/sign-in/finish", post(signin::finish))
         .route("/v1/apple/sign-in/cancel", post(signin::cancel))

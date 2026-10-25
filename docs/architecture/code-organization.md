@@ -1,5 +1,23 @@
 # Code organization
 
+Explicit Axum social management owns concrete matching services, thin provider
+handlers, closed wire types, original-owner/cookie binding, unlink delegation,
+composition, contract and fixed pages/controllers under `oidc/social/`. Existing
+provider route groups were extracted in a separate regression-tested commit.
+Private trusted selection metadata changes presentation only. Apple state-only
+return selection remains separate from cookie-free cross-site delivery and final
+authority. No SQL, account policy, provider framework or proof constructor moves
+into HTTP.
+
+Unchanged signing producers load once at the HTTP suite root, extracted separately.
+New feature suites separate lifecycle, binding, presentation/composition and actual
+audit/source faults. Owned browser modules separate process/composition, reused
+maintained authorization producers, ordinary mail delivery, journey observations
+and cases. New implementation/test modules remain below300 lines; longer ordered
+fixture constructors and browser cases retain coherent setup, negative/positive
+observations and cleanup as function-size exceptions. No unrelated cleanup or new
+dependency is introduced.
+
 Optional identity linking extends core `oidc/identities/linking.rs` and the owning
 Google/Apple authorization modules. Default operations still reject another
 purpose. PostgreSQL `oauth/identities/linking/` owns completion, retained-factor

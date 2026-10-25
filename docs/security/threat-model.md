@@ -1,5 +1,16 @@
 # Threat model — alpha design, before credential flows
 
+Explicit social web linking requires trusted concrete selection, exact-Origin
+closed JSON and four independent host-only private Link cookies per provider.
+Displayed owner UUIDs only reject an unexpected session; original purpose/session
+proof and final core/PG checks confer authority. Google GET and Apple's state-only
+same-origin presentation hint cannot consume/exchange/mutate. Apple cross-site
+delivery remains cookie/storage-free. Unique state hints prevent ambiguous UI;
+callback-aware cancellation prevents stale pages clearing newer proof. Scripts
+remove/scrub returns, fence late responses across navigation/restoration, discard
+raw input before finish and never retry credential completion. Local unlink remains
+distinct from unimplemented remote Apple grant revocation.
+
 Explicit social linking uses a separate Link purpose and original fresh owner/
 session with a signed nonce-bound provider result; matching email/profile never
 selects a local owner. Default sign-in/deletion cannot consume a linking proof.

@@ -12,6 +12,11 @@ pub struct AppleWebServices {
     pub(super) sign_in: Arc<OidcSignIn>,
 }
 impl AppleWebServices {
+    #[cfg(feature = "social-linking-web")]
+    pub(in crate::oidc) fn policy(&self) -> &OidcIdentityPolicy {
+        &self.policy
+    }
+
     pub fn new(
         policy: OidcIdentityPolicy,
         transactions: Arc<OAuthTransactions>,

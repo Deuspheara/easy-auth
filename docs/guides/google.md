@@ -572,3 +572,11 @@ freshness/deletion acceptance.
 The explicit session-age profile cannot manufacture recent authentication or waive
 Google application eligibility. Ordinary activation, genuine freshness/deletion
 and broader lifecycle review remain gated.
+
+## Explicit identity linking
+
+The optional [social management composition](social-linking.md) adds separate
+owner/session-bound web linking and fresh retained-method local unlink. Its fixed
+account-selection prompt does not establish authentication freshness. The separate
+Google web router retains only its existing sign-in and explicit deletion paths;
+compiling the linking feature does not silently add management routes.

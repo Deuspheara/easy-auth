@@ -24,3 +24,8 @@ pub use web::{OidcWebServices, oidc_web_openapi, oidc_web_router};
     any(feature = "saml-web", feature = "issuer-native-web")
 ))]
 pub(crate) use web::{attach, clear_proofs};
+
+#[cfg(feature = "social-linking-web")]
+mod social;
+#[cfg(feature = "social-linking-web")]
+pub use social::{SocialWebServices, experimental_social_web_router, social_web_openapi};

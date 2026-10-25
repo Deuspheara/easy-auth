@@ -25,6 +25,11 @@ export const guides = [
     slug: "apple-setup",
     title: "Apple prerequisites",
   },
+  {
+    source: "docs/guides/social-linking.md",
+    slug: "social-linking",
+    title: "Link provider accounts",
+  },
   { source: "docs/guides/passwords.md", slug: "passwords", title: "Passwords" },
   {
     source: "docs/guides/password-recovery.md",

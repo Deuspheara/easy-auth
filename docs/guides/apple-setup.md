@@ -111,7 +111,9 @@ Open `/apple/sign-in` and deliberately continue. Four independent protected Lax
 cookies retain the original operation. Apple's cross-site POST reaches only a
 bounded, escaped handoff at `/apple/callback`; it reads no cookies/storage and
 performs no code exchange or local commit. Its fixed script removes return data
-from DOM immediately. Deliberate confirmation then posts the actual raw form to
+from DOM immediately. A same-origin state-only presentation hint selects the fixed
+sign-in UI without storage access, exchange, consumption or mutation. Deliberate
+confirmation then posts the actual raw form to
 the same-origin finish endpoint. Original private proof, verified signed nonce,
 current provider policy and atomic commit are still required before a session.
 Unsigned names are ignored. An existing session prevents starting or completing
@@ -162,3 +164,10 @@ by this implementation. Owned offline signed responses are component evidence.
 See [integration selection](provider-setup.md) for the currently available paths.
 The [dated backend receipt](../security/apple-backend-verification-2026-10-25.md)
 records the local tests and the unperformed provider/OS acceptance separately.
+
+## Explicit identity linking
+
+The optional [social management composition](social-linking.md) adds separate
+owner/session-bound web link operations and fresh retained-method local unlink.
+The ordinary `AppleAuthorization` and separate Apple web router stay sign-in-only.
+This is not remote Apple grant revocation, native linking or ordinary activation.

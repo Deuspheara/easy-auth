@@ -1,5 +1,41 @@
 # HTTP contract v1
 
+## Experimental social linking web transport
+
+Explicit Axum `social-linking-web`, `SocialWebServices` and
+`experimental_social_web_router` compose one base router with matching existing
+Google/Apple web services and separate link authorizations. Same realm, HTTPS,
+exact existing callbacks and all source/profile checks remain mandatory. Compiling
+the feature does not enable linking in ordinary or separate provider builders.
+The [selected schema](openapi-social-web.json) and
+[guide](../guides/social-linking.md) specify the integration boundary.
+
+| Exact-Origin JSON POST | Closed body | Success |
+| --- | --- | --- |
+| `/v1/account/google-link/start`, `/v1/account/apple-link/start` | `expected_owner`, `confirmation="link this account"` | 200 public authorization URL and four independent protected Link cookies |
+| `/v1/account/google-link/finish` | actual raw `query`, same confirmation | 204 after atomic link; current session retained |
+| `/v1/account/apple-link/finish` | actual raw `response` form, same confirmation | 204 after atomic link; current session retained |
+| `/v1/account/google-link/cancel`, `/v1/account/apple-link/cancel` | optional returned public `state`; absent deliberately selects current | 204 original bound cancellation; current session retained |
+| `/v1/account/providers/oidc/unlink` | `expected_owner`, `identity`, `confirmation="unlink this account"` | 204 owned identity removal using a fresh retained method; no remote grant revocation |
+
+`expected_owner` is a deny-only check against the trusted current session, never an
+owner selector. The original Link purpose binds owner/session through final commit.
+Unknown query/body members, absent/duplicate/tampered private cookies, wrong purpose,
+changed source/session, stale original caps or conflicting subject ownership fail
+closed. A stale returned state cannot clear newer proof cookies. Logout clears all
+five Google/Apple sign-in/deletion/link proof sets. No mutation issues a session.
+
+`/social/accounts` is a fixed read/confirmation page using normal session/inventory
+reads. Google GET return selects link UI only under trusted explicit composition
+and unique matching protected state. Apple cross-site delivery remains cookie/
+storage/DB-free. Its same-origin POST `/v1/apple/return-operation` takes only `{state}`
+and returns a fixed `sign_in` or explicitly selected `link_identity` presentation
+hint, with no database, exchange, consume or mutation. Default Apple composition
+can select only sign-in. Unknown/ambiguous state returns401 without clearing proof.
+The default Apple schema includes the finite selected-composition enum; this is
+not authority or activation. Scripts drop raw returns before finish and on
+navigation/restoration; no storage, raw rendering or automatic finish retry.
+
 ## Optional Rust social identity mutation
 
 Core/PostgreSQL `oidc-linking` exposes `OidcIdentityLinking` and the

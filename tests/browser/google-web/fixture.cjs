@@ -20,7 +20,7 @@ function start(binary, root, origin) {
   child.stderr.on('data', () => {diagnostic = true;});
   child.on('error', () => rejectReady(new Error('owned fixture could not start')));
   const exited = new Promise(resolve => child.on('close', code => {rejectReady(new Error('owned fixture exited')); resolve(code);}));
-  return {ready,
+  return {ready, ownedDatabase: () => database,
     async close() {
       if (child.exitCode === null && child.signalCode === null) child.kill('SIGINT');
       let timer;

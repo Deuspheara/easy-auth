@@ -81,3 +81,6 @@ pub use issuer_web::{
     IssuerNativeWebServices, experimental_issuer_native_web_router, issuer_native_consumer_openapi,
     issuer_native_web_openapi,
 };
+
+#[cfg(feature = "social-linking-web")]
+pub use oidc::{SocialWebServices, experimental_social_web_router, social_web_openapi};

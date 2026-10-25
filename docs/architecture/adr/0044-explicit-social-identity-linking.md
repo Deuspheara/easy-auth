@@ -104,6 +104,47 @@ newer operation; callback-aware cancellation checks original public state. Keep
 proofs out of URLs, browser storage, diagnostics and reports, and never auto-retry
 credential completions. Ordinary activation remains separate.
 
+## Selected web composition and callback purpose
+
+The concrete experimental social web composition is implemented using the existing Google/Apple
+web services, their explicitly constructed matching link authorizations and one
+core linking use case. Share a single ordinary base router and attach extracted
+provider routes; do not merge duplicate base routers or infer activation from a
+compiled Cargo feature. Default provider builders expose no linking operation.
+All realm/configuration/HTTPS callback checks remain in the owning provider.
+
+It uses separate host-only protected Link cookies, explicit Google/Apple link
+start/finish/cancel routes and an owner-authorized OIDC unlink route. Start/unlink
+carry an expected owner UUID only as a consistency check against the trusted
+current session; it selects no owner. Require deliberate fixed confirmations.
+Changed-owner/session, stale state and malformed inputs cannot silently retarget
+an operation. A fixed account page consumes normal session/inventory reads and
+renders issuer/UUID metadata as text, with no issuer-derived navigation.
+
+The same persisted provider namespace and exact callback must serve sign-in and
+linking so a linked subject can later authenticate through the normal matching
+connection. Do not invent a second redirect, rewrite subject namespaces or relax
+exact-return validation. Google GET delivery can select a fixed purpose page from
+uniquely matching protected public-state hints, only when linking is explicitly
+selected; this remains presentation and never consumes a proof.
+
+Apple's cross-site POST cannot read cookies or storage and its protected Lax
+cookies are correctly absent. Retain the same inert escaped handoff. After removing
+raw data from DOM and scrubbing location, a fixed script may make an exact-Origin
+same-origin POST carrying only returned public state to select a presentation
+operation from uniquely matching private state cookies. This hint performs no
+authentication, database access, consumption, code exchange or mutation. Default
+composition can select sign-in only; selected social composition may select link.
+Unknown/ambiguous state fails closed without clearing cookies. It never substitutes
+for full state/private proof/original owner/session/provider/final-commit checks.
+Only a deliberate subsequent confirmation sends the actual response to finish.
+
+Hint/manager/return scripts retain owned cancellation/generation fences, drop
+payloads before finish and on navigation/restoration, and never retry credential
+completions. No return secret enters browser storage, diagnostics or a new URL.
+An operation hint, expected owner, API capability or inventory row grants nothing.
+Local unlink is not represented as Apple grant revocation.
+
 ## Required evidence
 
 Use maintained signed producers and actual committed local authentication, never

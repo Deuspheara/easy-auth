@@ -707,6 +707,52 @@
         }
       }
     },
+    "/v1/apple/return-operation": {
+      "post": {
+        "tags": [],
+        "operationId": "operation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppleReturnOperationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Non-authoritative fixed UI selection using unique matching private state cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppleReturnOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "413": {
+            "description": ""
+          },
+          "415": {
+            "description": ""
+          },
+          "504": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/v1/apple/sign-in/cancel": {
       "post": {
         "tags": [],
@@ -2006,6 +2052,28 @@
       },
       "AppleEmptyInput": {
         "type": "object",
+        "additionalProperties": false
+      },
+      "AppleReturnOperation": {
+        "type": "string",
+        "enum": [
+          "sign_in",
+          "link_identity"
+        ]
+      },
+      "AppleReturnOperationInput": {
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "Public returned state only. No code, token, profile or private proof.",
+            "maxLength": 43,
+            "minLength": 43
+          }
+        },
         "additionalProperties": false
       },
       "AppleStartResponse": {

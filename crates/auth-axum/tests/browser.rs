@@ -78,3 +78,7 @@ mod apple_provider;
 #[cfg(feature = "google-web")]
 #[path = "../../../tests/support/google/provider.rs"]
 mod google_provider;
+
+#[cfg(feature = "social-linking-web")]
+#[path = "browser/social/mod.rs"]
+mod social;

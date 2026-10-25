@@ -1,5 +1,12 @@
 # Architecture
 
+Explicit experimental Axum `social-linking-web` now composes matching existing
+Google/Apple transports with owner/session-bound link confirmation and retained-
+method local unlink. Separate provider builders expose no link mutation. Apple
+cross-site delivery remains cookie/storage-free; a state-only same-origin hint
+selects presentation and confers no authority. See the
+[social guide](../guides/social-linking.md) and [ADR0044](adr/0044-explicit-social-identity-linking.md).
+
 Optional core/PostgreSQL `oidc-linking` now extends existing provider modules with
 explicit purpose-bound linking and fresh retained-method unlink. Its mapped proof
 and original session are separate from public inventory metadata. Current source,

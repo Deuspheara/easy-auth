@@ -10,6 +10,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+social-linking-web = ["google-web", "apple-web", "auth-core/oidc-linking", "auth-postgres/oidc-linking"]
 issuer-native-web = ["issuer-token-management-web", "issuer-native-consent-web"]
 issuer-native-consent-web = ["issuer-consent-web", "auth-core/issuer-native-refresh", "auth-postgres/issuer-native-refresh"]
 issuer-token-management-web = ["issuer-web", "auth-core/issuer-token-management", "auth-postgres/issuer-token-management"]
@@ -135,3 +136,16 @@ required-features = ["issuer-consent-web"]
 name = "issuer-web-browser"
 path = "examples/issuer-web-browser/main.rs"
 required-features = ["issuer-web"]
+
+[[example]]
+name = "export_social_web_openapi"
+required-features = ["social-linking-web"]
+
+[[example]]
+name = "social-web-browser"
+path = "examples/social-web-browser/main.rs"
+required-features = ["social-linking-web"]
+
+[[example]]
+name = "social-source-probe"
+required-features = ["google-web"]

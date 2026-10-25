@@ -64,10 +64,10 @@ export const features = [
   {
     name: "Apple",
     mark: "◦",
-    status: "Planned",
+    status: "Component",
     description:
-      "A planned provider adapter. No implemented Apple sign-in is advertised.",
-    href: "/docs/features/",
+      "Experimental verified code flow and explicit web composition. Registration, grant lifecycle and ordinary activation remain gated.",
+    href: "/docs/guides/apple-setup/",
     featured: false,
   },
   {
