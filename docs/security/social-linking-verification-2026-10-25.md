@@ -42,12 +42,14 @@ retaining build-script debug level1 for the existing macOS SQLx alignment constr
 | `cargo test --workspace --all-features` | 1103 reports passed (1102 primary plus intentional logging-child repeat);0 failed/ignored |
 | Full all-feature HTTP / core / PostgreSQL | 211 /169 /628 passed |
 | New real-PG linking / HTTP scenarios | 22 /13 passed |
-| `cargo test --workspace --all-features --examples` | Passed with owned database/socket access |
-| Existing genuine Apple HTTPS Chromium suite | 11/11 passed |
+| `cargo test --workspace --all-features --examples` | 35 passed with owned database/socket access |
+| Existing genuine Apple / Google HTTPS Chromium suites | 11/11 and13/13 passed |
 | Genuine combined social HTTPS Chromium suite | 13/13 passed |
 | Existing SAML source / reference token checks | Passed |
 | Compiled advisory and all-feature cargo-deny | Passed; no exemption added |
 | Redacted changed-public-source secret scan | 64 files passed before this receipt was added; no leaks |
+| Website formatting / source/link tests / Astro check / build | Passed;7 source tests,0 diagnostics,27 generated pages |
+| Website Chromium interactions/search/mobile/routes/anchors | Passed;26 routes and441 anchors; ephemeral server closed |
 | Dependency lock | Unchanged |
 
 The lockfile's inactive optional RSA RUSTSEC-2023-0071 entry remains visible; it
