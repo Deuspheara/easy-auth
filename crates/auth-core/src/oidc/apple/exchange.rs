@@ -36,7 +36,7 @@ impl AppleClientType {
 pub struct AppleCodeExchange {
     pub(super) documents: Arc<OidcDocuments>,
     repository: Arc<dyn OidcExchangeRepository>,
-    signer: AppleClientSecretSigner,
+    signer: Arc<AppleClientSecretSigner>,
     http: Arc<dyn OidcTokenHttp>,
     verifier: OidcTokenVerifier,
     pub(super) client_type: AppleClientType,
@@ -49,6 +49,28 @@ impl AppleCodeExchange {
         registry: Arc<dyn OidcConnectionRepository>,
         repository: Arc<dyn OidcExchangeRepository>,
         signer: AppleClientSecretSigner,
+        client_type: AppleClientType,
+        http: Arc<dyn OidcHttp>,
+        tokens: Arc<dyn OidcTokenHttp>,
+    ) -> Result<Self> {
+        Self::with_shared_signer(
+            connection,
+            registry,
+            repository,
+            Arc::new(signer),
+            client_type,
+            http,
+            tokens,
+        )
+    }
+
+    /// Explicitly share the same protected signer/capacity with a revocation
+    /// worker. No private key projection, clone or alternative client is created.
+    pub fn with_shared_signer(
+        connection: OAuthConnection,
+        registry: Arc<dyn OidcConnectionRepository>,
+        repository: Arc<dyn OidcExchangeRepository>,
+        signer: Arc<AppleClientSecretSigner>,
         client_type: AppleClientType,
         http: Arc<dyn OidcHttp>,
         tokens: Arc<dyn OidcTokenHttp>,

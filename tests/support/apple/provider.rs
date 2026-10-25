@@ -84,6 +84,19 @@ impl Provider {
         );
     }
 }
+impl Provider {
+    pub fn assert_client_secret(&self, value: &str) {
+        let (payload, header) = jws::deserialize_compact(value, self.credential_verifier.as_ref())
+            .expect("actual registered ES256 credential signature");
+        let secret: Value = serde_json::from_slice(&payload).unwrap();
+        assert_eq!(header.key_id(), Some("KEY0000001"));
+        assert_eq!(secret["iss"], "TEAM000001");
+        assert_eq!(secret["sub"], CLIENT);
+        assert_eq!(secret["aud"], ISSUER);
+        assert!(secret["exp"].as_u64().unwrap() - secret["iat"].as_u64().unwrap() <= 300);
+    }
+}
+
 #[async_trait]
 impl OidcHttp for Provider {
     async fn resolve(&self, host: &str, port: u16) -> Result<Vec<SocketAddr>> {
@@ -144,15 +157,7 @@ impl OidcTokenHttp for Provider {
         } else {
             assert!(!fields.iter().any(|(name, _)| name == "redirect_uri"));
         }
-        let (payload, header) =
-            jws::deserialize_compact(field("client_secret"), self.credential_verifier.as_ref())
-                .expect("actual registered ES256 credential signature");
-        let secret: Value = serde_json::from_slice(&payload).unwrap();
-        assert_eq!(header.key_id(), Some("KEY0000001"));
-        assert_eq!(secret["iss"], "TEAM000001");
-        assert_eq!(secret["sub"], CLIENT);
-        assert_eq!(secret["aud"], ISSUER);
-        assert!(secret["exp"].as_u64().unwrap() - secret["iat"].as_u64().unwrap() <= 300);
+        self.assert_client_secret(field("client_secret"));
         if self.hold.load(Ordering::SeqCst) {
             self.entered.notify_one();
             self.release.notified().await;
