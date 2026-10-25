@@ -48,6 +48,10 @@ mod oidc_web;
 #[path = "browser/google_web/mod.rs"]
 mod google_web;
 
+#[cfg(feature = "apple-web")]
+#[path = "browser/apple_web/mod.rs"]
+mod apple_web;
+
 #[cfg(feature = "saml-web")]
 #[path = "browser/saml/mod.rs"]
 mod saml;

@@ -1,4 +1,8 @@
+#[cfg(feature = "apple-web")]
+mod apple;
 mod cookies;
+#[cfg(feature = "apple-web")]
+pub use apple::{AppleWebServices, apple_web_openapi, experimental_apple_web_router};
 mod deletion;
 #[cfg(feature = "google-web")]
 mod google;

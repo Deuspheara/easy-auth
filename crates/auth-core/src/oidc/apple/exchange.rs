@@ -76,6 +76,10 @@ impl AppleCodeExchange {
     pub fn configuration(&self) -> &OAuthConnection {
         self.documents.connection()
     }
+    /// Trusted immutable registration kind; never inferred from a callback.
+    pub fn client_type(&self) -> AppleClientType {
+        self.client_type
+    }
 
     pub async fn exchange(
         &self,

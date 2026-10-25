@@ -19,6 +19,15 @@ pub(super) const ACCOUNT_DELETION_COOKIES: Cookies = Cookies {
     ],
 };
 const COOKIE_SECONDS: u32 = 300;
+#[cfg(feature = "apple-web")]
+pub(super) const APPLE_SIGN_IN_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-apple-signin-browser",
+        "__Host-auth-apple-signin-state",
+        "__Host-auth-apple-signin-nonce",
+        "__Host-auth-apple-signin-pkce",
+    ],
+};
 #[cfg(feature = "google-web")]
 pub(super) const GOOGLE_SIGN_IN_COOKIES: Cookies = Cookies {
     names: [

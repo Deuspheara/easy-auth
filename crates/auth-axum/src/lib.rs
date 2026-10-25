@@ -26,6 +26,8 @@ use auth_core::Auth;
 pub use browser::BrowserConfig;
 pub use contract::openapi;
 pub use handlers::sessions::authenticate;
+#[cfg(feature = "apple-web")]
+pub use oidc::{AppleWebServices, apple_web_openapi, experimental_apple_web_router};
 #[cfg(feature = "google-web")]
 pub use oidc::{GoogleWebServices, experimental_google_web_router, google_web_openapi};
 #[cfg(feature = "oidc-account-deletion")]

@@ -1,5 +1,22 @@
 # Code organization
 
+The explicit Axum Apple adapter extends `oidc/apple/`: trusted web services,
+routing, closed wire types, delivery escaping, thin completion/cancel handlers,
+fixed pages/script and selected contract each own one purpose. Existing cookie,
+Origin and post-delivery boundaries are reused; no SQL or identity policy moves
+into HTTP. The read-only core client-kind getter permits rejecting native
+registration before web composition, without a public proof constructor.
+
+Unchanged maintained Apple test signing moved separately into `tests/support/apple/`
+before HTTP/browser reuse. Named HTTP suites separate delivery, boundary, binding,
+completion, atomicity and contract. Owned example modules separate lifetime,
+composition and public-input signed producer; browser modules separate runner,
+journey observation, loopback fixture I/O and ordered cases. Modules stay below300
+lines. Longer ordered fixture constructors/producer/scenarios retain setup,
+actual observations, negative and valid controls together as reviewed function-size
+exceptions. No structural refactor is mixed into behavior, new dependency or
+unrelated cleanup deferred.
+
 Apple's optional core feature lives in `oidc/apple/`: protected key import,
 fixed client-secret issuance, nonce encoding, code exchange, authorization inputs,
 callback decoding, unsigned profile and orchestration each own one responsibility.

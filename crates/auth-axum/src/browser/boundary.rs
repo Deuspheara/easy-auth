@@ -30,7 +30,7 @@ pub(crate) async fn boundary(
 
 /// Cross-site POST delivery may render only a non-authoritative handoff page.
 /// All authority-changing routes must use the ordinary same-origin boundary.
-#[cfg(feature = "saml-web")]
+#[cfg(any(feature = "saml-web", feature = "apple-web"))]
 pub(crate) async fn post_delivery_boundary(
     State(state): State<AppState>,
     request: Request,

@@ -1,7 +1,7 @@
 # Prepare Sign in with Apple
 
-An **experimental backend Apple component** is implemented behind core/PostgreSQL
-`apple` features. It generates client secrets and verifies initiated web/native
+An **experimental Apple component** is implemented behind core/PostgreSQL
+`apple` and explicit Axum `apple-web` features. It generates client secrets and verifies initiated web/native
 code results through existing state, identity and session boundaries. There is no
 ordinary Apple router, native OS adapter or `AUTH_APPLE_*` startup contract yet.
 Registered Apple web/native acceptance and grant lifecycle remain unverified.
@@ -84,7 +84,7 @@ Pass only the bounded actual return form to `AppleAuthorizationResponse::parse`,
 then supply the original state/private proof and independently trusted actual
 backend return to `finish`. A transport must enforce actual route/method/body and
 same-origin final completion; cross-site form-post must not weaken ordinary session
-cookies. The component does not implement that HTTP bridge or OS callback delivery.
+cookies. The explicit HTTP bridge is described below; OS callback delivery remains unimplemented.
 An unsolicited ID token is rejected as a substitute for backend code exchange.
 Bound denial cancels only its operation. Linking and deletion purposes reject.
 
@@ -96,6 +96,50 @@ email flags are accepted only by this profile; generic OIDC/Google retain boolea
 typing. Missing/empty managed-account email creates no contact. Unsigned initial
 profile names remain separate presentation, require text rendering, and may be
 absent on later consent. Front-channel identity tokens never replace verification.
+
+## Explicit experimental web composition
+
+Enable Axum `apple-web` and construct `AppleWebServices` from matching persisted
+identity policy, `OAuthTransactions`, web-only `AppleCodeExchange` and `OidcSignIn`.
+Pass those services, the same-realm `Auth` and trusted HTTPS `BrowserConfig` into
+`experimental_apple_web_router`. Only the exact origin plus `/apple/callback` is
+accepted. Neither native registration kind (even plain nonce) can select this
+transport. This is not an ordinary server configuration flag or account-lifecycle
+activation. The normal reference root does not advertise Apple.
+
+Open `/apple/sign-in` and deliberately continue. Four independent protected Lax
+cookies retain the original operation. Apple's cross-site POST reaches only a
+bounded, escaped handoff at `/apple/callback`; it reads no cookies/storage and
+performs no code exchange or local commit. Its fixed script removes return data
+from DOM immediately. Deliberate confirmation then posts the actual raw form to
+the same-origin finish endpoint. Original private proof, verified signed nonce,
+current provider policy and atomic commit are still required before a session.
+Unsigned names are ignored. An existing session prevents starting or completing
+another sign-in; cancel retains that session. No SameSite=None or permissive CORS
+is needed. Client IP keys abuse admission rather than pinning a moving browser.
+
+The return is discarded before completion and on navigation/restoration. A lost
+or rejected finish cannot be retried by this page. Check the current session before
+restarting; cancel a pending operation explicitly from the sign-in page. Callback
+cancellation includes its returned state so an older page cannot clear newer proof.
+The [HTTP contract](../architecture/api-contract.md#experimental-apple-web-transport)
+and [selected schema](../architecture/openapi-apple-web.json) specify exact inputs.
+
+Owned local acceptance uses:
+
+```sh
+cargo test --locked -p easy-auth-axum --features apple-web --test browser apple_web
+cargo build --locked -p easy-auth-axum --features apple-web --example apple-web-browser
+node tests/browser/apple-web/run.cjs
+```
+
+Use an owned disposable loopback `DATABASE_URL`, installed Chromium and existing
+`tests/browser/passkeys` npm dependencies. The browser fixture owns and removes its
+random database and private TLS files; it intercepts only Apple authorization
+navigation and never contacts real Apple. It signs normal public request inputs
+through maintained JOSE and exercises actual core/PostgreSQL commit. This proves
+offline transport behavior, not Apple eligibility, consent, registered return
+acceptance, native delivery or revocation.
 
 ## Account lifecycle qualification
 

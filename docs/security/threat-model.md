@@ -7,7 +7,7 @@ No arbitrary signing endpoint, default key, retired-key fallback or raw diagnost
 is exposed. Native library memory copies are not claimed erased.
 
 The explicit Apple profile fixes issuer/endpoints/Post authentication and RS256,
-retains private browser/state/nonce/source/client/realm/revision and original caps,
+retains private browser/state/nonce/provider-source/client/realm/revision and original caps,
 and requires an actually verified signed nonce after one-use code redemption.
 Its documented provider-specific wire contract does not pretend to offer S256;
 generic OIDC/Google retain that requirement. Native raw/SHA256-hex convention and
@@ -24,9 +24,17 @@ freshness, stronger-account fallback or local authority follows from presentatio
 A front-channel token cannot replace initiated backend code exchange. Final mapped
 identity/session commit still rechecks policy/subject/deadline under existing locks.
 
-No ordinary Apple route or session-cookie policy is changed. A future form-post
-bridge must retain actual dedicated delivery, bounded body and same-origin final
-completion without weakening ordinary cookies. Linking/deletion remain rejected
+No ordinary Apple startup or session-cookie policy is changed. Explicit `apple-web`
+uses one32KiB form-urlencoded cross-site handoff that reads no cookies/storage and
+cannot consume state, exchange tokens or commit a session. Escaped inert template
+data is removed immediately by fixed same-origin script; navigation/restoration
+and pre-finish discard prevent automatic repeat. A deliberate same-origin finish
+retains exact Origin/private Lax cookies/core verification and final atomic commit.
+Stale/malformed state cannot clear newer proof; callback cancel also checks its
+returned state. Any ambient session cookie prevents silent account replacement.
+Client IP keys committed abuse admission, not immutable identity. Owned browser
+fixtures exercise actual cross-site cookie omission and same-origin return; they
+establish no real Apple registration or OS behavior. Linking/deletion remain rejected
 by this sign-in component. Grant custody/revocation, real web/native acceptance
 and a usable account lifecycle remain required before activation. See
 [ADR0043](../architecture/adr/0043-apple-code-flow.md).

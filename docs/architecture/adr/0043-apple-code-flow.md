@@ -52,11 +52,9 @@ generic provider framework, persistence policy in handlers or weakening of exist
 claims/PKCE/cookie checks is permitted. Provider grant custody/revocation remains
 the separate AUTH-26 scope; ordinary activation cannot strand provider-only users.
 
-## Evidence and remaining work
-
 ## Experimental web delivery decision
 
-The next AUTH-24 boundary adds an explicit `apple-web` Axum composition, not
+AUTH-24 adds an explicit `apple-web` Axum composition, not
 ordinary server activation. Aligned persisted web-only Apple services, realm and
 exact HTTPS `/apple/callback` are mandatory. Start, finish and cancellation use
 the ordinary exact-Origin boundary and independent five-minute Secure/HttpOnly/
@@ -83,8 +81,9 @@ enter URLs, script storage, logs or rendered diagnostics. Unsigned first-consent
 profile is not promoted into local contact or identity/display policy.
 
 Owned HTTPS Chromium plus real PostgreSQL and maintained offline JOSE producers
-must establish actual cross-site Lax behavior, deliberate completion, replay and
-wrong-browser/source/realm rejection, cancellation, CSP/privacy and cleanup.
+must establish actual cross-site Lax behavior, deliberate completion, replay,
+wrong-browser/realm rejection, provider-source disable, committed source admission,
+cancellation, CSP/privacy and cleanup. Client IP is not an identity pin.
 Those fixtures grant no authority directly and are not registered Apple/device
 acceptance. Native OS delivery, ordinary activation and grant lifecycle remain
 separate gates. No PR, merge or deployment follows from this experimental adapter.

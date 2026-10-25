@@ -1,15 +1,48 @@
 # HTTP contract v1
 
-The optional Rust-only Apple boundary exposes `AppleClientSecretSigner`,
+The optional Rust Apple boundary exposes `AppleClientSecretSigner`,
 `AppleCodeExchange` and `AppleAuthorization` behind core/PostgreSQL `apple`.
 Preparation returns private proof separately from public web/native request
 inputs. Strict form decoding is untrusted; completion requires the retained
 operation/private proof and actual trusted dedicated backend return. Success
 returns the existing opaque verified identity, with unsigned first-consent profile
-separate; mapping/final session commit retain existing contracts. No new ordinary
-HTTP path, JSON DTO, cookie, OpenAPI operation or `AUTH_APPLE_*` setting is added.
-This component does not establish native OS or cross-site HTTP delivery. See the
+separate; mapping/final session commit retain existing contracts. No ordinary
+Apple startup or `AUTH_APPLE_*` setting is added. Native OS delivery is unimplemented. See the
 [Apple guide](../guides/apple-setup.md) and [ADR0043](adr/0043-apple-code-flow.md).
+
+## Experimental Apple web transport
+
+Axum `apple-web` exposes only explicit `AppleWebServices` and
+`experimental_apple_web_router` composition. Persisted realm, web-only client kind
+and exact trusted HTTPS origin plus `/apple/callback` must match. The selected
+[Apple OpenAPI](openapi-apple-web.json) is served at `/openapi.json`; ordinary
+and unrelated provider contracts contain none of these operations.
+
+| Route | Input / result |
+| --- | --- |
+| POST `/v1/apple/sign-in/start` | Closed JSON `{}`; `200 {authorization_url}` plus four private operation cookies |
+| POST `/apple/callback` | Actual form-urlencoded body, at most32KiB; escaped inert HTML handoff only, no cookies/storage/consume/exchange/session |
+| POST `/v1/apple/sign-in/finish` | Closed JSON `{response:string}` holding the actual raw form; `204` session cookie only after verified mapping and atomic commit |
+| POST `/v1/apple/sign-in/cancel` | Closed JSON `{state?:string}`; callback pages supply returned public state, standalone sign-in page deliberately cancels current pending proof; `204`, existing session retained |
+| GET `/apple/sign-in` | Fixed deliberate sign-in page; no query proof import |
+
+Start/finish/cancel require one exact trusted Origin and reject unknown queries or
+JSON fields. Start and finish reject any ambient session cookie, including invalid
+ones. Four independent `__Host-auth-apple-signin-{browser,state,nonce,pkce}` cookies
+are Secure, HttpOnly, Path=/, SameSite=Lax and Max-Age300, with no Domain. The `pkce`
+name retains the existing private operation-proof field; it advertises no Apple
+S256 wire support. Logout/session-clear responses also clear these proofs.
+
+Delivery is the sole cross-site exception. It validates form syntax but cannot
+authenticate Apple. Fixed `/apple/client.js` removes the inert return from DOM,
+retains it only in transient memory and requires a deliberate confirmation. Finish
+discards the payload before submission; navigation/restoration discards it without
+retry. Raw return data never enters URLs, browser storage or diagnostics. Malformed
+or mismatched-state finish/cancel cannot clear a newer operation. Successful
+state matching still requires all private/core/provider/current-policy checks.
+Client IP supplies committed abuse admission, not IP-pinned identity. Unsigned
+initial profile is ignored by local mapping. Real registered Apple/device tests,
+ordinary activation and provider-grant lifecycle remain gated.
 
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,

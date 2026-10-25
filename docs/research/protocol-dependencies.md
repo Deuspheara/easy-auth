@@ -16,6 +16,11 @@ are in [ADR0043](../architecture/adr/0043-apple-code-flow.md).
 Owned signing/PG fixtures establish component behavior, not actual Apple console,
 OS, provider rotation or lifecycle qualification. Existing license/advisory/native
 risks, outbound release gate and SAML waiver limits remain unchanged.
+The explicit Axum `apple-web` transport adds no dependency or version. Owned
+Chromium acceptance reuses existing Playwright/TLS/PG lifetime helpers and the
+unchanged maintained JOSE producer. It observes a real cross-site form POST and
+same-origin final commit; interception of Apple authorization remains offline
+fixture evidence, not registered-provider or OS acceptance.
 
 The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
 uses native browser modules/WebAuthn and fixed included HTML/CSS. The presentation
