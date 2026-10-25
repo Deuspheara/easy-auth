@@ -63,6 +63,12 @@ Apple's documented token contract supplies no code_verifier; this new explicit
 profile uses signed nonce/code-injection defense and dedicated return/private
 state binding, rather than silently switching generic policy after a failure.
 No interoperability or general protocol-compliance claim follows.
+Apple's [identity-token claim reference](https://developer.apple.com/documentation/signinwithapplejs/authorizationi/id_token)
+explicitly documents boolean/string verification flags and empty managed email.
+This initiated profile always requires nonce, even where Apple's broader platform
+guidance permits its absence. No `nonce_supported` value enables a replay fallback.
+Organization, fraud hints and transfer identifiers do not select local ownership,
+permissions or a migration/linking policy.
 
 `AppleAuthorization` aligns the exact transaction and code-component snapshots.
 Preparation returns public web form-post/native authorization inputs separately

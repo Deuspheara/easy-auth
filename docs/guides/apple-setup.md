@@ -116,3 +116,5 @@ These primary references were checked on 2026-10-25. No Apple account settings,
 production credentials, real-provider exchange or device acceptance were created
 by this implementation. Owned offline signed responses are component evidence.
 See [integration selection](provider-setup.md) for the currently available paths.
+The [dated backend receipt](../security/apple-backend-verification-2026-10-25.md)
+records the local tests and the unperformed provider/OS acceptance separately.
