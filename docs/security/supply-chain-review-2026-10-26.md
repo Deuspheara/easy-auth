@@ -128,6 +128,50 @@ complete Rust evidence. Official source SBOMs plus the separate selected graph
 retain both package coverage and resolver-only risks. New guards also exposed and
 corrected scoped npm naming and Debian-version representation assumptions.
 
+## Committed local validation
+
+Implementation `b83aabc60cc08cff1277ec6d4164c56df05dc300` was copied into a fresh
+isolated checkout. All five new exact CI command blocks passed locally: nineteen
+negative/helper tests, source inventory, source-verified/audited/frozen tool build,
+source/default-image SBOM generation and separate opt-in image SBOM generation.
+The source and SBOM receipts identify that exact checkout; all twenty SBOM hashes,
+complete selected-package coverage, graph references and supplemental copyright
+records were independently checked. Existing inventory/report output paths were
+refused without changing retained bytes. No hosted CI success is inferred.
+
+Three actual clean tool bootstrap executions retained their own source/audit/
+policy/binary receipts. The final build uses the unchanged official source archive
+SHA-256 `5d162f67705f0f5038759d73bf546a083bf30e8677c2e944b416bca48d9d69a8`
+and tooling lock SHA-256
+`907a775251bc3504de1df6c38830a2453ddbb1feef56b4bb9aa2a890a723abea`.
+Observed cargo-audit/cargo-deny versions and advisory database revision are in each
+receipt. The local final executable hash is
+`1bd6b4e8e9bbb1525b824d3c7206ffb2e673db0f503275e7506ccffbcdd0a35e`;
+other toolchains/platforms need their own observed binary identity.
+
+Formatting/whitespace, unique-key CI YAML parsing, local Markdown targets,
+changed-source and implementation-history secret scans pass without new scanner
+exceptions. The maintainability review found no handwritten module over 300 lines
+or function over roughly 50 lines; the generated tooling lock's size is deliberate.
+Source enumeration uses committed Git paths, not a filesystem walk over private/
+untracked inputs. Tests cover this boundary, stale CI revision, missing/ambiguous
+identity, unknown source, checksum/integrity/license gaps, missing/dangling graph
+nodes, archive traversal/links, source-prefix collisions, scoped npm names, full
+Debian package identity, root-license conflicts and unfamiliar copyright gaps.
+
+Authentication source, workspace manifests/lock, native dependency source, migration
+and build configuration are byte-identical to the AUTH-45 validation inputs. Its
+128 default/1,150 primary all-feature tests, including 651 PostgreSQL cases, strict
+default/all-feature Clippy and compiled advisory/license results remain evidence
+for those identical backend inputs; they are not claimed as new executions of
+unchanged tests in this tooling checkpoint. Compiled-graph cargo-audit and root
+cargo-deny were separately refreshed and passed, retaining inactive RSA and the
+existing warnings without policy changes. The new exact CI blocks and actual
+native builds above supply the additional validation. The original checkout's
+73 protected bytes/change set and empty index remain preserved; retained preview,
+accounts/passkeys and other services were not targeted. A documentation-only
+follow-up does not change exercised generator/tooling/image inputs.
+
 ## Reproduction and remaining acceptance
 
 Use Python 3.12+, Rust 1.95, Docker, installed cargo-audit/cargo-deny, and committed
