@@ -1,6 +1,7 @@
 # ADR0047: Separate schema administration from runtime verification
 
-Date: 2026-10-26. Status: proposed local implementation for AUTH-49; validation pending.
+Date: 2026-10-26. Status: accepted for the bounded local schema/role increment;
+AUTH-49 operational recovery and production acceptance remain incomplete.
 
 ## Context and scope
 
@@ -68,7 +69,14 @@ Reuse already locked Tokio/SQLx; adding a direct Tokio runtime edge to PostgreSQ
 introduces no package/version or crypto implementation. Keep metadata/locking in
 PostgreSQL, selection in server configuration, and CLI dispatch as composition.
 No SQL/persistence rule moves into HTTP/core, new crate/framework or migration rewrite.
-Required workspace/PG/security and maintainability gates remain before acceptance.
+Required workspace/PG/security and maintainability gates remain mandatory for
+subsequent changes.
+
+The [local verification record](../../security/database-role-verification-2026-10-26.md)
+now records passing required Rust/real-PG/security checks, exact committed role CI
+replay, real SMTP/HTTP/realm/logout observations, source identity and the failures
+corrected without assertion/policy relaxation. This accepts only this decision's
+schema/role boundary; the remaining AUTH-49 requirements are not completed.
 
 ## Responsibility review
 
