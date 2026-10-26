@@ -7,6 +7,8 @@ mod identity;
 #[cfg(feature = "issuer-clients")]
 mod issuer;
 mod locking;
+#[cfg(feature = "apple-grants")]
+mod maintenance;
 mod notifications;
 #[cfg(feature = "oauth-transactions")]
 mod oauth;

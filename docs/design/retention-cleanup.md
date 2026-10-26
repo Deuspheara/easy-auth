@@ -108,7 +108,8 @@ deletions. The original family cap, rather than consent/code/access expiry, prot
 reuse detection. Retained audits can deliberately keep those verifier rows longer.
 
 Apple maintenance is already owned by
-`oauth/identities/apple/revocation/maintenance.rs`. General maintenance must make
+`maintenance/apple.rs` (extracted unchanged from the Apple revocation module).
+General maintenance must make
 that same lifecycle available without depending on an active provider worker or
 silently enabling Apple. Its current counts cover expired ciphertext, not every
 maintenance action; any public report must name what was counted accurately.
@@ -127,3 +128,34 @@ fixtures for the resulting schema; previous schema38 overlap evidence must not b
 relabeled. This document completes only the eligibility/reference assessment.
 General retention implementation, operational qualification, incident session/key/
 token revocation and restored-snapshot reconciliation remain AUTH-49 work.
+
+## Structural preparation
+
+The Apple maintenance implementation was extracted separately to
+`crates/auth-postgres/src/maintenance/apple.rs`; its bytes match the previous module
+exactly (SHA-256
+`8ea5c167b79ddfb2c14d5f3b9af19059eea0d911e53117e168791b9d2607b1f2`).
+The `apple-grants` compile boundary and public method are unchanged. This prepares
+an owning maintenance location without adding general cleanup or enabling a
+feature. The entry files contain declarations only; no public visibility is added.
+
+Local checks on this extraction over design commit
+`5f6d5121e46c1898d180bc7af7012498d0856e92`:
+
+- `cargo fmt --all -- --check`: passed.
+- `cargo clippy --locked -p easy-auth-postgres --all-targets -- -D warnings`: passed.
+- The same strict Clippy command with `--all-features`: passed.
+- `cargo test --locked -p easy-auth-postgres --all-features --test lifecycle
+  'oidc::apple::grants::'`: 23 passed, zero failed/ignored, using owned real
+  PostgreSQL databases. Existing assertions were unchanged, including actual
+  lease recovery/backoff, expiry after waits and realm isolation.
+- Scoped redacted secret scan and whitespace checks: passed. The original 73
+  protected files retained their hashes and exact modified/untracked set; the
+  original index remained empty.
+
+The first invocation used an incorrect `lifecycle::` filter and selected zero
+tests; it is not accepted as test evidence. The corrected run asserts the actual
+23-test result, not merely Cargo's successful exit. Private qualified receipt:
+`auth49-retention-extraction-qualified-results.json`; initial logs remain retained.
+This is focused structural validation, not a fresh full-workspace, release or
+hosted-CI result. Complete retention behavior still requires the gates above.

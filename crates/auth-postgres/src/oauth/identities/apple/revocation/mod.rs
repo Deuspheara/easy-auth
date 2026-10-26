@@ -1,6 +1,5 @@
 mod claim;
 mod completion;
-mod maintenance;
 mod port;
 use auth_core::{AppleGrantRevocationJob, OAuthConnection};
 fn matches(source: &OAuthConnection, job: &AppleGrantRevocationJob) -> bool {

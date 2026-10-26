@@ -18,6 +18,12 @@ function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
+Realm maintenance owns the existing Apple grant expiry/lease/terminal cleanup in
+PostgreSQL `maintenance/apple.rs`. Its implementation was moved without byte
+changes before general retention work; the public method and `apple-grants`
+feature boundary remain unchanged. Provider revocation claim/ack/network policy
+stays in its owning feature. General retention is still proposed in ADR0050.
+
 Apple grant capture extends `oidc/apple/grants/` with explicit authorization,
 opaque verified/mapped/capture types and repository use cases. Shared response
 projection, redemption and callback admission were extracted in separate tested
