@@ -96,6 +96,33 @@ passkey or mailbox was touched.
 These remain Chromium virtual-authenticator observations, not Safari,
 physical-device or native OS storage acceptance.
 
+## Remaining browser and startup profiles refreshed
+
+At source base `4975e06ab165e3c09f42b32d5ac0164699da1cc2`, the existing isolated
+Google desktop loopback profile (1), Google HTTPS browser (13), Apple form-post
+browser (11) and SAML cross-site delivery/finish (8 named checks) all passed. The
+web profiles required normal owned database/TLS teardown; the desktop socket-only
+profile creates no database identity/session and does not claim Google/OS launch.
+Google/Apple browser fixtures use controlled provider ports and do not substitute
+for registered-provider acceptance. All reports retain exact source/binary hashes.
+
+The two existing startup CI steps were selected from parsed YAML and replayed
+verbatim with the explicit owned PostgreSQL container and newly generated database
+names. OIDC reported 13 passing cases; SAML reported 31 passing case records and
+configured-startup success. Both removed their databases normally. The freshly
+built no-provider binary was copied before enabled builds, retaining actual feature
+refusal controls. Standalone/embedded configuration, disabled/no-feature/partial
+refusal and trusted opt-in checks used no provider exchange, mail delivery or local
+account/session creation. These are startup checks, not real public TLS deployment.
+
+The separate sign-in and deletion reference-client browser checks also pass:
+each rejects seven malformed callbacks, requires explicit completion, scrubs URLs,
+refuses replay and browser storage, and distinguishes 503 from success. These use
+fixed intercepted HTTP responses and establish no provider acceptance. Initial
+sandboxed invocations failed; sign-in diagnosis located Chromium launch before
+scenario execution. The unchanged commands passed with browser process permissions;
+no assertion, fixture or application code was changed.
+
 ## Current workspace gates
 
 On 2026-10-26 the exact unchanged runtime baseline passed `cargo fmt --all --
@@ -122,7 +149,7 @@ by itself refresh all browser/provider/source-qualification receipts below.
 
 | Area / documented invariant | Existing feature-owned corpus and bounded evidence | AUTH-47 follow-up / remaining acceptance |
 | --- | --- | --- |
-| Mailbox/password/session proof: one use, browser binding, no enumeration or weaker-method upgrade, original idle/absolute/freshness caps | [HTTP cases](../../crates/auth-axum/tests/browser/), [PG identity](../../crates/auth-postgres/tests/lifecycle/identity/), [session concurrency/revocation](../../crates/auth-postgres/tests/lifecycle/sessions/), [audit ownership/rollback](../../crates/auth-postgres/tests/lifecycle/audit/), [reference browser](../../tests/browser/reference-ui/README.md) | Owned SMTP/reference replay above passes; mapping all named negative/positive controls remains in progress; operator/load/incident work stays separately tracked. |
+| Mailbox/password/session proof: one use, browser binding, no enumeration or weaker-method upgrade, original idle/absolute/freshness caps | [HTTP cases](../../crates/auth-axum/tests/browser/), [PG identity](../../crates/auth-postgres/tests/lifecycle/identity/), [session concurrency/revocation](../../crates/auth-postgres/tests/lifecycle/sessions/), [audit ownership/rollback](../../crates/auth-postgres/tests/lifecycle/audit/), [reference browser](../../tests/browser/reference-ui/README.md) | Owned SMTP/reference replay above passes; the bounded control-to-assertion review is linked below; operator/load/incident work stays separately tracked. |
 | Passkeys: exact RP/origin, signed context, UP/UV/signature, one-use/realm binding, lifecycle and recovery assurance | [core passkeys](../../crates/auth-core/src/passkeys/), [PG feature scenarios](../../crates/auth-postgres/tests/lifecycle/passkeys/), [browser](../../tests/browser/passkeys/README.md), [attachment](../../tests/browser/passkeys/attachment/README.md), [recovery](../../tests/browser/passkeys/recovery/README.md) | Owned Chromium/SMTP paths above pass; virtual-authenticator evidence does not establish all physical devices, Safari or OS recovery behavior. |
 | OAuth/OIDC: transaction purpose/source/owner, PKCE, nonce, issuer/audience/algorithm/key/time, JIT and no email merge | [core verifier](../../crates/auth-core/src/oidc/verification/tests/), [PG OIDC](../../crates/auth-postgres/tests/lifecycle/oidc/), [actual owned Keycloak backend](../../tests/browser/oidc/README.md), [public web/native](../../tests/browser/oidc/web/README.md) | Isolated current runs above supplement the baseline; the three owned Keycloak profiles above now pass; keep profile/source limits explicit. |
 | Google: fixed provider policy and signed claims, native/web return, purpose separation and genuine signed age where selected | [Google core](../../crates/auth-core/src/oidc/verification/tests/google/), [web](../../tests/browser/google-web/README.md), [desktop](../../tests/browser/google-desktop/README.md) | Owned fixtures are separate from registered Google/manual native eligibility and actual provider lifecycle; those checks remain unperformed here. |
@@ -131,7 +158,7 @@ by itself refresh all browser/provider/source-qualification receipts below.
 | Apple custody/revocation: authenticated storage binding, explicit keys/rotation, atomic detach, lease/version/final cap, finite retry and erasure | [core envelope/cancellation](../../crates/auth-core/src/oidc/apple/grants/), [PG jobs/upgrade/rotation](../../crates/auth-postgres/tests/lifecycle/oidc/apple/grants/), [owned nine-case browser](../../tests/browser/apple-grants/README.md), [receipt](apple-grant-revocation-verification-2026-10-25.md) | Current isolated profiles and browser replay pass. Explicit maintenance, retained keys and remote redemption/local commit crash gap remain obligations; no live Apple revoke is claimed. |
 | SAML: pinned/verified signed content, strict parser/conditions/correlation/replay, rollover, realm/purpose/time and final transaction | [core](../../crates/auth-core/src/saml/), [PG](../../crates/auth-postgres/tests/lifecycle/saml/), [maintained source qualification](../../scripts/qualify_saml_c14n.py), [owned Keycloak](../../tests/browser/saml-keycloak/README.md), [review history](saml-evidence-review.md) | Actual owned rollover/deletion profiles and maintained source qualification above pass. Preserve [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md); broader IdP/profiles and independent approval are not established. |
 | Outbound issuer/client: exact registration/redirect/PKCE, authenticated client, original consent/source bounds, replay/rotation, native audience and no cookie authority | [core issuer](../../crates/auth-core/src/issuer/), [PG](../../crates/auth-postgres/tests/lifecycle/issuer/), [native families](../../crates/auth-postgres/tests/lifecycle/issuer_native_refresh/), [standalone/client parity](../../tests/browser/issuer-standalone/README.md), [native browser](../../tests/browser/issuer-native/README.md) | Consent, signed Node client, native loopback and configured Rust/Node standalone/embedded parity above pass; internal/owned fixtures do not clear outbound release acceptance. |
-| HTTP/egress/log boundary: exact Origin, closed media/body/query, private cookies, TLS/address pinning, no redirect/proxy/stale fallback, finite errors | [HTTP suite](../../crates/auth-axum/tests/browser/), [real private-TLS transport](../../apps/auth-server/src/oidc_http/tests/), [source/logging controls](../../crates/auth-core/src/) | Current Apple transport profile passes alongside workspace negatives. Full threat-model/source review and current-source evidence reconciliation remain in progress. |
+| HTTP/egress/log boundary: exact Origin, closed media/body/query, private cookies, TLS/address pinning, no redirect/proxy/stale fallback, finite errors | [HTTP suite](../../crates/auth-axum/tests/browser/), [real private-TLS transport](../../apps/auth-server/src/oidc_http/tests/), [source/logging controls](../../crates/auth-core/src/) | Current Apple transport profile passes alongside workspace negatives. All fifteen table rows now have a bounded source/assertion map; external/operational acceptance remains separate. |
 
 ## Bounded source review: native refresh transaction
 
@@ -194,9 +221,10 @@ from green totals. Source/policy disable, nonce/subject/realm mismatch, concurre
 final post-wait time, audit/notice rollback, secret redaction and valid controls
 must remain observable. Application authorization stays outside authentication.
 
-Remaining work includes completing the threat-model control-to-assertion review
-and reconciling any provider/browser profile not covered by the refreshed runs
-above. Current local success does not replace the remaining manual acceptance.
+The [control-to-assertion review](threat-control-review.md) maps all fifteen
+threat-model rows, records corrected documentation drift and preserves residual
+limits. The named remaining browser and startup profiles above are refreshed.
+This bounded local evidence does not replace the remaining manual acceptance.
 Registered Google/Apple/manual OS/device checks and independent review remain open.
 Backup/restore/rolling recovery, performance/abuse capacity and publication are
 separate tracked obligations; this matrix neither executes nor waives them.

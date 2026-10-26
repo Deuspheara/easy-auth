@@ -1,4 +1,11 @@
-# Threat model — alpha design, before credential flows
+# Threat model — controls, evidence and recorded evolution
+
+The current control table and AUTH-47 evidence links below distinguish implemented
+checks from remaining acceptance. Detailed milestone notes retain their recorded
+stage: statements that a feature was absent or excluded are not a current feature
+inventory. Assurance limits remain open unless an explicit accepted decision
+supersedes them. In particular, ADR0032's SAML maintainer waiver supplies no
+independent security approval, and outbound OIDC remains a hard release gate.
 
 In-progress optional Apple capture retains credentials only after the same
 initiated response passes signed identity/nonce/source verification. Opaque
@@ -194,29 +201,40 @@ checks remain release gates. See [ADR 0013](../architecture/adr/0013-oauth-state
 
 AUTH-47 tracks current execution, unperformed manual checks and remaining source review in the
 [protocol validation matrix](protocol-validation-matrix.md). Counts and existing
-corpora do not establish protocol compliance or independent approval.
+corpora do not establish protocol compliance or independent approval. The
+[control-to-assertion review](threat-control-review.md) records the current source
+boundaries, concrete assertions and residual acceptance for every table row.
 
 Created 2026-10-18. Not a security audit. Assets: user identity, credential verifiers, active sessions, provider secrets/signing keys, email delivery and audit integrity. Actors: unauthenticated remote attacker, malicious browser origin, malicious configured/unconfigured IdP, compromised mailbox, compromised application/tenant, operator and stolen database/backup. Trust boundaries: browser/HTTP, core/persistence, outbound provider network, SMTP, configuration and application authorization.
 
 | Threat | Required control | Evidence/release gate |
 |---|---|---|
-| Email account takeover / enumeration | Browser-bound single-use high-entropy proof; generic start response; no email auto-link; email compromise acknowledged | Expiry, mismatch, enumeration-shape and replay tests; stronger methods later |
-| Login CSRF, CSRF, fixation | Exact Origin on every browser POST, HttpOnly host cookies, deliberate SameSite, fresh secret per authentication | Missing/null/wrong Origin, old cookie and duplicate-cookie tests |
+| Email account takeover / enumeration | Browser-bound single-use high-entropy proof; generic start response; no email auto-link; email compromise acknowledged | Expiry, mismatch, enumeration-shape and replay tests; mailbox compromise remains a risk and stronger-account policy refuses mailbox fallback |
+| Login CSRF, CSRF, fixation | Exact Origin on local session-changing browser POSTs, HttpOnly host cookies, deliberate SameSite and fresh secrets; separate non-authoritative cross-site handoffs and independently authenticated client-token endpoints | Missing/null/wrong Origin, old cookie and duplicate-cookie tests |
 | Session theft/replay | Only verifier in DB, idle+absolute expiry, DB validation, logout/revoke-all; TLS | DB expiry and immediate subsequent-request revocation tests; active bearer theft remains usable until revoked |
 | Refresh theft | Atomic rotation and family reuse detection; secure native storage | Core/real-PG reuse, concurrency, final-deadline and isolation tests exist; native OS/storage and release acceptance remain gated |
-| OAuth code injection/mix-up/state or nonce reuse | Connection+client+browser-bound expiring transaction, S256, issuer/nonce/audience/signature checks; atomic consume | M04/M05 wrong-state/nonce/issuer/audience/provider/replay corpus |
+| OAuth code injection/mix-up/state or nonce reuse | Connection+client+browser-bound expiring transaction, issuer/nonce/audience/signature checks and atomic consume; S256 for generic OIDC/Google, explicit fixed Apple code/nonce profile | M04/M05 wrong-state/nonce/issuer/audience/provider/replay corpus |
 | Open redirect | Exact registered redirect allowlist; never redirect to arbitrary user input | M07 invalid redirect tests |
 | Discovery/metadata SSRF | Explicit admin connections; HTTPS; DNS/IP/port allowlists, no redirects, bounded response, block private/link-local/metadata addresses unless explicit local test policy | M05 DNS rebinding/redirect/private-network tests |
-| SAML signature wrapping/XXE/replay | Reviewed XML/signature engine; use only verified content; reject DTD/external entities/duplicate IDs, pinned certs, correlation and all conditions | Hard M06 blocker until signed fixture and attack corpus passes |
-| RP/origin manipulation | Server-owned exact RP/origin, high-level webauthn-rs, UV, server-persisted single-use challenges | Core/PG/HTTP negatives and twenty Chromium virtual-authenticator registration/assertion cases; other browsers, real devices and stronger-account recovery remain gates |
+| SAML signature wrapping/XXE/replay | Pinned maintained XML/signature engine; use only verified content; reject DTD/external entities/duplicate IDs; pinned certificates, correlation and all conditions | Maintained source/negative/replay and owned Keycloak evidence; explicit opt-in follows ADR0032 maintainer waiver, with independent review still open |
+| RP/origin manipulation | Server-owned exact RP/origin, high-level webauthn-rs, UV, server-persisted single-use challenges | Core/PG/HTTP negatives and refreshed 31-case Chromium signup/authentication suite, four SMTP enrollment and nine recovery cases; physical devices, other browsers, ordinary activation and OS acceptance remain separate gates |
 | Unsafe linking / recovery downgrade | Fresh proof of both identities; no matching-email merge; last-credential and recovery policies; notifications/audit | M02/M03/M04 negative linking tests |
 | Tenant isolation / privilege escalation | Realm on every query/constraint; trusted router realm; no app membership/permissions in auth core | Cross-realm FK/query tests; app independently authorizes actions |
 | Brute force / spraying / mail abuse | Shared admission by realm+email and source IP; overall resource bounds; no trusted forwarded IP by default | Concurrent rate tests and load/retention plan |
 | Secret leakage / compromised config | Redacted errors/logging, secret types, bounded audit events, least-privilege roles, protected keys, no query tokens | Log review/secret scan; M09 rotation and incident drills |
-| Resource exhaustion | 8 KiB initial request bound, timeouts, bounded DB pool/SMTP and challenge admission | Oversize/timeout tests; M09 load evidence |
+| Resource exhaustion | Route-specific request limits, operation timeouts, bounded DB pool/SMTP and challenge admission; larger provider delivery/finish profiles are explicit and finite | Oversize/timeout tests; M09 load evidence |
 | Malicious connection disable/rollover race | Recheck connection status at commit; issuer/key binding; cert/key overlap policies | M05/M06/M07 concurrency and rollover tests |
 
 A database writer or compromised server can mint/change identities; verifier hashing protects against read-only database theft, not a compromised verifier. Mailbox-only authentication has limited assurance and must not serve as an invisible bypass for stronger credentials. A stolen live cookie is a bearer credential. In-flight requests may finish after revocation; critical application actions require domain-level authorization/transaction policies.
+
+## Recorded milestone boundaries and assurance limits
+
+The following notes preserve implementation evolution and the scope of each
+receipt. Later implementation does not retroactively broaden an earlier receipt.
+Use the current [validation matrix](protocol-validation-matrix.md), its bounded
+[control review](threat-control-review.md) and the explicitly linked ADRs for current
+execution and activation decisions. Unperformed provider/device/operational checks
+in these notes remain unperformed; this organization waives none of them.
 
 AUTH-53's [email-free identity design](../architecture/adr/0009-passkey-first-identity.md)
 now has optional core/PostgreSQL signup: pending-only identity allocation, separate
