@@ -1,5 +1,12 @@
 # Protocol dependency assessment
 
+The [2026-10-26 supply-chain checkpoint](../security/supply-chain-review-2026-10-26.md)
+records current source-license inventories, selected versus resolver-only graphs,
+standard source/image SBOM coverage and actual native/copyright provenance.
+Its separately pinned/audited SBOM tool adds no authentication runtime dependency;
+the exact tooling-only MIT-0 decision leaves the root application policy unchanged.
+Release prerequisites, residual advisories and independent approval remain open.
+
 AUTH-26's optional protected Apple custody/worker reuses locked
 josekit0.10.3/OpenSSL0.10.81 for internal fixed `dir` + `A256GCM` storage envelopes
 and existing protected ES256 client secrets. This adds no inbound JWE trust,

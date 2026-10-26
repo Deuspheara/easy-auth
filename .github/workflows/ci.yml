@@ -70,6 +70,7 @@ jobs:
       - name: Verify default container build-context exclusion
         run: python3 scripts/check_container_build_context.py
       - run: python3 -m unittest scripts.test_local_container_environment
+      - run: python3 -m unittest scripts.test_supply_chain
       - run: cargo fmt --all -- --check
       - run: cargo clippy --locked --workspace --all-targets -- -D warnings
       - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
@@ -357,6 +358,28 @@ jobs:
           if not all(value["high_critical_gate_passed"] for value in report["images"].values()):
               raise SystemExit("default image high/critical advisory gate failed")
           PYTHON
+      - name: Record source dependency and license inventory
+        run: python3 scripts/record_supply_chain.py --output target/supply-chain-source.json
+      - name: Build audited pinned source SBOM generator
+        run: python3 scripts/prepare_sbom_tool.py --destination "$RUNNER_TEMP/easy-auth-sbom-tool"
+      - name: Verify source and exact default-image SBOM coverage
+        run: |
+          python3 scripts/record_supply_chain_sboms.py \
+            --tool-directory "$RUNNER_TEMP/easy-auth-sbom-tool" \
+            --output target/supply-chain-sboms \
+            --image-report default=target/default-container-advisories/auth.json \
+            --image-report default-proxy=target/default-container-advisories/proxy.json
+      - name: Retain sanitized source and default-image SBOM evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-${{ github.sha }}
+          path: |
+            target/supply-chain-source.json
+            target/supply-chain-sboms/summary.json
+            target/supply-chain-sboms/*.cdx.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Retain sanitized default container evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -399,6 +422,11 @@ jobs:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
       - name: Assess all image advisory severities and gate high or critical findings
         run: python3 scripts/scan_saml_release.py --image easy-auth-saml-release:ci --proxy-image easy-auth-saml-proxy:ci
+      - name: Verify exact opt-in image SBOM package coverage
+        run: |
+          python3 scripts/record_image_sboms.py --output target/saml-image-sboms \
+            --image-report saml=target/saml-release-advisories/auth.json \
+            --image-report saml-proxy=target/saml-release-advisories/proxy.json
       - name: Retain exact-source release review evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -410,6 +438,8 @@ jobs:
             target/saml-release-advisories/auth.json
             target/saml-release-advisories/proxy.json
             target/saml-release-advisories/summary.json
+            target/saml-image-sboms/summary.json
+            target/saml-image-sboms/*.cdx.json
           retention-days: 14
   secrets:
     runs-on: ubuntu-latest
