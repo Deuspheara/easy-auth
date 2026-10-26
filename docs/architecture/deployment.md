@@ -1,5 +1,12 @@
 # Deployment design
 
+The [default container walkthrough](../guides/containers.md) uses committed public
+source, a nonroot distroless image and a separate disposable loopback stack. Probe
+its actual HTTP health/readiness externally; container-running is not readiness.
+The [backup guide](../guides/backups.md) and [client examples](../guides/minimal-clients.md)
+record their operational limits. [ADR0046](adr/0046-default-container-and-client-examples.md)
+preserves development bind/SMTP checks and the separate release gates.
+
 One auth-server process, PostgreSQL and a configurable SMTP relay. Compose development starts PostgreSQL and Mailpit with loopback-only ports and disposable development credentials. Production requires HTTPS at a trusted reverse proxy, private database access, SMTP TLS, persistent database backups and protected environment/file secrets. No Redis or Node runtime required.
 
 Start `easy-auth` without arguments after exporting configuration. `--help`/`-h`

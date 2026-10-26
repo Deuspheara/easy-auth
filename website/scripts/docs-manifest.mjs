@@ -1,6 +1,21 @@
 // Only named, committed public guides enter the site. Never glob docs/security.
 export const guides = [
   {
+    source: "docs/guides/containers.md",
+    slug: "containers",
+    title: "Local containers",
+  },
+  {
+    source: "docs/guides/backups.md",
+    slug: "backups",
+    title: "Backups and restore checks",
+  },
+  {
+    source: "docs/guides/minimal-clients.md",
+    slug: "minimal-clients",
+    title: "Minimal Rust and TypeScript",
+  },
+  {
     source: "docs/guides/setup-walkthrough.md",
     slug: "setup-walkthrough",
     title: "Setup walkthrough",

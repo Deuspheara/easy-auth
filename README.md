@@ -61,6 +61,11 @@ these results from production approval and independent assurance.
 
 ## Run locally
 
+For a complete disposable Docker stack, follow the
+[container walkthrough](docs/guides/containers.md),
+[backup/isolated restore procedure](docs/guides/backups.md), and
+[minimal Rust/TypeScript clients](docs/guides/minimal-clients.md).
+
 The optional [SAML provider](docs/guides/saml.md) supports normal standalone/embedded
 login with `saml-web`, explicit configuration and already-provisioned trusted IdP
 pins/policy. It defaults off. The maintainer waived independent review under
