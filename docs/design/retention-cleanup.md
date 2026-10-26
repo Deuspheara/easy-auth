@@ -1,9 +1,11 @@
 # Retention cleanup assessment
 
-AUTH-49, 2026-10-26. Implementation pending. This inventory supports
-[proposed ADR0050](../architecture/adr/0050-bounded-realm-retention.md); none of the
-eligibility rules below is a claim that general maintenance already exists.
-Operators must not translate this matrix into ad hoc production deletes.
+AUTH-49, 2026-10-26. The initial schema38 assessment below preceded implementation.
+The explicit maintenance boundary now follows
+[ADR0050 under qualification](../architecture/adr/0050-bounded-realm-retention.md);
+complete local/workspace/upgrade/security acceptance remains pending. Use the
+[retention guide](../guides/retention.md), not ad hoc production deletes from this
+matrix. Historical source/catalog evidence below retains its original scope.
 
 ## Scope and observed schema
 
@@ -28,7 +30,7 @@ eligible children separately, and retain referenced parents until no child/audit
 reference remains. Supporting indexes and actual query plans are still to be
 qualified; a row limit alone does not bound scan work or lock wait time.
 
-## Proposed cleanup eligibility
+## Cleanup eligibility contract
 
 | Table | Eligibility and preservation requirement |
 | --- | --- |
@@ -125,15 +127,16 @@ security gates after behavior changes, and update public contracts/operator guid
 
 Add immutable new migration indexes where needed and update upgrade/recovery
 fixtures for the resulting schema; previous schema38 overlap evidence must not be
-relabeled. This document completes only the eligibility/reference assessment.
-General retention implementation, operational qualification, incident session/key/
-token revocation and restored-snapshot reconciliation remain AUTH-49 work.
+relabeled. This section records the eligibility/reference assessment. Current
+maintenance implementation is under qualification; complete operational acceptance,
+incident session/key/token revocation and restored-snapshot reconciliation remain
+AUTH-49 work.
 
 ## Structural preparation
 
-The Apple maintenance implementation was extracted separately to
-`crates/auth-postgres/src/maintenance/apple.rs`; its bytes match the previous module
-exactly (SHA-256
+At structural checkpoint `4855fa7c75b8fee2ef608d8aeff8dd520fc71c88`, Apple maintenance
+was extracted separately to `crates/auth-postgres/src/maintenance/apple.rs` with bytes
+matching the previous module exactly (historical SHA-256
 `8ea5c167b79ddfb2c14d5f3b9af19059eea0d911e53117e168791b9d2607b1f2`).
 The `apple-grants` compile boundary and public method are unchanged. This prepares
 an owning maintenance location without adding general cleanup or enabling a

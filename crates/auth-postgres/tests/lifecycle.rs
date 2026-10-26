@@ -1,5 +1,8 @@
 mod support;
 
+#[path = "lifecycle/retention/mod.rs"]
+mod retention;
+
 #[path = "lifecycle/deadlines/mod.rs"]
 mod deadlines;
 

@@ -7,6 +7,7 @@ import uuid
 from . import mailbox
 
 PROBE_BYTES_PER_REALM = 100000
+CURRENT_MIGRATION_COUNT = 39
 
 
 def sign_in_realms(services, roles, processes):
@@ -61,7 +62,8 @@ def revoke_live_session(first, origin):
 
 def assert_snapshots(old, current, realms, first):
     if len(old["auth_users"]) != 2 or len(old["auth_sessions"]) != 2 \
-            or len(old["_sqlx_migrations"]) != 38 or len(current["_sqlx_migrations"]) != 38:
+            or len(old["_sqlx_migrations"]) != CURRENT_MIGRATION_COUNT \
+            or len(current["_sqlx_migrations"]) != CURRENT_MIGRATION_COUNT:
         raise ValueError("backup source cardinality mismatch")
     for content, expected_revoked in [(old, False), (current, True)]:
         selected = [row for row in content["auth_sessions"]

@@ -16,6 +16,11 @@ export const guides = [
     title: "Migration recovery and upgrades",
   },
   {
+    source: "docs/guides/retention.md",
+    slug: "retention",
+    title: "Realm retention maintenance",
+  },
+  {
     source: "docs/guides/minimal-clients.md",
     slug: "minimal-clients",
     title: "Minimal Rust and TypeScript",

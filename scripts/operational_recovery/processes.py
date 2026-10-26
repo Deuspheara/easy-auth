@@ -1,5 +1,6 @@
 """Own only the explicitly launched administration/runtime child processes."""
 import os
+import re
 from pathlib import Path
 import socket
 import subprocess
@@ -82,6 +83,34 @@ class Processes:
                 pass
             time.sleep(0.1)
         raise ValueError("owned runtime readiness deadline")
+
+    def retention(self, database_url, realm):
+        self.protect_url(database_url)
+        environment = {"PATH": os.environ.get("PATH", ""), "DATABASE_URL": database_url,
+                       "AUTH_REALM_ID": str(realm), "AUTH_RETENTION_AUDIT": "keep",
+                       "AUTH_RETENTION_NOTICES": "keep", "AUTH_DATABASE_MIGRATIONS": "run",
+                       "SMTP_PASSWORD": "unused-invalid-runtime-setting"}
+        child = subprocess.Popen([str(self.binary), "retention"], env=environment,
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.children.append(child)
+        output, diagnostic = child.communicate(timeout=60)
+        if any(value in output or value in diagnostic for value in self.private_values):
+            raise ValueError("retention output exposed fixture credentials")
+        if child.returncode != 0 or diagnostic:
+            raise ValueError("owned retention administration did not complete cleanly")
+        pattern = rb"([A-Za-z]+): deleted=(0|[1-9][0-9]*) expired_ciphertexts=(0|[1-9][0-9]*) exhausted_leases=(0|[1-9][0-9]*)"
+        effects = {}
+        for line in output.splitlines():
+            match = re.fullmatch(pattern, line)
+            if not match or match[1] in effects:
+                raise ValueError("retention output was not unique fixed-category metadata")
+            counts = tuple(int(match[index]) for index in (2, 3, 4))
+            if any(count > 64 for count in counts):
+                raise ValueError("retention exceeded a category effect bound")
+            effects[match[1]] = counts
+        if len(effects) != 28:
+            raise ValueError("retention output omitted a category")
+        return effects
 
     def close(self):
         for child in reversed(self.children):

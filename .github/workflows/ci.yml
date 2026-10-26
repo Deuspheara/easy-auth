@@ -362,7 +362,7 @@ jobs:
           python3 -m unittest discover -s scripts -p test_upgrade_source.py -v
           python3 -m unittest discover -s scripts -p test_upgrade_probe.py -v
           python3 scripts/prepare_upgrade_fixture.py --destination "$RUNNER_TEMP/easy-auth-upgrade-fixture"
-          python3 scripts/prepare_upgrade_fixture.py --profile schema38 --destination "$RUNNER_TEMP/easy-auth-upgrade-prior"
+          python3 scripts/prepare_upgrade_fixture.py --profile schema39 --destination "$RUNNER_TEMP/easy-auth-upgrade-prior"
       - name: Verify failed migration recovery and owned replica replacement
         run: python3 scripts/smoke_upgrade_recovery.py
         env:

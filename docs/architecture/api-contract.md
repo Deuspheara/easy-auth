@@ -1,5 +1,26 @@
 # HTTP contract v1
 
+## Trusted retention administration
+
+`auth_core::run_retention` and `RetentionRepository::retain_batch` provide explicit
+realm maintenance, not an HTTP endpoint or an authentication/application permission.
+`RetentionPolicy` requires independent audit/exhausted-notice horizons: `keep`, or
+a validated positive whole-second age. The PostgreSQL adapter performs finite
+64-row categories using explicit Read Committed, candidate row locks and a fresh
+reference/expiry check before deletion. Categories commit independently; failures
+can follow earlier commits. Retained audit/proof/grant children pin their parents.
+Durable identities, credentials, consumed recovery-code state and issuer/provider
+keys/configuration are excluded. Apple expiry/lease/terminal effects remain distinct.
+
+The executable's `easy-auth retention` and server library's `retain_database`
+compose that same core policy from protected `DATABASE_URL`, non-nil `AUTH_REALM_ID`
+and required `AUTH_RETENTION_AUDIT`/`AUTH_RETENTION_NOTICES`. Exact current schema
+verification precedes mutation, with no DDL/provisioning/startup fallback. Output
+contains only fixed category names and scalar effects. No listener/SMTP/provider
+composition, new wire schema or credential output is introduced. Operational
+qualification is in progress; [retention](../guides/retention.md) defines the command,
+limits, notification exception and embedding boundary.
+
 ## Database administration boundary
 
 `Postgres::migrate` and `Postgres::verify_schema` remain adapter administration

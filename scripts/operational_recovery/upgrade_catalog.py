@@ -1,4 +1,4 @@
-"""Owned schema37/38 catalog assertions and deliberately conflicting index fixture."""
+"""Owned schema37/39 catalog assertions and deliberately conflicting index fixture."""
 import json
 import time
 from urllib.parse import urlsplit, urlunsplit
@@ -76,4 +76,4 @@ def assert_upgraded_data(services, database, before):
     legacy = {name: rows for name, rows in before.items() if name != "_sqlx_migrations"}
     if current != legacy:
         raise ValueError("upgrade changed legacy table contents")
-    history(services, database, 38)
+    history(services, database, 39)

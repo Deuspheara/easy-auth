@@ -1,5 +1,19 @@
 # Threat model — controls, evidence and recorded evolution
 
+Explicit retention uses a trusted realm and deliberate audit/exhausted-notice
+horizons, never browser authority or an automatic startup task. Bounded category
+transactions explicitly select Read Committed even for differently configured
+embedded pools. Lock candidates, then recheck expiry and dependencies in a fresh
+statement; retained audit/grant/proof children prevent parent pruning. No parent
+cascade replaces the row limit. Live notification leases, full replay/cooldown
+caps, consumed recovery-code state and spent native generations through original
+family caps remain. Partial runs can commit earlier categories and must be safe
+to repeat. Expired Apple ciphertext is erased without claiming remote revocation.
+All durable key/configuration/identity state is excluded. Workspace/upgrade/security
+qualification remains in progress; [ADR0050](../architecture/adr/0050-bounded-realm-retention.md)
+does not replace incident revocation, backup/log retention or restored-snapshot
+reconciliation, and does not establish production or independent approval.
+
 Offline backup encryption uses explicitly prepared age commands and protected
 native recovery identities, with no plugin/agent/password fallback. Require a
 separately protected selected ciphertext digest and successful full-length

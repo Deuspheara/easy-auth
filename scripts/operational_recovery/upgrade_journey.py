@@ -25,7 +25,7 @@ class UpgradeJourney:
             raise ValueError("duplicate owned upgrade actor")
         directory = self.directory / name
         directory.mkdir(mode=0o700)
-        binaries = {"schema37": self.old_binary, "schema38": self.prior_binary, "current": self.current_binary}
+        binaries = {"schema37": self.old_binary, "schema39": self.prior_binary, "current": self.current_binary}
         if profile not in binaries:
             raise ValueError("unknown owned replica version")
         actor = Processes(binaries[profile], directory, self.services.smtp_port)
@@ -34,9 +34,9 @@ class UpgradeJourney:
 
     def _start(self, name, realm, *, profile="current", expected_success=True):
         roles = self.roles
-        url = roles.url(roles.migration, roles.migration_password) if profile != "current" \
+        url = roles.url(roles.migration, roles.migration_password) if profile == "schema37" \
             else roles.url(roles.runtime, roles.runtime_password)
-        origin = self._process(name, profile=profile).start(url, realm, mode="verify" if profile == "current" else "run",
+        origin = self._process(name, profile=profile).start(url, realm, mode="run" if profile == "schema37" else "verify",
                                                    expected_success=expected_success)
         self.origins[name] = origin
         return origin
@@ -86,7 +86,7 @@ class UpgradeJourney:
         upgrade_catalog.assert_upgraded_data(self.services, self.roles.database, self.before)
         self.roles.runtime_grants()
         upgraded = restore_fixture.snapshot(self.services, self.roles.database)
-        self._start("old-refuses-38", self.realms[0], profile="schema37", expected_success=False)
+        self._start("old-refuses-39", self.realms[0], profile="schema37", expected_success=False)
         upgrade_catalog.wait_for_drain(self.services, self.roles)
         if restore_fixture.snapshot(self.services, self.roles.database) != upgraded:
             raise ValueError("old future-schema refusal changed upgraded data")
@@ -97,9 +97,9 @@ class UpgradeJourney:
             old_version_future_schema_refused=True, ciphertext_sha256=expected)
 
     def replace_prior_software(self):
-        old_first = self._start("prior-a1", self.realms[0], profile="schema38")
-        old_peer = self._start("prior-a2", self.realms[0], profile="schema38")
-        old_other = self._start("prior-b", self.realms[1], profile="schema38")
+        old_first = self._start("prior-a1", self.realms[0], profile="schema39")
+        old_peer = self._start("prior-a2", self.realms[0], profile="schema39")
+        old_other = self._start("prior-b", self.realms[1], profile="schema39")
         for origin in (old_first, old_peer):
             self._assert_session(self.users[0], origin)
         self._assert_session(self.users[1], old_other)
@@ -135,7 +135,8 @@ class UpgradeJourney:
         self._assert_session(self.users[1], second)
         mailbox.remove_messages(self.services.mail_origin, self.messages)
         return dict(legacy_owners_preserved=True, current_verification=True,
-            selected_schema38_software_upgrade=True, old_new_replicas_served_during_overlap=True,
+            selected_schema39_software_upgrade=True, old_new_replicas_served_during_overlap=True,
+            prior_and_current_restricted_runtime=True,
             concurrent_availability_requests=self.availability_requests + replacement_probe.count,
             availability_failures=0,
             current_schema_replica_replacement=True, surviving_replica_served=True,

@@ -1,7 +1,8 @@
 # ADR0050: Explicit bounded retention by realm and lifecycle
 
-Date: 2026-10-26. Status: proposed for AUTH-49; implementation and qualification
-are pending. This decision does not enable a cleanup command or scheduler.
+Date: 2026-10-26. Status: implementation under qualification for AUTH-49;
+local acceptance and complete operational/production acceptance remain pending.
+The explicit cleanup command is implemented; no scheduler is enabled automatically.
 
 ## Context
 
@@ -18,9 +19,9 @@ auth tables, existing lifecycle checks and the intended eligibility for each.
 Its real PostgreSQL catalog observation is design evidence only, not a retention
 test or a completed acceptance criterion.
 
-## Proposed boundary
+## Implemented boundary under qualification
 
-Add one explicit trusted maintenance use case/port in auth-core and its PostgreSQL
+Use one explicit trusted maintenance use case/port in auth-core and its PostgreSQL
 implementation. Core owns validated retention choices, finite operation selection
 and bounded orchestration. PostgreSQL owns current database time, candidate
 locking, reference checks and writes. Standalone one-shot administration and
@@ -61,16 +62,31 @@ claim. Skip-locked or retained-reference rows can require later runs; an empty
 batch is not proof that the whole realm is clean. Scheduling/backlog monitoring
 and per-realm selection remain operator responsibilities.
 
+Explicitly select Read Committed inside each owned transaction, before its first
+query. Do not inherit an embedded pool's repeatable-read session default and then
+assume the second statement sees new children. PostgreSQL documents fresh command
+snapshots under [Read Committed](https://www.postgresql.org/docs/17/transaction-iso.html#XACT-READ-COMMITTED)
+and the conflict between [update/key-share row locks](https://www.postgresql.org/docs/17/explicit-locking.html#LOCKING-ROWS).
+Its [foreign-key implementation](https://github.com/postgres/postgres/blob/REL_17_STABLE/src/backend/utils/adt/ri_triggers.c)
+uses a key-share lookup of the referenced row. This supports the two-statement
+design; it does not replace real concurrency/cancellation tests. A regression test
+with an actual repeatable-read pool must fail before explicit isolation selection
+and pass afterward, with its deletion trigger observing Read Committed.
+
 Apple ciphertext expiry and terminal-metadata cleanup must reuse the owning grant
 lifecycle, including feature-disabled operation. Do not copy or weaken its seven-day
 job/final-metadata windows, lease/version checks or the distinction between expired
 and remotely confirmed revocation. A structural extraction of its maintenance
-implementation, if needed, is a separate verified commit before behavioral wiring.
+implementation was first moved byte-for-byte in separately verified structural
+commit `4855fa7c75b8fee2ef608d8aeff8dd520fc71c88`, before behavioral wiring.
 
 ## Migration and qualification
 
-Add new migration indexes where actual query plans require them; keep migrations
-1–38 immutable. Update the owned upgrade qualification for a new current schema.
+Migration0039 adds realm/expiry and reference indexes; migrations1–38 remain
+immutable. The index-only checkpoint
+`9209a2ae495b4fce4bfdfae33d7f65138e9e9119` preserves pre-retention schema39
+software separately from current behavior. Update the owned upgrade qualification
+for this schema using that pinned actual ancestor.
 The existing actual schema38 software-overlap result remains historical evidence,
 not proof that an old binary accepts a future schema or that DDL has no writer-drain
 requirement. Revalidate failed migration recovery and fresh-connection startup.

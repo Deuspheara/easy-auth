@@ -91,7 +91,7 @@ def exercise(services, initial, live, cipher, directory):
     if mailbox.request(users[0][0], origin + "/v1/session")[0] != 401:
         raise ValueError("restoration damaged live-source revocation")
     mailbox.remove_messages(services.mail_origin, messages)
-    return dict(realms=2, users=2, migrations=38, restored_databases=len(pg.clones),
+    return dict(realms=2, users=2, migrations=restore_fixture.CURRENT_MIGRATION_COUNT, restored_databases=len(pg.clones),
         all_public_table_contents_preserved=True, old_snapshot_precedes_live_revocation=True,
         live_revocation_preserved=True, cloned_runtime_connect_refused=True, clones_never_served=True,
         rejected_archives=refused, invalid_decryption_postgres_invocations=0, retained_plaintext_files=0,

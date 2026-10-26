@@ -1,5 +1,13 @@
 # Protocol dependency assessment
 
+AUTH-49 retention reuses the locked SQLx/PostgreSQL, Tokio, UUID and async-trait
+boundaries. It adds no dependency/version, cryptographic implementation, verifier,
+license rule or advisory exception. Fresh statement snapshots and FK-lock behavior
+follow the primary PostgreSQL references in
+[ADR0050](../architecture/adr/0050-bounded-realm-retention.md). Default and all-feature
+workspace/security qualification remains required; dependency reuse alone does
+not establish its safety or clear existing release gates.
+
 AUTH-49's offline backup commands use unchanged upstream age1.3.2 with an explicit
 build-only Go module selecting x/crypto0.56.0, checksum-pinned Go1.27.3 and pinned
 govulncheck1.9.0. This adds no authentication runtime dependency, crypto producer

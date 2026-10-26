@@ -82,6 +82,29 @@ async fn reuse_of_spent_refresh_commits_family_and_descendant_access_revocation_
         )
         .await
         .unwrap();
+    // A maintenance pass cannot erase the spent generation while the original
+    // family cap still permits reuse detection. Continue the actual credential
+    // replay below, preserving all original authority/revocation assertions.
+    let retained = auth_core::run_retention(
+        f.base.store.as_ref(),
+        f.base.authority.realm(),
+        auth_core::RetentionPolicy::new(
+            auth_core::RetentionHorizon::keep(),
+            auth_core::RetentionHorizon::keep(),
+        ),
+    )
+    .await
+    .unwrap();
+    assert_eq!(
+        retained
+            .steps
+            .iter()
+            .find(|step| step.category == auth_core::RetentionCategory::IssuerRefreshTokens)
+            .unwrap()
+            .effects
+            .deleted,
+        0
+    );
     assert!(matches!(
         refresh
             .refresh(

@@ -32,6 +32,24 @@ async fn erased_owner_keeps_replay_and_subject_cooldown_and_cannot_be_revived_by
         .await
         .unwrap();
     tx.commit().await.unwrap();
+    let maintained = auth_core::run_retention(
+        f.store.as_ref(),
+        owner.realm_id,
+        auth_core::RetentionPolicy::new(
+            auth_core::RetentionHorizon::keep(),
+            auth_core::RetentionHorizon::keep(),
+        ),
+    )
+    .await
+    .unwrap();
+    for step in maintained.steps.iter().filter(|step| {
+        matches!(
+            step.category,
+            auth_core::RetentionCategory::SamlReplays | auth_core::RetentionCategory::SamlCooldowns
+        )
+    }) {
+        assert_eq!(step.effects.deleted, 0);
+    }
     let retained: (i64,i64,i64,i64,i64) = sqlx::query_as("SELECT (SELECT count(*) FROM auth_users),(SELECT count(*) FROM auth_saml_identities),(SELECT count(*) FROM auth_sessions),(SELECT count(*) FROM auth_saml_replays),(SELECT count(*) FROM auth_saml_deleted_subjects WHERE blocked_until>clock_timestamp())")
         .fetch_one(&f.pool).await.unwrap();
     assert_eq!(retained, (0, 0, 0, 2, 1));

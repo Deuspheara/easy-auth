@@ -59,7 +59,7 @@ def main():
     if not old_directory or not prior_directory or not tool_directory:
         raise ValueError("both prepared upgrade fixtures and backup tool directories are required")
     old_binary, old_receipt = prepared_binary(old_directory)
-    prior_binary, prior_receipt = prepared_binary(prior_directory, "schema38")
+    prior_binary, prior_receipt = prepared_binary(prior_directory, "schema39")
     cipher = ArchiveCipher(tool_directory)
     source = ci_source_identity(ROOT)
     current = ROOT / "target/debug/easy-auth"

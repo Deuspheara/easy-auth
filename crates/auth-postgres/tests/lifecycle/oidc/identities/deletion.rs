@@ -47,6 +47,19 @@ async fn deleted_subject_cooldown_and_original_deadlines_prevent_anonymous_jit_r
         .await;
     let cap = second.identity().expires_us();
     delete(f.pool.clone(), f.realm(), original.id).await;
+    let cleanup = f
+        .store
+        .retain_batch(
+            f.realm(),
+            RetentionCategory::OidcCooldowns,
+            RetentionPolicy::new(RetentionHorizon::keep(), RetentionHorizon::keep()),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        cleanup.deleted, 0,
+        "maintenance preserves the original callback cooldown"
+    );
     let remaining: f64 = sqlx::query_scalar("SELECT extract(epoch FROM blocked_until-clock_timestamp())::float8 FROM auth_oidc_deleted_subjects").fetch_one(&f.pool).await.unwrap();
     assert!(
         remaining > 298.0 && remaining <= 300.0,

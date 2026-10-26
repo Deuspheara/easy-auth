@@ -11,7 +11,7 @@ cargo build --locked -p easy-auth-server --bin easy-auth
 `--help` (`-h`) and `--version` (`-V`) exit successfully without reading application
 configuration, opening a database, running migrations or starting a listener.
 Version reports the Cargo package version, not a Git revision or provider status.
-The separate `migrate` command is described below. Only one command/option is accepted.
+The separate `migrate` and `retention` commands are described below. Only one command/option is accepted.
 Unknown arguments, positional values, combined options
 and extra arguments exit with status 2 and a fixed diagnostic that omits their
 values. Earlier versions ignored arguments; scripts must now invoke the server
@@ -51,6 +51,14 @@ See [database role and migration procedure](database-roles.md) for grants, lock-
 limits, disposal tests and upgrade limitations.
 
 ## Startup diagnostics
+
+Explicit `easy-auth retention` instead runs one finite cleanup pass and exits.
+It requires protected database configuration, a non-nil realm and explicit
+`AUTH_RETENTION_AUDIT`/`AUTH_RETENTION_NOTICES` choices (`keep` or supported whole
+seconds). It verifies the current schema without migration fallback and starts
+no runtime services. Categories commit independently; failures can follow earlier
+commits. See [retention maintenance](retention.md) for exact effects, preserved
+state, scheduling and the qualification still in progress.
 
 Malformed values produce setting-specific diagnostics without echoing values.
 Environment settings must be valid Unicode. An invalid-Unicode value now fails

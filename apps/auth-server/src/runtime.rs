@@ -1,6 +1,21 @@
 use std::net::SocketAddr;
 
 #[tokio::main]
+pub(super) async fn retention() -> Result<(), Box<dyn std::error::Error>> {
+    let report = easy_auth_server::retain_database().await?;
+    for step in report.steps {
+        println!(
+            "{:?}: deleted={} expired_ciphertexts={} exhausted_leases={}",
+            step.category,
+            step.effects.deleted,
+            step.effects.expired_ciphertexts,
+            step.effects.exhausted_leases
+        );
+    }
+    Ok(())
+}
+
+#[tokio::main]
 pub(super) async fn migrate() -> Result<(), Box<dyn std::error::Error>> {
     easy_auth_server::migrate_database().await?;
     println!("database migrations completed");

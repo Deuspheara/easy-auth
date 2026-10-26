@@ -19,10 +19,29 @@ function-size exceptions; no unrelated cleanup is deferred.
 # Code organization
 
 Realm maintenance owns the existing Apple grant expiry/lease/terminal cleanup in
-PostgreSQL `maintenance/apple.rs`. Its implementation was moved without byte
-changes before general retention work; the public method and `apple-grants`
-feature boundary remain unchanged. Provider revocation claim/ack/network policy
-stays in its owning feature. General retention is still proposed in ADR0050.
+PostgreSQL `maintenance/apple.rs`. It was moved without byte changes before behavior
+work; its public compatibility helper remains `apple-grants` gated, while default
+realm maintenance can reuse the private lifecycle without activating a worker.
+Provider revocation claim/ack/network policy stays in its owning feature.
+
+Core `retention/` owns validated operator horizons, the finite category order and
+the repository/use-case boundary. PostgreSQL `maintenance/` separates transaction/
+cancellation lifetime, closed candidate eligibility, parent-reference guards and
+the shared Apple lifecycle. SQL identifiers come only from the closed category
+match; ages/realm/tuple selections are parameters. The two-statement candidate/
+delete transaction remains visible; no generic plugin/query configuration is added.
+Server retention composition and finite environment parsing are named modules;
+binary entry files only dispatch/compose. Tests separate proof categories, leases,
+replay/admission, audit/session retention, genuine elapsed issuer graphs, cancellation,
+rollback, actual query plans and schema migration. Existing genuine SAML/OIDC/
+native cases add maintenance before unchanged rejection assertions.
+
+New modules remain under300lines. The closed28-category match and ordered Apple
+three-stage transaction are cohesive function-size exceptions: keeping their full
+selection/atomic order visible supports security review. Longer ordered integration
+scenarios retain original capabilities, waits, retained controls and final facts
+together; no production internals were made public for tests. General retention
+qualification is still pending in ADR0050; no unrelated cleanup is deferred.
 
 Apple grant capture extends `oidc/apple/grants/` with explicit authorization,
 opaque verified/mapped/capture types and repository use cases. Shared response

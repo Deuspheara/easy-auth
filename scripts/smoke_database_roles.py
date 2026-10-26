@@ -9,14 +9,14 @@ import sys
 import tempfile
 import uuid
 
-from operational_recovery import mailbox
+from operational_recovery import mailbox, retention_drill
 from operational_recovery.processes import Processes
 from operational_recovery.roles import Roles
 from operational_recovery.services import Services
 from operational_recovery.evidence import source_identity, write_receipt
+from operational_recovery.restore_fixture import CURRENT_MIGRATION_COUNT
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_MIGRATION_COUNT = 38
 
 
 def journey(services, processes):
@@ -43,16 +43,20 @@ def journey(services, processes):
     if first[2]["realm_id"] != str(first_realm) or second[2]["realm_id"] != str(second_realm) \
             or first[2]["id"] == second[2]["id"]:
         raise ValueError("role-backed realm identity mismatch")
+    services.stage = "restricted-role-retention"
+    retention = retention_drill.qualify(services, roles, processes,
+        (first_realm, second_realm), (first, second), (first_origin, second_origin))
     mailbox.isolation_and_logout(first, second_origin, first_origin)
     services.stage = "owned-message-cleanup"
     mailbox.remove_messages(services.mail_origin, [first_message, second_message])
-    if services.sql(roles.database, "SELECT count(*) FROM _sqlx_migrations WHERE success") != str(EXPECTED_MIGRATION_COUNT):
+    if services.sql(roles.database, "SELECT count(*) FROM _sqlx_migrations WHERE success") != str(CURRENT_MIGRATION_COUNT):
         raise ValueError("role schema migration count mismatch")
     return dict(privileges=privileges, actual_smtp=True, actual_http_authentication=True,
                 realm_isolation=True, logout_revoked=True, administration_idempotent=True,
                 wrong_migration_password_refused=True, runtime_ddl_startup_refused=True,
                 wrong_runtime_password_refused=True,
-                verified_runtime_startup=True, migration_count=EXPECTED_MIGRATION_COUNT, owned_messages_removed=2)
+                verified_runtime_startup=True, migration_count=CURRENT_MIGRATION_COUNT,
+                retention=retention, owned_messages_removed=2)
 
 
 def main():

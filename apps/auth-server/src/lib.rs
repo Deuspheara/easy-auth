@@ -9,6 +9,7 @@ mod issuer_key;
 mod notifications;
 #[cfg(feature = "oidc-egress")]
 mod oidc_http;
+mod retention;
 mod smtp;
 
 pub use administration::migrate_database;
@@ -23,3 +24,4 @@ pub use issuer_key::load_issuer_signing_key;
 pub use notifications::notification_worker;
 #[cfg(feature = "oidc-egress")]
 pub use oidc_http::OidcHttps;
+pub use retention::retain_database;

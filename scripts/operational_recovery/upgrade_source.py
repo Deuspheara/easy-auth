@@ -1,4 +1,4 @@
-"""Build the one immutable schema37 fixture into a separate source/target tree."""
+"""Build selected immutable operational fixtures into separate source/target trees."""
 import hashlib
 import json
 import os
@@ -11,7 +11,8 @@ from .evidence import ci_source_identity, source_identity, write_receipt
 
 ROOT = Path(__file__).resolve().parents[2]
 PINS = {"schema37": ROOT / "tests/operational/upgrade-source.json",
-        "schema38": ROOT / "tests/operational/upgrade-source-schema38.json"}
+        "schema38": ROOT / "tests/operational/upgrade-source-schema38.json",
+        "schema39": ROOT / "tests/operational/upgrade-source-schema39.json"}
 ARCHIVE_LIMIT = 256 * 1024 * 1024
 
 
@@ -19,7 +20,9 @@ def load_pin(profile="schema37"):
     expected = {"schema37": dict(schema_version=1, revision="0783ff48b6409d362fbcae527f46a483ca66fb55",
                                 tree="ca9e75a6510e485094a110c74cfa05af74d552a1", migration_count=37),
                 "schema38": dict(schema_version=1, revision="e6a061f9e6804eda323ce1af78b0369c73cdd021",
-                                tree="5e615d2567c94ea930a962bd0a270266f07ed13c", migration_count=38)}
+                                tree="5e615d2567c94ea930a962bd0a270266f07ed13c", migration_count=38),
+                "schema39": dict(schema_version=1, revision="9209a2ae495b4fce4bfdfae33d7f65138e9e9119",
+                                tree="a61024f985c198e2eac1d4abdfdc5068ccce1ef9", migration_count=39)}
     if profile not in expected:
         raise ValueError("unknown owned upgrade source profile")
     value = json.loads(PINS[profile].read_text())

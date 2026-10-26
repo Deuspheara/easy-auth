@@ -13,7 +13,7 @@ from operational_recovery.upgrade_source import prepare
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--destination", type=Path, required=True)
-    parser.add_argument("--profile", choices=("schema37", "schema38"), default="schema37")
+    parser.add_argument("--profile", choices=("schema37", "schema38", "schema39"), default="schema37")
     try:
         options = parser.parse_args()
         receipt = prepare(options.destination.absolute(), options.profile)

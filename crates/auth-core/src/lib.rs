@@ -18,6 +18,7 @@ mod passkeys;
 mod password;
 mod ports;
 mod providers;
+mod retention;
 #[cfg(feature = "saml-requests")]
 mod saml;
 mod secret;
@@ -69,6 +70,10 @@ pub use ports::{EmailDelivery, Repository};
 pub use providers::{
     LINKED_PROVIDER_PAGE_SIZE, LinkedProvider, LinkedProviderCursor, LinkedProviderPage,
     ProviderKind,
+};
+pub use retention::{
+    RETENTION_BATCH_LIMIT, RetentionBatch, RetentionCategory, RetentionHorizon, RetentionPolicy,
+    RetentionReport, RetentionRepository, RetentionStep, run_retention,
 };
 #[cfg(feature = "saml-requests")]
 pub use saml::{

@@ -8,6 +8,8 @@ mod mail;
 pub(crate) mod oidc;
 #[path = "configuration/passwords.rs"]
 mod passwords;
+#[path = "configuration/retention.rs"]
+pub(crate) mod retention;
 #[path = "configuration/saml/mod.rs"]
 pub(crate) mod saml;
 
