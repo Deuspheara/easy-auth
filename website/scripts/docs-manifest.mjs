@@ -21,6 +21,11 @@ export const guides = [
     title: "Realm retention maintenance",
   },
   {
+    source: "docs/guides/incident-recovery.md",
+    slug: "incident-recovery",
+    title: "Incident recovery and revocation",
+  },
+  {
     source: "docs/guides/minimal-clients.md",
     slug: "minimal-clients",
     title: "Minimal Rust and TypeScript",

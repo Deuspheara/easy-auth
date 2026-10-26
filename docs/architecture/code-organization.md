@@ -18,6 +18,15 @@ function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
+Incident recovery qualification extends the native lifecycle suite in a named
+`incident/` module, reusing maintained signing, account and native-consumer fixtures.
+The physical-copy helper owns only SQLx test databases, connection lifetimes,
+server-backend observation and cleanup after scenario panics. The longer ordered
+scenario is a deliberate test-function size exception: it keeps the before-incident
+controls, live reductions, snapshot revival, independently checked family/key
+reductions and unaffected-realm controls visible in chronological order. No public
+proof constructor, production SQL, migration or generic recovery framework is added.
+
 Realm maintenance owns the existing Apple grant expiry/lease/terminal cleanup in
 PostgreSQL `maintenance/apple.rs`. It was moved without byte changes before behavior
 work; its public compatibility helper remains `apple-grants` gated, while default

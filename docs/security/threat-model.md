@@ -1,5 +1,12 @@
 # Threat model — controls, evidence and recorded evolution
 
+The incident recovery regression qualifies only explicit existing reductions with
+retained genuine authority. An older database snapshot can revive local sessions,
+native grants and disabled key configuration. Quarantine and a separately protected
+incident record remain mandatory; no automatic completeness/promotion decision is
+implemented. A cached public key still verifies an existing ID-token signature
+after local key disable. See the [incident procedure](../guides/incident-recovery.md).
+
 Explicit retention uses a trusted realm and deliberate audit/exhausted-notice
 horizons, never browser authority or an automatic startup task. Bounded category
 transactions explicitly select Read Committed even for differently configured

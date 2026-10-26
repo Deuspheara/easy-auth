@@ -197,3 +197,8 @@ Remove only the private archive directory you created when its retention is over
 For production, define recovery objectives, backup encryption/access/retention,
 tested restore isolation, least-privilege roles, key custody and rotation, and
 cross-version migration/recovery procedures before any release claim.
+
+The [incident recovery procedure](incident-recovery.md) distinguishes owner,
+credential-possession and trusted key reductions and the decisions required before
+restored-state promotion. Its local snapshot regression does not authorize
+automatic promotion or reconstruct an absent incident record.
