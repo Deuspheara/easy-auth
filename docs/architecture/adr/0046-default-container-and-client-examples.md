@@ -1,6 +1,6 @@
 # ADR0046: Default container inputs and independent client examples
 
-Date: 2026-10-26. Status: accepted implementation scope; validation in progress.
+Date: 2026-10-26. Status: accepted; bounded local implementation validation complete.
 
 ## Context
 
@@ -57,3 +57,8 @@ failure and failed image scan alongside corrected results. Run exact image
 advisory and independent consumer dependency/license checks, backend required gates
 and website publishing/link checks. Preserve SAML waiver limits and the outbound
 OIDC release gate. This decision makes no production-readiness or conformance claim.
+
+The [source-scoped verification record](../../security/container-client-verification-2026-10-26.md)
+records the actual committed-source builds, client/SMTP/backup smoke, exact image
+assessment, required repository/website checks, original failures and remaining
+release obligations. These local results do not establish production acceptance.
