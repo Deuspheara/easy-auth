@@ -317,6 +317,20 @@ jobs:
           node --experimental-vm-modules tests/browser/reference-ui/inventory-pagination.cjs
           node tests/browser/reference-ui/run.cjs
       - run: cargo build --locked -p easy-auth-server --bin easy-auth
+      - name: Verify separate database administration and runtime roles
+        run: |
+          python3 -m unittest discover -s scripts -p test_operational_recovery.py -v
+          python3 scripts/smoke_database_roles.py
+        env:
+          EASY_AUTH_DATABASE_ROLE_REPORT: ${{ runner.temp }}/database-roles-${{ github.sha }}.json
+      - name: Retain sanitized database role evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-roles-${{ github.sha }}
+          path: ${{ runner.temp }}/database-roles-${{ github.sha }}.json
+          if-no-files-found: error
+          retention-days: 14
       - run: python3 scripts/smoke_recovery_notice.py
         env:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}

@@ -26,6 +26,11 @@ export const guides = [
     title: "Server configuration",
   },
   {
+    source: "docs/guides/database-roles.md",
+    slug: "database-roles",
+    title: "Database roles and migrations",
+  },
+  {
     source: "docs/guides/provider-setup.md",
     slug: "provider-setup",
     title: "Choose an integration",

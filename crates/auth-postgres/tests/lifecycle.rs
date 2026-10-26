@@ -29,6 +29,8 @@ mod recovery;
 #[cfg(feature = "saml-requests")]
 #[path = "lifecycle/saml/mod.rs"]
 mod saml;
+#[path = "lifecycle/schema/mod.rs"]
+mod schema;
 #[path = "lifecycle/sessions/mod.rs"]
 mod sessions;
 

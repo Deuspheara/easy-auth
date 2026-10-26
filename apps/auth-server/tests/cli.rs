@@ -58,6 +58,8 @@ fn help_and_version_do_not_hide_extra_arguments() {
         ["--version", "--help"],
         ["--help", "--help"],
         ["--version", "--version"],
+        ["migrate", "private-marker"],
+        ["migrate", "--help"],
     ] {
         assert_invalid(&arguments.map(OsStr::new));
     }
@@ -77,4 +79,30 @@ fn no_arguments_still_enter_existing_configuration_validation() {
     let diagnostic = String::from_utf8(output.stderr).unwrap();
     assert!(diagnostic.contains("AUTH_REALM_ID is required"));
     assert!(!diagnostic.contains("invalid command line"));
+}
+
+#[test]
+fn migration_administration_requires_only_database_configuration() {
+    let output = command()
+        .arg("migrate")
+        .env("AUTH_REALM_ID", "private-marker")
+        .env("SMTP_PASSWORD", "private-marker")
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert!(output.stdout.is_empty());
+    assert_eq!(output.stderr, b"Error: \"DATABASE_URL is required\"\n");
+}
+
+#[test]
+fn migration_connection_failures_do_not_reflect_the_url_or_server_settings() {
+    let output = command()
+        .arg("migrate")
+        .env("DATABASE_URL", "private-marker")
+        .env("AUTH_PUBLIC_URL", "private-marker")
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert!(output.stdout.is_empty());
+    assert_eq!(output.stderr, b"Error: \"database connection failed\"\n");
 }

@@ -11,7 +11,8 @@ cargo build --locked -p easy-auth-server --bin easy-auth
 `--help` (`-h`) and `--version` (`-V`) exit successfully without reading application
 configuration, opening a database, running migrations or starting a listener.
 Version reports the Cargo package version, not a Git revision or provider status.
-Only one option is accepted. Unknown arguments, positional values, combined options
+The separate `migrate` command is described below. Only one command/option is accepted.
+Unknown arguments, positional values, combined options
 and extra arguments exit with status 2 and a fixed diagnostic that omits their
 values. Earlier versions ignored arguments; scripts must now invoke the server
 without arguments to start it. There are no command-line credential options.
@@ -29,6 +30,25 @@ only loopback HTTP/bind/SMTP configuration; production requires HTTPS and SMTP T
 The deployment guide describes [transport and startup policy](../architecture/deployment.md).
 Help is usage information, not a configuration, database or provider health check.
 For a disposable first run, use the [clean-checkout walkthrough](setup-walkthrough.md).
+
+## Schema administration
+
+`easy-auth migrate` uses only `DATABASE_URL` to apply the embedded SQLx migrations,
+then exits with `database migrations completed`. It starts no listener, mail worker
+or provider composition. Supply the migration role's connection setting through a
+protected environment; there are no credential arguments. Missing/invalid settings,
+connection failures and migration errors fail with fixed diagnostics.
+
+Normal executable and embedded startup accept `AUTH_DATABASE_MIGRATIONS=run|verify`.
+The default `run` preserves automatic migration. Select exact `verify` with a
+separate runtime role after administration: it checks the complete embedded migration
+history/checksums without creating history or applying DDL. Missing, dirty, future
+or mismatched history fails startup without a migration fallback. Empty, unknown,
+case-changed and non-Unicode values are rejected. Verification is not a full schema
+drift or privilege audit. Normal auth operations and realm initialization need DML.
+
+See [database role and migration procedure](database-roles.md) for grants, lock-wait
+limits, disposal tests and upgrade limitations.
 
 ## Startup diagnostics
 
@@ -49,6 +69,8 @@ operators should not use parser/debug messages as a stable machine-readable API.
 | `AUTH_PUBLIC_URL must be an allowed origin (HTTPS, or loopback HTTP in development)` | Use the trusted origin without credentials, path, query or fragment |
 | `DATABASE_URL is required` | Export the database connection URL without putting it in arguments or logs |
 | `database connection failed` | Check the configured database service, connectivity and role permissions privately |
+| `database migration failed` | Stop administration and investigate privately; never edit migration history to force success |
+| `AUTH_DATABASE_MIGRATIONS must be run or verify` | Use one exact supported value; verification never falls back to DDL |
 | `AUTH_DEVELOPMENT must be true or false` | Use the exact lowercase value; production defaults to `false` |
 | `development bind must be loopback` | Use a loopback listener for development |
 | `development SMTP must be loopback` | Use the local development relay or configure production TLS |

@@ -1,4 +1,5 @@
 //! Validated server composition shared by the binary and embedded example.
+mod administration;
 mod application;
 mod configuration;
 #[cfg(feature = "google-desktop")]
@@ -10,6 +11,7 @@ mod notifications;
 mod oidc_http;
 mod smtp;
 
+pub use administration::migrate_database;
 pub use application::{ConfiguredApplication, configured_application};
 pub use configuration::configured_auth;
 #[cfg(feature = "google-desktop")]

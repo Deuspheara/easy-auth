@@ -1,5 +1,5 @@
 #[path = "configuration/database.rs"]
-mod database;
+pub(crate) mod database;
 #[path = "configuration/environment.rs"]
 mod environment;
 #[path = "configuration/mail.rs"]

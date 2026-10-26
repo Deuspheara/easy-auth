@@ -1,5 +1,16 @@
 # HTTP contract v1
 
+## Database administration boundary
+
+`Postgres::migrate` and `Postgres::verify_schema` remain adapter administration
+operations, with no HTTP route. The server library's `migrate_database` and executable
+`easy-auth migrate` require only a privately supplied `DATABASE_URL`, apply SQLx
+migrations and exit. Shared configured runtime composition accepts exact
+`AUTH_DATABASE_MIGRATIONS=run|verify`, default `run`; verification never applies DDL
+or falls back to migration. Missing/dirty/future/checksum-mismatched history fails
+closed. Auth wire schemas, realm scope and public credential handling are unchanged.
+See [database roles](../guides/database-roles.md) for privilege and recovery limits.
+
 ## Experimental social linking web transport
 
 Explicit Axum `social-linking-web`, `SocialWebServices` and

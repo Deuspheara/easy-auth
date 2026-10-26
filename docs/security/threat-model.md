@@ -1,5 +1,15 @@
 # Threat model — controls, evidence and recorded evolution
 
+Separate schema/runtime database credentials limit runtime DDL and migration-history
+writes when operators provision the documented grants. Exact `verify` startup checks
+all embedded SQLx migration versions/checksums without DDL or insecure fallback;
+it cannot detect arbitrary manual schema drift or prove role permissions. Dedicated
+schema connections close on every completion/cancellation, with bounded server lock
+waits to avoid abandoned advisory waiters. Runtime auth DML remains privileged and
+must not be exposed as application SQL. Backup restoration, retention and incident
+qualification remain separate operational requirements; see
+[database roles](../guides/database-roles.md).
+
 The current control table and AUTH-47 evidence links below distinguish implemented
 checks from remaining acceptance. Detailed milestone notes retain their recorded
 stage: statements that a feature was absent or excluded are not a current feature

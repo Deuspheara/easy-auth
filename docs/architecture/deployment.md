@@ -15,6 +15,14 @@ access. Extra or unsupported arguments fail with status 2 and omit their values.
 See [CLI setup diagnostics](../guides/server-cli.md); these options do not validate
 configuration or establish readiness.
 
+`easy-auth migrate` is a separate one-shot administration command requiring only
+the migration role's private `DATABASE_URL`. Normal configured startup defaults to
+`AUTH_DATABASE_MIGRATIONS=run` for compatibility; separately migrated deployments
+can select exact `verify` with runtime credentials. Verification checks complete
+SQLx history/checksums before realm initialization and serving, without DDL or a
+migration fallback. Use the [role procedure](../guides/database-roles.md) for grants,
+timeouts, failure handling and the limits of this implementation evidence.
+
 Typed startup validation rejects production HTTP, public development HTTP, malformed public URLs and unsafe SMTP configuration. Bind loopback by default; proxy headers are not trusted to select origins, realms, secure cookies or identity. The configured public URL is authoritative. A production proxy must enforce body/time/connection limits and forward only the intended host; application limits also apply. Migration runs before readiness, fails closed, and must have backup/restore compatibility tests before a release.
 
 Sessions and challenges remain durable across processes. Admission counters use database atomicity and a database clock; service replicas must not introduce local-only revocation or rate-limit semantics. SMTP delivery cannot be rolled back with database transactions; tokens remain expiring and require browser binding. A durable encrypted delivery outbox is a later reliability improvement, not a reason to store plaintext session secrets.

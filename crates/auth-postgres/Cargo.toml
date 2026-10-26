@@ -35,12 +35,12 @@ auth-core.workspace = true
 async-trait.workspace = true
 sqlx.workspace = true
 uuid.workspace = true
+tokio.workspace = true
 
 [dev-dependencies]
 saml-rs.workspace = true
 openssl.workspace = true
 josekit.workspace = true
-tokio.workspace = true
 webauthn-authenticator-rs = { version = "=0.5.5", default-features = false, features = ["softtoken"] }
 url.workspace = true
 serde_json.workspace = true

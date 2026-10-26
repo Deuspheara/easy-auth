@@ -1,5 +1,13 @@
 # Architecture
 
+Schema administration is a separate server command/library composition over the
+existing PostgreSQL adapter. Configured runtime can explicitly verify complete
+embedded SQLx history without DDL using separately provisioned runtime credentials.
+Default automatic migration remains compatible; failed verification never selects
+that path. No HTTP administration route or role-provisioning policy is introduced.
+See [ADR0047](adr/0047-schema-administration-and-runtime-verification.md) and the
+[database role procedure](../guides/database-roles.md).
+
 Explicit experimental Axum `social-linking-web` now composes matching existing
 Google/Apple transports with owner/session-bound link confirmation and retained-
 method local unlink. Separate provider builders expose no link mutation. Apple

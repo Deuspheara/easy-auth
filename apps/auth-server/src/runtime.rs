@@ -1,6 +1,13 @@
 use std::net::SocketAddr;
 
 #[tokio::main]
+pub(super) async fn migrate() -> Result<(), Box<dyn std::error::Error>> {
+    easy_auth_server::migrate_database().await?;
+    println!("database migrations completed");
+    Ok(())
+}
+
+#[tokio::main]
 pub(super) async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt()
         .with_env_filter("easy_auth=info,easy_auth_axum=info")
