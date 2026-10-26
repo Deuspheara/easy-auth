@@ -1,4 +1,4 @@
-use super::{StartupResult, required_setting};
+use crate::configuration::{StartupResult, environment::required_setting};
 use auth_core::{Error, RetentionHorizon, RetentionPolicy};
 use std::time::Duration;
 use uuid::Uuid;

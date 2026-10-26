@@ -14,6 +14,6 @@ pub(super) fn setting(name: &'static str, default: &str) -> StartupResult<String
     Ok(optional_setting(name)?.unwrap_or_else(|| default.to_owned()))
 }
 
-pub(super) fn required_setting(name: &'static str) -> StartupResult<String> {
+pub(crate) fn required_setting(name: &'static str) -> StartupResult<String> {
     optional_setting(name)?.ok_or_else(|| format!("{name} is required").into())
 }

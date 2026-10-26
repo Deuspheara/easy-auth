@@ -1,15 +1,13 @@
 #[path = "configuration/database.rs"]
 pub(crate) mod database;
 #[path = "configuration/environment.rs"]
-mod environment;
+pub(crate) mod environment;
 #[path = "configuration/mail.rs"]
 mod mail;
 #[path = "configuration/oidc/mod.rs"]
 pub(crate) mod oidc;
 #[path = "configuration/passwords.rs"]
 mod passwords;
-#[path = "configuration/retention.rs"]
-pub(crate) mod retention;
 #[path = "configuration/saml/mod.rs"]
 pub(crate) mod saml;
 
@@ -23,7 +21,7 @@ use environment::{optional_setting, required_setting, setting};
 use std::{net::SocketAddr, sync::Arc};
 use uuid::Uuid;
 
-type StartupResult<T> = Result<T, Box<dyn std::error::Error>>;
+pub(crate) type StartupResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 pub(crate) struct Parameters {
     pub browser: BrowserConfig,
