@@ -2,8 +2,8 @@
 
 AUTH-49, 2026-10-26. The initial schema38 assessment below preceded implementation.
 The explicit maintenance boundary now follows
-[ADR0050 under qualification](../architecture/adr/0050-bounded-realm-retention.md);
-complete local/workspace/upgrade/security acceptance remains pending. Use the
+[ADR0050](../architecture/adr/0050-bounded-realm-retention.md), with exact
+[local/workspace/upgrade/security evidence](../security/retention-verification-2026-10-27.md). Use the
 [retention guide](../guides/retention.md), not ad hoc production deletes from this
 matrix. Historical source/catalog evidence below retains its original scope.
 
@@ -128,9 +128,10 @@ security gates after behavior changes, and update public contracts/operator guid
 Add immutable new migration indexes where needed and update upgrade/recovery
 fixtures for the resulting schema; previous schema38 overlap evidence must not be
 relabeled. This section records the eligibility/reference assessment. Current
-maintenance implementation is under qualification; complete operational acceptance,
-incident session/key/token revocation and restored-snapshot reconciliation remain
-AUTH-49 work.
+maintenance has bounded local qualification recorded above. The separate
+[incident qualification](../security/incident-recovery-verification-2026-10-27.md)
+records stale-authority recovery controls; production recovery and complete
+incident-inventory/promotion decisions remain operator responsibilities.
 
 ## Structural preparation
 

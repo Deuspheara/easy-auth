@@ -49,8 +49,8 @@ New modules remain under300lines. The closed28-category match and ordered Apple
 three-stage transaction are cohesive function-size exceptions: keeping their full
 selection/atomic order visible supports security review. Longer ordered integration
 scenarios retain original capabilities, waits, retained controls and final facts
-together; no production internals were made public for tests. General retention
-qualification is still pending in ADR0050; no unrelated cleanup is deferred.
+together; no production internals were made public for tests. Bounded local retention
+qualification is recorded in ADR0050; no unrelated cleanup is deferred.
 
 Apple grant capture extends `oidc/apple/grants/` with explicit authorization,
 opaque verified/mapped/capture types and repository use cases. Shared response

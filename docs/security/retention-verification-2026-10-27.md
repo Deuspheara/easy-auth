@@ -139,3 +139,7 @@ delete external backups/logs or establish a legal retention policy. Incident
 session/key/token revocation and post-restore reconciliation remain required work.
 AUTH-47/AUTH-48 prerequisites, deferred real provider/OS/production verification,
 SAML waiver limits and the outbound OIDC release gate remain open.
+
+The subsequent [incident qualification](incident-recovery-verification-2026-10-27.md)
+records the new populated native/session/key snapshot regression and its own exact
+workspace/security gates. It does not relabel the runtime or operational runs above.

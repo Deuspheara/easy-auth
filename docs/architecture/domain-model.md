@@ -9,7 +9,7 @@ native spent generations survive the original family cap for reuse detection.
 Consumed recovery-code state, durable identity mappings and key/configuration
 records are never reset by expiry cleanup. Migration0039 adds supporting indexes
 without changing data or foreign keys. [ADR0050](adr/0050-bounded-realm-retention.md)
-records the implementation under qualification and separate incident requirements.
+records the locally qualified implementation and separate incident requirements.
 
 Optional `oidc-linking` adds an explicit identity mutation boundary using the
 existing `OAuthPurpose::Link {user,session}`, opaque mapped proof and current fresh

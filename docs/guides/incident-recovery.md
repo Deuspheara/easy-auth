@@ -3,8 +3,9 @@
 Keep a restored database quarantined from application traffic, SMTP and provider
 workers until the incident's affected identities, credentials, keys and queued work
 are reconciled. A successful migration, exact table comparison or retention pass
-cannot make an older snapshot authoritative. The local AUTH-49 incident drill is
-under qualification; it does not approve promotion or production recovery.
+cannot make an older snapshot authoritative. The [local AUTH-49 incident drill](../security/incident-recovery-verification-2026-10-27.md)
+is qualified for its exact recorded scope; it does not approve promotion or
+production recovery.
 
 ## Record the reductions outside the snapshot
 
@@ -84,7 +85,6 @@ verification surviving local key disable, making that limitation explicit.
 This is a database snapshot/revocation regression, not a new backup format,
 production cloning recipe, encrypted-archive assessment or independent provider
 qualification. The separate encrypted backup drill covers actual archive creation,
-authenticated decryption, restoration and runtime CONNECT refusal. Complete local
-workspace/security gates and exact qualification evidence remain required before
-accepting the incident increment. Real provider/OS/production acceptance, AUTH-47/
+authenticated decryption, restoration and runtime CONNECT refusal. The linked verification record identifies the exact passing local
+workspace/security gates and their scope. Real provider/OS/production acceptance, AUTH-47/
 AUTH-48 prerequisites, SAML waiver limits and outbound OIDC release gate remain open.

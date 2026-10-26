@@ -6,7 +6,7 @@ second Read Committed statement preserve current expiry/references; independent
 bounded commits avoid retaining child locks into parent operations. Existing Apple
 maintenance is shared without requiring a provider worker. No HTTP administration,
 implicit scheduler, credential/key reset or default audit-deletion policy is added.
-Implementation qualification is in progress; see [retention](../guides/retention.md)
+Local implementation qualification is recorded; see [retention](../guides/retention.md)
 and [ADR0050](adr/0050-bounded-realm-retention.md).
 
 Schema administration is a separate server command/library composition over the

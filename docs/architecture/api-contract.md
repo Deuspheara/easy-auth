@@ -17,9 +17,20 @@ compose that same core policy from protected `DATABASE_URL`, non-nil `AUTH_REALM
 and required `AUTH_RETENTION_AUDIT`/`AUTH_RETENTION_NOTICES`. Exact current schema
 verification precedes mutation, with no DDL/provisioning/startup fallback. Output
 contains only fixed category names and scalar effects. No listener/SMTP/provider
-composition, new wire schema or credential output is introduced. Operational
-qualification is in progress; [retention](../guides/retention.md) defines the command,
+composition, new wire schema or credential output is introduced. Bounded local operational
+qualification is recorded; [retention](../guides/retention.md) defines the command,
 limits, notification exception and embedding boundary.
+
+## Incident recovery boundaries
+
+Incident recovery composes the existing genuine-owner session revocation,
+matching-client/credential-possession native-family revocation and trusted
+realm/issuer key-disable operations. It adds no HTTP administration route, public
+proof constructor, automatic incident replay or restored-database promotion API.
+An old snapshot can revive authority until separately recorded reductions are
+reapplied. Offline signed tokens/cached keys and downstream sessions remain outside
+local revocation. The [incident procedure](../guides/incident-recovery.md) records
+these distinct authority requirements and quarantine/promotion limits.
 
 ## Database administration boundary
 
