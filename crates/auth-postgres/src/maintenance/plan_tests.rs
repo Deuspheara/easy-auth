@@ -28,13 +28,23 @@ async fn plan(pool: &PgPool, realm: Uuid, category: RetentionCategory) -> Value 
         .unwrap()
 }
 
-fn uses_index(plan: &Value, name: &str) -> bool {
+fn uses_index(plan: &Value, name: &str, conditions: &[&str]) -> bool {
     match plan {
         Value::Object(fields) => {
-            fields.get("Index Name").and_then(Value::as_str) == Some(name)
-                || fields.values().any(|value| uses_index(value, name))
+            (fields.get("Index Name").and_then(Value::as_str) == Some(name)
+                && conditions.iter().all(|condition| {
+                    fields
+                        .get("Index Cond")
+                        .and_then(Value::as_str)
+                        .is_some_and(|value| value.contains(condition))
+                }))
+                || fields
+                    .values()
+                    .any(|value| uses_index(value, name, conditions))
         }
-        Value::Array(values) => values.iter().any(|value| uses_index(value, name)),
+        Value::Array(values) => values
+            .iter()
+            .any(|value| uses_index(value, name, conditions)),
         _ => false,
     }
 }
@@ -59,29 +69,41 @@ fn index_names(plan: &Value) -> Vec<&str> {
 
 #[sqlx::test(migrations = "./migrations")]
 async fn realm_expiry_index_is_selected_for_the_actual_candidate_query(pool: PgPool) {
-    let a = Uuid::new_v4();
-    let b = Uuid::new_v4();
-    for realm in [a, b] {
+    let first = Uuid::parse_str("10000000-0000-4000-8000-000000000001").unwrap();
+    let second = Uuid::parse_str("20000000-0000-4000-8000-000000000002").unwrap();
+    for realm in [first, second] {
         crate::Postgres::new(pool.clone())
             .ensure_realm(realm)
             .await
             .unwrap();
-        // A large foreign-realm backlog is exactly where the composite index
-        // must avoid scanning the old global expiry index's foreign rows. With
-        // only four globally expired rows that older index is a legitimate plan.
-        sqlx::query("INSERT INTO auth_email_challenges(realm_id,token_hash,browser_hash,email,expires_at) SELECT $1,sha256(convert_to(gen_random_uuid()::text,'UTF8')),decode(repeat('01',32),'hex'),'owned-plan@example.test',statement_timestamp()+CASE WHEN n<=2 OR $1::uuid=$2::uuid THEN interval '-1 second' ELSE interval '1 day' END FROM generate_series(1,10000) AS records(n)")
-            .bind(realm).bind(b).execute(&pool).await.unwrap();
     }
-    sqlx::query("ANALYZE auth_email_challenges")
-        .execute(&pool)
-        .await
-        .unwrap();
-    let actual = plan(&pool, a, RetentionCategory::EmailChallenges).await;
-    assert!(
-        uses_index(&actual, "auth_retention_email_challenge"),
-        "selective realm/expiry scan must use the supporting index; selected {:?}",
-        index_names(&actual)
-    );
+    for (selected, foreign) in [(first, second), (second, first)] {
+        sqlx::query("TRUNCATE auth_email_challenges")
+            .execute(&pool)
+            .await
+            .unwrap();
+        // A small realm beside a much larger foreign backlog tests the actual
+        // isolation need. Balanced realms can legitimately choose the old global
+        // index on a cost tie. Both UUID orderings prevent a lucky heap correlation.
+        for (realm, count, expired) in [(selected, 1000, 2), (foreign, 20000, 20000)] {
+            sqlx::query("INSERT INTO auth_email_challenges(realm_id,token_hash,browser_hash,email,expires_at) SELECT $1,sha256(convert_to(gen_random_uuid()::text,'UTF8')),decode(repeat('01',32),'hex'),'owned-plan@example.test',statement_timestamp()+CASE WHEN n<=$3 THEN interval '-1 second' ELSE interval '1 day' END FROM generate_series(1,$2::integer) AS records(n)")
+                .bind(realm).bind(count).bind(expired).execute(&pool).await.unwrap();
+        }
+        sqlx::query("ANALYZE auth_email_challenges")
+            .execute(&pool)
+            .await
+            .unwrap();
+        let actual = plan(&pool, selected, RetentionCategory::EmailChallenges).await;
+        assert!(
+            uses_index(
+                &actual,
+                "auth_retention_email_challenge",
+                &["realm_id", "expires_at"]
+            ),
+            "candidate scan must bind both realm and expiry in the supporting index; selected {:?}",
+            index_names(&actual)
+        );
+    }
 }
 
 #[sqlx::test(migrations = "./migrations")]
@@ -116,11 +138,19 @@ async fn expired_session_candidate_and_audit_references_use_the_new_indexes(pool
         .unwrap();
     let actual = plan(&pool, realm, RetentionCategory::Sessions).await;
     assert!(
-        uses_index(&actual, "auth_retention_session"),
+        uses_index(
+            &actual,
+            "auth_retention_session",
+            &["realm_id", "expires_at"]
+        ),
         "selective expiry scan must use its realm index"
     );
     assert!(
-        uses_index(&actual, "auth_retention_audit_session"),
+        uses_index(
+            &actual,
+            "auth_retention_audit_session",
+            &["realm_id", "session_id"]
+        ),
         "retained audit lookup must use its target index"
     );
 }
