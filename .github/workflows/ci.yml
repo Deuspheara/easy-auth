@@ -331,6 +331,29 @@ jobs:
           path: ${{ runner.temp }}/database-roles-${{ github.sha }}.json
           if-no-files-found: error
           retention-days: 14
+      - name: Prepare pinned offline backup encryption commands
+        run: |
+          python3 -m unittest discover -s scripts -p test_backup_tool.py -v
+          python3 scripts/prepare_backup_tool.py --destination "$RUNNER_TEMP/easy-auth-backup-tool"
+      - name: Verify encrypted backups and quarantined restoration
+        run: |
+          python3 -m unittest discover -s scripts -p test_encrypted_archives.py -v
+          python3 -m unittest discover -s scripts -p test_backup_archive_cli.py -v
+          python3 scripts/smoke_encrypted_backup.py
+        env:
+          EASY_AUTH_BACKUP_TOOL_DIRECTORY: ${{ runner.temp }}/easy-auth-backup-tool
+          EASY_AUTH_ENCRYPTED_BACKUP_REPORT: ${{ runner.temp }}/encrypted-backup-${{ github.sha }}.json
+      - name: Retain sanitized encrypted backup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-backup-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/encrypted-backup-${{ github.sha }}.json
+            ${{ runner.temp }}/easy-auth-backup-tool/receipt.json
+            ${{ runner.temp }}/easy-auth-backup-tool/logs/*audit*.log
+          if-no-files-found: error
+          retention-days: 14
       - run: python3 scripts/smoke_recovery_notice.py
         env:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}

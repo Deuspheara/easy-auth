@@ -25,3 +25,11 @@ def source_identity(root):
 def write_receipt(destination, result):
     with os.fdopen(os.open(Path(destination), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as output:
         json.dump(result, output, indent=2)
+
+
+def ci_source_identity(root):
+    source = source_identity(root)
+    expected = os.environ.get("GITHUB_SHA")
+    if expected and (expected != source["revision"] or not source["clean"]):
+        raise ValueError("CI source must be the exact clean commit")
+    return source

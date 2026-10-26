@@ -1,5 +1,16 @@
 # Protocol dependency assessment
 
+AUTH-49's offline backup commands use unchanged upstream age1.3.2 with an explicit
+build-only Go module selecting x/crypto0.56.0, checksum-pinned Go1.27.3 and pinned
+govulncheck1.9.0. This adds no authentication runtime dependency, crypto producer
+or application-policy exemption. Exact source/version/checksum, read-only locks,
+source/binary scan inventories, imported-package rejection and BSD-style notice
+hashes are recorded by `scripts/prepare_backup_tool.py`. The unimported OpenPGP
+module advisory remains visible; scans are not independent assurance. Primary
+contracts, the fixed SSH dependency findings, installed CMS issue, native archive
+profile and quarantine limits are recorded in
+[ADR0048](../architecture/adr/0048-encrypted-backup-quarantine.md).
+
 The [2026-10-26 supply-chain checkpoint](../security/supply-chain-review-2026-10-26.md)
 records current source-license inventories, selected versus resolver-only graphs,
 standard source/image SBOM coverage and actual native/copyright provenance.

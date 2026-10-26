@@ -1,5 +1,16 @@
 # Threat model — controls, evidence and recorded evolution
 
+Offline backup encryption uses explicitly prepared age commands and protected
+native recovery identities, with no plugin/agent/password fallback. Require a
+separately protected selected ciphertext digest and successful full-length
+authenticated decryption into a bounded private quarantine file before PostgreSQL
+receives bytes. Integrity does not establish the backup sender or choose the latest
+snapshot; trusted archives can execute SQL. Old snapshots can revive revoked
+sessions, deleted identities and pending side effects. Restored databases stay
+disconnected from runtime/workers pending incident/key/configuration reconciliation.
+This operator component establishes no automated promotion or production recovery
+guarantee; see [ADR0048](../architecture/adr/0048-encrypted-backup-quarantine.md).
+
 Separate schema/runtime database credentials limit runtime DDL and migration-history
 writes when operators provision the documented grants. Exact `verify` startup checks
 all embedded SQLx migration versions/checksums without DDL or insecure fallback;
