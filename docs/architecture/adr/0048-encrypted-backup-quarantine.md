@@ -1,7 +1,7 @@
 # ADR0048: Authenticated encryption and quarantined backup restoration
 
-Date: 2026-10-26. Status: proposed implementation for AUTH-49; full recovery
-validation pending. Production/provider/OS acceptance and release prerequisites
+Date: 2026-10-26. Status: accepted for the bounded local encrypted-archive increment;
+full AUTH-49 recovery remains incomplete. Production/provider/OS acceptance and release prerequisites
 remain deferred; this decision authorizes no deployment or release.
 
 ## Scope and dependency choice
@@ -73,3 +73,9 @@ decryption never invokes restoration. Required repository/security gates,
 maintainability review and exact evidence remain before ticket completion.
 Retention, failed-DDL recovery/upgrade and incident stale-key/token drills remain
 part of AUTH-49. The SAML waiver's limits and outbound OIDC release gate remain.
+
+The [verification record](../../security/encrypted-backup-verification-2026-10-26.md)
+records exact committed CI replay, source/binary/notice assessment, actual encrypted
+PostgreSQL restoration and negative/key/cleanup controls, failures and remaining
+scope. Acceptance applies only to this archive/quarantine boundary; it does not
+complete retention, upgrade/failed-DDL or incident-reconciliation requirements.
