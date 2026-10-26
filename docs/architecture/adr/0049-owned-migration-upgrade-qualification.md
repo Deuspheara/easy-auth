@@ -1,6 +1,7 @@
 # ADR0049: Qualify schema failure and replica replacement with owned revisions
 
-Date: 2026-10-26. Status: proposed local AUTH-49 qualification; validation pending.
+Date: 2026-10-26. Status: accepted for the selected local recovery/software-upgrade
+increment; complete AUTH-49 operational/production acceptance remains pending.
 
 Use the committed schema37 ancestor
 `0783ff48b6409d362fbcae527f46a483ca66fb55`, the validated pre-operations schema38
@@ -49,3 +50,9 @@ fixture responsibilities separate from application policy; add no HTTP admin rou
 generic migration engine, new crate or crypto. Retention and stale-key/token incident
 work remain AUTH-49 requirements. AUTH-48/AUTH-47 release prerequisites, SAML waiver
 limits, outbound OIDC release gate and real provider/OS/production acceptance remain.
+
+The [verification record](../../security/migration-upgrade-verification-2026-10-26.md)
+records exact committed CI replay, source/binary/immutable-input identities, actual
+transactional failure/recovery, selected software overlap, continuous session probes,
+cleanup and remaining limits. It accepts this selected boundary without completing
+retention or incident reconciliation.
