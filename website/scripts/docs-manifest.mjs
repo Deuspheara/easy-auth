@@ -11,6 +11,11 @@ export const guides = [
     title: "Backups and restore checks",
   },
   {
+    source: "docs/guides/upgrades.md",
+    slug: "upgrades",
+    title: "Migration recovery and upgrades",
+  },
+  {
     source: "docs/guides/minimal-clients.md",
     slug: "minimal-clients",
     title: "Minimal Rust and TypeScript",

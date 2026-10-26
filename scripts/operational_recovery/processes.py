@@ -29,7 +29,11 @@ class Processes:
         if password:
             self.private_values.add(password.encode())
 
-    def one_shot(self, database_url, *, expected_success):
+    def one_shot(self, database_url, *, expected_success, failure_kind="connection"):
+        expected_failures = {"connection": b'Error: "database connection failed"\n',
+                             "migration": b'Error: "database migration failed"\n'}
+        if failure_kind not in expected_failures:
+            raise ValueError("unknown owned migration failure profile")
         self.protect_url(database_url)
         environment = {"PATH": os.environ.get("PATH", ""), "DATABASE_URL": database_url,
                        "AUTH_REALM_ID": "unused-invalid-runtime-setting",
@@ -43,8 +47,8 @@ class Processes:
         if expected_success:
             if child.returncode != 0 or output != b"database migrations completed\n" or diagnostic:
                 raise ValueError("owned migration administration did not complete cleanly")
-        elif child.returncode == 0 or output or b"database connection failed" not in diagnostic:
-            raise ValueError("owned migration credential refusal not observed")
+        elif child.returncode == 0 or output or diagnostic != expected_failures[failure_kind]:
+            raise ValueError("owned migration refusal did not match its exact profile")
 
     def start(self, database_url, realm, *, mode="verify", expected_success=True):
         self.protect_url(database_url)

@@ -354,6 +354,33 @@ jobs:
             ${{ runner.temp }}/easy-auth-backup-tool/logs/*audit*.log
           if-no-files-found: error
           retention-days: 14
+      - name: Prepare immutable migration and software upgrade fixtures
+        run: |
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            git fetch --no-tags --unshallow origin
+          fi
+          python3 -m unittest discover -s scripts -p test_upgrade_source.py -v
+          python3 -m unittest discover -s scripts -p test_upgrade_probe.py -v
+          python3 scripts/prepare_upgrade_fixture.py --destination "$RUNNER_TEMP/easy-auth-upgrade-fixture"
+          python3 scripts/prepare_upgrade_fixture.py --profile schema38 --destination "$RUNNER_TEMP/easy-auth-upgrade-prior"
+      - name: Verify failed migration recovery and owned replica replacement
+        run: python3 scripts/smoke_upgrade_recovery.py
+        env:
+          EASY_AUTH_UPGRADE_FIXTURE_DIRECTORY: ${{ runner.temp }}/easy-auth-upgrade-fixture
+          EASY_AUTH_UPGRADE_PRIOR_DIRECTORY: ${{ runner.temp }}/easy-auth-upgrade-prior
+          EASY_AUTH_BACKUP_TOOL_DIRECTORY: ${{ runner.temp }}/easy-auth-backup-tool
+          EASY_AUTH_UPGRADE_REPORT: ${{ runner.temp }}/upgrade-recovery-${{ github.sha }}.json
+      - name: Retain sanitized migration upgrade evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-upgrade-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/upgrade-recovery-${{ github.sha }}.json
+            ${{ runner.temp }}/easy-auth-upgrade-fixture/receipt.json
+            ${{ runner.temp }}/easy-auth-upgrade-prior/receipt.json
+          if-no-files-found: error
+          retention-days: 14
       - run: python3 scripts/smoke_recovery_notice.py
         env:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}

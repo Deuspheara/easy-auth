@@ -15,6 +15,13 @@ access. Extra or unsupported arguments fail with status 2 and omit their values.
 See [CLI setup diagnostics](../guides/server-cli.md); these options do not validate
 configuration or establish readiness.
 
+The [migration recovery/upgrade procedure](../guides/upgrades.md) uses a writer-drain
+window for DDL, fresh verified connections afterwards and separately qualified
+replica replacement on unchanged schema. Its actual owned37→38 rollback/recovery
+drill does not establish arbitrary mixed-version DDL, downgrade or production
+orchestration support. Restored snapshots remain quarantined pending incident
+reconciliation.
+
 `easy-auth migrate` is a separate one-shot administration command requiring only
 the migration role's private `DATABASE_URL`. Normal configured startup defaults to
 `AUTH_DATABASE_MIGRATIONS=run` for compatibility; separately migrated deployments
