@@ -17,6 +17,7 @@ mod recovery;
 mod repository;
 #[cfg(feature = "saml-requests")]
 mod saml;
+mod schema;
 mod sessions;
 
 use auth_core::{Error, Result};
@@ -39,12 +40,6 @@ impl Postgres {
             #[cfg(feature = "apple-grants")]
             apple_grant_vault: None,
         }
-    }
-    pub async fn migrate(&self) -> Result<()> {
-        sqlx::migrate!()
-            .run(&self.pool)
-            .await
-            .map_err(|_| Error::Unavailable)
     }
     /// Only trusted startup configuration provisions realms, never request input.
     pub async fn ensure_realm(&self, realm: Uuid) -> Result<()> {
