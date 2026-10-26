@@ -3,7 +3,7 @@
 Schema changes use the separate [administration command](database-roles.md).
 Runtime verification checks complete embedded SQLx history, never migrates as a
 fallback and does not audit arbitrary schema drift. This guide records the bounded
-owned schema37→38 procedure and its limits; it is not production orchestration,
+owned schema37→39 procedure and its limits; it is not production orchestration,
 arbitrary-version interoperability, downgrade or zero-downtime qualification.
 
 ## Review the revision pair and isolate recovery
@@ -63,9 +63,9 @@ old instance, confirm another replica still serves, and check shared logout/revo
 and realm isolation through the survivors. Keep workers bound to the intended live
 database; do not repoint them at a restored snapshot as a readiness shortcut.
 
-The reference drill qualifies the selected pre-operations schema38 software revision
-to the current restricted-runtime software on unchanged schema38, after the actual
-37→38 data upgrade. Both versions serve original sessions during overlap. Continuous
+The reference drill qualifies the selected pre-retention schema39 software revision
+to the current restricted-runtime software on unchanged schema39, after the actual
+37→39 data upgrade. Both versions serve original sessions during overlap. Continuous
 owned probes check request/identity progress while peers start/stop, and an additional
 current-replica replacement runs. Other revision pairs, load balancers, full in-flight
 request draining, deployment controllers, failover/RTO/RPO and production TLS require
@@ -74,8 +74,8 @@ their own selected qualification.
 ## Run the owned recovery drill
 
 Build the current default server and prepare the [backup tool](backups.md). The
-drill also builds pinned public schema37 and prior schema38 ancestors in separate
-source/target directories. Their ancestry/trees, all37/38 immutable migration files and Cargo dependency/toolchain
+drill also builds pinned public schema37 and prior schema39 ancestors in separate
+source/target directories. Their ancestry/trees, all37/39 immutable migration files and Cargo dependency/toolchain
 inputs must match; all exported files must stay unchanged during the frozen build.
 It rejects existing build directories, altered artifacts and unrelated compiler/
 native/cache/SQLx database overrides. It does not execute the protected original
@@ -86,7 +86,7 @@ cargo build --locked -p easy-auth-server --bin easy-auth
 python3 -m unittest discover -s scripts -p test_upgrade_source.py -v
 python3 -m unittest discover -s scripts -p test_upgrade_probe.py -v
 python3 scripts/prepare_upgrade_fixture.py --destination /private/tmp/easy-auth-upgrade-fixture
-python3 scripts/prepare_upgrade_fixture.py --profile schema38 --destination /private/tmp/easy-auth-upgrade-prior
+python3 scripts/prepare_upgrade_fixture.py --profile schema39 --destination /private/tmp/easy-auth-upgrade-prior
 export EASY_AUTH_UPGRADE_FIXTURE_DIRECTORY=/private/tmp/easy-auth-upgrade-fixture
 export EASY_AUTH_UPGRADE_PRIOR_DIRECTORY=/private/tmp/easy-auth-upgrade-prior
 # Set this to the directory prepared using the backup guide:
@@ -110,14 +110,15 @@ effects must roll back, and all legacy rows/history and the conflict must remain
 
 Both recovery paths then run: decrypt/restore the pre-failure snapshot into a new
 disconnected clone and migrate it; inspect/remove the owned source conflict and
-rerun migration38. Compare complete legacy table contents and actual successful
-history. The old binary must refuse schema38; current replicas must preserve the
+rerun migration38 and apply39. Compare complete legacy table contents and actual successful
+history. The old binary must refuse schema39; current replicas must preserve the
 original identities/sessions, replace prior software with current software while
 continuous real session requests succeed, replace a current instance, refuse
 foreign-realm cookies and share logout without affecting the other realm. Remove
 only the run's two messages and all owned processes/containers/volume/private files.
 
 See [ADR0049](../architecture/adr/0049-owned-migration-upgrade-qualification.md).
-Retention and stale-session/key/token incident reconciliation remain separate
-AUTH-49 work. Real provider/OS/production acceptance, SAML waiver limits and the
+The [schema39 retention qualification](../security/retention-verification-2026-10-27.md)
+records the selected current revisions and results. Stale-session/key/token incident
+reconciliation remains separate AUTH-49 work. Real provider/OS/production acceptance, SAML waiver limits and the
 outbound OIDC release gate remain open.

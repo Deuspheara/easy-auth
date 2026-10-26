@@ -1,7 +1,8 @@
 # ADR0050: Explicit bounded retention by realm and lifecycle
 
-Date: 2026-10-26. Status: implementation under qualification for AUTH-49;
-local acceptance and complete operational/production acceptance remain pending.
+Date: 2026-10-26. Status: accepted for bounded local implementation on 2026-10-27;
+[exact verification evidence](../../security/retention-verification-2026-10-27.md)
+records the tested scope. Complete AUTH-49 and production acceptance remain pending.
 The explicit cleanup command is implemented; no scheduler is enabled automatically.
 
 ## Context
@@ -19,7 +20,7 @@ auth tables, existing lifecycle checks and the intended eligibility for each.
 Its real PostgreSQL catalog observation is design evidence only, not a retention
 test or a completed acceptance criterion.
 
-## Implemented boundary under qualification
+## Implemented boundary
 
 Use one explicit trusted maintenance use case/port in auth-core and its PostgreSQL
 implementation. Core owns validated retention choices, finite operation selection

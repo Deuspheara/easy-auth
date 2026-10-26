@@ -7,6 +7,10 @@ and [encrypted archive](encrypted-backup-verification-2026-10-26.md) increments.
 Retention and stale-session/key/token incident reconciliation remain incomplete;
 AUTH-49 is In Progress. No production, independent approval or compliance follows.
 
+This is historical schema38 evidence. The subsequent
+[schema39 qualification](retention-verification-2026-10-27.md) records the new
+revision pair and fresh operational results; it does not relabel this run.
+
 ## Selected revisions and artifacts
 
 | Role | Source revision | Actual local binary SHA256 |

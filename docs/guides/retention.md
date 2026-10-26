@@ -1,7 +1,9 @@
 # Realm retention maintenance
 
 The explicit core/PostgreSQL maintenance boundary and one-shot server command are
-implemented locally; AUTH-49 qualification is in progress. This guide does not
+implemented and locally qualified on the exact revision recorded in the
+[verification evidence](../security/retention-verification-2026-10-27.md). AUTH-49
+remains in progress for incident revocation and restored-snapshot reconciliation. This guide does not
 establish production recovery, legal retention periods or independent review.
 No scheduler or HTTP administration route is enabled automatically.
 
@@ -119,11 +121,12 @@ Migration0039 adds realm/expiry and reference indexes without changing earlier
 migrations, rows or foreign keys. Apply schema changes with writers drained and
 fresh connections as described in [upgrades](upgrades.md). Historical schema38
 software-overlap evidence does not establish that an older executable accepts
-schema39. Current upgrade qualification must use the separately pinned schema39
-ancestor and actual current software; that requalification remains in progress.
+schema39. The recorded current upgrade qualification uses the separately pinned schema39
+ancestor and actual current software; it includes real session continuity and
+restricted runtime roles for both versions.
 
 The [complete table assessment](../design/retention-cleanup.md) distinguishes all
 47 auth tables and their retention/exclusion rules. [ADR0050](../architecture/adr/0050-bounded-realm-retention.md)
-records implementation/qualification boundaries. Full workspace, real database,
-security, upgrade and operator acceptance remain pending until their exact evidence
-is recorded. SAML's maintainer waiver and the outbound OIDC release gate are unchanged.
+records implementation/qualification boundaries. The verification evidence records
+workspace, real database, security and owned operator drills with their exact scope.
+Production operator acceptance remains deferred. SAML's maintainer waiver and the outbound OIDC release gate are unchanged.
