@@ -68,7 +68,8 @@ async fn dropped_http_future_records_cancellation_in_original_subscriber_and_rol
     let events = capture.events();
     assert_eq!(events.len(), 1);
     let event = &events[0];
-    let keys: Vec<_> = event.keys().map(String::as_str).collect();
+    let mut keys: Vec<_> = event.keys().map(String::as_str).collect();
+    keys.sort_unstable();
     assert_eq!(
         keys,
         ["completion", "duration_micros", "message", "request_id"]

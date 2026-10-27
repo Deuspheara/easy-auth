@@ -60,7 +60,8 @@ async fn actual_http_events_keep_only_fixed_metadata_and_ignore_client_request_i
     let events = capture.events();
     assert_eq!(events.len(), 2);
     for (index, event) in events.iter().enumerate() {
-        let keys: Vec<_> = event.keys().map(String::as_str).collect();
+        let mut keys: Vec<_> = event.keys().map(String::as_str).collect();
+        keys.sort_unstable();
         assert_eq!(
             keys,
             [
