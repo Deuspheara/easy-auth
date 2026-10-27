@@ -57,6 +57,7 @@ export async function checkMobileAndSearch(page, origin) {
   );
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /search/i }).click();
+  await page.locator("dialog input").fill("SAML");
   await result.click();
   await page.waitForURL((url) => url.href === destination.href);
   assert.equal(await page.locator("h1").first().isVisible(), true);

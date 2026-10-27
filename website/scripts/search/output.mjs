@@ -1,4 +1,5 @@
 import {
+  chmod,
   mkdir,
   mkdtemp,
   readFile,
@@ -9,6 +10,29 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { assetPath, validateBundle } from "./bundle.mjs";
+
+const publicFileMode = 0o644;
+const publicDirectoryMode = 0o755;
+
+async function publicPermissions(directory, assets) {
+  const parents = new Set();
+  for (const name of assets.keys()) {
+    await chmod(path.join(directory, name), publicFileMode);
+    for (
+      let parent = path.dirname(name);
+      parent !== ".";
+      parent = path.dirname(parent)
+    ) {
+      parents.add(parent);
+    }
+  }
+  for (const parent of parents) {
+    await chmod(path.join(directory, parent), publicDirectoryMode);
+  }
+  // Keep the outer staging directory private until all bytes and child modes
+  // are complete. Published static assets must be readable by the serving user.
+  await chmod(directory, publicDirectoryMode);
+}
 
 async function checkDirectory(directory, assets, prefix = "") {
   const found = new Set();
@@ -57,6 +81,7 @@ export async function writeBundle(site, files) {
       await writeFile(target, content, { flag: "wx" });
     }
     await verifyOutput(staging, files);
+    await publicPermissions(staging, assets);
     await rename(staging, destination);
   } finally {
     await rm(staging, { recursive: true, force: true });

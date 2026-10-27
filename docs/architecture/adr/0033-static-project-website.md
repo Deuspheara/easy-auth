@@ -76,6 +76,8 @@ Review this deliberate hook adaptation on future Starlight upgrades.
 Validate the complete response, fixed version/entry/language assets, compressed
 payloads and safe distinct paths before writing. Write into a fresh owned staging
 directory, await closes and compare every emitted file byte-for-byte before rename.
+Keep staging private until validation; normalize public file/directory modes to
+0644/0755 before publication, even under a restrictive umask.
 Missing/empty/altered/unexpected output, an existing destination or a write fault
 fails the build; remove only owned staging. This completion boundary needs neither
 sleep nor retry nor a new assertion waiver. Existing real browser controls stay

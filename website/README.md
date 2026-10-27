@@ -82,7 +82,9 @@ The pinned Starlight integration keeps its normal search UI and configuration.
 public `getFiles()` API returns the complete index in memory, then Node writes
 and closes each file in a new staging directory. Entry/language references,
 compressed assets and the complete emitted file set are checked; byte-for-byte
-readback precedes publishing the directory. Existing output is refused. A malformed
+readback precedes publishing the directory. Only after validation are public file/
+directory modes normalized to0644/0755, including under a restrictive build umask.
+Existing output is refused. A malformed
 bundle, write failure or incomplete readback fails the build without retries or
 arbitrary sleeps. This avoids killing Pagefind while its own disk writes remain
 buffered. The adapter must be reviewed when upgrading Starlight or Pagefind.

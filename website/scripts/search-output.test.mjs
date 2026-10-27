@@ -5,6 +5,7 @@ import {
   readFile,
   readdir,
   rm,
+  stat,
   symlink,
   writeFile,
 } from "node:fs/promises";
@@ -96,4 +97,26 @@ test("a symlink cannot make external bytes count as generated output", async (t)
     await readFile(external, "utf8"),
     "owned control must not be read as an index",
   );
+});
+
+test("published static assets stay readable under a restrictive build umask", async (t) => {
+  const site = await owned(t);
+  const previous = process.umask(0o077);
+  try {
+    await writeBundle(site, files);
+  } finally {
+    process.umask(previous);
+  }
+  const output = path.join(site, "pagefind");
+  assert.equal((await stat(output)).mode & 0o777, 0o755);
+  for (const file of files) {
+    assert.equal(
+      (await stat(path.join(output, file.path))).mode & 0o777,
+      0o644,
+    );
+    assert.equal(
+      (await stat(path.dirname(path.join(output, file.path)))).mode & 0o777,
+      0o755,
+    );
+  }
 });
