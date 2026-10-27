@@ -18,7 +18,8 @@ jobs:
         ports: ["5432:5432"]
         options: --health-cmd "pg_isready -U auth -d auth" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
-      DATABASE_URL: postgres://auth:ci-only-password@localhost:5432/auth
+      # Owned persistence probes intentionally require a literal loopback host.
+      DATABASE_URL: postgres://auth:ci-only-password@127.0.0.1:5432/auth
       CARGO_INCREMENTAL: '0'
     steps:
       - uses: actions/checkout@v4
