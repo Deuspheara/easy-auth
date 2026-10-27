@@ -7,6 +7,9 @@ now use the same `configured_application` factory for standalone and embedding.
 Owned Keycloak public-login/lifecycle acceptance is recorded below. Dated checks
 are recorded in the [verification history](../security/verification.md); broader
 release gates remain explicit.
+The [2026-10-27 M05 acceptance review](../security/enterprise-oidc-acceptance-2026-10-27.md)
+records refreshed Keycloak backend, deletion and two-mode public flows plus normal
+startup controls, with exact source and fixture limitations.
 Default builds and absent settings do not activate these routes. This is not production-readiness,
 external-provider interoperability or independent-review evidence.
 

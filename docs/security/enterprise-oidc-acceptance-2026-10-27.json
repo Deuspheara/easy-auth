@@ -1,0 +1,642 @@
+{
+  "recorded_at": "2026-10-27T03:18:24.333389+00:00",
+  "source": "6c38aafee76bd9ca532122127d1f7adea2b7510a",
+  "source_tree": "674a0d144bfc65919ada06379b251c507b0d9a65",
+  "scope": "AUTH-27 local IdP and adversarial milestone acceptance; no production/provider/OS matrix or independent security approval",
+  "profiles": [
+    {
+      "profile": "normal-startup",
+      "summary": {
+        "passed": 13,
+        "fixture_database_removed": true,
+        "private_files_removed": true,
+        "provider_exchange": false
+      },
+      "cases": [
+        "configured-standalone-routes-and-stable-revision",
+        "configured-embedded-routes-and-stable-revision",
+        "unsupported-build-refuses-activation",
+        "partial-settings-refused",
+        "unknown-tls_root_file",
+        "unknown-address_override",
+        "unknown-client_secret",
+        "development-cannot-downgrade-oidc-https",
+        "missing-secret-cannot-fall-back-to-public",
+        "explicit-confidential-file-preserves-revision",
+        "publicly-readable-secret-refused",
+        "policy-mismatch-is-not-startup-reconfiguration",
+        "operator-disable-is-not-cleared-at-startup"
+      ],
+      "smtp_override": "owned delivery host/port only; unchanged startup checks"
+    },
+    {
+      "profile": "backend",
+      "passed": 23,
+      "report_sha256": "e1a261e8a3d3c67e799da4b861ef7dca1bac55cd88cda90e26801b46e1dd09a7",
+      "binary_sha256": "2114ad12d291d991e5d0febe5ffd2f53ac2817ea1b72e5cc3ff79d41c33bfd76",
+      "source_hashes_verified": 1807,
+      "provider_image": "quay.io/keycloak/keycloak:26.8.1@sha256:79c623a22abacf3fe6c00a5fb30f5b7843d717b234033b80995891c06116d244",
+      "node": "v24.22.1",
+      "playwright": "1.64.1",
+      "chromium": "156.0.8078.4",
+      "platform": "darwin",
+      "arch": "arm64",
+      "boundary": "real Keycloak code/S256 and RS256; real PostgreSQL state/context and current-policy JIT/local source-bound session/audit commit plus purpose-bound reauthentication and provider deletion; production TLS builder/GET/POST/readers; private owned certificate/address mapping and TLS proxy; fresh isolated Chromium context with fixture-only certificate tolerance; no public login/session/deletion route or production override",
+      "limitations": [
+        "controlled signature corruption and captured-token replay occur at the owned proxy, not inside Keycloak",
+        "Keycloak no-store discovery and JWKS headers are unchanged; real rotation does not establish the forced-refresh cache branch",
+        "mailbox control uses actual repository proof, not SMTP/device evidence; no independent audit, production-provider acceptance or ordinary provider route"
+      ],
+      "cases": [
+        {
+          "name": "keycloak-real-code-s256-and-rs256",
+          "status": "passed"
+        },
+        {
+          "name": "postgres-consumed-state-replay",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-exact-code-and-verifier-replay",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-signed-wrong-nonce",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-rejects-wrong-s256-proof",
+          "status": "passed"
+        },
+        {
+          "name": "controlled-corruption-of-keycloak-signature",
+          "status": "passed"
+        },
+        {
+          "name": "captured-keycloak-token-replay-on-fresh-state",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-signed-untrusted-additional-audience",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-real-signing-key-rotation",
+          "status": "passed"
+        },
+        {
+          "name": "fresh-keycloak-success-after-all-negatives",
+          "status": "passed"
+        },
+        {
+          "name": "disabled-postgres-context-sends-no-code",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-identity-owned-mailbox-control",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-valid-proof-default-jit-deny",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-explicit-jit-no-matching-email-merge",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-bound-subject-without-optional-profile",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-verified-proof-rejected-after-policy-revision",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-jit-deny-still-resolves-bound-subject",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-jit-denies-new-valid-subject-with-usable-display",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-verified-proof-and-session-rejected-after-disable",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-deletion-current-source-control",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-deletion-wrong-signed-subject-denied",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-reauthentication-and-atomic-provider-deletion",
+          "status": "passed"
+        },
+        {
+          "name": "keycloak-fresh-valid-subject-cannot-jit-through-deletion-cooldown",
+          "status": "passed"
+        }
+      ],
+      "proxy": {
+        "posts": 19,
+        "token_responses": 18,
+        "signature_mutations": 1,
+        "token_replays": 1
+      },
+      "provider_container_removed": true,
+      "private_files_removed": true,
+      "source_manifest_sha256": "1b93181c459460bf33dd8f6dae3aa157871dc6b24f23bc1d5863956cad7d7a42",
+      "fixture_exit": 0,
+      "fixture_database_removed": true,
+      "emergency_database_cleanup": false,
+      "unexpected_native_diagnostics": false,
+      "database": {
+        "users": 1,
+        "sessions": 1,
+        "audit": 6,
+        "pending": 0
+      },
+      "identity_database": {
+        "identities": 0,
+        "provider_users": 0,
+        "provider_contacts": 0,
+        "oidc_sessions": 0,
+        "weak_provider_sessions": 0
+      },
+      "deletion_database": {
+        "deleted": 1,
+        "live_cooldown": 1,
+        "erased_provider_audits": 4,
+        "live_mailbox_audits": 1
+      },
+      "verification_proxy": {
+        "posts": 8,
+        "token_responses": 7,
+        "signature_mutations": 1,
+        "token_replays": 1
+      }
+    },
+    {
+      "profile": "http-deletion",
+      "passed": 6,
+      "report_sha256": "a495941a22a0dc50e0524f39a5d80cca28dafcf183d8d435940f1b3934c25eff",
+      "binary_sha256": "b4bb4afa8c34bf0822c2a2c8569d4f36d96d2c286a905b5f25ff8d768d00b134",
+      "source_hashes_verified": 1807,
+      "provider_image": "quay.io/keycloak/keycloak:26.8.1@sha256:79c623a22abacf3fe6c00a5fb30f5b7843d717b234033b80995891c06116d244",
+      "node": "v24.22.1",
+      "playwright": "1.64.1",
+      "chromium": "156.0.8078.4",
+      "platform": "darwin",
+      "arch": "arm64",
+      "boundary": "actual Keycloak login and reauthentication; real HTTP deletion/reference pages, protected cookies and PostgreSQL commit; production core verifier, repository and HTTPS GET/POST transport; owned TLS proxy and certificate/address mapping only",
+      "limitations": [
+        "initial session uses actual signed core login and a one-use fixture-only cookie-delivery capability, not an ordinary provider login route",
+        "controlled token unavailability is injected at the owned TLS proxy; it must return 503 and grants no expected authorization success",
+        "finite verified-port observations forward opaque proof unchanged and preserve the real PostgreSQL result",
+        "email-free account; no provider-contact SMTP, production-provider interoperability, independent audit or ordinary activation evidence"
+      ],
+      "cases": [
+        {
+          "name": "keycloak-http-real-provider-session-bootstrap",
+          "status": "passed",
+          "actual_signed_bootstrap": true,
+          "one_use_cookie_delivery": true,
+          "session_cookie_protected": true,
+          "local_contact_absent": true
+        },
+        {
+          "name": "keycloak-http-callback-get-and-cancellation-cannot-delete",
+          "status": "passed",
+          "callback_get_preserves_pending_and_account": true,
+          "explicit_cancellation": true,
+          "four_protected_proof_cookies": true
+        },
+        {
+          "name": "keycloak-http-wrong-fresh-signed-subject-denied",
+          "status": "passed",
+          "verified_deletion": {
+            "subject_matches": false,
+            "configuration_matches": true,
+            "purpose_bound": true,
+            "signed_time_present": true,
+            "signed_time_recent": true,
+            "original_cap_live": true,
+            "result": "unauthorized"
+          },
+          "original_account_session_retained": true
+        },
+        {
+          "name": "keycloak-http-token-infrastructure-failure-is-503",
+          "status": "passed",
+          "controlled_token_unavailability": true,
+          "http_status": 503,
+          "no_verified_deletion_or_account_mutation": true
+        },
+        {
+          "name": "keycloak-http-explicit-reauthentication-deletion-and-replay",
+          "status": "passed",
+          "verified_deletion": {
+            "subject_matches": true,
+            "configuration_matches": true,
+            "purpose_bound": true,
+            "signed_time_present": true,
+            "signed_time_recent": true,
+            "original_cap_live": true,
+            "result": "committed"
+          },
+          "explicit_confirmation": true,
+          "no_surviving_session": true,
+          "old_cookie_and_callback_replay_denied": true
+        },
+        {
+          "name": "keycloak-http-deletion-cooldown-rejects-fresh-bootstrap-proof",
+          "status": "passed",
+          "fresh_signed_proof": {
+            "verified_before_resolution": true,
+            "configuration_matches": true,
+            "subject_matches": true,
+            "sign_in_purpose": true,
+            "signed_time_recent": true,
+            "original_cap_live": true
+          },
+          "live_cooldown": true,
+          "local_authority_remains_absent": true
+        }
+      ],
+      "proxy": {
+        "posts": 5,
+        "token_responses": 4,
+        "signature_mutations": 0,
+        "token_replays": 0
+      },
+      "provider_container_removed": true,
+      "private_files_removed": true,
+      "source_manifest_sha256": "1b93181c459460bf33dd8f6dae3aa157871dc6b24f23bc1d5863956cad7d7a42",
+      "fixture_exit": 0,
+      "fixture_database_removed": true,
+      "emergency_database_cleanup": false,
+      "unexpected_native_diagnostics": false,
+      "database": {
+        "users": 0,
+        "sessions": 0,
+        "identities": 0,
+        "audit": 2,
+        "pending": 0,
+        "cooldown": 1,
+        "notices": 0,
+        "contacts": 0,
+        "live_cooldown": 1,
+        "retained_subjects": 0
+      },
+      "controlled_faults": {
+        "unavailable": 1
+      }
+    },
+    {
+      "profile": "public-web",
+      "passed": 18,
+      "report_sha256": "38eea139ab022e111d0a71e5af6a2af6b1cd7e583a0d5aea8ccc11d29c7bbcbb",
+      "binary_sha256": "1ce9b1eaaad8a600f73af8adcebcaabe62d12b714c900f45393a8091fd1b8418",
+      "source_hashes_verified": 1915,
+      "provider_image": "quay.io/keycloak/keycloak:26.8.1@sha256:79c623a22abacf3fe6c00a5fb30f5b7843d717b234033b80995891c06116d244",
+      "node": "v24.22.1",
+      "playwright": "1.64.1",
+      "chromium": "156.0.8078.4",
+      "platform": "darwin",
+      "arch": "arm64",
+      "boundary": "unchanged configured application/settings and embedded application-route sources; real public sign-in/callback/finish, protected file client authentication, current-session use/logout and fresh deletion; actual Keycloak/HTTPS/core/PostgreSQL",
+      "limitations": [
+        "not a normal-binary public-root TLS positive control or production-provider interoperability",
+        "normal binary startup/feature/refusal behavior has separate PostgreSQL smoke evidence",
+        "owned database gates observe real final commit and verified subject resolution; no state timing, proof, identity or session is fabricated",
+        "email-free path; no provider-contact SMTP, device/browser matrix, independent review or production-readiness claim"
+      ],
+      "cases": [
+        {
+          "name": "keycloak-web-standalone-configured-routes-and-no-bootstrap",
+          "status": "passed",
+          "configured_factory": true,
+          "auth_only_settings_refused": true,
+          "no_bootstrap_endpoint": true,
+          "no_seeded_authority": true
+        },
+        {
+          "name": "keycloak-web-standalone-callback-get-cannot-sign-in-and-cancel-is-denial-only",
+          "status": "passed",
+          "callback_nonmutating": true,
+          "four_protected_cookies": true,
+          "pending_callback_survives_factory_restart": true,
+          "explicit_cancellation": true
+        },
+        {
+          "name": "keycloak-web-standalone-token-infrastructure-is-503-not-an-auth-rejection",
+          "status": "passed",
+          "controlled_token_outage": true,
+          "http_status": 503,
+          "no_cookie_or_database_grant": true
+        },
+        {
+          "name": "keycloak-web-standalone-public-signin-waits-for-real-final-commit",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "reference_provider_account": true,
+          "real_audit_wait_observed": true,
+          "http_response_and_cookie_wait_for_commit": true,
+          "no_grant_before_commit": true,
+          "session_cookie_protected": true,
+          "session_survives_factory_restart": true,
+          "committed_owner_and_session": true
+        },
+        {
+          "name": "keycloak-web-standalone-ambient-session-cannot-switch-and-logout-revokes",
+          "status": "passed",
+          "ambient_account_switch_rejected": true,
+          "provider_not_contacted": true,
+          "old_session_replay_denied": true,
+          "explicit_logout": true
+        },
+        {
+          "name": "keycloak-web-standalone-returning-public-login-reuses-the-original-owner",
+          "status": "passed",
+          "real_new_provider_flow": true,
+          "existing_owner_reused": true,
+          "no_extra_identity_or_contact": true
+        },
+        {
+          "name": "keycloak-web-standalone-wrong-fresh-provider-subject-cannot-delete",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "wrong_subject_denied": true,
+          "original_account_session_preserved": true
+        },
+        {
+          "name": "keycloak-web-standalone-explicit-fresh-deletion-erases-and-rejects-old-proof",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "explicit_destructive_confirmation": true,
+          "all_local_authority_erased": true,
+          "retained_audit_deidentified": true,
+          "old_cookies_and_callback_replay_denied": true
+        },
+        {
+          "name": "keycloak-web-standalone-cooldown-rejects-a-verified-public-signin-at-subject-resolution",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "verified_sql_resolution_observed": true,
+          "original_cap_live": true,
+          "live_cooldown_denied_jit": true,
+          "no_reprovisioned_authority": true
+        },
+        {
+          "name": "keycloak-web-embedded-configured-routes-and-no-bootstrap",
+          "status": "passed",
+          "configured_factory": true,
+          "auth_only_settings_refused": true,
+          "no_bootstrap_endpoint": true,
+          "no_seeded_authority": true
+        },
+        {
+          "name": "keycloak-web-embedded-callback-get-cannot-sign-in-and-cancel-is-denial-only",
+          "status": "passed",
+          "callback_nonmutating": true,
+          "four_protected_cookies": true,
+          "pending_callback_survives_factory_restart": true,
+          "explicit_cancellation": true
+        },
+        {
+          "name": "keycloak-web-embedded-token-infrastructure-is-503-not-an-auth-rejection",
+          "status": "passed",
+          "controlled_token_outage": true,
+          "http_status": 503,
+          "no_cookie_or_database_grant": true
+        },
+        {
+          "name": "keycloak-web-embedded-public-signin-waits-for-real-final-commit",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "reference_provider_account": true,
+          "real_audit_wait_observed": true,
+          "http_response_and_cookie_wait_for_commit": true,
+          "no_grant_before_commit": true,
+          "session_cookie_protected": true,
+          "session_survives_factory_restart": true,
+          "committed_owner_and_session": true
+        },
+        {
+          "name": "keycloak-web-embedded-ambient-session-cannot-switch-and-logout-revokes",
+          "status": "passed",
+          "ambient_account_switch_rejected": true,
+          "provider_not_contacted": true,
+          "old_session_replay_denied": true,
+          "explicit_logout": true
+        },
+        {
+          "name": "keycloak-web-embedded-returning-public-login-reuses-the-original-owner",
+          "status": "passed",
+          "real_new_provider_flow": true,
+          "existing_owner_reused": true,
+          "no_extra_identity_or_contact": true
+        },
+        {
+          "name": "keycloak-web-embedded-wrong-fresh-provider-subject-cannot-delete",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "wrong_subject_denied": true,
+          "original_account_session_preserved": true
+        },
+        {
+          "name": "keycloak-web-embedded-explicit-fresh-deletion-erases-and-rejects-old-proof",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "explicit_destructive_confirmation": true,
+          "all_local_authority_erased": true,
+          "retained_audit_deidentified": true,
+          "old_cookies_and_callback_replay_denied": true
+        },
+        {
+          "name": "keycloak-web-embedded-cooldown-rejects-a-verified-public-signin-at-subject-resolution",
+          "status": "passed",
+          "actual_signed_claim_source": true,
+          "exact_issuer_audience_subject_nonce": true,
+          "signed_time_present_and_recent": true,
+          "token_cap_live": true,
+          "verified_sql_resolution_observed": true,
+          "original_cap_live": true,
+          "live_cooldown_denied_jit": true,
+          "no_reprovisioned_authority": true
+        }
+      ],
+      "proxy": {
+        "posts": 12,
+        "token_responses": 10,
+        "signature_mutations": 0,
+        "token_replays": 0
+      },
+      "provider_container_removed": true,
+      "private_files_removed": true,
+      "source_manifest_sha256": "c30da88ff439c51b17c9d497af7eb7448ccee2d08916ac9c430fce032127a755",
+      "client_authentication": {
+        "basic": 12,
+        "post": 0,
+        "public": 0
+      },
+      "controlled_faults": {
+        "unavailable": 2
+      },
+      "cleanup": [
+        {
+          "mode": "standalone",
+          "application_stopped": true,
+          "database_removed": true,
+          "emergency_database_cleanup": false,
+          "application_instances": 3,
+          "stopped_instances": 3
+        },
+        {
+          "mode": "embedded",
+          "application_stopped": true,
+          "database_removed": true,
+          "emergency_database_cleanup": false,
+          "application_instances": 3,
+          "stopped_instances": 3
+        }
+      ],
+      "modes": [
+        {
+          "mode": "standalone",
+          "database": {
+            "users": 0,
+            "sessions": 0,
+            "live_sessions": 0,
+            "identities": 0,
+            "audit": 4,
+            "pending": 0,
+            "cooldown": 1,
+            "live_cooldown": 1,
+            "notices": 0,
+            "contacts": 0,
+            "provider_users": 0,
+            "oidc_sessions": 0,
+            "retained_subjects": 0
+          }
+        },
+        {
+          "mode": "embedded",
+          "database": {
+            "users": 0,
+            "sessions": 0,
+            "live_sessions": 0,
+            "identities": 0,
+            "audit": 4,
+            "pending": 0,
+            "cooldown": 1,
+            "live_cooldown": 1,
+            "notices": 0,
+            "contacts": 0,
+            "provider_users": 0,
+            "oidc_sessions": 0,
+            "retained_subjects": 0
+          }
+        }
+      ]
+    }
+  ],
+  "owned_service_images": {
+    "postgres": "sha256:25a89970a83255ae96484d709005bb35aa71f7455f941bc1634514f31c5d5c62",
+    "mail": "sha256:32a9262f9b8b7cc97130cddf9d17fb3f467cafa622e4427fb2159fe7282b3cad"
+  },
+  "all_owned_services_removed": true,
+  "owned_oidc_databases_remaining": 0,
+  "full_workspace_qualification": {
+    "source": "92a8a2a4ad9d7d2664a2666d1ecf2657bf4a2d32",
+    "authentication_build_test_schema_and_security_inputs_identical": true,
+    "default_reported_passes": 171,
+    "all_feature_reported_passes": 1197,
+    "all_feature_primary_passes": 1196,
+    "isolated_logging_child_passes": 1,
+    "postgres_lifecycle_passes": 676,
+    "failed": 0,
+    "ignored": 0,
+    "reexecution_claimed": false
+  },
+  "historical_hosted_children": [
+    {
+      "issue": "AUTH-28",
+      "run_id": 39326434266,
+      "head_sha": "052427a45ac997620ea8a2bde539cda1650a2477",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39326434266",
+      "exact_head_matches": true
+    },
+    {
+      "issue": "AUTH-29",
+      "run_id": 39343190737,
+      "head_sha": "28ffe9bb14cfd94383a9c6eaddc937ebb20d9d3c",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39343190737",
+      "exact_head_matches": true
+    },
+    {
+      "issue": "AUTH-30",
+      "run_id": 39355085483,
+      "head_sha": "34febdb9030bfd639cceff508ef37a18d466e32c",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39355085483",
+      "exact_head_matches": true
+    },
+    {
+      "issue": "AUTH-55",
+      "run_id": 39365720693,
+      "head_sha": "e55dded204aaa0011d7e6e6c3802aaaaabfad26c",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39365720693",
+      "exact_head_matches": true
+    },
+    {
+      "issue": "AUTH-56",
+      "run_id": 39379861505,
+      "head_sha": "0e8dcb28a917f38247cb8992e39769d92994f8bf",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39379861505",
+      "exact_head_matches": true
+    }
+  ],
+  "current_head_hosted_result_claimed": false,
+  "limitations": [
+    "Owned certificate/address mapping and Chromium certificate tolerance are fixture-only; no normal-binary public-root positive TLS or production-provider interoperability is established.",
+    "Keycloak no-store JWKS rotation does not cover the forced-refresh cache branch; the unchanged genuine-signature/cache tests have separate workspace evidence.",
+    "Private HTTP-deletion bootstrap is not public sign-in; only the two-mode public-web profile proves that boundary.",
+    "Native OS/device/browser matrices, provider-contact attachment/policy transition, independent review and production operations are not qualified.",
+    "SAML waiver limits and the outbound OIDC hard release gate remain unchanged."
+  ]
+}
