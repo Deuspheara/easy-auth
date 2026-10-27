@@ -1,6 +1,7 @@
 mod boundary;
 mod config;
 mod cookies;
+mod headers;
 
 pub(crate) use boundary::boundary;
 pub use config::BrowserConfig;
