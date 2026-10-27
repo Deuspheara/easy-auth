@@ -50,7 +50,7 @@ drift or privilege audit. Normal auth operations and realm initialization need D
 See [database role and migration procedure](database-roles.md) for grants, lock-wait
 limits, disposal tests and upgrade limitations.
 
-## Startup diagnostics
+## Retention maintenance
 
 Explicit `easy-auth retention` instead runs one finite cleanup pass and exits.
 It requires protected database configuration, a non-nil realm and explicit
@@ -58,7 +58,9 @@ It requires protected database configuration, a non-nil realm and explicit
 seconds). It verifies the current schema without migration fallback and starts
 no runtime services. Categories commit independently; failures can follow earlier
 commits. See [retention maintenance](retention.md) for exact effects, preserved
-state, scheduling and the qualification still in progress.
+state, scheduling and exact bounded local qualification.
+
+## Startup diagnostics
 
 Malformed values produce setting-specific diagnostics without echoing values.
 Environment settings must be valid Unicode. An invalid-Unicode value now fails
@@ -114,7 +116,7 @@ validation or permission to enable another authentication path.
 | Enterprise OIDC | [Browser settings](oidc-web.md) and [startup contract](../architecture/deployment.md#explicit-oidc-browser-startup); exact HTTPS issuer/callback and explicit client authentication |
 | Google web/native | [Component and acceptance guide](google.md); experimental components/examples do not activate Google in ordinary server startup; registered-provider/OS/lifecycle evidence remains required |
 | Passkeys/custom UI | [Enrollment](passkey-enrollment.md), [sign-in](passkey-authentication.md) and [management/recovery](passkey-management.md); preserve RP/origin, browser proof and stronger-account policy; ordinary activation remains gated |
-| Apple | [Experimental backend and account preparation](apple-setup.md); no startup contract or ordinary routes; actual web/native and grant-lifecycle acceptance remain pending |
+| Apple | [Experimental backend and account preparation](apple-setup.md); no startup contract or ordinary routes; registered web/native and remote-provider acceptance remain pending |
 | SAML | Explicit `saml-web` and complete persisted HTTPS trust; [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md) waives independent review, which was not performed |
 | Outbound OIDC issuer | Explicit `issuer-web` and protected matching persisted key; [standalone setup and bounded parity](issuer-standalone.md); production release/assurance gates remain separate |
 

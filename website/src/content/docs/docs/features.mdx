@@ -11,7 +11,7 @@ All capabilities are part of a **pre-release project**. This page describes impl
 
 ## Reading the labels
 
-**Available** identifies an implemented path with existing tests. **Opt-in** requires explicit configuration and feature flags. **Experimental** and **Component** identify narrower integration building blocks, not complete general-purpose provider flows. **Planned** and **Not released** must not be presented as usable login capabilities.
+**Available** identifies an implemented path with existing tests. **Opt-in** requires explicit configuration and feature flags. **Experimental** and **Component** identify narrower integration building blocks, not complete general-purpose provider flows. **Planned** describes unimplemented work. **Not released** identifies an open release gate, including when optional components have bounded test evidence. Neither label establishes general availability.
 
 ## SAML activation decision
 
@@ -23,4 +23,4 @@ Read the [SAML guide](/docs/guides/saml/) and [release configuration](/docs/guid
 
 ## Other release boundaries
 
-Outbound OIDC issuer registration groundwork does not constitute a released authorization server. Its release gate remains in place. Apple has experimental code/web flows, explicit linking and protected grant revocation with owned offline-provider qualification; registered-provider acceptance and ordinary activation remain gated. Explicit Google/Apple account linking is documented in the [social management guide](/docs/guides/social-linking/). Passkey and native-provider components retain the scope documented in their individual guides.
+Optional outbound issuer components provide signed issuance, discovery/JWKS, key rotation, native refresh and authenticated introspection with bounded owned-client evidence. The [standalone issuer guide](/docs/guides/issuer-standalone/) records explicit configuration and tested scope. The outbound release gate remains in place. Apple has experimental code/web flows, explicit linking and protected grant revocation with owned offline-provider qualification; registered-provider acceptance and ordinary activation remain gated. Explicit Google/Apple account linking is documented in the [social management guide](/docs/guides/social-linking/). Passkey and native-provider components retain the scope documented in their individual guides.
