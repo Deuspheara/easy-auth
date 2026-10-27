@@ -8,6 +8,8 @@ mod boundary;
 mod contract;
 #[path = "browser/email.rs"]
 mod email;
+#[path = "browser/observability/mod.rs"]
+mod observability;
 #[path = "browser/passwords.rs"]
 mod passwords;
 #[path = "browser/providers.rs"]

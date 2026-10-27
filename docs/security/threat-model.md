@@ -1,5 +1,14 @@
 # Threat model — controls, evidence and recorded evolution
 
+HTTP request observations accept only server-generated request IDs, finite
+completion categories, actual response status and monotonic duration. No path,
+query, headers, body, source address or identity/credential metadata enters these
+events. Cancellation retains the original subscriber, has no fabricated HTTP
+status and proves neither rollback nor transport delivery. Request IDs are log
+correlation values, never metric labels. Existing KDF permits survive HTTP-future
+cancellation until their blocking jobs finish; no crypto or admission policy is
+weakened for telemetry or load tests. See [the event contract](../guides/http-observability.md).
+
 The incident recovery regression qualifies only explicit existing reductions with
 retained genuine authority. An older database snapshot can revive local sessions,
 native grants and disabled key configuration. Quarantine and a separately protected

@@ -1,3 +1,4 @@
+use super::observation::{Completion, Observation};
 use crate::router::AppState;
 use axum::{
     Json,
@@ -8,7 +9,8 @@ use axum::{
 };
 use serde_json::json;
 use std::time::Duration;
-use uuid::Uuid;
+
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(15);
 
 pub(crate) async fn boundary(
     State(state): State<AppState>,
@@ -73,8 +75,8 @@ async fn serve(
     same_origin: bool,
     timeout_body: serde_json::Value,
 ) -> Response {
-    let request_id = Uuid::new_v4().to_string();
-    let mut response = if same_origin
+    let observation = Observation::start();
+    let (mut response, completion) = if same_origin
         && request.method() == Method::POST
         && (request.headers().get_all(header::ORIGIN).iter().count() != 1
             || request
@@ -83,22 +85,26 @@ async fn serve(
                 .and_then(|v| v.to_str().ok())
                 != Some(state.browser.origin()))
     {
-        (
+        let response = (
             StatusCode::FORBIDDEN,
             Json(json!({"code":"origin_rejected"})),
         )
-            .into_response()
+            .into_response();
+        (response, Completion::Response)
     } else {
-        match tokio::time::timeout(Duration::from_secs(15), next.run(request)).await {
-            Ok(response) => response,
-            Err(_) => (StatusCode::GATEWAY_TIMEOUT, Json(timeout_body)).into_response(),
+        match tokio::time::timeout(REQUEST_TIMEOUT, next.run(request)).await {
+            Ok(response) => (response, Completion::Response),
+            Err(_) => (
+                (StatusCode::GATEWAY_TIMEOUT, Json(timeout_body)).into_response(),
+                Completion::TimedOut,
+            ),
         }
     };
-    super::headers::apply(&mut response, state.browser.secure, &request_id);
-    tracing::info!(
-        request_id,
-        status = response.status().as_u16(),
-        "http_request_completed"
+    super::headers::apply(
+        &mut response,
+        state.browser.secure,
+        observation.request_id(),
     );
+    observation.complete(response.status(), completion);
     response
 }

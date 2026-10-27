@@ -2,6 +2,7 @@ mod boundary;
 mod config;
 mod cookies;
 mod headers;
+mod observation;
 
 pub(crate) use boundary::boundary;
 pub use config::BrowserConfig;

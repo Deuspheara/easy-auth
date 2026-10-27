@@ -18,6 +18,16 @@ function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
+Browser security headers and the unchanged CSP assertion live in `browser/headers`;
+they were extracted separately before telemetry changes. Private `observation`
+owns only a generated request ID, monotonic lifetime and original subscriber. It
+accepts no request metadata. The boundary keeps Origin/timeout/response composition
+visible together. HTTP tests separate event capture, untrusted-input privacy,
+observed database lock/rollback and controlled KDF overload/cancellation. Longer
+ordered pressure scenarios keep worker ownership, cancellation, permit retention
+and recovery controls visible together; no public introspection hook or weaker
+hash policy is added. New modules stay below 200 lines.
+
 The owned authentication benchmark stays in the server's examples: bounded load
 measurement, existing password-service calls and session fixtures/transactions
 have named modules. Its Python runner separates resource ownership/builds,

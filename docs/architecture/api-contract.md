@@ -1,5 +1,17 @@
 # HTTP contract v1
 
+## Request observations
+
+Selected authentication boundaries retain fresh server UUID `x-request-id` headers
+and emit fixed request-ID/status completion events with monotonic microsecond
+duration and response/timeout classification. Dropped boundary futures emit a
+separate cancellation observation without a fabricated HTTP status, through their
+original subscriber. No path/query/header/body/identity/credential data is logged
+by these observations. Duration ends at boundary response production, not body or
+network delivery; cancellation is not transaction-undo or retry authority. No
+metrics endpoint or authentication policy changes. The exact event contract and
+bounded aggregation are in the [HTTP observability guide](../guides/http-observability.md).
+
 ## Trusted retention administration
 
 `auth_core::run_retention` and `RetentionRepository::retain_batch` provide explicit
