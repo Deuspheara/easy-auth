@@ -117,6 +117,7 @@ async fn exercise(app: Router, passwords: Arc<PasswordService>) {
     );
     drop(release);
     blocker.await.unwrap();
+    wait_for_cancelled_native_work().await;
     wait_for_hash_capacity(&passwords).await;
     let response = app
         .oneshot(login(33))
@@ -152,6 +153,16 @@ fn login(index: usize) -> axum::http::Request<axum::body::Body> {
         None,
         Some("https://app.example"),
     )
+}
+
+async fn wait_for_cancelled_native_work() {
+    // The pinned Tokio blocking pool queues jobs FIFO. With one worker, this
+    // barrier runs only after the real cancelled KDF jobs have exited. Measure
+    // capacity recovery separately from their CPU time on a shared CI runner.
+    tokio::time::timeout(Duration::from_secs(30), tokio::task::spawn_blocking(|| ()))
+        .await
+        .expect("cancelled native work did not drain within the fixture bound")
+        .unwrap();
 }
 
 async fn wait_for_hash_capacity(passwords: &PasswordService) {
