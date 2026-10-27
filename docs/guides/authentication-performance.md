@@ -148,3 +148,7 @@ churn, the Python driver, shared CPU, logging and Docker affect the numbers. It
 does not establish sustained/open-loop capacity, distributed abuse resistance,
 native/provider interoperability or production readiness. Original library numbers
 and controlled in-process cancellation tests keep their distinct source/scope.
+
+The [dated HTTP qualification](../security/http-benchmark-verification-2026-10-27.md)
+records the exact source/binary, all three repeated measurements, retained
+diagnostic mismatch and correction, and the limits on interpreting these numbers.
