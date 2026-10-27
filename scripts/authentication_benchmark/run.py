@@ -29,6 +29,9 @@ def build(directory):
             or any(environment.get(key) for key in ('RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS', 'RUSTC_WRAPPER')):
         raise ValueError('unrecorded optimization override')
     environment['CARGO_INCREMENTAL'] = '0'
+    # Retain build-tool symbols to avoid the observed stripped Mach-O SQLx
+    # procedural-macro load failure. Application release optimization is unchanged.
+    environment['CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG'] = '1'
     command = ['cargo', 'build', '--frozen', '--release', '-p', 'easy-auth-server',
                '--example', 'authentication_benchmark']
     with (directory / 'build.log').open('xb') as output:
@@ -46,6 +49,8 @@ def run(output, repetitions):
     receipt = {'source': git('rev-parse', 'HEAD'), 'platform': platform.system(),
                'machine': platform.machine(), 'logical_cpus': os.cpu_count(),
                'rustc': subprocess.check_output(['rustc', '-vV'], text=True),
+               'build': {'frozen': True, 'profile': 'release', 'incremental': False,
+                         'build_override_debug': 1},
                'repetitions': repetitions, 'results': [], 'cleanup_verified': False,
                'failure': None}
     services = None

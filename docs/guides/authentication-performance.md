@@ -14,7 +14,12 @@ python3 scripts/benchmark_authentication.py --output /tmp/easy-auth-benchmark-ne
 The output directory must not exist. The runner creates it privately, builds the
 example with `cargo build --frozen --release`, records the exact commit, compiler
 and binary hash, and runs three sequential repetitions. `--repetitions` accepts
-one through five. Required locked dependencies and the existing
+one through five. The runner explicitly retains debug symbols for build tools
+(`CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG=1`): the initial default macOS build
+failed to load SQLx's stripped procedural macro with a misaligned LINKEDIT string
+pool. This does not change application release optimization or Argon2 parameters.
+The receipt records that setting; other release/target/flag overrides are refused.
+Required locked dependencies and the existing
 `postgres:17-alpine` / `axllent/mailpit:v1.27` fixture images must already be cached.
 Resolved Docker image IDs are recorded. No download or remote provider is part of
 the workload. Mailpit comes from the existing owned-service lifetime helper; this
@@ -37,6 +42,13 @@ KiB converted to bytes on Linux. It includes process setup, pool/fixture work an
 allocator/runtime overhead. It excludes PostgreSQL/Docker memory and is not a
 per-request allocation measurement. Other OS workloads, CPU scheduling, power
 management and Docker's virtual machine remain uncontrolled local factors.
+
+The resource contract follows [Python's child-usage interface](https://docs.python.org/3/library/resource.html),
+[Linux's KiB definition](https://man7.org/linux/man-pages/man2/getrusage.2.html)
+and [Apple's XNU source](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/kern_resource.c)
+which assigns `resident_size_max` directly. Apple's old archived manual describes
+kilobytes; an actual 64 MiB allocation probe on the local macOS reports roughly
+78 MiB in raw bytes, confirming the selected conversion for this qualification.
 
 The session profile uses an eight-connection pool, eight independently enrolled
 synthetic owners and eight untimed warm-up validations. Enrollment calls the
