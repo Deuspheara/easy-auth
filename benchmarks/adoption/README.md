@@ -4,7 +4,11 @@ These are disposable research executables for AUTH-5, outside the production Car
 
 ## Reproduce
 
-Use Rust 1.95, Python 3.9+, Docker Compose and `ps` (RSS in KiB on macOS/Linux). Start the existing loopback development PostgreSQL service. The runner uses only its documented development credentials and creates a separate `easy_auth_compare_<random>` database for each process, then removes that exact database in `finally`. It never truncates the application's database. The Rust probes independently reject other database names and non-loopback hosts.
+Historical replay must use an isolated source export of exact producer `34ed2e9e9e2255f6b32b25bf18db99b0cca94565` for the sustained-load dataset, or `f43e46f0874443b27d511e8f3c733d989363a486` for the original sequential experiment. Current `src/easy.rs` has evolved with the product and does not match the historical producer hash. The committed results describe their original runtime and lockfile, not current HEAD. Review the recorded dependency advisories before executing old upstream code. Stored arithmetic/provenance can be checked with `python3 benchmarks/adoption/verify_recorded.py` without running those libraries or opening a database.
+
+Use separately owned disposable PostgreSQL and SMTP fixtures in that isolated checkout. The legacy runner below expects its documented development Compose endpoint; do not point it at a retained application preview, account store or production service.
+
+Use Rust 1.95, Python 3.9+, Docker Compose and `ps` (RSS in KiB on macOS/Linux). Start only the isolated checkout’s disposable loopback development PostgreSQL service. The runner uses only its documented development credentials and creates a separate `easy_auth_compare_<random>` database for each process, then removes that exact database in `finally`. It never truncates the application's database. The Rust probes independently reject other database names and non-loopback hosts.
 
 ```sh
 docker compose up -d postgres

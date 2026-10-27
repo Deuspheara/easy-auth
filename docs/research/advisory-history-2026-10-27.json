@@ -1,0 +1,2107 @@
+{
+  "review_date": "2026-10-27",
+  "scope": "Published repository advisories mapped to seven historical source pins; not a transitive dependency or independent security audit.",
+  "range_evaluator": {
+    "name": "npm-semver",
+    "version": "7.8.5",
+    "license": "ISC",
+    "comma_normalization": "replace comma-separated comparator separators with spaces; reject invalid ranges; stable Better Auth and Rauthy versions only"
+  },
+  "totals": {
+    "repositories": 7,
+    "published_advisories": 52,
+    "package_ranges": 74,
+    "outside_declared_range": 59,
+    "matches_declared_range": 1,
+    "exact_fix_review_required": 11,
+    "includes_fixed_tag_ancestry": 3
+  },
+  "projects": [
+    {
+      "repository": "better-auth/better-auth",
+      "source": "d0ca6d538db47547b0a842cfa44ca92a8ea9bba0",
+      "retrieved_at": "2026-10-27T02:36:16.037997+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/better-auth/better-auth/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "731250c6d212671eb3172a131a9a79cd85fc1395ae17420ead32df0f34e4ca56",
+          "records": 37,
+          "link": null
+        }
+      ],
+      "records": 37,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/better-auth/package.json",
+        "path": "packages/better-auth/package.json",
+        "status": 200,
+        "sha256": "287b2c1c6370c6d3e512a18c2617ac1ba856ea3512ddaa51d5462ea8effcbcb3"
+      },
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-44jh-23m7-hpcf",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-44jh-23m7-hpcf",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2026-09-30T21:34:11Z",
+          "updated_at": "2026-09-30T21:35:15Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/drizzle-adapter"
+              },
+              "vulnerable_version_range": ">= 1.6.17, < 1.7.7",
+              "patched_versions": "1.7.7",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/drizzle-adapter/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/kysely-adapter"
+              },
+              "vulnerable_version_range": ">= 1.6.17, < 1.7.0",
+              "patched_versions": "1.7.0",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/kysely-adapter/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.6.17, < 1.7.7",
+              "patched_versions": "1.7.7",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-965c-763c-88jm",
+          "cve_id": "CVE-2026-114607",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-965c-763c-88jm",
+          "severity": "critical",
+          "state": "published",
+          "published_at": "2026-09-30T21:31:02Z",
+          "updated_at": "2026-10-22T16:46:53Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.4.0-beta.18, < 1.7.7",
+              "patched_versions": "1.7.7",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-mx9r-x6ww-qjw9",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-mx9r-x6ww-qjw9",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-09-29T18:48:44Z",
+          "updated_at": "2026-09-29T18:48:44Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.7.0-rc.2, < 1.7.0",
+              "patched_versions": "1.7.3",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.7.0, < 1.7.3",
+              "patched_versions": "1.7.3",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-r4xp-prcw-77qf",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-r4xp-prcw-77qf",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-09-30T21:32:26Z",
+          "updated_at": "2026-09-30T21:34:34Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.5.0-beta.12, < 1.7.7",
+              "patched_versions": "1.7.7",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-8c5h-wx78-2cfg",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-8c5h-wx78-2cfg",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-08-11T22:16:27Z",
+          "updated_at": "2026-09-26T07:59:10Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.4.8-beta.1, < 1.4.8",
+              "patched_versions": "1.4.8",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.4.9, <= 1.6.26",
+              "patched_versions": "1.6.27",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, <= 1.7.0-rc.4",
+              "patched_versions": "1.7.0-rc.5",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-qq9h-g4jm-xgf3",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-qq9h-g4jm-xgf3",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-06-26T22:33:37Z",
+          "updated_at": "2026-09-26T07:21:13Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.1.3, < 1.6.22",
+              "patched_versions": "1.6.22",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.10",
+              "patched_versions": "1.7.0-beta.10",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-q84f-53jg-9ppm",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-q84f-53jg-9ppm",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-09-28T09:19:07Z",
+          "updated_at": "2026-09-28T09:19:07Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.3.8-beta.3, < 1.7.0-rc.3",
+              "patched_versions": "1.7.0-rc.3",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-prpr-5gj3-qqhg",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-prpr-5gj3-qqhg",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-06-26T22:33:17Z",
+          "updated_at": "2026-09-26T07:21:02Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": "<= 1.6.20",
+              "patched_versions": "1.6.21",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.10",
+              "patched_versions": "1.7.0-beta.10",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-h3rm-78g3-j7cp",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-h3rm-78g3-j7cp",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-06-26T22:33:03Z",
+          "updated_at": "2026-09-26T07:20:46Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/stripe"
+              },
+              "vulnerable_version_range": ">= 1.4.11, < 1.6.21",
+              "patched_versions": "1.6.21",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/stripe/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/stripe"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.10",
+              "patched_versions": "1.7.0-beta.10",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/stripe/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-rjg6-39jm-rgg4",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-rjg6-39jm-rgg4",
+          "severity": "critical",
+          "state": "published",
+          "published_at": "2026-06-26T22:32:52Z",
+          "updated_at": "2026-09-26T08:00:03Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/scim"
+              },
+              "vulnerable_version_range": ">= 1.4.0-beta.27, <= 1.6.21",
+              "patched_versions": "1.6.22",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/scim/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/scim"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, <= 1.7.0-beta.10",
+              "patched_versions": "1.7.0-rc.0",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/scim/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-j8v8-g9cx-5qf4",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-j8v8-g9cx-5qf4",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:29Z",
+          "updated_at": "2026-09-26T07:59:46Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/scim"
+              },
+              "vulnerable_version_range": ">= 1.5.0, < 1.7.0-beta.4",
+              "patched_versions": "1.7.0-beta.4",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/scim/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-p2fr-6hmx-4528",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-p2fr-6hmx-4528",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:30Z",
+          "updated_at": "2026-09-26T07:59:50Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/oauth-provider"
+              },
+              "vulnerable_version_range": ">= 1.4.8, < 1.7.0-beta.4",
+              "patched_versions": "1.7.0-beta.4",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/oauth-provider/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-86j7-9j95-vpqj",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-86j7-9j95-vpqj",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:28Z",
+          "updated_at": "2026-09-27T11:46:27Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.6.13",
+              "patched_versions": "1.6.13",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.4",
+              "patched_versions": "1.7.0-beta.4",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-gv74-j8m3-fg5f",
+          "cve_id": "CVE-2026-53515",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-gv74-j8m3-fg5f",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:22Z",
+          "updated_at": "2026-09-26T07:59:40Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.2.10, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.4",
+              "patched_versions": "1.7.0-beta.4",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-392p-2q2v-4372",
+          "cve_id": "CVE-2026-53517",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-392p-2q2v-4372",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:26Z",
+          "updated_at": "2026-09-26T07:58:42Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/oauth-provider"
+              },
+              "vulnerable_version_range": ">= 1.6.0, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/oauth-provider/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.4.8-beta.7, < 1.6.0",
+              "patched_versions": "1.6.0",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-7w99-5wm4-3g79",
+          "cve_id": "CVE-2026-53518",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-7w99-5wm4-3g79",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:27Z",
+          "updated_at": "2026-09-26T07:59:05Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/oauth-provider"
+              },
+              "vulnerable_version_range": ">= 1.6.0, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/oauth-provider/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-5rr4-8452-hf4v",
+          "cve_id": "CVE-2026-53513",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-5rr4-8452-hf4v",
+          "severity": "critical",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:20Z",
+          "updated_at": "2026-09-26T07:58:55Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/sso"
+              },
+              "vulnerable_version_range": ">= 0.1.0, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/sso/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-g38m-r43w-p2q7",
+          "cve_id": "CVE-2026-53516",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-g38m-r43w-p2q7",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:22Z",
+          "updated_at": "2026-09-26T07:59:36Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.4",
+              "patched_versions": "1.7.0-beta.4",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-2vg6-77g8-24mp",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-2vg6-77g8-24mp",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:28Z",
+          "updated_at": "2026-09-26T07:58:38Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 0.3.4, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/scim"
+              },
+              "vulnerable_version_range": ">= 1.6.0, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/scim/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-xr8f-h2gw-9xh6",
+          "cve_id": "CVE-2026-41427",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-xr8f-h2gw-9xh6",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-04-16T10:05:40Z",
+          "updated_at": "2026-09-27T11:45:52Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/oauth-provider"
+              },
+              "vulnerable_version_range": ">= 1.4.8-beta.7, < 1.6.5",
+              "patched_versions": "1.6.5",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/oauth-provider/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/oauth-provider"
+              },
+              "vulnerable_version_range": ">= 1.7.0-beta.0, < 1.7.0-beta.2",
+              "patched_versions": "1.7.0-beta.2",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/oauth-provider/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-cq3f-vc6p-68fh",
+          "cve_id": "CVE-2026-45337",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-cq3f-vc6p-68fh",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:24Z",
+          "updated_at": "2026-09-26T07:59:29Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.6.0, < 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-wxw3-q3m9-c3jr",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-wxw3-q3m9-c3jr",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-05-11T10:34:11Z",
+          "updated_at": "2026-09-26T08:00:12Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.6.2",
+              "patched_versions": "1.6.2",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-9h47-pqcx-hjr4",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-9h47-pqcx-hjr4",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:07:07Z",
+          "updated_at": "2026-09-26T07:59:19Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-pw9m-5jxm-xr6h",
+          "cve_id": "CVE-2026-53512",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-pw9m-5jxm-xr6h",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:21Z",
+          "updated_at": "2026-09-27T11:46:30Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-p6v2-xcpg-h6xw",
+          "cve_id": "CVE-2026-45364",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-p6v2-xcpg-h6xw",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-11T10:36:05Z",
+          "updated_at": "2026-09-26T07:59:52Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.4.17",
+              "patched_versions": "1.4.17",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.5.0-beta.1, < 1.5.0-beta.9",
+              "patched_versions": "1.5.0-beta.9",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-xg6x-h9c9-2m83",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-xg6x-h9c9-2m83",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-04-01T02:30:19Z",
+          "updated_at": "2026-09-27T12:31:39Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.4.0-beta.15, < 1.4.6",
+              "patched_versions": "1.4.6",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-x732-6j76-qmhm",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-x732-6j76-qmhm",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2025-12-15T22:01:16Z",
+          "updated_at": "2026-09-27T11:46:36Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.4.5",
+              "patched_versions": "1.4.5",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-4vcf-q4xf-f48m",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-4vcf-q4xf-f48m",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2025-11-24T23:35:37Z",
+          "updated_at": "2026-09-27T11:46:39Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "@better-auth/passkey"
+              },
+              "vulnerable_version_range": "< 1.4.0",
+              "patched_versions": "1.4.0",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/passkey/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-569q-mpph-wgww",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-569q-mpph-wgww",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2025-11-27T03:04:38Z",
+          "updated_at": "2026-09-27T12:31:37Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.2.4-beta.10, < 1.4.3",
+              "patched_versions": "1.4.3",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-wmjr-v86c-m9jj",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-wmjr-v86c-m9jj",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2025-11-26T00:34:16Z",
+          "updated_at": "2026-09-27T12:31:35Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 0.4.14-beta.2, < 1.4.0",
+              "patched_versions": "1.4.0",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-99h5-pjcv-gr6v",
+          "cve_id": "CVE-2025-61928",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-99h5-pjcv-gr6v",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2025-10-08T18:53:50Z",
+          "updated_at": "2026-09-27T12:31:33Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.2.0-beta.18, < 1.4.0",
+              "patched_versions": "1.4.0",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-fmh4-wcc4-5jm3",
+          "cve_id": "CVE-2026-53514",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-fmh4-wcc4-5jm3",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-05-31T14:05:23Z",
+          "updated_at": "2026-09-26T07:59:32Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.6.11",
+              "patched_versions": "1.6.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.6.14",
+              "patched_versions": "",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "matches-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-36rg-gfq2-3h56",
+          "cve_id": "CVE-2025-53535",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-36rg-gfq2-3h56",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2025-07-06T06:31:33Z",
+          "updated_at": "2026-09-27T12:31:41Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.2.11",
+              "patched_versions": "1.2.11",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.3.0-beta.1, < 1.3.0-beta.4",
+              "patched_versions": "1.3.0-beta.4",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-vp58-j275-797x",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-vp58-j275-797x",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2025-02-24T19:18:58Z",
+          "updated_at": "2026-09-27T12:31:45Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.1.21",
+              "patched_versions": "1.1.21",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.2.0-beta.1, < 1.2.0-beta.16",
+              "patched_versions": "1.2.0-beta.16",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-hjpm-7mrm-26w8",
+          "cve_id": "CVE-2025-27143",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-hjpm-7mrm-26w8",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2025-02-24T13:30:48Z",
+          "updated_at": "2026-09-27T12:31:43Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.1.20",
+              "patched_versions": "1.1.20",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 1.2.0-beta.1, < 1.2.0-beta.15",
+              "patched_versions": "1.2.0-beta.15",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-9x4v-xfq5-m8x5",
+          "cve_id": null,
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-9x4v-xfq5-m8x5",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2025-02-05T21:38:07Z",
+          "updated_at": "2026-09-27T12:31:47Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": ">= 0.0.2, < 1.1.16",
+              "patched_versions": "1.1.16",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-8jhw-6pjj-8723",
+          "cve_id": "CVE-2024-56734",
+          "html_url": "https://github.com/better-auth/better-auth/security/advisories/GHSA-8jhw-6pjj-8723",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2024-12-30T07:28:14Z",
+          "updated_at": "2026-09-27T11:46:58Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "npm",
+                "name": "better-auth"
+              },
+              "vulnerable_version_range": "< 1.1.6",
+              "patched_versions": "1.1.6",
+              "pin_assessment": {
+                "version": "1.7.10",
+                "manifest": "packages/better-auth/package.json",
+                "method": "npm-semver 7.8.5; comma-separated comparators joined with spaces",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        }
+      ],
+      "manifest_version": "1.7.10",
+      "commit_identity": {
+        "repository": "better-auth/better-auth",
+        "sha": "d0ca6d538db47547b0a842cfa44ca92a8ea9bba0",
+        "url": "https://api.github.com/repos/better-auth/better-auth/commits/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0",
+        "committer_date": "2026-10-17T09:44:22Z",
+        "author_date": "2026-10-17T09:44:22Z",
+        "recorded_committer_time_matches": true
+      }
+    },
+    {
+      "repository": "better-auth-rs/better-auth-rs",
+      "source": "9f91cd7fdb8a5f73a9c69d5c56d363468a7dc281",
+      "retrieved_at": "2026-10-27T02:36:15.635047+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/better-auth-rs/better-auth-rs/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0,
+          "link": null
+        }
+      ],
+      "records": 0,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/better-auth-rs/better-auth-rs/9f91cd7fdb8a5f73a9c69d5c56d363468a7dc281/Cargo.toml",
+        "path": "Cargo.toml",
+        "status": 200,
+        "sha256": "a093f110412ad840b7e96151e4a99781dac32ad65134a4db18dea69532820773"
+      },
+      "advisories": [],
+      "manifest_version": "1.0.0-alpha.3",
+      "commit_identity": {
+        "repository": "better-auth-rs/better-auth-rs",
+        "sha": "9f91cd7fdb8a5f73a9c69d5c56d363468a7dc281",
+        "url": "https://api.github.com/repos/better-auth-rs/better-auth-rs/commits/9f91cd7fdb8a5f73a9c69d5c56d363468a7dc281",
+        "committer_date": "2026-09-30T15:31:11Z",
+        "author_date": "2026-09-30T15:31:11Z",
+        "recorded_committer_time_matches": true
+      }
+    },
+    {
+      "repository": "salasebas/rustauth",
+      "source": "b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e",
+      "retrieved_at": "2026-10-27T02:36:15.658797+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/salasebas/rustauth/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0,
+          "link": null
+        }
+      ],
+      "records": 0,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/salasebas/rustauth/b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e/Cargo.toml",
+        "path": "Cargo.toml",
+        "status": 200,
+        "sha256": "481c5df8c167235eb267b7714b4cd312edc3af567026557be83370423f6fd8bf"
+      },
+      "advisories": [],
+      "manifest_version": "0.3.2",
+      "commit_identity": {
+        "repository": "salasebas/rustauth",
+        "sha": "b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e",
+        "url": "https://api.github.com/repos/salasebas/rustauth/commits/b55e9ce3c9f375a66d8ae7ef40afe0cbd041ec1e",
+        "committer_date": "2026-09-28T05:20:37Z",
+        "author_date": "2026-09-28T05:20:37Z",
+        "recorded_committer_time_matches": true
+      }
+    },
+    {
+      "repository": "lucid-softworks/auth",
+      "source": "d16c16bfa2050e5ac08cf7e18521576f41a214f0",
+      "retrieved_at": "2026-10-27T02:36:15.619460+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/lucid-softworks/auth/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "records": 0,
+          "link": null
+        }
+      ],
+      "records": 0,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/lucid-softworks/auth/d16c16bfa2050e5ac08cf7e18521576f41a214f0/Cargo.toml",
+        "path": "Cargo.toml",
+        "status": 200,
+        "sha256": "2bde3ebb481d71d41f552297ed5beb83b333e7c1b04572f4673bbfb1aca7434b"
+      },
+      "advisories": [],
+      "manifest_version": "0.1.0",
+      "commit_identity": {
+        "repository": "lucid-softworks/auth",
+        "sha": "d16c16bfa2050e5ac08cf7e18521576f41a214f0",
+        "url": "https://api.github.com/repos/lucid-softworks/auth/commits/d16c16bfa2050e5ac08cf7e18521576f41a214f0",
+        "committer_date": "2026-08-31T23:56:17Z",
+        "author_date": "2026-08-31T23:56:17Z",
+        "recorded_committer_time_matches": true
+      }
+    },
+    {
+      "repository": "sebadob/rauthy",
+      "source": "ea587538b35c886ea602ab918853d8500d3b92bd",
+      "retrieved_at": "2026-10-27T02:36:16.573215+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/sebadob/rauthy/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "623f2965837dcd77bd1e84379fa40c07d40dea43b846c23cdc716fd951123639",
+          "records": 3,
+          "link": null
+        }
+      ],
+      "records": 3,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/sebadob/rauthy/ea587538b35c886ea602ab918853d8500d3b92bd/Cargo.toml",
+        "path": "Cargo.toml",
+        "status": 200,
+        "sha256": "5ada8370c3c5f2031ba5c4602ac222d6dbad893dc86e5c662768a0c732ae11a1"
+      },
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-wx92-7mmw-5x82",
+          "cve_id": null,
+          "html_url": "https://github.com/sebadob/rauthy/security/advisories/GHSA-wx92-7mmw-5x82",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-09-16T16:27:49Z",
+          "updated_at": "2026-09-16T16:27:49Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "rauthy"
+              },
+              "vulnerable_version_range": "<= 0.36.1",
+              "patched_versions": "0.36.2",
+              "pin_assessment": {
+                "version": "0.37.1",
+                "method": "project workspace version comparison; npm-semver 7.8.5; no source-fix proof",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-7qh2-3hc5-2vqp",
+          "cve_id": "CVE-2026-103969",
+          "html_url": "https://github.com/sebadob/rauthy/security/advisories/GHSA-7qh2-3hc5-2vqp",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-08-08T18:18:34Z",
+          "updated_at": "2026-10-01T18:05:41Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "",
+                "name": "sebadob/rauthy"
+              },
+              "vulnerable_version_range": ">= 0.30.0, < 0.36.1",
+              "patched_versions": "0.36.1",
+              "pin_assessment": {
+                "version": "0.37.1",
+                "method": "project workspace version comparison; npm-semver 7.8.5; no source-fix proof",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-x8jp-v2j6-6vjf",
+          "cve_id": "CVE-2026-69199",
+          "html_url": "https://github.com/sebadob/rauthy/security/advisories/GHSA-x8jp-v2j6-6vjf",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-08-05T11:08:39Z",
+          "updated_at": "2026-08-05T11:08:39Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "",
+                "name": ""
+              },
+              "vulnerable_version_range": "<0.36.0",
+              "patched_versions": "0.36.0",
+              "pin_assessment": {
+                "version": "0.37.1",
+                "method": "project workspace version comparison; npm-semver 7.8.5; no source-fix proof",
+                "status": "outside-declared-range"
+              }
+            }
+          ]
+        }
+      ],
+      "manifest_version": "0.37.1",
+      "commit_identity": {
+        "repository": "sebadob/rauthy",
+        "sha": "ea587538b35c886ea602ab918853d8500d3b92bd",
+        "url": "https://api.github.com/repos/sebadob/rauthy/commits/ea587538b35c886ea602ab918853d8500d3b92bd",
+        "committer_date": "2026-10-15T12:40:45Z",
+        "author_date": "2026-10-15T12:40:45Z",
+        "recorded_committer_time_matches": true
+      }
+    },
+    {
+      "repository": "kanidm/kanidm",
+      "source": "f76b7ee9fdd28f123bb57d26351afef1515857d6",
+      "retrieved_at": "2026-10-27T02:36:16.321773+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/kanidm/kanidm/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "d0526109590419d846f50533a01050f1f1e83cf157ce78420c49a5cb07196f34",
+          "records": 10,
+          "link": null
+        }
+      ],
+      "records": 10,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/kanidm/kanidm/f76b7ee9fdd28f123bb57d26351afef1515857d6/Cargo.toml",
+        "path": "Cargo.toml",
+        "status": 200,
+        "sha256": "d9de500c63996dfb608428fb13eed8ee3859ac6ebda03d3100a0639fa9bcdc4c"
+      },
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-2pm5-6m23-h692",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-2pm5-6m23-h692",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-08-02T03:06:41Z",
+          "updated_at": "2026-08-02T08:30:20Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "",
+                "name": ""
+              },
+              "vulnerable_version_range": "HEAD of master",
+              "patched_versions": "",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-qcrp-p3rq-pffr",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-qcrp-p3rq-pffr",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-06-23T02:53:18Z",
+          "updated_at": "2026-06-23T02:53:18Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "kanidm"
+              },
+              "vulnerable_version_range": "<= 1.10.3",
+              "patched_versions": "",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-hh34-7jqq-3f73",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-hh34-7jqq-3f73",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2026-06-23T03:20:04Z",
+          "updated_at": "2026-06-23T03:20:04Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "kanidm"
+              },
+              "vulnerable_version_range": "1.10.3",
+              "patched_versions": "",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-j4gj-f54h-56j5",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-j4gj-f54h-56j5",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2026-05-27T05:14:01Z",
+          "updated_at": "2026-07-22T19:05:53Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "",
+                "name": ""
+              },
+              "vulnerable_version_range": "<= 1.10",
+              "patched_versions": ">= 1.11.0",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-x8cg-3c8h-gw55",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-x8cg-3c8h-gw55",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2026-05-27T05:11:21Z",
+          "updated_at": "2026-05-27T05:11:21Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": ""
+              },
+              "vulnerable_version_range": "none",
+              "patched_versions": "1.11.0-dev",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-xxwr-vvr3-2g9f",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-xxwr-vvr3-2g9f",
+          "severity": "critical",
+          "state": "published",
+          "published_at": "2026-05-14T07:04:09Z",
+          "updated_at": "2026-05-14T07:04:09Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "kanidm"
+              },
+              "vulnerable_version_range": "< 1.9.3, 1.10.1",
+              "patched_versions": ">= 1.9.4, >= 1.10.2",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-gpxg-fx2g-qxj2",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-gpxg-fx2g-qxj2",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-04-30T02:48:00Z",
+          "updated_at": "2026-04-30T02:48:01Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "",
+                "name": ""
+              },
+              "vulnerable_version_range": "< 1.9.2",
+              "patched_versions": ">= 1.9.3",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-53hj-r94p-8c8f",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-53hj-r94p-8c8f",
+          "severity": "low",
+          "state": "published",
+          "published_at": "2026-04-30T02:48:05Z",
+          "updated_at": "2026-04-30T02:48:05Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "",
+                "name": ""
+              },
+              "vulnerable_version_range": "< 1.9.2",
+              "patched_versions": ">= 1.9.3",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-r5fr-9gmv-jggh",
+          "cve_id": "CVE-2026-46689",
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-r5fr-9gmv-jggh",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-04-30T02:48:09Z",
+          "updated_at": "2026-08-02T08:36:48Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "scim_proto"
+              },
+              "vulnerable_version_range": "< 1.9.2",
+              "patched_versions": ">= 1.9.3",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "kanidm_proto"
+              },
+              "vulnerable_version_range": "< 1.9.2",
+              "patched_versions": ">= 1.9.3",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-84jc-3hj2-hwc7",
+          "cve_id": null,
+          "html_url": "https://github.com/kanidm/kanidm/security/advisories/GHSA-84jc-3hj2-hwc7",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2026-04-30T02:48:12Z",
+          "updated_at": "2026-04-30T02:48:13Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "rust",
+                "name": "kanidmd_lib"
+              },
+              "vulnerable_version_range": "< 1.9.2",
+              "patched_versions": ">= 1.9.3",
+              "pin_assessment": {
+                "version": "1.12.0-dev (workspace)",
+                "method": "manual; development source and incomplete/nonportable advisory ranges",
+                "status": "exact-fix-review-required"
+              }
+            }
+          ]
+        }
+      ],
+      "manifest_version": "1.12.0-dev",
+      "commit_identity": {
+        "repository": "kanidm/kanidm",
+        "sha": "f76b7ee9fdd28f123bb57d26351afef1515857d6",
+        "url": "https://api.github.com/repos/kanidm/kanidm/commits/f76b7ee9fdd28f123bb57d26351afef1515857d6",
+        "committer_date": "2026-10-12T22:28:29Z",
+        "author_date": "2026-10-12T22:28:29Z",
+        "recorded_committer_time_matches": true
+      }
+    },
+    {
+      "repository": "ory/kratos",
+      "source": "b86338da04a040247a07f46100a86dcfb3875909",
+      "retrieved_at": "2026-10-27T02:36:16.380933+00:00",
+      "pages": [
+        {
+          "url": "https://api.github.com/repos/ory/kratos/security-advisories?state=published&per_page=100",
+          "status": 200,
+          "sha256": "a322e702f8abef6270e9518910c009f17fa4eecaed13ecf3f840de6987ef0715",
+          "records": 2,
+          "link": null
+        }
+      ],
+      "records": 2,
+      "pagination_complete": true,
+      "manifest": {
+        "url": "https://raw.githubusercontent.com/ory/kratos/b86338da04a040247a07f46100a86dcfb3875909/go.mod",
+        "path": "go.mod",
+        "status": 200,
+        "sha256": "0a35bab08e6334ba14ab924cbd1e14f091bea7d4ab2f9156a3f1cfb29a419a19"
+      },
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-hgx2-28f8-6g2r",
+          "cve_id": "CVE-2026-33503",
+          "html_url": "https://github.com/ory/kratos/security/advisories/GHSA-hgx2-28f8-6g2r",
+          "severity": "high",
+          "state": "published",
+          "published_at": "2026-03-20T17:46:54Z",
+          "updated_at": "2026-03-20T18:33:36Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "go",
+                "name": "github.com/ory/kratos"
+              },
+              "vulnerable_version_range": "v25.4.0",
+              "patched_versions": "v26.2.0",
+              "pin_assessment": {
+                "version": null,
+                "method": "source pin descends from advisory advertised fixed release tag",
+                "fixed_tag": "v26.2.0",
+                "status": "includes-fixed-tag-ancestry"
+              }
+            }
+          ]
+        },
+        {
+          "ghsa_id": "GHSA-wc43-73w7-x2f5",
+          "cve_id": "CVE-2024-45042",
+          "html_url": "https://github.com/ory/kratos/security/advisories/GHSA-wc43-73w7-x2f5",
+          "severity": "medium",
+          "state": "published",
+          "published_at": "2024-09-26T10:52:59Z",
+          "updated_at": "2024-09-26T10:52:59Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "ory kratos",
+                "name": "https://github.com/ory/kratos"
+              },
+              "vulnerable_version_range": "<=1.2.0",
+              "patched_versions": "1.3.0",
+              "pin_assessment": {
+                "version": null,
+                "method": "source pin descends from advisory advertised fixed release tag",
+                "fixed_tag": "v1.3.0",
+                "status": "includes-fixed-tag-ancestry"
+              }
+            },
+            {
+              "package": {
+                "ecosystem": "go",
+                "name": "github.com/ory/kratos"
+              },
+              "vulnerable_version_range": "<=1.2.0",
+              "patched_versions": "1.3.0",
+              "pin_assessment": {
+                "version": null,
+                "method": "source pin descends from advisory advertised fixed release tag",
+                "fixed_tag": "v1.3.0",
+                "status": "includes-fixed-tag-ancestry"
+              }
+            }
+          ]
+        }
+      ],
+      "manifest_version": "source pin; no root semantic version",
+      "commit_identity": {
+        "repository": "ory/kratos",
+        "sha": "b86338da04a040247a07f46100a86dcfb3875909",
+        "url": "https://api.github.com/repos/ory/kratos/commits/b86338da04a040247a07f46100a86dcfb3875909",
+        "committer_date": "2026-07-29T09:30:36Z",
+        "author_date": "2026-07-29T09:25:46Z",
+        "recorded_committer_time_matches": true
+      }
+    }
+  ],
+  "better_auth_package_manifests": [
+    {
+      "name": "@better-auth/api-key",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/api-key/package.json",
+      "path": "packages/api-key/package.json",
+      "sha256": "9a7009bc6ead1b349a421be9ab4a78ef5999c3f8912f047b15607d5d9dd02751"
+    },
+    {
+      "name": "better-auth",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/better-auth/package.json",
+      "path": "packages/better-auth/package.json",
+      "sha256": "287b2c1c6370c6d3e512a18c2617ac1ba856ea3512ddaa51d5462ea8effcbcb3"
+    },
+    {
+      "name": "@better-auth/cimd",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/cimd/package.json",
+      "path": "packages/cimd/package.json",
+      "sha256": "e4da79fcba188723b63d21aa001b4efaf2585689a3c71afede2e4c6c055fde3a"
+    },
+    {
+      "name": "auth",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/cli/package.json",
+      "path": "packages/cli/package.json",
+      "sha256": "bd3ed971e937e9d8aca108da1a36354a78fd88033874784df8ff4544a62ced4c"
+    },
+    {
+      "name": "@better-auth/core",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/core/package.json",
+      "path": "packages/core/package.json",
+      "sha256": "3376afc881653ac991b863685fa5ef885f779eda3e9c32bf227ba0235c7f36c0"
+    },
+    {
+      "name": "@better-auth/drizzle-adapter",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/drizzle-adapter/package.json",
+      "path": "packages/drizzle-adapter/package.json",
+      "sha256": "41e5405d3547b5c9921fb4779e1062573abf994320bd1e3f5dc082329f89e3bb"
+    },
+    {
+      "name": "@better-auth/electron",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/electron/package.json",
+      "path": "packages/electron/package.json",
+      "sha256": "4bb0e06dcda934a141a34ccf24647a41bff4834efcc19dab8744aea6cb71b765"
+    },
+    {
+      "name": "@better-auth/expo",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/expo/package.json",
+      "path": "packages/expo/package.json",
+      "sha256": "51d5629008b41c8c29035963821ec1ecb567e7745ae837ae833b80a70c47b898"
+    },
+    {
+      "name": "@better-auth/i18n",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/i18n/package.json",
+      "path": "packages/i18n/package.json",
+      "sha256": "531d40dbd2ce1f72ac7a3d0f91c40395a4f44990df3480d469162cf8c889e0e1"
+    },
+    {
+      "name": "@better-auth/kysely-adapter",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/kysely-adapter/package.json",
+      "path": "packages/kysely-adapter/package.json",
+      "sha256": "63c2ab1a2c310d0931fa83d38d0f0c3cf7eeff101bf3ecb1db75b6f6be3926ab"
+    },
+    {
+      "name": "@better-auth/mcp",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/mcp/package.json",
+      "path": "packages/mcp/package.json",
+      "sha256": "c1eb1c44078ffed61177502f12880423e7468cf4d2a7aaebeff87704e99e81a0"
+    },
+    {
+      "name": "@better-auth/memory-adapter",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/memory-adapter/package.json",
+      "path": "packages/memory-adapter/package.json",
+      "sha256": "825ae791a275589bdccf6fe0f807278896b7cd1694d01ed4f5633df627313118"
+    },
+    {
+      "name": "@better-auth/mongo-adapter",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/mongo-adapter/package.json",
+      "path": "packages/mongo-adapter/package.json",
+      "sha256": "0d3365440aef9c2a5acb1e9d808907cedd8dd10b966a3e45379f88aa296f8956"
+    },
+    {
+      "name": "@better-auth/oauth-provider",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/oauth-provider/package.json",
+      "path": "packages/oauth-provider/package.json",
+      "sha256": "f5ac6d267f34ceeca35ff8e50bf1d7e2a75a4ab756d011396e8ca1398ec29425"
+    },
+    {
+      "name": "@better-auth/passkey",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/passkey/package.json",
+      "path": "packages/passkey/package.json",
+      "sha256": "98824ce23e1273e332f899e6f9e2c86416a90bb53c0bb91dc0b36b2ff095e35b"
+    },
+    {
+      "name": "@better-auth/prisma-adapter",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/prisma-adapter/package.json",
+      "path": "packages/prisma-adapter/package.json",
+      "sha256": "1f2e9e326f47abbd66f7836d8ac3273b839ad8b60c80fa3292fb023676a8f4eb"
+    },
+    {
+      "name": "@better-auth/redis-storage",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/redis-storage/package.json",
+      "path": "packages/redis-storage/package.json",
+      "sha256": "703b022de74776967d715c6c2a49a94d483cbd6d8731b0ab1ce719aeba58c416"
+    },
+    {
+      "name": "@better-auth/release-tooling",
+      "version": "0.0.0",
+      "license": null,
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/release-tooling/package.json",
+      "path": "packages/release-tooling/package.json",
+      "sha256": "d8b43cb17c1b60d556c327632adfe3fd80782419074d43aca42abaf50460200d"
+    },
+    {
+      "name": "@better-auth/scim",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/scim/package.json",
+      "path": "packages/scim/package.json",
+      "sha256": "139a4c23461351098d8b463ea5175508d584168e12b4fc377a60471e44aa8494"
+    },
+    {
+      "name": "@better-auth/sso",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/sso/package.json",
+      "path": "packages/sso/package.json",
+      "sha256": "a1ca5f27418b76cd4f182402c6f7217fc9668435e1e430bd3d837b5728b38098"
+    },
+    {
+      "name": "@better-auth/stripe",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/stripe/package.json",
+      "path": "packages/stripe/package.json",
+      "sha256": "d211d718d065f36e7b39028c14cf6cfd1667684fe294def612f1bcb9104738fa"
+    },
+    {
+      "name": "@better-auth/telemetry",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/telemetry/package.json",
+      "path": "packages/telemetry/package.json",
+      "sha256": "620ced802df7f2c59a203220a4d5cdcf24327b4742d492e83e07ff6b4018a727"
+    },
+    {
+      "name": "@better-auth/test-utils",
+      "version": "1.7.10",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/better-auth/better-auth/d0ca6d538db47547b0a842cfa44ca92a8ea9bba0/packages/test-utils/package.json",
+      "path": "packages/test-utils/package.json",
+      "sha256": "4ce6446eaa6f99dbb74cd852025f292baf10a1de4ab10759fde0d72f32ee6a75"
+    }
+  ],
+  "kratos_fixed_tag_ancestry": [
+    {
+      "fixed_tag": "v1.3.0",
+      "url": "https://api.github.com/repos/ory/kratos/compare/v1.3.0...b86338da04a040247a07f46100a86dcfb3875909?per_page=1",
+      "status": "ahead",
+      "ahead_by": 868,
+      "behind_by": 0,
+      "base_sha": "0a49fd05245f179501b117163cd574786f287fe8",
+      "merge_base_sha": "0a49fd05245f179501b117163cd574786f287fe8"
+    },
+    {
+      "fixed_tag": "v26.2.0",
+      "url": "https://api.github.com/repos/ory/kratos/compare/v26.2.0...b86338da04a040247a07f46100a86dcfb3875909?per_page=1",
+      "status": "ahead",
+      "ahead_by": 202,
+      "behind_by": 0,
+      "base_sha": "9d7085948039ffb8960160d4979f71527b5cf4d5",
+      "merge_base_sha": "9d7085948039ffb8960160d4979f71527b5cf4d5"
+    }
+  ],
+  "limitations": [
+    "Empty feeds do not establish absence of vulnerabilities or maintained security support.",
+    "A version outside declared ranges does not prove source-fix presence, runtime reachability or absence of regressions.",
+    "Kanidm development-pin applicability is unresolved; exact fix ancestry and configuration review are required before adoption.",
+    "Private/unpublished advisories, complete transitive graphs, native libraries and future revisions are outside this inventory."
+  ]
+}
