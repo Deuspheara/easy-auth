@@ -82,3 +82,7 @@ Missing/empty/altered/unexpected output, an existing destination or a write faul
 fails the build; remove only owned staging. This completion boundary needs neither
 sleep nor retry nor a new assertion waiver. Existing real browser controls stay
 required and additionally exercise selecting a result under the project base.
+
+The [verification record](../../security/website-search-verification-2026-10-27.md)
+records exact implementation revisions, root-cause evidence, failure controls,
+public permissions, Node24/26 browser qualification and unchanged backend gates.

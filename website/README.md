@@ -105,3 +105,7 @@ It removes its owned temporary files and fails if any verified sample is incompl
 Upstream truncation is intermittent; a sample with no failures does not disprove the
 recorded failure. This diagnostic never retries a failed website build into success.
 The ordinary browser gate still requires actual indexed results and navigation.
+
+The [2026-10-27 verification record](../docs/security/website-search-verification-2026-10-27.md)
+identifies exact source/tool versions, the intermittent reproduction, negative
+controls, genuine browser results and remaining qualification limits.
