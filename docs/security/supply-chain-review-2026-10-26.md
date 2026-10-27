@@ -1,5 +1,9 @@
 # Supply-chain evidence checkpoint — 2026-10-26
 
+The [2026-10-27 source-only refresh](outbound-oidc-acceptance-2026-10-27.md#source-sbom-refresh)
+records the added RP test graph and its five-package browser SBOM. All source,
+image/native and advisory observations below retain their original dated scope.
+
 AUTH-48 remains subject to its AUTH-47 prerequisite and release dispositions.
 This is bounded local source/artifact evidence, not production acceptance,
 independent legal/security approval or protocol compliance. Real provider/OS

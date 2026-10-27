@@ -314,5 +314,178 @@
     "qualified_parity_binaries_rebuilt_with_identical_hashes": true,
     "scanner_metadata_shape": "explicit artifact/sha256 rows; no artifact-name JSON keys",
     "scanner_rules_changed": false
+  },
+  "source_sbom_refresh": {
+    "source": "1fcb748c0e822d3dcd05ed34b3e395465b8d9ae8",
+    "recorded_at": "2026-10-27T04:23:53.735359+00:00",
+    "source_inventory_sha256": "60526d34b2bebb19417f94a03022932726c4c881b7c8a5ddc01f5fd20fec5241",
+    "source_sbom_summary_sha256": "aabed515469922f3407a91876aaf560b19d35b25fc8a915b2bd23868e4e0bff7",
+    "helper_test_methods_passed": 19,
+    "cargo_source_inventory": [
+      {
+        "manifest": "Cargo.toml",
+        "metadata_packages": 403,
+        "selected_all_target_feature_refs": 380,
+        "resolver_only_refs": 23
+      },
+      {
+        "manifest": "examples/clients/rust/Cargo.toml",
+        "metadata_packages": 155,
+        "selected_all_target_feature_refs": 127,
+        "resolver_only_refs": 28
+      }
+    ],
+    "npm_source_inventory": [
+      {
+        "lockfile": "website/package-lock.json",
+        "package_locations": 529,
+        "missing_license_declarations": 0,
+        "lock_sha256": "aef57d5e341110fc1c3e210222cde909e2f48029d34c0444f51c703153f00911"
+      },
+      {
+        "lockfile": "tools/reference-ui/package-lock.json",
+        "package_locations": 33,
+        "missing_license_declarations": 0,
+        "lock_sha256": "db1721bcccd4f052ba44b3021a3fea92e670d42e2338efd8fdf53c6dd07a97cc"
+      },
+      {
+        "lockfile": "tests/browser/passkeys/package-lock.json",
+        "package_locations": 5,
+        "missing_license_declarations": 0,
+        "lock_sha256": "effa1ed628662343cebc9e4658974c95f64b181ec1ab8bf9fd132b69ff61beda"
+      }
+    ],
+    "source_sbom_profiles": [
+      {
+        "profile": "default",
+        "sboms": 4,
+        "selected_normal_build_packages": 213,
+        "observed_source_package_identities": 246,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 33
+      },
+      {
+        "profile": "saml",
+        "sboms": 4,
+        "selected_normal_build_packages": 332,
+        "observed_source_package_identities": 354,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 22
+      },
+      {
+        "profile": "all-features",
+        "sboms": 4,
+        "selected_normal_build_packages": 368,
+        "observed_source_package_identities": 388,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 20
+      },
+      {
+        "profile": "consumer",
+        "sboms": 1,
+        "selected_normal_build_packages": 127,
+        "observed_source_package_identities": 155,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 28
+      }
+    ],
+    "rust_sboms": 13,
+    "npm_sboms": 3,
+    "image_sboms": 0,
+    "browser_sbom": {
+      "path": "browser-tests.cdx.json",
+      "sha256": "8210547618bc42cb858e98950240427a2fb2cf4d011cf401afde16fc4fab5cb9",
+      "expected_package_identities": 5,
+      "missing_package_identities": [],
+      "identity_comparison": "scoped name and version",
+      "additional_identities": [],
+      "components_without_reported_license": 0,
+      "scope": "Package SBOM, no license/security approval; missing license fields remain explicit",
+      "published_path": "docs/security/sboms/browser-tests-2026-10-27.cdx.json"
+    },
+    "browser_libraries": [
+      {
+        "name": "jose",
+        "version": "6.2.13",
+        "purl": "pkg:npm/jose@6.2.13",
+        "licenses": [
+          {
+            "license": {
+              "id": "MIT"
+            }
+          }
+        ]
+      },
+      {
+        "name": "oauth4webapi",
+        "version": "3.8.8",
+        "purl": "pkg:npm/oauth4webapi@3.8.8",
+        "licenses": [
+          {
+            "license": {
+              "id": "MIT"
+            }
+          }
+        ]
+      },
+      {
+        "name": "openid-client",
+        "version": "6.8.8",
+        "purl": "pkg:npm/openid-client@6.8.8",
+        "licenses": [
+          {
+            "license": {
+              "id": "MIT"
+            }
+          }
+        ]
+      },
+      {
+        "name": "playwright-core",
+        "version": "1.64.1",
+        "purl": "pkg:npm/playwright-core@1.64.1",
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-2.0"
+            }
+          }
+        ]
+      },
+      {
+        "name": "playwright",
+        "version": "1.64.1",
+        "purl": "pkg:npm/playwright@1.64.1",
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-2.0"
+            }
+          }
+        ]
+      }
+    ],
+    "shipped_notice_asset_records": 21,
+    "generator": {
+      "source": {
+        "name": "cargo-cyclonedx",
+        "version": "0.5.9",
+        "archive_url": "https://static.crates.io/crates/cargo-cyclonedx/cargo-cyclonedx-0.5.9.crate",
+        "archive_sha256": "5d162f67705f0f5038759d73bf546a083bf30e8677c2e944b416bca48d9d69a8",
+        "lock_sha256": "907a775251bc3504de1df6c38830a2453ddbb1feef56b4bb9aa2a890a723abea",
+        "license": "Apache-2.0",
+        "scope": "Unchanged official SBOM generator source; separately patched and audited tooling lock. No application runtime dependency."
+      },
+      "binary_sha256": "1bd6b4e8e9bbb1525b824d3c7206ffb2e673db0f503275e7506ccffbcdd0a35e",
+      "tooling_policy_sha256": "e15bddeebfa45dacb438516d9d970ca6be1e76e24c38c75c7c99b07a2c75f3cd",
+      "bootstrap_sha256": "0a120875034e6c96d043fa2596785fffa9abb82b9e342cbd20195ec56ae2073d",
+      "current_tooling_lock_and_cached_source_match": true,
+      "fresh_bootstrap_claimed": false
+    },
+    "scanner_image": "aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c",
+    "scanner_network": "none",
+    "image_upload": false,
+    "scope": "Source package/dependency-license coverage including dev tools. Existing image/native/advisory and release/assurance records retain their own source scope; no production or independent approval.",
+    "browser_application_placeholder_license_reported": false
   }
 }

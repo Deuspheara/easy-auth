@@ -104,6 +104,43 @@ explicit `artifact`/`sha256` rows for those public checksums. Failed redacted sc
 remain local; default rules and exceptions are unchanged. No credential or added
 allowlist entry is represented by that digest.
 
+## Source SBOM refresh
+
+After adding the third-party RP, the existing source inventory/SBOM commands were
+replayed at exact `1fcb748c0e822d3dcd05ed34b3e395465b8d9ae8`. Nineteen helper
+methods pass. Four source profiles generate thirteen Rust SBOMs; three npm SBOMs
+cover website, presentation tooling and browser tools. Every selected normal/build
+identity and graph reference is covered. Inventory/output hashes and counts are
+in the receipt's `source_sbom_refresh` field.
+
+The [browser-tool CycloneDX 1.7 SBOM](sboms/browser-tests-2026-10-27.cdx.json)
+now covers all five dependency identities: Playwright/core 1.64.1 (Apache-2.0) plus
+openid-client 6.8.8, jose 6.2.13 and oauth4webapi 3.8.8 (MIT). All dependency-license
+fields are present. The scanner's application placeholder for `package-lock.json`
+retains its missing own-root license field; it is not counted as another licensed
+dependency, silently removed or assigned an invented expression. npm source
+inventories contain 529 website locations, 33 presentation-tool packages and 5 browser
+packages, with zero missing declared dependency licenses. Twenty-one shipped
+notice/asset records remain separately hashed.
+
+Cargo inventories retain 403 workspace/380 selected/23 resolver-only packages and
+155 consumer/127 selected/28 resolver-only. Source SBOM normal/build selected versus
+observed counts are 213/246 default, 332/354 SAML/OIDC, 368/388 all-feature and 127/155
+consumer. These inventories include resolver overapproximation and dev-tool data;
+they do not establish successful compilation on every target or actual binary
+reachability. The earlier source checkpoint's two browser packages remain dated
+historical evidence rather than being rewritten to five.
+
+The previously audited pinned generator was reused after source/lock/policy/
+bootstrap/binary checks; the current committed lock also matches its declared pin
+and cached source byte-for-byte. No fresh bootstrap or tool audit is claimed.
+Trivy runs offline with network disabled on owned copies of committed public
+manifests and locks. No private/untracked original source, upload or application
+service is involved. All sixteen output hashes/coverage records were checked.
+Image/native/advisory inventories and their unresolved release dispositions retain
+their existing source scope. AUTH-48's AUTH-47 prerequisite and every release/
+independent-approval gate remain open.
+
 ## Maintainability and remaining release acceptance
 
 The Fetch adapter, third-party operation and guard tests have separate named
