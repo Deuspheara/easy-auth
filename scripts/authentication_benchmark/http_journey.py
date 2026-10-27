@@ -14,7 +14,6 @@ class Journey:
         self.owners, self.messages, self.private_values = [], [], [PASSWORD.encode()]
         self.issued = []
         self.issued_lock = threading.Lock()
-        self.reports = []
 
     def setup(self):
         self.window = self.buckets()['window']
