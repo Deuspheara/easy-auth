@@ -18,7 +18,7 @@ async function sdkToken(fixture,consent) {
   const response=await fixture.command('complete',{callback:callback.href});
   assert.equal(response.verified,true);assert.equal(response.posts,1);
 }
-async function run({origin,fixture,mail,page,post,consent,plan}) {
+async function run({origin,fixture,mail,page,post,consent,plan,standards}) {
   assert.equal(plan.propagation_seconds,300,'unchanged persisted key prepublication policy');
   // No pending operation spans this wait. Preserve the production interval and
   // genuinely authenticate again; never rewrite ready_at, auth_time or a clock.
@@ -35,6 +35,7 @@ async function run({origin,fixture,mail,page,post,consent,plan}) {
   // Same ordinary production bytes, different trusted audience expectation.
   assert.throws(()=>before.actor.verify(before.token,oldKeys,fixture.readyValue.native_client_id),assert.AssertionError);
   await sdkToken(fixture,consent);
+  await standards.verify(consent);
   await fixture.activateRotation();
   const after=await nodeToken(origin,fixture,consent);
   const keys=(await after.actor.request('/oidc/jwks')).value;
@@ -44,8 +45,10 @@ async function run({origin,fixture,mail,page,post,consent,plan}) {
   const kid=token=>JSON.parse(Buffer.from(token.split('.')[0],'base64url')).kid;
   assert.notEqual(kid(before.token),kid(after.token),'normal issuance follows the explicit new key');
   await sdkToken(fixture,consent);
+  await standards.verify(consent);
   await page.goto(origin+'/');
   assert.equal(await post('/v1/logout',{}),204);
-  return {ordinary_rollover_verified:true,old_key_overlap_verified:true,independent_audience_denial:true,sdk_before_after_rotation:true};
+  return {ordinary_rollover_verified:true,old_key_overlap_verified:true,independent_audience_denial:true,sdk_before_after_rotation:true,
+    standards_rp_rollover_verified:true};
 }
 module.exports={run};

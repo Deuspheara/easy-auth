@@ -203,6 +203,7 @@ jobs:
           node tests/browser/issuer-native/run.cjs
       - name: Verify actual standalone and embedded issuer client parity
         run: |
+          node --test tests/browser/issuer-standalone/standards/fetch.test.cjs
           cargo build --locked -p easy-auth-server --features issuer-web,oidc-client --bin easy-auth --example issuer-client-acceptance
           node tests/browser/issuer-standalone/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs

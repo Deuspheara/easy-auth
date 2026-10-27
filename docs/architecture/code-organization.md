@@ -18,6 +18,15 @@ function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
+Owned issuer `standards/` separates the third-party RP operation from its Fetch
+transport and input-boundary tests. The Fetch adapter retains raw response bytes,
+abort lifetime and bounded owned HTTPS I/O; the older Node assertion client owns
+JSON/primitive observations. Neither duplicates production authentication policy
+or becomes a generic transport framework. Existing case/rollover modules compose
+only the added checks and retain all original ordering/assertions. New modules
+stay below100lines and functions below50; no runtime API, SQL or signing producer
+moves into tests, and no unrelated cleanup is bundled.
+
 Browser security headers and the unchanged CSP assertion live in `browser/headers`;
 they were extracted separately before telemetry changes. Private `observation`
 owns only a generated request ID, monotonic lifetime and original subscriber. It

@@ -1,5 +1,24 @@
 # Protocol dependency assessment
 
+AUTH-36's independent standards-client acceptance pins test-only
+[openid-client6.8.8](https://github.com/panva/openid-client/tree/v6.8.8), with locked
+jose6.2.13 and oauth4webapi3.8.8 (all MIT) in the existing shared browser toolchain.
+Exact registry archive integrities are in `tests/browser/passkeys/package-lock.json`;
+installation uses `npm ci --ignore-scripts`. The 2026-10-27 whole-browser npm audit
+reports zero known findings, not independent security approval or unknown-risk
+clearance. The dependency introduces no Rust runtime, native library, crypto
+implementation, shipping asset, lockfile/advisory exemption or weaker assertion.
+
+The RP uses the upstream discovery, S256/state/nonce and code-grant implementation.
+Its explicit [JWS validation option](https://github.com/panva/openid-client/blob/v6.8.8/docs/functions/enableNonRepudiationChecks.md)
+requires JWKS signature verification as well as normal HTTPS/claim checks. The
+fixture-only Fetch adapter passes original bytes through the same explicit private
+certificate/address trust boundary, with no cookie authority, insecure request or
+production override. Existing normal signing producers, original Node/Rust cases,
+clock/propagation intervals and SAML waiver limits remain unchanged. This strengthens
+bounded independent RP evidence; the outbound OIDC hard release gate, independent
+review, real provider/OS and production acceptance remain separate.
+
 AUTH-49 retention reuses the locked SQLx/PostgreSQL, Tokio, UUID and async-trait
 boundaries. It adds no dependency/version, cryptographic implementation, verifier,
 license rule or advisory exception. Fresh statement snapshots and FK-lock behavior
