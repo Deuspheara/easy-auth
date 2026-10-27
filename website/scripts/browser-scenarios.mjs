@@ -49,7 +49,17 @@ export async function checkMobileAndSearch(page, origin) {
     (await page.locator(".pagefind-ui__result-link").count()) > 0,
     "Search must return indexed guides",
   );
+  const result = page.locator(".pagefind-ui__result-link").first();
+  const destination = new URL(await result.getAttribute("href"), origin + "/");
+  assert.ok(
+    destination.href.startsWith(origin + "/docs/"),
+    "Search result stays under the public docs base",
+  );
   await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: /search/i }).click();
+  await result.click();
+  await page.waitForURL((url) => url.href === destination.href);
+  assert.equal(await page.locator("h1").first().isVisible(), true);
 }
 
 export async function checkRoutes(page, origin) {

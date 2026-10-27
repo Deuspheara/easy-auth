@@ -18,6 +18,14 @@ function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
+Website `scripts/search/` owns pinned asset-format validation, staged file output
+and the narrow Starlight writer adapter in separate modules. Tests separate bundle
+faults, real filesystem/readback/cleanup and hook preservation/native indexing;
+shared ordinary HTML setup is test-only. The bounded lifetime diagnostic compares
+independent samples without becoming a build retry. Astro configuration remains
+composition; no auth policy, provider producer, generic plugin or dependency patch
+moves into the website. New modules and functions remain below the review triggers.
+
 Incident recovery qualification extends the native lifecycle suite in a named
 `incident/` module, reusing maintained signing, account and native-consumer fixtures.
 The physical-copy helper owns only SQLx test databases, connection lifetimes,
