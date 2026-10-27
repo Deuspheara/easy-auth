@@ -1,10 +1,13 @@
 # Experimental passkey management
 
 AUTH-20 is in progress. Optional core/PostgreSQL and explicit experimental HTTP
-management provide bounded inventory, rename and removal. All-keys-lost recovery,
-stronger-policy activation and ordinary server enablement remain incomplete.
-Those and required physical-device/browser evidence remain acceptance gates.
-See [ADR 0011](../architecture/adr/0011-passkey-management-and-recovery.md).
+management provide bounded inventory, rename and removal. A separate explicit
+experimental saved-code recovery flow includes delayed claims, cancellation,
+replacement registration/assertion and reference pages, described below.
+Independent recovery review, physical-device/other-browser acceptance and ordinary
+activation remain open. See
+[ADR 0011](../architecture/adr/0011-passkey-management-and-recovery.md) and
+[ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
 
 Construct `PasskeyManagement` with a trusted realm, the existing configured
 `PasskeyService`, and a `PasskeyManagementRepository`. Both embedding and standalone
@@ -48,7 +51,8 @@ leased/retry queue. `EmailDelivery::passkeys_changed` is a required delivery por
 implementations must report unavailable delivery honestly. The real SMTP adapter
 implements it. No raw credential, label, recovery secret or sign-in link enters a
 notice. Email-free users have no fabricated notification address or implied email
-recovery; recovery notification limits remain explicit unfinished AUTH-20 work.
+recovery; the saved-code flow's email-free notification limits remain explicit
+AUTH-20 review requirements.
 
 Migration 0012 adds management versions and bounded target/audit/notice schema.
 Existing key encodings, metadata, owner IDs and session provenance are preserved;
@@ -95,13 +99,13 @@ browser interoperability, recovery safety or general activation readiness.
 
 The optional `PasskeyRecoverySetup` core service and
 `PasskeyRecoverySetupRepository` adapter prepare and confirm a saved recovery code.
-A separate experimental HTTP constructor now exposes configuration. There is no
-recovery authentication endpoint; this must not be advertised as a working
-all-keys-lost recovery flow. It never changes
-account policy or ordinary server enablement. See
+A separate experimental HTTP constructor exposes configuration only; the
+[recovery constructor](#experimental-recovery-http) additionally exposes claims
+and replacement completion. Configuration alone grants no recovery session and
+never changes account policy or ordinary server enablement. See
 [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md) for the implemented
 configuration, claim and private replacement boundaries plus the remaining review
-and HTTP/activation gates.
+and activation gates.
 
 `prepare(session, source)` requires actual fresh passkey-method authority and an
 owned key with assertion-use evidence in the configured RP. It returns a pending
@@ -173,8 +177,10 @@ configuration response. Email-free confirmation sends no fabricated email.
 
 `PasskeyRecoveryClaims` currently provides core/PostgreSQL `begin`, `resume`,
 `status`, `cancel`, `cancel_with_key`, `cancel_current_with_key` and `cancel_with_code`.
-This service issues no key or session; the explicit HTTP wrapper is described below. These methods must not be advertised
-as working all-keys-lost login. See [ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
+This service issues no key or session. Completing recovery additionally requires
+the separately verified replacement registration and assertion described below;
+claim eligibility alone never authenticates an account. See
+[ADR 0012](../architecture/adr/0012-saved-passkey-recovery.md).
 
 Begin supplies the explicit public account ID, saved code and a separate browser
 secret retained before the request. A code authorizes one browser-bound claim in

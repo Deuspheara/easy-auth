@@ -2,9 +2,11 @@
 
 Status: experimental management and additional-enrollment boundaries implemented
 in AUTH-20, 2026-10-19.
-Saved-code configuration is described in [ADR 0012](0012-saved-passkey-recovery.md).
-The full recovery protocol and ordinary activation remain incomplete; this is not acceptance
-of the full ticket or an assurance/conformance claim.
+Current implementation status: saved-code configuration, delayed claims,
+cancellation, replacement completion, explicit HTTP transport and reference pages
+are described in [ADR 0012](0012-saved-passkey-recovery.md). Independent recovery
+review, physical-device/other-browser acceptance and ordinary activation remain
+open; this is not acceptance of the full ticket or an assurance/conformance claim.
 
 ## Credential management
 
@@ -52,21 +54,22 @@ conditional consumption itself; a write-trigger wait cannot extend either deadli
 
 ## Remaining recovery and activation work
 
-AUTH-20 retains pre-enrolled independent recovery proof, single-use/expiry,
-explicit delay/cancellation, notifications where a verified channel exists, audit,
-safe stronger-policy activation and complete
-remaining HTTP/native/physical-device evidence. Mere denial of fallback does not fulfill it.
+ADR0012 implements pre-enrolled saved-code proof, single-use/expiry, explicit
+delay/cancellation, verified-contact notifications, audit and replacement
+completion, with experimental HTTP/native virtual-authenticator evidence.
+AUTH-20 retains independent review of that policy and its email-free notification
+limits, physical-device/other-browser acceptance and safe ordinary activation.
 A remaining strong key supports normal authentication and replacement enrollment;
-it is not a claim of all-keys-lost recovery.
+all-keys-lost recovery instead follows the separate saved-code flow.
 
 The [NIST authenticator-event guidance](https://pages.nist.gov/800-63-4/sp800-63b/events/)
 distinguishes replacement while another authenticator is available from recovery,
 and discusses prearranged recovery secrets and independent notification. It informs
 the review, but does not establish this implementation's compliance or approve a
-mailbox-only fallback. A saved-proof recovery proposal must specify secure offline
-issuance/storage, throttling, rotation, restricted replacement-key bootstrap,
-waiting-period cancellation and the honest limits for accounts without an
-independent notification channel before it is implemented or activated.
+mailbox-only fallback. ADR0012 specifies offline issuance/storage, throttling,
+rotation, restricted replacement-key bootstrap, waiting-period cancellation and
+the limits for accounts without an independent notification channel. Implementing
+those controls does not establish independent acceptance or permit ordinary activation.
 
 ## Compatibility and verification
 
@@ -86,5 +89,5 @@ Earlier constructors and ordinary server routes remain unchanged. Closed JSON,
 configured realm/origin startup checks, 8 KiB bodies, shared browser guards and
 post-commit cookie clearing preserve the existing trust boundary. Native platform/
 USB cases now cover independent spare-device proof, original exclusion/residence/
-UV policy, removal and real queued SMTP notices. Recovery design, physical-device/
-other-browser evidence and ordinary activation remain incomplete.
+UV policy, removal and real queued SMTP notices. Independent recovery review,
+physical-device/other-browser evidence and ordinary activation remain incomplete.
