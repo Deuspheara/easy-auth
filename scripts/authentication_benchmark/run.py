@@ -9,6 +9,7 @@ import tempfile
 import uuid
 
 from operational_recovery.services import Services
+from .build import build
 from .measurement import launch
 from .validation import validate
 
@@ -21,23 +22,6 @@ def git(*arguments):
 
 def write_receipt(directory, receipt):
     (directory / 'results.json').write_text(json.dumps(receipt, indent=2) + '\n')
-
-
-def build(directory):
-    environment = dict(os.environ)
-    if any(key.startswith(('CARGO_PROFILE_RELEASE_', 'CARGO_TARGET_')) for key in environment) \
-            or any(environment.get(key) for key in ('RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS', 'RUSTC_WRAPPER')):
-        raise ValueError('unrecorded optimization override')
-    environment['CARGO_INCREMENTAL'] = '0'
-    # Retain build-tool symbols to avoid the observed stripped Mach-O SQLx
-    # procedural-macro load failure. Application release optimization is unchanged.
-    environment['CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG'] = '1'
-    command = ['cargo', 'build', '--frozen', '--release', '-p', 'easy-auth-server',
-               '--example', 'authentication_benchmark']
-    with (directory / 'build.log').open('xb') as output:
-        subprocess.run(command, cwd=ROOT, env=environment, stdout=output, stderr=output,
-                       check=True, timeout=1800)
-    return ROOT / 'target/release/examples/authentication_benchmark'
 
 
 def run(output, repetitions):
