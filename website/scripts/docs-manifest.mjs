@@ -51,6 +51,11 @@ export const guides = [
     title: "Choose an integration",
   },
   {
+    source: "docs/guides/issuer-standalone.md",
+    slug: "issuer-standalone",
+    title: "Explicit issuer setup",
+  },
+  {
     source: "docs/guides/custom-ui.md",
     slug: "custom-ui",
     title: "Custom UI",
