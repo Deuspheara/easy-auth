@@ -15,6 +15,15 @@ use uuid::Uuid;
 #[sqlx::test]
 async fn http_hash_overload_stays_bounded_after_cancellation_and_recovers(pool: PgPool) {
     let options = pool.connect_options();
+    // SQLx can replace connections after request cancellation. Resolve a reachable
+    // address before occupying the private runtime's only blocking thread, or
+    // localhost DNS can queue behind our deliberate KDF blocker instead.
+    let address = tokio::net::TcpStream::connect((options.get_host(), options.get_port()))
+        .await
+        .unwrap()
+        .peer_addr()
+        .unwrap();
+    let options = (*options).clone().host(&address.ip().to_string());
     pool.close().await;
     // Control the blocking queue in a private runtime. The SQLx test's outer
     // runtime remains live and owns the disposable database's final cleanup.
@@ -28,7 +37,7 @@ async fn http_hash_overload_stays_bounded_after_cancellation_and_recovers(pool: 
             .block_on(async {
                 let pool = PgPoolOptions::new()
                     .max_connections(4)
-                    .connect_with((*options).clone())
+                    .connect_with(options)
                     .await
                     .unwrap();
                 let (app, passwords) = application(pool.clone()).await;
