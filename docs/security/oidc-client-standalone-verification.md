@@ -1,6 +1,8 @@
 # Independent OIDC client and configured issuer verification
 
-Local verification date: 2026-10-24. Implementation checkpoints:
+Historical local verification date: 2026-10-24. The [2026-10-27 extension](outbound-oidc-acceptance-2026-10-27.md) adds a maintained third-party RP, retains all original fifteen facts and records eighteen facts per mode. Earlier source counts/failures below remain historical evidence; the outbound release gate and independent-review/production limits are not cleared.
+
+Implementation verification date: 2026-10-24. Implementation checkpoints:
 
 - `30c42a768b53af383a9ca6f216ac666ba7781cc8`: independent Rust SDK after three separately verified structural extractions.
 - `50c3a4fbae270133a1bae5e07bb87926733c60c2`: default-off configured issuer and executable/embedded client parity.

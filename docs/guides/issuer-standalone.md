@@ -65,8 +65,12 @@ Supply the normal local `DATABASE_URL` privately. The runner creates a random ow
 database, ordinary ephemeral operator keys and private TLS files. It runs the actual
 binary and embedded factory in separate processes with identical trusted settings.
 Both perform real SMTP email sign-in and browser confirmation, then independent
-cookie-free HTTPS Node and Rust clients fetch actual discovery/JWKS and verify
-production-issued tokens. Replay, bound denial without POST, access/local-session
+cookie-free HTTPS Node, Rust and pinned third-party `openid-client` clients fetch
+actual discovery/JWKS and verify production-issued tokens. The third-party RP
+explicitly enables JWS verification, rejects wrong state before any code POST and
+checks ordinary tokens before/after rollover. The [2026-10-27 local acceptance
+extension](../security/outbound-oidc-acceptance-2026-10-27.md) records eighteen true
+facts per mode and the still-open outbound release/independent-review gates. Replay, bound denial without POST, access/local-session
 separation, browser privacy and logout are checked in both modes. It also sends an SDK native authorization through an actual already-bound
 loopback listener, rotates its credential once and verifies logout refuses another refresh.
 It checks normal fixture-parent exit, database removal, exact owned mail removal

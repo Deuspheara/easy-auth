@@ -1,13 +1,14 @@
 # Protocol dependency assessment
 
 AUTH-36's independent standards-client acceptance pins test-only
-[openid-client6.8.8](https://github.com/panva/openid-client/tree/v6.8.8), with locked
-jose6.2.13 and oauth4webapi3.8.8 (all MIT) in the existing shared browser toolchain.
+[openid-client 6.8.8](https://github.com/panva/openid-client/tree/v6.8.8), with locked
+jose 6.2.13 and oauth4webapi 3.8.8 (all MIT) in the existing shared browser toolchain.
 Exact registry archive integrities are in `tests/browser/passkeys/package-lock.json`;
 installation uses `npm ci --ignore-scripts`. The 2026-10-27 whole-browser npm audit
 reports zero known findings, not independent security approval or unknown-risk
-clearance. The dependency introduces no Rust runtime, native library, crypto
-implementation, shipping asset, lockfile/advisory exemption or weaker assertion.
+clearance. The dependency introduces no Rust runtime, native library, custom
+cryptographic primitive, shipping asset, lockfile/advisory exemption or weaker
+assertion.
 
 The RP uses the upstream discovery, S256/state/nonce and code-grant implementation.
 Its explicit [JWS validation option](https://github.com/panva/openid-client/blob/v6.8.8/docs/functions/enableNonRepudiationChecks.md)

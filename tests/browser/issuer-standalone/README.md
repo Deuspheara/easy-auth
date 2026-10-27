@@ -10,7 +10,7 @@ random database, recipient messages and private directory. Fixture services must
 never be deployed or connected to production data.
 
 
-The shared browser toolchain now pins the third-party `openid-client`6.8.8 RP:
+The shared browser toolchain now pins the third-party `openid-client` 6.8.8 RP:
 install it with `npm ci --ignore-scripts --prefix tests/browser/passkeys`.
 `node --test tests/browser/issuer-standalone/standards/fetch.test.cjs` checks the
 owned Fetch boundary before the full runner. Existing Node/Rust/native controls

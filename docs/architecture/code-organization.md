@@ -24,7 +24,7 @@ abort lifetime and bounded owned HTTPS I/O; the older Node assertion client owns
 JSON/primitive observations. Neither duplicates production authentication policy
 or becomes a generic transport framework. Existing case/rollover modules compose
 only the added checks and retain all original ordering/assertions. New modules
-stay below100lines and functions below50; no runtime API, SQL or signing producer
+stay below 100 lines and functions below 50; no runtime API, SQL or signing producer
 moves into tests, and no unrelated cleanup is bundled.
 
 Browser security headers and the unchanged CSP assertion live in `browser/headers`;
