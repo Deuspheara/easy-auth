@@ -5,7 +5,7 @@ It does not establish production capacity, an independent audit, provider/OS
 interoperability or completion of the AUTH-49 prerequisite. External review and
 production verification remain separate work.
 
-From a clean committed isolated checkout, with Rust, Python 3.10+ and Docker:
+From a clean committed isolated Linux/macOS checkout, with Rust, Python 3.10+ and Docker:
 
 ```sh
 python3 scripts/benchmark_authentication.py --output /tmp/easy-auth-benchmark-new
@@ -97,6 +97,7 @@ transactions, distributed abuse, pool exhaustion, cancellation under live HTTP
 load, or sustained production behavior. Endpoint metrics and external ingress
 budgets need their own bounded-cardinality/privacy and adversarial verification;
 no monitoring endpoint or automatic policy tuning follows from these numbers.
-AUTH-50 remains open for its complete evidence, prerequisite reconciliation and
-independent review plan/scheduling. SAML waiver limits and the outbound OIDC hard
-release gate are unchanged.
+The [independent review plan](../security/independent-review-plan.md) records scope
+and evidence preparation; no reviewer is booked or contacted. AUTH-50 remains open
+for its complete evidence, prerequisite reconciliation and external scheduling.
+SAML waiver limits and the outbound OIDC hard release gate are unchanged.

@@ -72,6 +72,11 @@ export const guides = [
   },
   { source: "docs/guides/passwords.md", slug: "passwords", title: "Passwords" },
   {
+    source: "docs/guides/authentication-performance.md",
+    slug: "authentication-performance",
+    title: "Local authentication measurements",
+  },
+  {
     source: "docs/guides/password-recovery.md",
     slug: "password-recovery",
     title: "Password recovery",
