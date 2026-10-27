@@ -32,6 +32,9 @@ jobs:
           sudo apt-get install -y libssl-dev pkg-config cmake
       - name: Identify dependency cache environment
         id: cache-environment
+        env:
+          # Freeze source inputs before generated build trees exist; post-save reuses it.
+          DEPENDENCY_INPUT_HASH: ${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}
         run: |
           python3 - <<'PYTHON'
           import hashlib, os, subprocess
@@ -47,6 +50,7 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a") as output:
               if metadata is not None:
                   print("available=true", file=output)
+                  print("dependency-hash=" + os.environ["DEPENDENCY_INPUT_HASH"], file=output)
                   print("fingerprint=" + hashlib.sha256(metadata.encode()).hexdigest(), file=output)
               else:
                   print("available=false", file=output)
@@ -63,9 +67,9 @@ jobs:
             target/debug/build
             target/debug/deps
             ${{ runner.temp }}/easy-auth-security-tools
-          key: rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}-${{ github.sha }}
+          key: rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ steps.cache-environment.outputs.dependency-hash }}-${{ github.sha }}
           restore-keys: |
-            rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}-
+            rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ steps.cache-environment.outputs.dependency-hash }}-
       - run: python3 scripts/check_saml_source.py
       - run: python3 -m unittest scripts.test_saml_source
       - name: Verify default container build-context exclusion
