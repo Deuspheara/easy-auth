@@ -73,7 +73,7 @@ jobs:
       - run: python3 -m unittest scripts.test_supply_chain
       - name: Verify bounded benchmark accounting without load or provider credentials
         run: |
-          python3 -m unittest scripts.test_authentication_benchmark
+          python3 -m unittest scripts.test_authentication_benchmark scripts.test_authentication_http_benchmark
           cargo test --locked -p easy-auth-server --example authentication_benchmark
       - run: cargo fmt --all -- --check
       - run: cargo clippy --locked --workspace --all-targets -- -D warnings

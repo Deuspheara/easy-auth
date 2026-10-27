@@ -104,3 +104,47 @@ The [independent review plan](../security/independent-review-plan.md) records sc
 and evidence preparation; no reviewer is booked or contacted. AUTH-50 remains open
 for its complete evidence, prerequisite reconciliation and external scheduling.
 SAML waiver limits and the outbound OIDC hard release gate are unchanged.
+
+## Separate actual HTTP workload
+
+```sh
+python3 scripts/benchmark_authentication_http.py --output /tmp/easy-auth-http-benchmark-new
+```
+
+This separately builds the actual default-feature `easy-auth` executable with the
+same frozen optimized/build-tool-symbol settings. Each of three repetitions owns
+a fresh database and server process. Eight accounts complete genuine SMTP email
+proof and public password enrollment; no identity/session row is inserted by the
+harness. The development-only tiny corpus, password, cookies and private responses
+stay in RAM or private temporary inputs. Only synthetic data is used.
+
+Session workloads use concurrency one/two/eight and 32 attempts per worker for one
+shared session, independent owners and anonymous rejection. A separate eight-worker
+password workload makes four login attempts per owner. Eight enrollments plus 32
+login attempts reach the existing 40/source budget; each email remains below its
+10-attempt budget. Every received new credential must prove its actual owner
+outside the timed load. An extra source-budget refusal must leave counters
+unchanged, and saved-cookie logout replay must fail while another owner survives.
+The run refuses qualification if the actual fixed rate window changes.
+
+Requests use a new IPv4 loopback TCP connection each time. Client-observed latency
+includes connection/send/read, ending before JSON/ownership verification. Wall
+throughput includes closed-loop driver scheduling; refusals stay separate from
+successful responses. The fixed workload stops on transport loss, retains its
+partial counts, and cannot qualify; it never retries a lost credential completion.
+All response UUIDs and no-store headers are checked. Actual daemon log counts must
+match setup, measured, verification, readiness and control requests exactly, with
+unique server UUIDs and no known private fixture values.
+
+One fresh observer launches exactly one daemon and waits for owned shutdown, so
+OS lifetime peak RSS/CPU excludes cargo, the Python driver and Docker/PostgreSQL.
+It includes daemon startup, corpus, SMTP/notification work and all control requests.
+Raw logs are checked privately and removed; only their hash and aggregate counts
+enter receipts. Databases are dropped only after actual backend absence; owned
+messages, containers and exclusive volumes are removed and checked.
+
+This is local development HTTP, not TLS or production configuration. Connection
+churn, the Python driver, shared CPU, logging and Docker affect the numbers. It
+does not establish sustained/open-loop capacity, distributed abuse resistance,
+native/provider interoperability or production readiness. Original library numbers
+and controlled in-process cancellation tests keep their distinct source/scope.

@@ -37,6 +37,14 @@ implementation, runtime dependency or monitoring endpoint. The longer load runne
 keeps worker launch, shared start and complete result collection together; the
 fixture's ordered proof setup keeps synthetic capability ownership explicit.
 
+The same benchmark folder owns a separate actual-HTTP workflow: fixed socket I/O,
+closed-loop accounting, genuine SMTP/credential journeys, single-child daemon RSS,
+log cross-checks and owned lifetime composition stay in named modules. Frozen
+build policy was extracted separately before adding the executable selection.
+The longer ordered repetition keeps daemon shutdown, private-log checks and
+database cleanup together; no runtime auth/SQL policy, public hook or dependency
+is introduced. Handwritten modules remain below 200 lines.
+
 Website `scripts/search/` owns pinned asset-format validation, staged file output
 and the narrow Starlight writer adapter in separate modules. Tests separate bundle
 faults, real filesystem/readback/cleanup and hook preservation/native indexing;
