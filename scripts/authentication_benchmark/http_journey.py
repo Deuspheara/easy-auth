@@ -31,6 +31,7 @@ class Journey:
                 raise ValueError('enrollment replaced the actual owner incorrectly')
             self.owners.append({'user': user, 'cookie': cookie})
             self.private_values.append(cookie.partition('=')[2].encode())
+            self.private_values.extend(user[field].encode() for field in ('id', 'realm_id', 'email'))
 
     def sessions(self, reports):
         for concurrency in (1, 2, 8):

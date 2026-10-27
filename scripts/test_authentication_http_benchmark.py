@@ -71,6 +71,8 @@ class HttpEvidenceTests(unittest.TestCase):
         self.assertEqual(report['unique_generated_request_ids'], len(lines))
         for changed in (lines[:-1], lines + [lines[0]],
                         [lines[0].replace('response', 'timed_out'), *lines[1:]],
+                        [lines[0] + ' raw_token=unexpected', *lines[1:]],
+                        [*lines, 'unexpected diagnostic'],
                         [*lines, 'private-canary']):
             with self.assertRaises(ValueError):
                 summarize('\n'.join(changed).encode(), [b'private-canary'], result)
