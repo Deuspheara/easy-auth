@@ -94,9 +94,12 @@ No cookie, password, hash, email address, token or database URL is printed.
 
 This library workload does not measure HTTP/TLS ingress, real password-login
 transactions, distributed abuse, pool exhaustion, cancellation under live HTTP
-load, or sustained production behavior. Endpoint metrics and external ingress
-budgets need their own bounded-cardinality/privacy and adversarial verification;
-no monitoring endpoint or automatic policy tuning follows from these numbers.
+load, or sustained production behavior. Separate fixed-field
+[HTTP observations and resource-lifetime controls](http-observability.md) now
+record response/timeout/cancellation outcomes without request data; those handler
+tests are distinct from this earlier numeric benchmark. External ingress budgets,
+representative TCP/TLS load and production behavior still need qualification.
+No monitoring endpoint or automatic policy tuning follows from these numbers.
 The [independent review plan](../security/independent-review-plan.md) records scope
 and evidence preparation; no reviewer is booked or contacted. AUTH-50 remains open
 for its complete evidence, prerequisite reconciliation and external scheduling.

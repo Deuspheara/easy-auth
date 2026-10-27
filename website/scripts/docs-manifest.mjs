@@ -77,6 +77,11 @@ export const guides = [
     title: "Local authentication measurements",
   },
   {
+    source: "docs/guides/http-observability.md",
+    slug: "http-observability",
+    title: "HTTP observations and resource limits",
+  },
+  {
     source: "docs/guides/password-recovery.md",
     slug: "password-recovery",
     title: "Password recovery",

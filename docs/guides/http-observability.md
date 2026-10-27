@@ -40,7 +40,9 @@ Aggregate completion counts by the fixed event/completion categories and actual
 status. Build duration histograms from `duration_micros` with explicitly chosen
 buckets in the receiving system. Count cancellations separately; they have no
 response status and cannot be counted as successful responses. A 429 refusal is
-not successful authentication capacity. Keep the request UUID in logs for bounded
+not successful authentication capacity. Response counts describe HTTP completions,
+not successful sign-ins; a status alone establishes no identity or authentication
+authority. Keep the request UUID in logs for bounded
 retention/correlation, **never as a metric label**. Do not enrich metric labels
 with paths, identities, tokens or request-supplied values.
 
