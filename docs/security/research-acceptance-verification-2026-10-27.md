@@ -35,7 +35,9 @@ require the exact historical source in an isolated checkout with owned fixtures.
 The initial expectation that current probe bytes still matched was rejected;
 the producer checks were retained, rather than replacing their expected hashes.
 
-Run only these read-only checks to inspect the committed historical evidence:
+The verifier needs the producer Git object in the local checkout; it neither checks
+out old code nor starts services. Run these read-only checks to inspect the
+committed historical evidence:
 
 ```sh
 python3 benchmarks/adoption/verify_recorded.py
@@ -56,6 +58,43 @@ The original exact-head [hosted AUTH-5 run](https://github.com/Deuspheara/easy-a
 was freshly observed completed/success at published
 `3d644d4b209d1be757825edc2e7068bf6bff8325`; it is historical child evidence,
 not a hosted result for this branch.
+
+## Fresh validation
+
+Exact clean source `92a8a2a4ad9d7d2664a2666d1ecf2657bf4a2d32` passed:
+
+- `cargo fmt --all -- --check`.
+- `cargo clippy --locked --workspace --all-targets -- -D warnings` and the same
+  command with `--all-features`.
+- `cargo test --locked --workspace`: 171 passes; with `--all-features`: 1,197 reported
+  passes (1,196 primary plus the isolated logging child), zero failed/ignored.
+  The all-feature real-PostgreSQL lifecycle target passed 676 cases.
+- The existing benchmark example Rust control and five Python benchmark methods.
+- `python3 scripts/audit.py`: compiled advisory gate PASS, retaining the inactive
+  RSA 0.9.10 / RUSTSEC-2023-0071 lock entry. All-feature `cargo deny check` passed
+  advisories, bans, licenses and sources, retaining existing warnings.
+- The new stored-record verifier and existing summarizer. Copies with a mutated
+  producer hash or doubled throughput were both rejected. The advisory inventory
+  was compared with all collected public records/manifests: 52 identities, 74 ranges,
+  unchanged original fields, raw-response hashes and seven version/module IDs.
+  All 40 local Markdown links in the changed documents resolved after correcting
+  one draft deployment-document path.
+- Node 24 website formatting, 22 unit tests, type checking, build and genuine browser
+  checks: 36 routes / 581 anchors. The research inventory is repository documentation;
+  the website still publishes only its existing explicit public-guide allowlist.
+- Unchanged-policy Gitleaks scans of an exported committed source tree and the
+  AUTH-1 Git range: zero findings. An initial overbroad working-directory scan and
+  its diagnostic rerun exited 1 with 288 findings, all under ignored `target/` build
+  output and zero tracked paths. Their redacted reports remain local; no scanner
+  exception or policy relaxation was introduced and build artifacts are not pushed.
+
+Backend checks used newly owned disposable PostgreSQL/Mailpit on random loopback
+ports, no host mounts and exclusively owned anonymous volumes. Their exact
+containers and volumes were removed and absence verified. No historical competitor
+probe or retained application database was executed. All 73 protected original-file
+hashes, exact original changed-path set and empty original index were verified.
+This evidence-only follow-up changes no qualified executable/test/dependency/schema
+input. No new hosted result or deployment is inferred from local validation.
 
 ## Change scope and remaining gates
 
