@@ -18,6 +18,15 @@ function-size exceptions; no unrelated cleanup is deferred.
 
 # Code organization
 
+The owned authentication benchmark stays in the server's examples: bounded load
+measurement, existing password-service calls and session fixtures/transactions
+have named modules. Its Python runner separates resource ownership/builds,
+single-child RSS observation and receipt validation, reusing the existing exclusive
+service lifetime. It adds no application policy, public proof constructor, SQL
+implementation, runtime dependency or monitoring endpoint. The longer load runner
+keeps worker launch, shared start and complete result collection together; the
+fixture's ordered proof setup keeps synthetic capability ownership explicit.
+
 Website `scripts/search/` owns pinned asset-format validation, staged file output
 and the narrow Starlight writer adapter in separate modules. Tests separate bundle
 faults, real filesystem/readback/cleanup and hook preservation/native indexing;
