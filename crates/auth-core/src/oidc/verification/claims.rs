@@ -38,7 +38,7 @@ pub(super) struct Claims {
     #[serde(default, deserialize_with = "optional")]
     pub(super) email: Option<String>,
     #[serde(default, deserialize_with = "optional")]
-    pub(super) email_verified: Option<bool>,
+    email_verified: Option<super::claim_flags::EmailVerification>,
     #[cfg(feature = "oidc-identities")]
     #[serde(default, deserialize_with = "super::profile::attribute")]
     pub(super) name: Option<String>,
@@ -81,10 +81,8 @@ impl Claims {
         }
         self.validate_times(now_us)?;
         self.validate_audiences(expected.client, policy)?;
-        self.validate_attributes()?;
-        if self.iss != expected.issuer
-            || Secret::parse(self.nonce.clone())?.verifier() != expected.nonce.verifier()
-        {
+        self.validate_attributes(policy)?;
+        if self.iss != expected.issuer || !policy.nonce_matches(&self.nonce, expected.nonce) {
             return Err(Error::Unauthorized);
         }
         Ok(())
@@ -132,13 +130,27 @@ impl Claims {
         Ok(())
     }
 
-    fn validate_attributes(&self) -> Result<()> {
+    pub(super) fn email_verified(&self) -> bool {
+        self.email_verified
+            .as_ref()
+            .is_some_and(|flag| flag.verified())
+    }
+
+    pub(super) fn validate_email_flag_type(&self, apple: bool) -> Result<()> {
+        if let Some(flag) = &self.email_verified {
+            flag.validate(apple)?;
+        }
+        Ok(())
+    }
+
+    fn validate_attributes(&self, policy: &OidcVerificationPolicy) -> Result<()> {
+        self.validate_email_flag_type(policy.is_apple())?;
         if self.sub.is_empty()
             || self.sub.len() > MAX_SUBJECT_BYTES
             || !self.sub.is_ascii()
             || self.sub.chars().any(char::is_control)
             || self.email.as_ref().is_some_and(|value| {
-                value.is_empty()
+                (value.is_empty() && !policy.is_apple())
                     || value.len() > MAX_EMAIL_ATTRIBUTE_BYTES
                     || value.chars().any(char::is_control)
             })

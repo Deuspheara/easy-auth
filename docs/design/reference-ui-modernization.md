@@ -247,3 +247,41 @@ stub corrected the harness without changing controller assertions. The two expec
 pre-fix regression failures remain distinct from the passing final-source checks.
 Final logs use the local `/tmp/auth43-integration-` prefix. Hosted verification of
 the follow-up commit is separate and must be checked before integration.
+
+## Theme measurement correction — 2026-10-25
+
+Fresh isolated verification of merged `06312f5ca22f0519301f5ec021bb61dab3df2f63`
+found an account contrast-measurement race without optional screenshot capture.
+The account scenario read colors immediately after media emulation, before the
+theme handler and transitions settled. Genuine passkey requests succeeded;
+the initial run failed its session-heading contrast assertion. Reusing only the
+anonymous scenario's initial animation-batch wait still failed the badge check:
+an inherited child color transition remained running, measuring 4.467:1 before
+settling to 14.477:1. Both failed runs verified owned database/mail cleanup.
+
+A separate structural checkpoint extracts the existing anonymous theme selection
+into `tests/browser/reference-ui/theme.cjs`; all twelve real-page presentation
+cases pass after extraction. The correction reuses that selection in both account
+measurement loops and waits for subsequent running/pending native animations
+within the existing test timeout. It changes no contrast assertion, disables no
+animation and adds no fixed sleep or timeout increase. The full genuine UI journey
+then passes without screenshot capture, including native signup, management,
+same-owner verification, keyboard/reflow and inventory-invalidation checks, with
+zero external requests, page errors or CSP violations and normal owned cleanup.
+A separate full run with local masked screenshot capture enabled also passes,
+including the earlier account measurement loop; each final run removes its exact
+nineteen owned messages and disposable database. Captures remain local.
+
+The helper has one presentation-synchronization responsibility and is under
+twenty lines. Existing ordered scenario size exceptions remain; no unrelated
+cleanup is deferred. Production Rust, JavaScript, CSS, assets, APIs, schemas,
+dependencies and authentication policy are unchanged. Fresh baseline formatting,
+strict default/all-feature Clippy and sequential workspace suites pass: 128 default
+and 1,022 full-feature reports (one isolated child), including 181 HTTP and 596 real
+PostgreSQL cases. Source integrity, token drift, compiled advisory and cargo-deny
+checks also pass without advisory ignores. Local low-debug compilation initially
+hit a macOS SQLx macro-library LINKEDIT loader error; retaining build-dependency
+debug information resolved it without source changes.
+
+Hosted results are separate receipts; this
+correction alone establishes no hosted success, integration or production approval.

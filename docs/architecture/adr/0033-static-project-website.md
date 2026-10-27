@@ -53,3 +53,36 @@ Guides distinguish quickstart, complete Axum composition, a separate application
 Cargo example, same-origin browser usage, concepts, deployment and troubleshooting.
 The two full Rust example listings come from allowlisted committed source, keeping
 them tied to code compilation rather than hand-maintained pseudo-APIs.
+
+## Search writer completion (AUTH-60, 2026-10-27)
+
+An observed successful build emitted empty Pagefind runtime/entry files and failed
+real browser search. A bounded owned reproduction found3 incomplete outputs in12
+upstream writer/close runs. The pinned
+[Pagefind1.5.2 writer](https://github.com/Pagefind/pagefind/blob/v1.5.2/pagefind/src/output/mod.rs)
+awaits Tokio file writes without flushing; the Node close routine terminates its
+backend. [Tokio documents](https://docs.rs/tokio/latest/tokio/fs/struct.File.html)
+that pending file operations can outlive a file's scope without flush. The source
+and reproduction support a writer-shutdown race; this is not a disk-durability claim.
+
+Use Pagefind's documented [in-memory file API](https://pagefind.app/docs/node-api/)
+and Node-owned awaited writes instead. A small Astro integration adapter replaces
+only Starlight's writer hook, retaining every other hook and its normal UI/indexing
+configuration. It does not patch node_modules, disable search, upgrade dependencies,
+duplicate indexing or introduce a second search provider. Pagefind1.5.2 becomes an
+exact direct build dependency with no change to the resolved lockfile package set.
+Review this deliberate hook adaptation on future Starlight upgrades.
+
+Validate the complete response, fixed version/entry/language assets, compressed
+payloads and safe distinct paths before writing. Write into a fresh owned staging
+directory, await closes and compare every emitted file byte-for-byte before rename.
+Keep staging private until validation; normalize public file/directory modes to
+0644/0755 before publication, even under a restrictive umask.
+Missing/empty/altered/unexpected output, an existing destination or a write fault
+fails the build; remove only owned staging. This completion boundary needs neither
+sleep nor retry nor a new assertion waiver. Existing real browser controls stay
+required and additionally exercise selecting a result under the project base.
+
+The [verification record](../../security/website-search-verification-2026-10-27.md)
+records exact implementation revisions, root-cause evidence, failure controls,
+public permissions, Node24/26 browser qualification and unchanged backend gates.

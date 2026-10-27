@@ -1,4 +1,157 @@
-# Threat model — alpha design, before credential flows
+# Threat model — controls, evidence and recorded evolution
+
+HTTP request observations accept only server-generated request IDs, finite
+completion categories, actual response status and monotonic duration. No path,
+query, headers, body, source address or identity/credential metadata enters these
+events. Cancellation retains the original subscriber, has no fabricated HTTP
+status and proves neither rollback nor transport delivery. Request IDs are log
+correlation values, never metric labels. Existing KDF permits survive HTTP-future
+cancellation until their blocking jobs finish; no crypto or admission policy is
+weakened for telemetry or load tests. See [the event contract](../guides/http-observability.md).
+
+The incident recovery regression qualifies only explicit existing reductions with
+retained genuine authority. An older database snapshot can revive local sessions,
+native grants and disabled key configuration. Quarantine and a separately protected
+incident record remain mandatory; no automatic completeness/promotion decision is
+implemented. A cached public key still verifies an existing ID-token signature
+after local key disable. See the [incident procedure](../guides/incident-recovery.md).
+
+Explicit retention uses a trusted realm and deliberate audit/exhausted-notice
+horizons, never browser authority or an automatic startup task. Bounded category
+transactions explicitly select Read Committed even for differently configured
+embedded pools. Lock candidates, then recheck expiry and dependencies in a fresh
+statement; retained audit/grant/proof children prevent parent pruning. No parent
+cascade replaces the row limit. Live notification leases, full replay/cooldown
+caps, consumed recovery-code state and spent native generations through original
+family caps remain. Partial runs can commit earlier categories and must be safe
+to repeat. Expired Apple ciphertext is erased without claiming remote revocation.
+All durable key/configuration/identity state is excluded. Workspace/upgrade/security
+qualification remains in progress; [ADR0050](../architecture/adr/0050-bounded-realm-retention.md)
+does not replace incident revocation, backup/log retention or restored-snapshot
+reconciliation, and does not establish production or independent approval.
+
+Offline backup encryption uses explicitly prepared age commands and protected
+native recovery identities, with no plugin/agent/password fallback. Require a
+separately protected selected ciphertext digest and successful full-length
+authenticated decryption into a bounded private quarantine file before PostgreSQL
+receives bytes. Integrity does not establish the backup sender or choose the latest
+snapshot; trusted archives can execute SQL. Old snapshots can revive revoked
+sessions, deleted identities and pending side effects. Restored databases stay
+disconnected from runtime/workers pending incident/key/configuration reconciliation.
+This operator component establishes no automated promotion or production recovery
+guarantee; see [ADR0048](../architecture/adr/0048-encrypted-backup-quarantine.md).
+
+Separate schema/runtime database credentials limit runtime DDL and migration-history
+writes when operators provision the documented grants. Exact `verify` startup checks
+all embedded SQLx migration versions/checksums without DDL or insecure fallback;
+it cannot detect arbitrary manual schema drift or prove role permissions. Dedicated
+schema connections close on every completion/cancellation, with bounded server lock
+waits to avoid abandoned advisory waiters. Runtime auth DML remains privileged and
+must not be exposed as application SQL. Backup restoration, retention and incident
+qualification remain separate operational requirements; see
+[database roles](../guides/database-roles.md).
+
+The current control table and AUTH-47 evidence links below distinguish implemented
+checks from remaining acceptance. Detailed milestone notes retain their recorded
+stage: statements that a feature was absent or excluded are not a current feature
+inventory. Assurance limits remain open unless an explicit accepted decision
+supersedes them. In particular, ADR0032's SAML maintainer waiver supplies no
+independent security approval, and outbound OIDC remains a hard release gate.
+
+In-progress optional Apple capture retains credentials only after the same
+initiated response passes signed identity/nonce/source verification. Opaque
+mapped/capture types expose no raw-token upload or proof constructor. Atomic
+final completion encrypts against actual resolved realm/source/client/identity/
+grant binding; the provider client is inside the authenticated payload too.
+Missing vault, audit failure, source disable and original-cap expiry roll back
+local authority and capture together. Local unlink/account erasure queue encrypted
+jobs through a schema trigger; local user/contact/subject data is not copied into
+the ledger. Explicit workers claim finite source-scoped leases before network I/O,
+compare authenticated provider-client binding, reuse the protected signer and send
+only to fixed Apple HTTPS through the reviewed pinned/TLS adapter. Only empty200
+can produce an opaque confirmation. Final lease/version/time checks after waits
+prevent stale acknowledgment; lost responses retry after bounded backoff. Errors
+retain ciphertext with finite categories, never raw provider details. Explicit
+bounded realm maintenance erases expired unconfirmed ciphertext and later terminal
+metadata; it must be scheduled even without active source workers. No automatic
+TTL or real-provider qualification is established. Explicit Axum capture/link selection keeps matching concrete authorization and
+final commit services together; default builders still discard credentials.
+Missing protection cannot select fallback, and raw grants never reach HTTP output.
+Original cookies, purpose, Origin, cross-site delivery and local owner checks remain
+unchanged. Owned Chromium/PG checks now exercise both selected paths through local unlink,
+finite provider failure, actual backoff and confirmed erasure; a separately built
+capture/linking-disabled probe preserves ciphertext through ordinary repository
+account erasure. These checks use offline provider ports and establish no live
+Apple registration, OS delivery or provider revocation. A job or elapsed token lifetime never establishes remote revocation.
+
+Explicit social web linking requires trusted concrete selection, exact-Origin
+closed JSON and four independent host-only private Link cookies per provider.
+Displayed owner UUIDs only reject an unexpected session; original purpose/session
+proof and final core/PG checks confer authority. Google GET and Apple's state-only
+same-origin presentation hint cannot consume/exchange/mutate. Apple cross-site
+delivery remains cookie/storage-free. Unique state hints prevent ambiguous UI;
+callback-aware cancellation prevents stale pages clearing newer proof. Scripts
+remove/scrub returns, fence late responses across navigation/restoration, discard
+raw input before finish and never retry credential completion. Local unlink remains
+distinct from the explicitly selected background Apple grant revocation component.
+
+Explicit social linking uses a separate Link purpose and original fresh owner/
+session with a signed nonce-bound provider result; matching email/profile never
+selects a local owner. Default sign-in/deletion cannot consume a linking proof.
+Current target/source policy, exact subject uniqueness and earliest original caps
+are rechecked under locks after provider I/O and final writes. Explicit-linked
+storage permits only the existing mailbox policy's optional provider source;
+historical JIT records and passkey requirements gain no fallback. Local-only
+credential mutations still reject provider methods even with recent signed time.
+
+Unlink requires a genuinely fresh retained method and rejects removal of its own
+OIDC source. Reciprocal attempts serialize on owner and revalidate retained source
+after waits. Only removed-source sessions are revoked/detached; their historical
+method/revision/timestamps/audit rows remain. Detached source rows cannot be
+unrevoked or validated. Scoped cooldown blocks old verified callbacks from
+reattaching/JIT replacement. Link/unlink/audit/verified-local-contact notice enqueue
+commit atomically; notices use no provider recipient. Remote grant revocation,
+native linking, ordinary activation and real-provider qualification remain gated.
+See [ADR0044](../architecture/adr/0044-explicit-social-identity-linking.md).
+
+The optional Apple backend signs only fixed ES256 team/client/audience claims
+from one protected P-256 key with a finite operator window. Five-minute secrets
+are capped at key retirement; signing capacity remains owned through cancellation.
+No arbitrary signing endpoint, default key, retired-key fallback or raw diagnostic
+is exposed. Native library memory copies are not claimed erased.
+
+The explicit Apple profile fixes issuer/endpoints/Post authentication and RS256,
+retains private browser/state/nonce/provider-source/client/realm/revision and original caps,
+and requires an actually verified signed nonce after one-use code redemption.
+Its documented provider-specific wire contract does not pretend to offer S256;
+generic OIDC/Google retain that requirement. Native raw/SHA256-hex convention and
+web/native kind are immutable trusted composition, never inferred from a token or
+selected by a callback. Changing that policy requires trusted reconfiguration,
+a new revision and replacement services. A native code result is not proof of
+OS delivery; actual Authentication Services and registered-client checks remain.
+
+Only the Apple profile accepts exact signed boolean/text verification flags and
+missing/empty managed email. Generic/Google reject text at the original signed
+parsing stage. Unsigned initial names stay separate from identity/mapping, require
+text rendering and may disappear on later consent. No email matching, invented
+freshness, stronger-account fallback or local authority follows from presentation.
+A front-channel token cannot replace initiated backend code exchange. Final mapped
+identity/session commit still rechecks policy/subject/deadline under existing locks.
+
+No ordinary Apple startup or session-cookie policy is changed. Explicit `apple-web`
+uses one32KiB form-urlencoded cross-site handoff that reads no cookies/storage and
+cannot consume state, exchange tokens or commit a session. Escaped inert template
+data is removed immediately by fixed same-origin script; navigation/restoration
+and pre-finish discard prevent automatic repeat. A deliberate same-origin finish
+retains exact Origin/private Lax cookies/core verification and final atomic commit.
+Stale/malformed state cannot clear newer proof; callback cancel also checks its
+returned state. Any ambient session cookie prevents silent account replacement.
+Client IP keys committed abuse admission, not immutable identity. Owned browser
+fixtures exercise actual cross-site cookie omission and same-origin return; they
+establish no real Apple registration or OS behavior. Linking/deletion remain rejected
+by this sign-in component. Grant custody/revocation, real web/native acceptance
+and a usable account lifecycle remain required before activation. See
+[ADR0043](../architecture/adr/0043-apple-code-flow.md).
 
 The [reference UI](../architecture/adr/0042-reference-account-ui.md) consumes only
 selected-interface booleans and current account policy metadata. Compiled features,
@@ -97,27 +250,42 @@ recheck them again after network exchange. Account policy, external token signat
 nonce validation, final identity/session atomicity, reviewed egress and real-provider
 checks remain release gates. See [ADR 0013](../architecture/adr/0013-oauth-state-transactions.md).
 
+AUTH-47 tracks current execution, unperformed manual checks and remaining source review in the
+[protocol validation matrix](protocol-validation-matrix.md). Counts and existing
+corpora do not establish protocol compliance or independent approval. The
+[control-to-assertion review](threat-control-review.md) records the current source
+boundaries, concrete assertions and residual acceptance for every table row.
+
 Created 2026-10-18. Not a security audit. Assets: user identity, credential verifiers, active sessions, provider secrets/signing keys, email delivery and audit integrity. Actors: unauthenticated remote attacker, malicious browser origin, malicious configured/unconfigured IdP, compromised mailbox, compromised application/tenant, operator and stolen database/backup. Trust boundaries: browser/HTTP, core/persistence, outbound provider network, SMTP, configuration and application authorization.
 
 | Threat | Required control | Evidence/release gate |
 |---|---|---|
-| Email account takeover / enumeration | Browser-bound single-use high-entropy proof; generic start response; no email auto-link; email compromise acknowledged | Expiry, mismatch, enumeration-shape and replay tests; stronger methods later |
-| Login CSRF, CSRF, fixation | Exact Origin on every browser POST, HttpOnly host cookies, deliberate SameSite, fresh secret per authentication | Missing/null/wrong Origin, old cookie and duplicate-cookie tests |
+| Email account takeover / enumeration | Browser-bound single-use high-entropy proof; generic start response; no email auto-link; email compromise acknowledged | Expiry, mismatch, enumeration-shape and replay tests; mailbox compromise remains a risk and stronger-account policy refuses mailbox fallback |
+| Login CSRF, CSRF, fixation | Exact Origin on local session-changing browser POSTs, HttpOnly host cookies, deliberate SameSite and fresh secrets; separate non-authoritative cross-site handoffs and independently authenticated client-token endpoints | Missing/null/wrong Origin, old cookie and duplicate-cookie tests |
 | Session theft/replay | Only verifier in DB, idle+absolute expiry, DB validation, logout/revoke-all; TLS | DB expiry and immediate subsequent-request revocation tests; active bearer theft remains usable until revoked |
-| Refresh theft | Atomic rotation and family reuse detection; secure native storage | Native release blocked pending replay tests |
-| OAuth code injection/mix-up/state or nonce reuse | Connection+client+browser-bound expiring transaction, S256, issuer/nonce/audience/signature checks; atomic consume | M04/M05 wrong-state/nonce/issuer/audience/provider/replay corpus |
+| Refresh theft | Atomic rotation and family reuse detection; secure native storage | Core/real-PG reuse, concurrency, final-deadline and isolation tests exist; native OS/storage and release acceptance remain gated |
+| OAuth code injection/mix-up/state or nonce reuse | Connection+client+browser-bound expiring transaction, issuer/nonce/audience/signature checks and atomic consume; S256 for generic OIDC/Google, explicit fixed Apple code/nonce profile | M04/M05 wrong-state/nonce/issuer/audience/provider/replay corpus |
 | Open redirect | Exact registered redirect allowlist; never redirect to arbitrary user input | M07 invalid redirect tests |
 | Discovery/metadata SSRF | Explicit admin connections; HTTPS; DNS/IP/port allowlists, no redirects, bounded response, block private/link-local/metadata addresses unless explicit local test policy | M05 DNS rebinding/redirect/private-network tests |
-| SAML signature wrapping/XXE/replay | Reviewed XML/signature engine; use only verified content; reject DTD/external entities/duplicate IDs, pinned certs, correlation and all conditions | Hard M06 blocker until signed fixture and attack corpus passes |
-| RP/origin manipulation | Server-owned exact RP/origin, high-level webauthn-rs, UV, server-persisted single-use challenges | Core/PG/HTTP negatives and twenty Chromium virtual-authenticator registration/assertion cases; other browsers, real devices and stronger-account recovery remain gates |
+| SAML signature wrapping/XXE/replay | Pinned maintained XML/signature engine; use only verified content; reject DTD/external entities/duplicate IDs; pinned certificates, correlation and all conditions | Maintained source/negative/replay and owned Keycloak evidence; explicit opt-in follows ADR0032 maintainer waiver, with independent review still open |
+| RP/origin manipulation | Server-owned exact RP/origin, high-level webauthn-rs, UV, server-persisted single-use challenges | Core/PG/HTTP negatives and refreshed 31-case Chromium signup/authentication suite, four SMTP enrollment and nine recovery cases; physical devices, other browsers, ordinary activation and OS acceptance remain separate gates |
 | Unsafe linking / recovery downgrade | Fresh proof of both identities; no matching-email merge; last-credential and recovery policies; notifications/audit | M02/M03/M04 negative linking tests |
 | Tenant isolation / privilege escalation | Realm on every query/constraint; trusted router realm; no app membership/permissions in auth core | Cross-realm FK/query tests; app independently authorizes actions |
 | Brute force / spraying / mail abuse | Shared admission by realm+email and source IP; overall resource bounds; no trusted forwarded IP by default | Concurrent rate tests and load/retention plan |
 | Secret leakage / compromised config | Redacted errors/logging, secret types, bounded audit events, least-privilege roles, protected keys, no query tokens | Log review/secret scan; M09 rotation and incident drills |
-| Resource exhaustion | 8 KiB initial request bound, timeouts, bounded DB pool/SMTP and challenge admission | Oversize/timeout tests; M09 load evidence |
+| Resource exhaustion | Route-specific request limits, operation timeouts, bounded DB pool/SMTP and challenge admission; larger provider delivery/finish profiles are explicit and finite | Oversize/timeout tests; M09 load evidence |
 | Malicious connection disable/rollover race | Recheck connection status at commit; issuer/key binding; cert/key overlap policies | M05/M06/M07 concurrency and rollover tests |
 
 A database writer or compromised server can mint/change identities; verifier hashing protects against read-only database theft, not a compromised verifier. Mailbox-only authentication has limited assurance and must not serve as an invisible bypass for stronger credentials. A stolen live cookie is a bearer credential. In-flight requests may finish after revocation; critical application actions require domain-level authorization/transaction policies.
+
+## Recorded milestone boundaries and assurance limits
+
+The following notes preserve implementation evolution and the scope of each
+receipt. Later implementation does not retroactively broaden an earlier receipt.
+Use the current [validation matrix](protocol-validation-matrix.md), its bounded
+[control review](threat-control-review.md) and the explicitly linked ADRs for current
+execution and activation decisions. Unperformed provider/device/operational checks
+in these notes remain unperformed; this organization waives none of them.
 
 AUTH-53's [email-free identity design](../architecture/adr/0009-passkey-first-identity.md)
 now has optional core/PostgreSQL signup: pending-only identity allocation, separate

@@ -50,6 +50,31 @@ pub struct OidcTokenRequest {
     authorization: Option<Zeroizing<String>>,
 }
 impl OidcTokenRequest {
+    #[cfg(feature = "apple")]
+    pub(in crate::oidc) fn apple(
+        client: &str,
+        redirect: Option<&str>,
+        code: OidcAuthorizationCode,
+        authentication: OidcClientAuthentication,
+    ) -> Result<Self> {
+        let OidcClientAuthentication::ClientSecretPost(secret) = authentication else {
+            return Err(Error::InvalidInput);
+        };
+        let mut form = url::form_urlencoded::Serializer::new(String::new());
+        form.append_pair("grant_type", "authorization_code")
+            .append_pair("client_id", client)
+            .append_pair("client_secret", &secret.0)
+            .append_pair("code", &code.0);
+        if let Some(redirect) = redirect {
+            form.append_pair("redirect_uri", redirect);
+        }
+        // Apple's documented profile has no code_verifier input. The private
+        // operation still binds nonce/state/browser/source and cannot be replayed.
+        Ok(Self {
+            form: Zeroizing::new(form.finish()),
+            authorization: None,
+        })
+    }
     pub fn form(&self) -> &str {
         &self.form
     }

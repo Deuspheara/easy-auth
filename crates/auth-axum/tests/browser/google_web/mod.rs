@@ -4,6 +4,5 @@ mod contract;
 mod deletion;
 mod failures;
 mod lifecycle;
-#[path = "../../../../../tests/support/google/provider.rs"]
-mod provider;
+use crate::google_provider as provider;
 mod setup;

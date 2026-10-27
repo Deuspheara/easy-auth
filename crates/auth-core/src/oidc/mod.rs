@@ -1,4 +1,13 @@
+#[cfg(feature = "apple")]
+mod apple;
 mod documents;
+#[cfg(feature = "apple")]
+pub use apple::{
+    AppleAuthorization, AppleAuthorizationCompletion, AppleAuthorizationOutcome,
+    AppleAuthorizationRequest, AppleAuthorizationResponse, AppleAuthorizationStart,
+    AppleClientSecret, AppleClientSecretSigner, AppleClientType, AppleCodeExchange,
+    AppleInitialProfile, AppleNonceEncoding,
+};
 #[cfg(feature = "google")]
 mod google;
 #[cfg(feature = "google")]
@@ -9,6 +18,12 @@ pub use google::{
 };
 #[cfg(feature = "oidc-identities")]
 mod identities;
+#[cfg(all(feature = "apple", feature = "oidc-linking"))]
+pub use apple::AppleIdentityLinkAuthorization;
+#[cfg(all(feature = "google", feature = "oidc-linking"))]
+pub use google::GoogleIdentityLinkAuthorization;
+#[cfg(feature = "oidc-linking")]
+pub use identities::{OidcIdentityLinkRepository, OidcIdentityLinking};
 mod metadata;
 mod policy;
 mod ports;
@@ -48,4 +63,21 @@ pub use verification::{
 #[cfg(feature = "oidc-client")]
 pub use verification::{
     OidcClientCredential, OidcClientCredentials, OidcClientIdentity, OidcClientTokens,
+};
+
+#[cfg(feature = "apple-grants")]
+pub use apple::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};
+
+#[cfg(feature = "apple-grants")]
+pub use apple::{
+    AppleGrantAuthorization, AppleGrantAuthorizationCompletion, AppleGrantCapture,
+    AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
+    AppleVerifiedGrant,
+};
+
+#[cfg(feature = "apple-grants")]
+pub use apple::{
+    AppleGrantRevocationJob, AppleGrantRevocationRepository, AppleGrantRevoker,
+    AppleRevocationConfirmation, AppleRevocationFailure, AppleRevocationHttp,
+    AppleRevocationOutcome, AppleRevocationRequest, AppleRevocationResponse,
 };

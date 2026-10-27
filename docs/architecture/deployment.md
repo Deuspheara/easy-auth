@@ -1,5 +1,12 @@
 # Deployment design
 
+The [default container walkthrough](../guides/containers.md) uses committed public
+source, a nonroot distroless image and a separate disposable loopback stack. Probe
+its actual HTTP health/readiness externally; container-running is not readiness.
+The [backup guide](../guides/backups.md) and [client examples](../guides/minimal-clients.md)
+record their operational limits. [ADR0046](adr/0046-default-container-and-client-examples.md)
+preserves development bind/SMTP checks and the separate release gates.
+
 One auth-server process, PostgreSQL and a configurable SMTP relay. Compose development starts PostgreSQL and Mailpit with loopback-only ports and disposable development credentials. Production requires HTTPS at a trusted reverse proxy, private database access, SMTP TLS, persistent database backups and protected environment/file secrets. No Redis or Node runtime required.
 
 Start `easy-auth` without arguments after exporting configuration. `--help`/`-h`
@@ -7,6 +14,21 @@ and `--version`/`-V` print static information without configuration or database
 access. Extra or unsupported arguments fail with status 2 and omit their values.
 See [CLI setup diagnostics](../guides/server-cli.md); these options do not validate
 configuration or establish readiness.
+
+The [migration recovery/upgrade procedure](../guides/upgrades.md) uses a writer-drain
+window for DDL, fresh verified connections afterwards and separately qualified
+replica replacement on unchanged schema. Its actual owned37→38 rollback/recovery
+drill does not establish arbitrary mixed-version DDL, downgrade or production
+orchestration support. Restored snapshots remain quarantined pending incident
+reconciliation.
+
+`easy-auth migrate` is a separate one-shot administration command requiring only
+the migration role's private `DATABASE_URL`. Normal configured startup defaults to
+`AUTH_DATABASE_MIGRATIONS=run` for compatibility; separately migrated deployments
+can select exact `verify` with runtime credentials. Verification checks complete
+SQLx history/checksums before realm initialization and serving, without DDL or a
+migration fallback. Use the [role procedure](../guides/database-roles.md) for grants,
+timeouts, failure handling and the limits of this implementation evidence.
 
 Typed startup validation rejects production HTTP, public development HTTP, malformed public URLs and unsafe SMTP configuration. Bind loopback by default; proxy headers are not trusted to select origins, realms, secure cookies or identity. The configured public URL is authoritative. A production proxy must enforce body/time/connection limits and forward only the intended host; application limits also apply. Migration runs before readiness, fails closed, and must have backup/restore compatibility tests before a release.
 

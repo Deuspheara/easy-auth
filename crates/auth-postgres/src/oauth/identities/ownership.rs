@@ -1,12 +1,9 @@
-use crate::{
-    identity::{lock_provider_user, user_from_row},
-    unavailable,
-};
+#[cfg(not(feature = "oidc-linking"))]
+use crate::identity::lock_provider_user;
+use crate::{identity::user_from_row, unavailable};
 use auth_core::{Error, OidcJitPolicy, OidcMappedIdentity, Result, User};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
-
-const DELETED_SUBJECT_CLEANUP_BATCH: i64 = 32;
 
 pub(super) async fn resolve(
     tx: &mut Transaction<'_, Postgres>,
@@ -14,16 +11,15 @@ pub(super) async fn resolve(
 ) -> Result<(User, Uuid)> {
     let proof = mapped.identity();
     let c = proof.configuration();
-    // Canonical scoped hash is a serialization key, not authentication authority.
-    sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended(encode(auth_oidc_subject_key($1,$2,$3,$4,$5),'hex'),0))")
-        .bind(c.realm())
-        .bind(c.connection())
-        .bind(c.client())
-        .bind(c.issuer())
-        .bind(proof.subject())
-        .execute(&mut **tx)
-        .await
-        .map_err(unavailable)?;
+    super::subject::lock(
+        tx,
+        c.realm(),
+        c.connection(),
+        c.client(),
+        c.issuer(),
+        proof.subject(),
+    )
+    .await?;
     let existing: Option<(Uuid,Uuid,Option<String>)> = sqlx::query_as(r#"
         SELECT e.id,e.user_id,u.email FROM auth_oidc_identities e
         JOIN auth_users u ON u.realm_id=e.realm_id AND u.id=e.user_id
@@ -38,7 +34,11 @@ pub(super) async fn resolve(
         .await
         .map_err(unavailable)?;
     if let Some((identity, owner, email)) = existing {
+        #[cfg(not(feature = "oidc-linking"))]
         let user = lock_provider_user(tx, c.realm(), owner, email.as_deref()).await?;
+        #[cfg(feature = "oidc-linking")]
+        let user =
+            crate::identity::lock_user_snapshot(tx, c.realm(), owner, email.as_deref()).await?;
         let bound: Option<Uuid> = sqlx::query_scalar(
             r#"
             SELECT id FROM auth_oidc_identities
@@ -59,6 +59,17 @@ pub(super) async fn resolve(
         if bound != Some(identity) {
             return Err(Error::Unauthorized);
         }
+        #[cfg(feature = "oidc-linking")]
+        {
+            let linked:bool=sqlx::query_scalar("SELECT explicitly_linked FROM auth_oidc_identities WHERE realm_id=$1 AND id=$2 AND user_id=$3")
+                .bind(c.realm()).bind(identity).bind(owner).fetch_one(&mut **tx).await.map_err(unavailable)?;
+            if !user
+                .authentication_policy
+                .permits_session_method("oidc", linked)
+            {
+                return Err(Error::Unauthorized);
+            }
+        }
         // A vanished owner never falls through to JIT in an old callback.
         return Ok((user, identity));
     }
@@ -66,7 +77,7 @@ pub(super) async fn resolve(
         return Err(Error::Unauthorized);
     }
     let display_name = mapped.display_name().ok_or(Error::Unauthorized)?;
-    reject_deleted_subject(tx, mapped).await?;
+    super::subject::reject_deleted(tx, mapped).await?;
     let id = Uuid::new_v4();
     let row = sqlx::query(r#"
         INSERT INTO auth_users(realm_id,id,email,email_verified_at,display_name,authentication_policy)
@@ -92,44 +103,4 @@ pub(super) async fn resolve(
         .await
         .map_err(unavailable)?;
     Ok((user_from_row(c.realm(), &row)?, identity))
-}
-
-async fn reject_deleted_subject(
-    tx: &mut Transaction<'_, Postgres>,
-    mapped: &OidcMappedIdentity,
-) -> Result<()> {
-    let c = mapped.identity().configuration();
-    // Only a new-owner path prunes expired hashes, before acquiring any owner lock.
-    sqlx::query(
-        r#"
-        DELETE FROM auth_oidc_deleted_subjects WHERE ctid IN (
-          SELECT ctid FROM auth_oidc_deleted_subjects
-          WHERE realm_id=$1 AND blocked_until<=clock_timestamp()
-          ORDER BY blocked_until LIMIT $2 FOR UPDATE SKIP LOCKED)
-    "#,
-    )
-    .bind(c.realm())
-    .bind(DELETED_SUBJECT_CLEANUP_BATCH)
-    .execute(&mut **tx)
-    .await
-    .map_err(unavailable)?;
-    let blocked: bool = sqlx::query_scalar(
-        r#"
-        SELECT EXISTS(SELECT 1 FROM auth_oidc_deleted_subjects
-        WHERE realm_id=$1 AND subject_hash=auth_oidc_subject_key($1,$2,$3,$4,$5)
-          AND blocked_until>clock_timestamp())
-    "#,
-    )
-    .bind(c.realm())
-    .bind(c.connection())
-    .bind(c.client())
-    .bind(c.issuer())
-    .bind(mapped.identity().subject())
-    .fetch_one(&mut **tx)
-    .await
-    .map_err(unavailable)?;
-    if blocked {
-        return Err(Error::Unauthorized);
-    }
-    Ok(())
 }

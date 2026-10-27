@@ -2,8 +2,9 @@
 
 AUTH-19 provides optional account-bound and resident-credential sign-in through the
 shared core, PostgreSQL and an explicit Axum router. Ordinary embedded/server
-composition remains disabled while stronger-account management/recovery policy and
-passkey-first enrollment are unfinished. This is alpha functionality, not an audited
+composition remains disabled pending independent recovery review and required
+physical-device/other-browser acceptance. Experimental passkey-first enrollment,
+management and saved-code recovery are implemented. This is alpha functionality, not an audited
 identity service or an MFA/AAL compliance claim.
 
 Enable `easy-auth-axum/passkey-authentication`. Construct `PasskeyEnrollment` and
@@ -95,8 +96,11 @@ Session method provenance records real email/password/passkey proof and preserve
 unknown historical methods and rotation time/method. AUTH-53's initial account
 policy now rejects weak-method sessions and mailbox/password fallback for
 passkey-required users; fresh passkey session controls also work without email.
-Normal activation remains gated; email-free bootstrap and mailbox attachment are
-still AUTH-53 work, with full management/recovery in AUTH-20. See the
+Experimental email-free bootstrap and mailbox attachment are implemented in
+AUTH-53; see [passkey signup](passkey-signup.md) and
+[contact attachment](email-attachment.md). Normal activation remains gated by
+AUTH-20's recovery review and required device/browser acceptance; see
+[passkey management and recovery](passkey-management.md) and the
 [optional-mailbox guide](optional-mailbox.md).
 Other browsers, real devices/provider-backed passkeys and operational retention
 remain release work. See the [source review](../research/passkey-authentication.md)

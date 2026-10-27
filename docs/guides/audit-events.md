@@ -10,6 +10,8 @@ Both server compositions record the same committed lifecycle facts through the s
 | --- | --- | --- | --- |
 | `email_authenticated` | none | newly issued session | Verified bound mailbox proof committed |
 | `oidc_authenticated` | none | newly issued session | Optional verified provider proof, current policy and scoped identity resolution/session committed together; no claims, email, tokens or raw subject in audit |
+| `oidc_identity_linked` | original fresh owner session | none | Optional purpose-bound signed provider proof attached to the exact owner; `oidc_identity_id` is the public target UUID |
+| `oidc_identity_unlinked` | fresh retained-method session | none | Exact owned identity removed and its sessions revoked/detached; the confirming factor remains |
 | `password_authenticated` | none | newly issued session | Password verification and exact stored-credential recheck committed |
 | `password_enrolled` | fresh initiating session | replacement session | First credential enrollment and rotation committed |
 | `passkey_enrolled` | fresh initiating session | none | Optional core/PostgreSQL registration verified, state consumed and unique credential inserted; no new authenticated session |
@@ -32,6 +34,16 @@ A live subject's user and session references must share the event's realm and ow
 There are no passwords/PHC strings, bearer values/verifiers, mailbox addresses, reset/browser proofs, IP/user agents, arbitrary request context or provider claims in these rows. Rejected HTTP fields do not become audit context. Notifications keep their separately documented delivery recipient and retry state; they are not arbitrary audit payloads.
 
 ## Deletion and upgrades
+
+Migration0037 adds nullable public `oidc_identity_id` metadata and the closed
+linked/unlinked version1 shapes. Only these live facts may carry the target; an
+active-identity foreign key would prevent unlinking, so the locked owning
+transaction establishes target ownership. Actor ownership keeps its existing
+composite foreign key. A deidentification trigger clears newer identity metadata
+even when feature-disabled erasure statements know only older columns. Unlink
+retains revoked historical session rows and their original OIDC provenance so
+audit references remain valid; it never rewrites them as local authentication or
+erases unrelated account history. Detached rows cannot be unrevoked or authenticate.
 
 Deleting an account sets its old events' `subject_erased=true` and removes user, actor-session affected-session and passkey/claim-target references. The original kinds/times remain, followed by a subject-free deletion event. Other users and realms keep their attribution. This deidentifies the live store; timing, backups, previously exported data and delivered mail have separate privacy/retention policies.
 

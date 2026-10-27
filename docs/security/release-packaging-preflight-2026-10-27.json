@@ -1,0 +1,159 @@
+{
+  "source": "c4d0fe9bd263b31ef946d4aeb36d41c1a9914cff",
+  "results": [
+    {
+      "package": "easy-auth-core",
+      "mode": "list",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-core",
+        "--list"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\n",
+      "listed_files": 313,
+      "listing_sha256": "ff511c55575c26911d640bfe4fa20e9419ed652284f4a198d523e0a3f1824459",
+      "own_license_texts_included": false,
+      "sql_files": 0
+    },
+    {
+      "package": "easy-auth-core",
+      "mode": "archive",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-core",
+        "--no-verify"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\n   Packaging easy-auth-core v0.1.0-alpha.1 (SOURCE_EXPORT/crates/auth-core)\n    Packaged 313 files, 899.2KiB (194.1KiB compressed)\n"
+    },
+    {
+      "package": "easy-auth-postgres",
+      "mode": "list",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-postgres",
+        "--list"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\n",
+      "listed_files": 593,
+      "listing_sha256": "6e02b5014bd097ccedf506cf55136ef311c9a3ee2a0c56bd999cb02b114e349d",
+      "own_license_texts_included": false,
+      "sql_files": 39
+    },
+    {
+      "package": "easy-auth-postgres",
+      "mode": "archive",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-postgres",
+        "--no-verify"
+      ],
+      "exit_code": 101,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\nerror: failed to verify manifest at `SOURCE_EXPORT/crates/auth-postgres/Cargo.toml`\n\nCaused by:\n  all dependencies must have a version requirement specified when packaging.\n  dependency `easy-auth-core` does not specify a version\n  Note: The packaged dependency will use the version from crates.io,\n  the `path` specification will be removed from the dependency declaration.\n"
+    },
+    {
+      "package": "easy-auth-axum",
+      "mode": "list",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-axum",
+        "--list"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\n",
+      "listed_files": 437,
+      "listing_sha256": "bee57df7f606683b533270973c4185ac7265c3725b0d0ab82aad9fcd169647b9",
+      "own_license_texts_included": false,
+      "sql_files": 0
+    },
+    {
+      "package": "easy-auth-axum",
+      "mode": "archive",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-axum",
+        "--no-verify"
+      ],
+      "exit_code": 101,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\nerror: failed to verify manifest at `SOURCE_EXPORT/crates/auth-axum/Cargo.toml`\n\nCaused by:\n  all dependencies must have a version requirement specified when packaging.\n  dependency `easy-auth-core` does not specify a version\n  Note: The packaged dependency will use the version from crates.io,\n  the `path` specification will be removed from the dependency declaration.\n"
+    },
+    {
+      "package": "easy-auth-server",
+      "mode": "list",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-server",
+        "--list"
+      ],
+      "exit_code": 0,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\n",
+      "listed_files": 152,
+      "listing_sha256": "65bc91c9a5feef3a56f60ce06b16a55cc1ba07b4821875a747206ca67e997d1d",
+      "own_license_texts_included": false,
+      "sql_files": 0
+    },
+    {
+      "package": "easy-auth-server",
+      "mode": "archive",
+      "command": [
+        "cargo",
+        "package",
+        "--offline",
+        "--locked",
+        "-p",
+        "easy-auth-server",
+        "--no-verify"
+      ],
+      "exit_code": 101,
+      "stderr": "warning: manifest has no description, documentation, homepage or repository\n  |\n  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info\nerror: failed to verify manifest at `SOURCE_EXPORT/apps/auth-server/Cargo.toml`\n\nCaused by:\n  all dependencies must have a version requirement specified when packaging.\n  dependency `easy-auth-axum` does not specify a version\n  Note: The packaged dependency will use the version from crates.io,\n  the `path` specification will be removed from the dependency declaration.\n"
+    }
+  ],
+  "audit_kind": "offline source packaging preflight; no build verification or publication",
+  "cargo_version": "cargo 1.95.0 (f2d3ce0bd 2026-03-21) (Homebrew)",
+  "core_archive": {
+    "sha256": "a383663d627d7e6dabc1b8ebe35905b506be8d5047f27899275787bb9be32f10",
+    "files": 313,
+    "normalized_manifest_sha256": "9e8f51a304b3b64b1d21e7f39c5b44ba0f237e2361f3bbfcc7035ac581135bca",
+    "normalized_saml_dependency": {
+      "version": "=0.6.1",
+      "optional": true,
+      "default-features": false
+    },
+    "publish": false,
+    "readme": false
+  },
+  "build_verified": false,
+  "registry_resolution_verified": false,
+  "published": false,
+  "release_gate_cleared": false
+}

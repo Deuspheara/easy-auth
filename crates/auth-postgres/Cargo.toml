@@ -20,7 +20,10 @@ saml-verification = ["saml-certificates", "auth-core/saml-verification"]
 saml-certificates = ["saml-requests", "auth-core/saml-certificates"]
 saml-requests = ["auth-core/saml-requests"]
 google = ["oidc-identities", "auth-core/google"]
+apple-grants = ["apple", "oidc-linking", "auth-core/apple-grants"]
+apple = ["oidc-identities", "auth-core/apple"]
 oidc-identities = ["oidc-verification", "auth-core/oidc-identities"]
+oidc-linking = ["oidc-identities", "auth-core/oidc-linking"]
 oidc-verification = ["oidc-egress", "auth-core/oidc-verification"]
 oidc-egress = ["oauth-transactions", "auth-core/oidc-egress"]
 oauth-transactions = ["auth-core/oauth-transactions"]
@@ -32,12 +35,12 @@ auth-core.workspace = true
 async-trait.workspace = true
 sqlx.workspace = true
 uuid.workspace = true
+tokio.workspace = true
 
 [dev-dependencies]
 saml-rs.workspace = true
 openssl.workspace = true
 josekit.workspace = true
-tokio.workspace = true
 webauthn-authenticator-rs = { version = "=0.5.5", default-features = false, features = ["softtoken"] }
 url.workspace = true
 serde_json.workspace = true

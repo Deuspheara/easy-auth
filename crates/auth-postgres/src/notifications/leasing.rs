@@ -39,6 +39,7 @@ impl Postgres {
         .map_err(unavailable)?;
         row.map(|row| {
             let kind = match row.get::<String, _>("kind").as_str() {
+                "providers_changed" => SecurityNoticeKind::ProvidersChanged,
                 "passkey_recovery_completed" => SecurityNoticeKind::PasskeyRecoveryCompleted,
                 "passkey_recovery_started" => SecurityNoticeKind::PasskeyRecoveryStarted,
                 "passkey_recovery_cancelled" => SecurityNoticeKind::PasskeyRecoveryCancelled,

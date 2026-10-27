@@ -1,5 +1,264 @@
 # HTTP contract v1
 
+## Request observations
+
+Selected authentication boundaries retain fresh server UUID `x-request-id` headers
+and emit fixed request-ID/status completion events with monotonic microsecond
+duration and response/timeout classification. Dropped boundary futures emit a
+separate cancellation observation without a fabricated HTTP status, through their
+original subscriber. No path/query/header/body/identity/credential data is logged
+by these observations. Duration ends at boundary response production, not body or
+network delivery; cancellation is not transaction-undo or retry authority. No
+metrics endpoint or authentication policy changes. The exact event contract and
+bounded aggregation are in the [HTTP observability guide](../guides/http-observability.md).
+
+## Trusted retention administration
+
+`auth_core::run_retention` and `RetentionRepository::retain_batch` provide explicit
+realm maintenance, not an HTTP endpoint or an authentication/application permission.
+`RetentionPolicy` requires independent audit/exhausted-notice horizons: `keep`, or
+a validated positive whole-second age. The PostgreSQL adapter performs finite
+64-row categories using explicit Read Committed, candidate row locks and a fresh
+reference/expiry check before deletion. Categories commit independently; failures
+can follow earlier commits. Retained audit/proof/grant children pin their parents.
+Durable identities, credentials, consumed recovery-code state and issuer/provider
+keys/configuration are excluded. Apple expiry/lease/terminal effects remain distinct.
+
+The executable's `easy-auth retention` and server library's `retain_database`
+compose that same core policy from protected `DATABASE_URL`, non-nil `AUTH_REALM_ID`
+and required `AUTH_RETENTION_AUDIT`/`AUTH_RETENTION_NOTICES`. Exact current schema
+verification precedes mutation, with no DDL/provisioning/startup fallback. Output
+contains only fixed category names and scalar effects. No listener/SMTP/provider
+composition, new wire schema or credential output is introduced. Bounded local operational
+qualification is recorded; [retention](../guides/retention.md) defines the command,
+limits, notification exception and embedding boundary.
+
+## Incident recovery boundaries
+
+Incident recovery composes the existing genuine-owner session revocation,
+matching-client/credential-possession native-family revocation and trusted
+realm/issuer key-disable operations. It adds no HTTP administration route, public
+proof constructor, automatic incident replay or restored-database promotion API.
+An old snapshot can revive authority until separately recorded reductions are
+reapplied. Offline signed tokens/cached keys and downstream sessions remain outside
+local revocation. The [incident procedure](../guides/incident-recovery.md) records
+these distinct authority requirements and quarantine/promotion limits.
+
+## Database administration boundary
+
+`Postgres::migrate` and `Postgres::verify_schema` remain adapter administration
+operations, with no HTTP route. The server library's `migrate_database` and executable
+`easy-auth migrate` require only a privately supplied `DATABASE_URL`, apply SQLx
+migrations and exit. Shared configured runtime composition accepts exact
+`AUTH_DATABASE_MIGRATIONS=run|verify`, default `run`; verification never applies DDL
+or falls back to migration. Missing/dirty/future/checksum-mismatched history fails
+closed. Auth wire schemas, realm scope and public credential handling are unchanged.
+See [database roles](../guides/database-roles.md) for privilege and recovery limits.
+
+## Experimental social linking web transport
+
+Explicit Axum `social-linking-web`, `SocialWebServices` and
+`experimental_social_web_router` compose one base router with matching existing
+Google/Apple web services and separate link authorizations. Same realm, HTTPS,
+exact existing callbacks and all source/profile checks remain mandatory. Compiling
+the feature does not enable linking in ordinary or separate provider builders.
+The [selected schema](openapi-social-web.json) and
+[guide](../guides/social-linking.md) specify the integration boundary.
+
+| Exact-Origin JSON POST | Closed body | Success |
+| --- | --- | --- |
+| `/v1/account/google-link/start`, `/v1/account/apple-link/start` | `expected_owner`, `confirmation="link this account"` | 200 public authorization URL and four independent protected Link cookies |
+| `/v1/account/google-link/finish` | actual raw `query`, same confirmation | 204 after atomic link; current session retained |
+| `/v1/account/apple-link/finish` | actual raw `response` form, same confirmation | 204 after atomic link; current session retained |
+| `/v1/account/google-link/cancel`, `/v1/account/apple-link/cancel` | optional returned public `state`; absent deliberately selects current | 204 original bound cancellation; current session retained |
+| `/v1/account/providers/oidc/unlink` | `expected_owner`, `identity`, `confirmation="unlink this account"` | 204 owned identity removal using a fresh retained method; no remote grant revocation |
+
+`expected_owner` is a deny-only check against the trusted current session, never an
+owner selector. The original Link purpose binds owner/session through final commit.
+Unknown query/body members, absent/duplicate/tampered private cookies, wrong purpose,
+changed source/session, stale original caps or conflicting subject ownership fail
+closed. A stale returned state cannot clear newer proof cookies. Logout clears all
+five Google/Apple sign-in/deletion/link proof sets. No mutation issues a session.
+
+`/social/accounts` is a fixed read/confirmation page using normal session/inventory
+reads. Google GET return selects link UI only under trusted explicit composition
+and unique matching protected state. Apple cross-site delivery remains cookie/
+storage/DB-free. Its same-origin POST `/v1/apple/return-operation` takes only `{state}`
+and returns a fixed `sign_in` or explicitly selected `link_identity` presentation
+hint, with no database, exchange, consume or mutation. Default Apple composition
+can select only sign-in. Unknown/ambiguous state returns401 without clearing proof.
+The default Apple schema includes the finite selected-composition enum; this is
+not authority or activation. Scripts drop raw returns before finish and on
+navigation/restoration; no storage, raw rendering or automatic finish retry.
+
+## Optional Rust Apple grant capture (in progress)
+
+Core/PostgreSQL `apple-grants` adds explicit `AppleGrantAuthorization::sign_in` and
+`::linking`, separate from default credential-discarding Apple operations. Link
+registration remains web-only. Begin/cancel/callback admission reuse original
+purpose/private proof/exact return/one-use state/source/deadline checks.
+Completion returns opaque `AppleVerifiedGrant` only after the same response's
+Apple signature/nonce/issuer/audience/source checks pass. Unsigned profile never
+selects an owner. There is no raw-token upload or public proof constructor.
+
+`grant.map(&policy)` consumes the result into `AppleMappedGrant`.
+`AppleGrantSignIn::finish` generates a local session only after final repository
+commit; `AppleGrantLinking::finish` retains the original owner/session and issues
+no session. `AppleGrantRepository` extends shared identity/link transactions with
+atomic encrypted capture. Select explicit protected `AppleGrantVault` on the
+PostgreSQL adapter using `with_apple_grant_vault`; missing configuration returns
+Unavailable and rolls back all local authority. Compiling the feature changes
+neither the normal Apple router nor its selected services.
+
+Axum `apple-grants-web` supplies explicit
+`AppleWebServices::new_with_grants(policy,transactions,exchange,sign_in)` using
+`AppleGrantSignIn`. Together with `social-linking-web`,
+`SocialWebServices::new_with_apple_grants` selects the matching Apple transactions,
+exchange and `AppleGrantLinking`, retaining ordinary Google and local unlink
+services. Source/policy/realm and web-only registration checks apply at construction.
+The existing `new` builders still discard credentials even with capture compiled.
+The selected grant services require the same protected PostgreSQL vault at final
+commit; absence returns503 without a normal-flow fallback.
+
+No HTTP route, body, public token field or browser script is added. The selected
+flows retain original Origin, private cookies, purpose, state-only presentation,
+cross-site handoff, explicit confirmation and one-use callback checks. Grant data
+stays behind signed proof and atomic encryption; a successful finish never returns
+provider credentials. Local unlink queues every captured grant atomically and
+returns before provider I/O. Selecting these services schedules no worker or
+maintenance; operators must explicitly compose both.
+
+The repository-only `into_parts` boundary exposes a mapped proof and opaque
+`AppleGrantCapture`, never a raw credential. Its `seal(binding,vault)` requires
+the same realm/source/client. The transaction supplies the identity actually
+resolved under existing locks. Authenticated storage binding includes realm/
+source/client/identity/grant; the encrypted payload also binds the exact provider
+client string. Refresh tokens are preferred. Access-only capture requires a
+positive bounded lifetime conservatively anchored before redemption; this is
+not authentication freshness or an extended proof/session lifetime.
+
+Migration0038 stores only encrypted credentials. A storage trigger moves every
+captured grant into pending revocation atomically on unlink/deletion, including
+ordinary account deletion with no vault selected. Existing freshness, audit
+erasure and session isolation still apply. Jobs retain opaque binding/source IDs,
+not local user/contact/subject columns. Pending eligibility is capped at604800
+elapsed seconds, independent of database timezone; this is not automatic erasure
+or confirmed remote revocation. Explicit maintenance is required; this timestamp
+is not a database TTL.
+
+Trusted `rotate_apple_grant_key(realm,grant_id)` rewraps active/pending/failed rows
+under the configured current storage key using a row lock and version CAS. It
+skips busy/leased/finished rows, preserves binding/deadlines, changes no provider
+token and claims no remote success. Retain explicit old reading keys until
+migration completes; missing keys never select fallback. See
+[ADR0045](adr/0045-apple-grant-custody-and-revocation.md). Owned genuine Chromium-to-worker qualification now covers both selected capture
+paths, local unlink, provider failure, actual backoff/erasure and ordinary account
+erasure in a separately compiled capture/linking-disabled probe. This is offline
+provider fixture evidence; real-provider/production acceptance remains pending.
+
+`AppleGrantRevoker::new` selects one immutable Apple source, the shared protected
+`Arc<AppleClientSecretSigner>`, vault, repository and checked HTTPS adapters.
+`run_once()` claims one eligible job before network I/O. The PostgreSQL claim has
+an exclusive60-second lease/version and at most8 attempts. An expired lease can
+be reclaimed; stale workers cannot acknowledge or reschedule its replacement.
+The30-second attempt decrypts against the stored binding, compares the encrypted
+provider client, issues a fresh client secret and resolves only
+`https://appleid.apple.com/auth/revoke`. Disabling sign-in does not discard pending
+revocation or reenable authentication. No user/session lock spans network I/O.
+
+`AppleRevocationHttp` receives a protected, redacted form request, never an uploaded
+ID token or a caller-selected endpoint. Server `apple-grants` selects the existing
+`OidcHttps` implementation with normal certificate/hostname verification, checked
+address pinning and shared bounded operations. It uses no proxy, redirect, cookie,
+automatic retry or raw diagnostics. Its dedicated16KiB response profile permits
+an absent Content-Type only for actually empty200; ordinary OIDC responses still
+require their original JSON profile. Core accepts only empty200 as confirmation;
+nonempty200 and400 invalid_grant do not become success. Errors retain finite
+transport/provider/configuration/unavailable categories.
+
+Only an opaque worker-created `AppleRevocationConfirmation` can request repository
+completion. Exact realm/source/client/job/lease/version and authoritative clock
+checks after row/write waits precede commit. Confirmed completion erases ciphertext
+and key ID. Failure retains ciphertext and schedules capped exponential backoff
+starting at30 seconds; exhausting8 attempts remains a visible failed state. A lost
+successful response can be retried idempotently after backoff; no local session is
+created, refreshed or revoked by this worker.
+
+Trusted `maintain_apple_grants(realm)` processes at most64 rows per phase with
+`SKIP LOCKED`: erase expired pending/leased/failed ciphertext, classify exhausted
+expired leases, then remove terminal metadata after another604800 elapsed seconds.
+It returns the number expired, not the number confirmed. Claims invoke maintenance
+for their realm; an operator must also schedule it for inactive sources/realms and
+repeat bounded batches as necessary. Without invocation no automatic purge occurs.
+Normal startup does not schedule or select this component.
+
+## Optional Rust social identity mutation
+
+Core/PostgreSQL `oidc-linking` exposes `OidcIdentityLinking` and the
+`OidcIdentityLinkRepository` port. Explicit `AppleIdentityLinkAuthorization` and
+`GoogleIdentityLinkAuthorization` retain original private web operation proof and
+only accept linking purpose; default sign-in/deletion components still reject it.
+Google's selected ordinary/session-age profile remains explicit and requests fixed
+account selection without inventing freshness. Apple native kind and Google desktop
+loopback linking are rejected; OS delivery remains unimplemented.
+
+`finish(mapped,current_session)` consumes the mapped link proof and requires its
+original session/owner, current source/policy, uniqueness and original deadlines.
+It returns public `LinkedProvider` metadata only; no local session or policy change.
+Duplicate/conflicting ownership, including same-owner repeat, is Unauthorized
+without exposing another owner. `unlink(realm,current_session,identity_uuid)`
+requires fresh retained-method authority and rejects removal of the caller's own
+OIDC source. Cross-owner/realm UUIDs are not authority. Identity mutation, scoped
+cooldown, finite audit and existing verified-contact notice enqueue are atomic.
+The delivery port's additive `providers_changed` hook must be implemented by custom
+adapters selecting this feature; its default reports Unavailable and leaves retry
+work rather than claiming delivery. Existing SMTP implements a fixed non-secret notice.
+See [ADR0044](adr/0044-explicit-social-identity-linking.md).
+
+The optional Rust Apple boundary exposes `AppleClientSecretSigner`,
+`AppleCodeExchange` and `AppleAuthorization` behind core/PostgreSQL `apple`.
+Preparation returns private proof separately from public web/native request
+inputs. Strict form decoding is untrusted; completion requires the retained
+operation/private proof and actual trusted dedicated backend return. Success
+returns the existing opaque verified identity, with unsigned first-consent profile
+separate; mapping/final session commit retain existing contracts. No ordinary
+Apple startup or `AUTH_APPLE_*` setting is added. Native OS delivery is unimplemented. See the
+[Apple guide](../guides/apple-setup.md) and [ADR0043](adr/0043-apple-code-flow.md).
+
+## Experimental Apple web transport
+
+Axum `apple-web` exposes only explicit `AppleWebServices` and
+`experimental_apple_web_router` composition. Persisted realm, web-only client kind
+and exact trusted HTTPS origin plus `/apple/callback` must match. The selected
+[Apple OpenAPI](openapi-apple-web.json) is served at `/openapi.json`; ordinary
+and unrelated provider contracts contain none of these operations.
+
+| Route | Input / result |
+| --- | --- |
+| POST `/v1/apple/sign-in/start` | Closed JSON `{}`; `200 {authorization_url}` plus four private operation cookies |
+| POST `/apple/callback` | Actual form-urlencoded body, at most32KiB; escaped inert HTML handoff only, no cookies/storage/consume/exchange/session |
+| POST `/v1/apple/sign-in/finish` | Closed JSON `{response:string}` holding the actual raw form; `204` session cookie only after verified mapping and atomic commit |
+| POST `/v1/apple/sign-in/cancel` | Closed JSON `{state?:string}`; callback pages supply returned public state, standalone sign-in page deliberately cancels current pending proof; `204`, existing session retained |
+| GET `/apple/sign-in` | Fixed deliberate sign-in page; no query proof import |
+
+Start/finish/cancel require one exact trusted Origin and reject unknown queries or
+JSON fields. Start and finish reject any ambient session cookie, including invalid
+ones. Four independent `__Host-auth-apple-signin-{browser,state,nonce,pkce}` cookies
+are Secure, HttpOnly, Path=/, SameSite=Lax and Max-Age300, with no Domain. The `pkce`
+name retains the existing private operation-proof field; it advertises no Apple
+S256 wire support. Logout/session-clear responses also clear these proofs.
+
+Delivery is the sole cross-site exception. It validates form syntax but cannot
+authenticate Apple. Fixed `/apple/client.js` removes the inert return from DOM,
+retains it only in transient memory and requires a deliberate confirmation. Finish
+discards the payload before submission; navigation/restoration discards it without
+retry. Raw return data never enters URLs, browser storage or diagnostics. Malformed
+or mismatched-state finish/cancel cannot clear a newer operation. Successful
+state matching still requires all private/core/provider/current-policy checks.
+Client IP supplies committed abuse admission, not IP-pinned identity. Unsigned
+initial profile is ignored by local mapping. Real registered Apple/device tests,
+ordinary activation and provider-grant lifecycle remain gated.
+
 Current SAML activation policy: [ADR0032](adr/0032-saml-maintainer-directed-activation.md) permits explicitly configured
 normal SAML by maintainer direction, waiving independent review. Default-off,
 trusted persisted configuration and every protocol/security check remain required.

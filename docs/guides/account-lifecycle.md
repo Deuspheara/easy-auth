@@ -49,3 +49,25 @@ python3 scripts/smoke.py --embedded --lifecycle
 The script creates only disposable synthetic accounts, checks actual SMTP confirmations/notices, stable identity across email change, old-session rejection, password continuity and confirmed deletion. PostgreSQL tests cover competing address changes, scope/binding/expiry, rollback, cleanup, audit deidentification and migration from the prior schema. See [ADR 0005](../architecture/adr/0005-account-lifecycle.md) and the [OWASP authentication baseline](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#changing-a-users-registered-email-address).
 
 Audit deidentification also removes actor/affected-session references introduced by migration 0006. User/session/audit mutations and the deletion notice remain one transaction; [audit semantics](audit-events.md).
+
+## Experimental Apple capture and pending revocation
+
+When explicitly selecting the in-progress Rust `apple-grants` component, captured
+provider credentials are stored encrypted and separately from local account data.
+Ordinary account deletion still performs its fresh-authority checks and audit
+subject erasure without requiring an active vault or waiting for Apple. A schema
+trigger detaches captured grants into pending jobs instead of cascading away the
+material needed for revocation. Jobs retain only protected credentials and minimal
+opaque source/binding IDs; they do not copy the local user/contact/provider-subject
+columns. Local deletion is not confirmed remote revocation. Explicit Rust workers
+can now revoke queued grants with leased retries and finite failure states.
+Schedule `maintain_apple_grants(realm)` for every configured realm: after604800
+elapsed seconds it erases unconfirmed ciphertext, and after another604800 seconds
+removes terminal metadata, in bounded batches. Expiry is not remote success;
+pending eligibility alone does not delete ciphertext. Explicit Axum capture/link selection now queues these jobs through the same local
+lifecycle. Owned browser-to-worker checks and a separate capture/linking-disabled erasure
+probe verify protected queue preservation and eventual fixture confirmation.
+Real Apple verification remains pending; see the
+[verification record](../security/apple-grant-revocation-verification-2026-10-25.md). See the [Apple guide](apple-setup.md) and
+[ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md). Existing
+normal server startup does not select this component.

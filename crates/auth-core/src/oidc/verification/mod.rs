@@ -1,3 +1,4 @@
+mod claim_flags;
 mod claims;
 mod exchange;
 mod flow;

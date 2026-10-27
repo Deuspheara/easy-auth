@@ -72,7 +72,17 @@ pub(super) async fn read(
     response: reqwest::Response,
     addresses: &[SocketAddr],
 ) -> Result<OidcHttpResponse, Failure> {
-    read_statuses(response, addresses, &[200]).await
+    read_profile(
+        response,
+        addresses,
+        Profile {
+            statuses: &[200],
+            max_bytes: MAX_OIDC_DOCUMENT_BYTES,
+            allow_empty200: false,
+            allow_jwk_type: true,
+        },
+    )
+    .await
 }
 
 #[cfg(any(feature = "oidc-verification", feature = "oidc-client"))]
@@ -80,13 +90,31 @@ pub(super) async fn read_token(
     response: reqwest::Response,
     addresses: &[SocketAddr],
 ) -> Result<OidcHttpResponse, Failure> {
-    read_statuses(response, addresses, &[200, 400, 401]).await
+    read_profile(
+        response,
+        addresses,
+        Profile {
+            statuses: &[200, 400, 401],
+            max_bytes: MAX_OIDC_DOCUMENT_BYTES,
+            allow_empty200: false,
+            allow_jwk_type: true,
+        },
+    )
+    .await
 }
 
-async fn read_statuses(
+// Trusted wire profiles are selected by concrete adapters, never by a request.
+pub(super) struct Profile {
+    pub statuses: &'static [u16],
+    pub max_bytes: usize,
+    pub allow_empty200: bool,
+    pub allow_jwk_type: bool,
+}
+
+pub(super) async fn read_profile(
     mut response: reqwest::Response,
     addresses: &[SocketAddr],
-    statuses: &[u16],
+    profile: Profile,
 ) -> Result<OidcHttpResponse, Failure> {
     let received = tokio::time::Instant::now();
     if !response
@@ -96,7 +124,7 @@ async fn read_statuses(
         return Err(Failure::Peer);
     }
     let status = response.status().as_u16();
-    if !statuses.contains(&status) {
+    if !profile.statuses.contains(&status) {
         return Err(Failure::Status);
     }
     if response
@@ -108,20 +136,29 @@ async fn read_statuses(
     {
         return Err(Failure::Headers);
     }
-    if response.headers().get_all(CONTENT_TYPE).iter().count() != 1 {
+    let type_count = response.headers().get_all(CONTENT_TYPE).iter().count();
+    // Only the dedicated revocation profile permits an absent Content-Type,
+    // and only for an actually empty200. Documents/token responses stay JSON.
+    let optional_type = profile.allow_empty200 && status == 200;
+    if type_count > 1 || (type_count == 0 && !optional_type) {
         return Err(Failure::ContentType);
     }
     let content_type = response
         .headers()
         .get(CONTENT_TYPE)
-        .and_then(|value| value.to_str().ok())
-        .ok_or(Failure::ContentType)?
-        .to_owned();
-    let mime = content_type.split(';').next().unwrap_or("").trim();
-    if !mime.eq_ignore_ascii_case("application/json")
-        && !mime.eq_ignore_ascii_case("application/jwk-set+json")
-    {
-        return Err(Failure::ContentType);
+        .map(|v| {
+            v.to_str()
+                .map(str::to_owned)
+                .map_err(|_| Failure::ContentType)
+        })
+        .transpose()?;
+    if let Some(value) = &content_type {
+        let mime = value.split(';').next().unwrap_or("").trim();
+        if !mime.eq_ignore_ascii_case("application/json")
+            && (!profile.allow_jwk_type || !mime.eq_ignore_ascii_case("application/jwk-set+json"))
+        {
+            return Err(Failure::ContentType);
+        }
     }
     if response.headers().get_all(CONTENT_ENCODING).iter().count() > 1 {
         return Err(Failure::Encoding);
@@ -138,21 +175,24 @@ async fn read_statuses(
     }
     if response
         .content_length()
-        .is_some_and(|length| length > MAX_OIDC_DOCUMENT_BYTES as u64)
+        .is_some_and(|length| length > profile.max_bytes as u64)
     {
         return Err(Failure::Size);
     }
     let cache_seconds = cache_headers::seconds(response.headers());
     let mut body = Vec::new();
     while let Some(chunk) = response.chunk().await.map_err(network)? {
-        if chunk.len() > MAX_OIDC_DOCUMENT_BYTES - body.len() {
+        if chunk.len() > profile.max_bytes - body.len() {
             return Err(Failure::Size);
         }
         body.extend_from_slice(&chunk);
     }
+    if content_type.is_none() && !body.is_empty() {
+        return Err(Failure::ContentType);
+    }
     Ok(OidcHttpResponse {
         status,
-        content_type: Some(content_type),
+        content_type,
         content_encoding,
         body,
         cache_seconds: std::time::Duration::from_secs(cache_seconds)

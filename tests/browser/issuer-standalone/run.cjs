@@ -12,6 +12,7 @@ const {client}=require('../issuer-web/client.cjs');
 const {mailbox}=require('./mail.cjs');
 const cases=require('./cases.cjs');
 const loopback=require('../issuer-native/listener.cjs');
+const {standardsClient}=require('./standards/client.cjs');
 const root=path.resolve(__dirname,'../../..');
 async function mode(mode,browser) {
   const directory=fs.mkdtempSync(path.join(os.tmpdir(),'easy-auth-issuer-parity-'));
@@ -29,6 +30,8 @@ async function mode(mode,browser) {
     fixture.readyValue=await fixture.ready;
     proxy.connect('http://'+fixture.readyValue.application_address);
     fixture.createClient=()=>client(proxy.origin,fs.readFileSync(path.join(directory,'fixture.pem')));
+    fixture.createStandardsClient=()=>standardsClient(proxy.origin,
+      fs.readFileSync(path.join(directory,'fixture.pem')),fixture.readyValue.client_id);
     fixture.activateRotation=async()=>{
       const response=await fixture.command('activate_rotation');
       proxy.connect('http://'+response.application_address);

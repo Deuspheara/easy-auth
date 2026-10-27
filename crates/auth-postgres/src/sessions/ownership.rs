@@ -1,7 +1,7 @@
 use crate::locking::lock_email;
 use crate::unavailable;
 use auth_core::{Error, Result, Verifier};
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{PgExecutor, Postgres, Transaction};
 use uuid::Uuid;
 
 /// Snapshot only selects the lock path; it does not authorize an operation.
@@ -11,7 +11,11 @@ pub(super) struct Owner {
 }
 
 impl Owner {
-    pub(super) async fn load(pool: &PgPool, realm: Uuid, current: Verifier) -> Result<Self> {
+    pub(super) async fn load(
+        executor: impl PgExecutor<'_>,
+        realm: Uuid,
+        current: Verifier,
+    ) -> Result<Self> {
         let (user, email) = sqlx::query_as(
             r#"
             SELECT u.id,u.email FROM auth_users u
@@ -21,7 +25,7 @@ impl Owner {
         )
         .bind(realm)
         .bind(current.as_slice())
-        .fetch_optional(pool)
+        .fetch_optional(executor)
         .await
         .map_err(unavailable)?
         .ok_or(Error::Unauthorized)?;

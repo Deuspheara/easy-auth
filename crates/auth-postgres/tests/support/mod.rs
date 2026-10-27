@@ -7,7 +7,7 @@ pub(crate) mod legacy_attribution;
 pub(crate) mod legacy_oauth;
 #[path = "../../../../tests/support/postgres/linked_providers.rs"]
 pub(crate) mod linked_provider_records;
-#[cfg(any(feature = "saml-identities", feature = "google"))]
+#[cfg(any(feature = "saml-identities", feature = "google", feature = "apple"))]
 #[path = "../../../../tests/support/postgres/observation.rs"]
 pub(crate) mod observation;
 pub(crate) mod schema;
@@ -56,10 +56,10 @@ pub(crate) async fn reset_proof(store: &Postgres, realm: Uuid, email: &str) -> (
     (token, browser)
 }
 
-#[cfg(not(any(feature = "saml-identities", feature = "google")))]
+#[cfg(not(any(feature = "saml-identities", feature = "google", feature = "apple")))]
 #[path = "../../../../tests/support/postgres/locks.rs"]
 pub(crate) mod lock_observation;
-#[cfg(any(feature = "saml-identities", feature = "google"))]
+#[cfg(any(feature = "saml-identities", feature = "google", feature = "apple"))]
 pub(crate) use observation as lock_observation;
 
 #[cfg(feature = "issuer-signing")]

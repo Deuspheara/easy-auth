@@ -10,6 +10,12 @@ pub(crate) async fn record(
     realm: Uuid,
     event: AuditEvent,
 ) -> Result<()> {
+    if let Some(identity) = event.oidc_identity_id() {
+        sqlx::query("INSERT INTO auth_audit(realm_id,user_id,kind,schema_version,actor_session_id,oidc_identity_id,occurred_at) VALUES($1,$2,$3,1,$4,$5,clock_timestamp())")
+            .bind(realm).bind(event.user_id()).bind(event.kind()).bind(event.actor_session_id()).bind(identity)
+            .execute(&mut **tx).await.map_err(unavailable)?;
+        return Ok(());
+    }
     #[cfg(feature = "issuer-native-refresh")]
     if let Some(fact) = event.native_credential() {
         sqlx::query("INSERT INTO auth_audit(realm_id,user_id,kind,schema_version,issuer_client_id,issuer_authorization_id,issuer_family_id,issuer_generation,issuer_credential_kind,occurred_at) VALUES ($1,$2,$3,1,$4,$5,$6,$7,$8,clock_timestamp())")

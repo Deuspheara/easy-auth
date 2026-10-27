@@ -1,5 +1,5 @@
 use crate::{locking::fresh_session, unavailable};
-use auth_core::{Error, Result, Verifier};
+use auth_core::{AuthenticationPolicy, Error, Result, Verifier};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
@@ -12,6 +12,24 @@ pub(super) enum Source {
 }
 
 impl Source {
+    pub(super) async fn permits_policy(
+        &self,
+        tx: &mut Transaction<'_, Postgres>,
+        realm: Uuid,
+        owner: Uuid,
+        policy: AuthenticationPolicy,
+    ) -> Result<bool> {
+        let explicitly_linked = match self {
+            #[cfg(all(feature = "oidc-identities", feature = "oidc-linking"))]
+            Self::Oidc(source) if policy == AuthenticationPolicy::Mailbox => {
+                source.explicitly_linked(tx, realm, owner).await?
+            }
+            _ => false,
+        };
+        // Non-linking builds never grant mailbox authority from a provider row.
+        let _ = (tx, realm, owner);
+        Ok(policy.permits_session_method(self.method(), explicitly_linked))
+    }
     pub(super) async fn lock(
         tx: &mut Transaction<'_, Postgres>,
         realm: Uuid,

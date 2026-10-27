@@ -1,4 +1,8 @@
+#[cfg(feature = "apple-web")]
+mod apple;
 mod cookies;
+#[cfg(feature = "apple-web")]
+pub use apple::{AppleWebServices, apple_web_openapi, experimental_apple_web_router};
 mod deletion;
 #[cfg(feature = "google-web")]
 mod google;
@@ -20,3 +24,8 @@ pub use web::{OidcWebServices, oidc_web_openapi, oidc_web_router};
     any(feature = "saml-web", feature = "issuer-native-web")
 ))]
 pub(crate) use web::{attach, clear_proofs};
+
+#[cfg(feature = "social-linking-web")]
+mod social;
+#[cfg(feature = "social-linking-web")]
+pub use social::{SocialWebServices, experimental_social_web_router, social_web_openapi};

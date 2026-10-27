@@ -60,7 +60,7 @@ pub(crate) fn clear_auth_cookies(browser: &BrowserConfig) -> Response {
     response
 }
 
-#[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+#[cfg(any(feature = "oidc-web", feature = "saml-web", feature = "apple-web"))]
 pub(crate) fn require_anonymous(
     config: &BrowserConfig,
     headers: &HeaderMap,

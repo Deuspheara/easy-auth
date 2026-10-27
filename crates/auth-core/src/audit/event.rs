@@ -4,6 +4,16 @@ use uuid::Uuid;
 /// Only the repository transaction that commits a verified operation records its event.
 #[derive(Debug)]
 pub enum AuditEvent {
+    OidcIdentityLinked {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+        identity_id: Uuid,
+    },
+    OidcIdentityUnlinked {
+        user_id: Uuid,
+        actor_session_id: Uuid,
+        identity_id: Uuid,
+    },
     IssuerNativeCredential(super::IssuerNativeCredentialEvent),
     IssuerAuthorized {
         user_id: Uuid,

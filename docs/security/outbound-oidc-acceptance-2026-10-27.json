@@ -1,0 +1,491 @@
+{
+  "recorded_at": "2026-10-27T03:57:53.786603+00:00",
+  "source": "538b2bb82cf1615dbb37401a5b37befcdf51bbc5",
+  "source_tree": "d7ef0beae06477b0d8f548edbf406799b6a5b00f",
+  "scope": "AUTH-36 bounded local third-party RP and existing issuer qualification; no independent security approval, certification or production acceptance",
+  "release_gate_cleared": false,
+  "ticket_status": "In Progress",
+  "profiles": [
+    {
+      "profile": "consent",
+      "summary": {
+        "passed": 8,
+        "database_removed": true,
+        "private_tls_files_removed": true
+      },
+      "duration_seconds": 3.798193,
+      "log_sha256": "24dd32b4b0f356f639969c3dd5dfb860bc066c9ee7428b3e13f4066612a2683d",
+      "binaries": [
+        {
+          "artifact": "target/debug/examples/issuer-consent-browser",
+          "sha256": "2b60932b57f0c18f7839a28216e1f0b924995e045df1b2ddced9a03cf7fdb81d"
+        }
+      ]
+    },
+    {
+      "profile": "signed-web",
+      "summary": {
+        "passed": 3,
+        "database_removed": true,
+        "private_tls_files_removed": true
+      },
+      "duration_seconds": 1.633118,
+      "log_sha256": "73f5e3f744f39c0666fc236d4e332f67ad14ba96ac7fd6486754004e7160d945",
+      "binaries": [
+        {
+          "artifact": "target/debug/examples/issuer-web-browser",
+          "sha256": "7b3a6720fef98342a07185b83e687a5b4e187f628c235da28e9606e9795d70ed"
+        }
+      ]
+    },
+    {
+      "profile": "native",
+      "summary": {
+        "passed": 6,
+        "database_removed": true,
+        "private_tls_files_removed": true
+      },
+      "duration_seconds": 1.978034,
+      "log_sha256": "369258cecc8d5da57b7afa84f48b747cd3884c4de5f48aa6a7678a91157df653",
+      "binaries": [
+        {
+          "artifact": "target/debug/examples/issuer-web-browser",
+          "sha256": "b5fde5ab9a49a6ffba8e1a3a615a31611ae8737aa1c337b4efeb28b7c6c2ce6f"
+        }
+      ]
+    },
+    {
+      "profile": "parity-rollover",
+      "summary": {
+        "standalone": {
+          "behavior": {
+            "smtp_signin": true,
+            "node_production_token": true,
+            "code_replay_rejected": true,
+            "access_is_not_local_session": true,
+            "sdk_verified": true,
+            "bound_denial_without_post": true,
+            "native_sdk_verified": true,
+            "native_rotated": true,
+            "logout_blocks_refresh": true,
+            "browser_privacy": true,
+            "logout": true,
+            "standards_rp_verified": true,
+            "standards_rp_wrong_state_no_post": true,
+            "ordinary_rollover_verified": true,
+            "old_key_overlap_verified": true,
+            "independent_audience_denial": true,
+            "sdk_before_after_rotation": true,
+            "standards_rp_rollover_verified": true
+          },
+          "database_removed": true,
+          "mail_removed": true,
+          "private_files_removed": true
+        },
+        "embedded": {
+          "behavior": {
+            "smtp_signin": true,
+            "node_production_token": true,
+            "code_replay_rejected": true,
+            "access_is_not_local_session": true,
+            "sdk_verified": true,
+            "bound_denial_without_post": true,
+            "native_sdk_verified": true,
+            "native_rotated": true,
+            "logout_blocks_refresh": true,
+            "browser_privacy": true,
+            "logout": true,
+            "standards_rp_verified": true,
+            "standards_rp_wrong_state_no_post": true,
+            "ordinary_rollover_verified": true,
+            "old_key_overlap_verified": true,
+            "independent_audience_denial": true,
+            "sdk_before_after_rotation": true,
+            "standards_rp_rollover_verified": true
+          },
+          "database_removed": true,
+          "mail_removed": true,
+          "private_files_removed": true
+        },
+        "parity": true
+      },
+      "duration_seconds": 611.737919,
+      "log_sha256": "faa66b912b2233e24d2e1efe614b30462ffe4b687b90b383d81a7fb523be5ddc",
+      "binaries": [
+        {
+          "artifact": "target/debug/examples/issuer-client-acceptance",
+          "sha256": "2611959514a3957c56588fe624fab4499ac1f7ef000e99480734183de08313de"
+        },
+        {
+          "artifact": "target/debug/easy-auth",
+          "sha256": "30b2cddb2b8bd8b07f4054259ef11014132872a6919b611d881904439da5e7dc"
+        }
+      ]
+    }
+  ],
+  "fixture_images": {
+    "postgres": "sha256:25a89970a83255ae96484d709005bb35aa71f7455f941bc1634514f31c5d5c62",
+    "mail": "sha256:32a9262f9b8b7cc97130cddf9d17fb3f467cafa622e4427fb2159fe7282b3cad"
+  },
+  "owned_databases_remaining": 0,
+  "owned_mail_remaining": 0,
+  "owned_services_and_volumes_removed": true,
+  "test_toolchain": {
+    "node": "24.22.1",
+    "rustc": "1.95.0",
+    "cargo": "1.95.0"
+  },
+  "third_party_test_dependencies": [
+    {
+      "package": "openid-client",
+      "version": "6.8.8",
+      "license": "MIT",
+      "integrity": "sha512-ZsucJA5Ad04Uv7YN4ql+s4GXNmb9uAYQwyJTsJx7CH/MX3JZioLE2pVKi1SC+YrbSLA4Px3Gi30dMjgOZtb6pA==",
+      "resolved": "https://registry.npmjs.org/openid-client/-/openid-client-6.8.8.tgz",
+      "license_sha256": "14c5cc0dc21f44add6d88a5621c65813d40bf382550c978430096db3df0cf68c"
+    },
+    {
+      "package": "jose",
+      "version": "6.2.13",
+      "license": "MIT",
+      "integrity": "sha512-7TIg10ZE1x82YediN+lcrPNvGMKge9yFHQD+Qho/b8y2adfugU3AsvvHfxV0fzyFllT6l9xCjf4RWY9g/Z9PJQ==",
+      "resolved": "https://registry.npmjs.org/jose/-/jose-6.2.13.tgz",
+      "license_sha256": "8078b0829d6c3e9ecde2f003e1966e4cad3efc6e7a640efbab0313cc166b1af1"
+    },
+    {
+      "package": "oauth4webapi",
+      "version": "3.8.8",
+      "license": "MIT",
+      "integrity": "sha512-8N28E+a/oxfXWBgOMt+ZP/JUf/XR+IFbvkAEPP3gznXOMv9BpAAwiIj0TFNz3tGTPc0ZQ8zmWBNgN1nAys0gng==",
+      "resolved": "https://registry.npmjs.org/oauth4webapi/-/oauth4webapi-3.8.8.tgz",
+      "license_sha256": "81e7b4b0196e8caa43cf243131512e5e4ab04fc312623335e783abae6ff46d79"
+    }
+  ],
+  "browser_npm_audit_vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "owned_fetch_guard_test_methods": 3,
+  "maintained_saml_source": {
+    "files": 245,
+    "patches": 11,
+    "existing_python_methods_passed": 11,
+    "independent_approval_claimed": false
+  },
+  "workspace_gates": [
+    {
+      "check": "fmt",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "benchmark-python",
+      "exit_code": 0,
+      "log_sha256": "6273232de4d3ef7acd4ecafa5c86beeeb974f56586b21089a2990b3f72facbe6"
+    },
+    {
+      "check": "benchmark-rust",
+      "exit_code": 0,
+      "log_sha256": "10c8ddc11ddbd5995eede528d7f5bf659e16fe5aee8fe593b6acae439c920539"
+    },
+    {
+      "check": "clippy-default",
+      "exit_code": 0,
+      "log_sha256": "703e7eca104f790350e17d972e1a99183de1c7b70c586dad54684bf0b710ec76"
+    },
+    {
+      "check": "clippy-all",
+      "exit_code": 0,
+      "log_sha256": "148008a3dc2c6b75a26c1aeb8523e537a1b87f96be0df0e649a3ed5d2efd948f"
+    },
+    {
+      "check": "test-default",
+      "exit_code": 0,
+      "log_sha256": "361fc0f17865c32c37f6fdc243f1e8fe054c56bbe09e04c4d02b8a99cf335e8d",
+      "reported_passes": 171,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "check": "test-all",
+      "exit_code": 0,
+      "log_sha256": "0caab829f2aa8f2ad478628b0c9f8ca1f0288e09760f014e1438925ae0c02231",
+      "reported_passes": 1197,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "check": "audit",
+      "exit_code": 0,
+      "log_sha256": "1b1fe4bcc03c48d56ad2ffc8435b6bf8291bbdc575f465a577d0595f84354297"
+    },
+    {
+      "check": "deny",
+      "exit_code": 0,
+      "log_sha256": "76d436c08508b21923cbb854811cfa4aba7fe301e98c6754cd2b5245a1182677"
+    }
+  ],
+  "all_feature_pass_accounting": {
+    "primary": 1196,
+    "isolated_logging_child": 1,
+    "reported_total": 1197,
+    "postgres_lifecycle": 676
+  },
+  "historical_hosted_observations": [
+    {
+      "issues": [
+        "AUTH-37"
+      ],
+      "run_id": 40098314216,
+      "head_sha": "b7a2ed2d76b7f3c8013e798c51901a84b9a636b8",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/40098314216",
+      "status": "completed",
+      "conclusion": "success",
+      "exact_head_matches": true
+    },
+    {
+      "issues": [
+        "AUTH-38",
+        "AUTH-39"
+      ],
+      "run_id": 39998025108,
+      "head_sha": "5857080af57e60dc3669becbadb4fe85ec487501",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39998025108",
+      "status": "completed",
+      "conclusion": "success",
+      "exact_head_matches": true
+    },
+    {
+      "issues": [
+        "AUTH-40"
+      ],
+      "run_id": 40042731872,
+      "head_sha": "099ab82c328b4b5c70b7cc75f5b4da938be64668",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/40042731872",
+      "status": "completed",
+      "conclusion": "success",
+      "exact_head_matches": true
+    },
+    {
+      "issues": [
+        "AUTH-41"
+      ],
+      "run_id": 40093478194,
+      "head_sha": "adada6eda34ca693baa68e1c1516cdd837a5a054",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/40093478194",
+      "status": "completed",
+      "conclusion": "success",
+      "exact_head_matches": true
+    },
+    {
+      "issues": [
+        "AUTH-32 activation; assurance remains open"
+      ],
+      "run_id": 39930343186,
+      "head_sha": "b791875dc45e283528a42c749509736eb2200f71",
+      "url": "https://github.com/Deuspheara/easy-auth/actions/runs/39930343186",
+      "status": "completed",
+      "conclusion": "success",
+      "exact_head_matches": true
+    }
+  ],
+  "current_source_hosted_result_claimed": false,
+  "retained_driver_failure": {
+    "source": "4aa9688765ade3417188086c4ec3f764b6f0059a",
+    "overall_result": "failed",
+    "category": "TypeError",
+    "profiles_completed": 4,
+    "services_removed": true,
+    "cause": "enclosing Mailpit check attempted JSON decoding of an already-decoded dictionary",
+    "correction": "require the actual decoded-dictionary/zero-message contract; rerun all profiles and enclosing checks using separate new owned services and receipt"
+  },
+  "limitations": [
+    "The new third-party profile is public web code/S256/RS256; it is not a full OP certification suite or third-party confidential/native compatibility matrix.",
+    "Owned TLS/address trust and browser certificate tolerance are fixture-only; public-DNS/system-root production acceptance remains unperformed.",
+    "OS vaults, physical devices, real-provider registration, independent security review and production operations are unperformed.",
+    "Earlier native fixture teardown does not prove graceful runtime shutdown.",
+    "SAML ADR0032 supplies no independent approval or outbound waiver; the outbound hard release gate remains open."
+  ],
+  "binary_digest_provenance": {
+    "qualified_parity_binaries_rebuilt_with_identical_hashes": true,
+    "scanner_metadata_shape": "explicit artifact/sha256 rows; no artifact-name JSON keys",
+    "scanner_rules_changed": false
+  },
+  "source_sbom_refresh": {
+    "source": "1fcb748c0e822d3dcd05ed34b3e395465b8d9ae8",
+    "recorded_at": "2026-10-27T04:23:53.735359+00:00",
+    "source_inventory_sha256": "60526d34b2bebb19417f94a03022932726c4c881b7c8a5ddc01f5fd20fec5241",
+    "source_sbom_summary_sha256": "aabed515469922f3407a91876aaf560b19d35b25fc8a915b2bd23868e4e0bff7",
+    "helper_test_methods_passed": 19,
+    "cargo_source_inventory": [
+      {
+        "manifest": "Cargo.toml",
+        "metadata_packages": 403,
+        "selected_all_target_feature_refs": 380,
+        "resolver_only_refs": 23
+      },
+      {
+        "manifest": "examples/clients/rust/Cargo.toml",
+        "metadata_packages": 155,
+        "selected_all_target_feature_refs": 127,
+        "resolver_only_refs": 28
+      }
+    ],
+    "npm_source_inventory": [
+      {
+        "lockfile": "website/package-lock.json",
+        "package_locations": 529,
+        "missing_license_declarations": 0,
+        "lock_sha256": "aef57d5e341110fc1c3e210222cde909e2f48029d34c0444f51c703153f00911"
+      },
+      {
+        "lockfile": "tools/reference-ui/package-lock.json",
+        "package_locations": 33,
+        "missing_license_declarations": 0,
+        "lock_sha256": "db1721bcccd4f052ba44b3021a3fea92e670d42e2338efd8fdf53c6dd07a97cc"
+      },
+      {
+        "lockfile": "tests/browser/passkeys/package-lock.json",
+        "package_locations": 5,
+        "missing_license_declarations": 0,
+        "lock_sha256": "effa1ed628662343cebc9e4658974c95f64b181ec1ab8bf9fd132b69ff61beda"
+      }
+    ],
+    "source_sbom_profiles": [
+      {
+        "profile": "default",
+        "sboms": 4,
+        "selected_normal_build_packages": 213,
+        "observed_source_package_identities": 246,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 33
+      },
+      {
+        "profile": "saml",
+        "sboms": 4,
+        "selected_normal_build_packages": 332,
+        "observed_source_package_identities": 354,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 22
+      },
+      {
+        "profile": "all-features",
+        "sboms": 4,
+        "selected_normal_build_packages": 368,
+        "observed_source_package_identities": 388,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 20
+      },
+      {
+        "profile": "consumer",
+        "sboms": 1,
+        "selected_normal_build_packages": 127,
+        "observed_source_package_identities": 155,
+        "missing_selected_packages": [],
+        "resolver_overapproximation": 28
+      }
+    ],
+    "rust_sboms": 13,
+    "npm_sboms": 3,
+    "image_sboms": 0,
+    "browser_sbom": {
+      "path": "browser-tests.cdx.json",
+      "sha256": "8210547618bc42cb858e98950240427a2fb2cf4d011cf401afde16fc4fab5cb9",
+      "expected_package_identities": 5,
+      "missing_package_identities": [],
+      "identity_comparison": "scoped name and version",
+      "additional_identities": [],
+      "components_without_reported_license": 0,
+      "scope": "Package SBOM, no license/security approval; missing license fields remain explicit",
+      "published_path": "docs/security/sboms/browser-tests-2026-10-27.cdx.json"
+    },
+    "browser_libraries": [
+      {
+        "name": "jose",
+        "version": "6.2.13",
+        "purl": "pkg:npm/jose@6.2.13",
+        "licenses": [
+          {
+            "license": {
+              "id": "MIT"
+            }
+          }
+        ]
+      },
+      {
+        "name": "oauth4webapi",
+        "version": "3.8.8",
+        "purl": "pkg:npm/oauth4webapi@3.8.8",
+        "licenses": [
+          {
+            "license": {
+              "id": "MIT"
+            }
+          }
+        ]
+      },
+      {
+        "name": "openid-client",
+        "version": "6.8.8",
+        "purl": "pkg:npm/openid-client@6.8.8",
+        "licenses": [
+          {
+            "license": {
+              "id": "MIT"
+            }
+          }
+        ]
+      },
+      {
+        "name": "playwright-core",
+        "version": "1.64.1",
+        "purl": "pkg:npm/playwright-core@1.64.1",
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-2.0"
+            }
+          }
+        ]
+      },
+      {
+        "name": "playwright",
+        "version": "1.64.1",
+        "purl": "pkg:npm/playwright@1.64.1",
+        "licenses": [
+          {
+            "license": {
+              "id": "Apache-2.0"
+            }
+          }
+        ]
+      }
+    ],
+    "shipped_notice_asset_records": 21,
+    "generator": {
+      "source": {
+        "name": "cargo-cyclonedx",
+        "version": "0.5.9",
+        "archive_url": "https://static.crates.io/crates/cargo-cyclonedx/cargo-cyclonedx-0.5.9.crate",
+        "archive_sha256": "5d162f67705f0f5038759d73bf546a083bf30e8677c2e944b416bca48d9d69a8",
+        "lock_sha256": "907a775251bc3504de1df6c38830a2453ddbb1feef56b4bb9aa2a890a723abea",
+        "license": "Apache-2.0",
+        "scope": "Unchanged official SBOM generator source; separately patched and audited tooling lock. No application runtime dependency."
+      },
+      "binary_sha256": "1bd6b4e8e9bbb1525b824d3c7206ffb2e673db0f503275e7506ccffbcdd0a35e",
+      "tooling_policy_sha256": "e15bddeebfa45dacb438516d9d970ca6be1e76e24c38c75c7c99b07a2c75f3cd",
+      "bootstrap_sha256": "0a120875034e6c96d043fa2596785fffa9abb82b9e342cbd20195ec56ae2073d",
+      "current_tooling_lock_and_cached_source_match": true,
+      "fresh_bootstrap_claimed": false
+    },
+    "scanner_image": "aquasec/trivy@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c",
+    "scanner_network": "none",
+    "image_upload": false,
+    "scope": "Source package/dependency-license coverage including dev tools. Existing image/native/advisory and release/assurance records retain their own source scope; no production or independent approval.",
+    "browser_application_placeholder_license_reported": false
+  }
+}

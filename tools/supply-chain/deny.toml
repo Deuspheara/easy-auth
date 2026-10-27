@@ -1,0 +1,15 @@
+# Only for the separately built cargo-cyclonedx tool. Root auth policy is unchanged.
+[advisories]
+version = 2
+[licenses]
+allow = ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "CC0-1.0", "0BSD", "CDLA-Permissive-2.0"]
+# Reviewed against the retained package text and SPDX MIT-0; not a runtime exception.
+[[licenses.exceptions]]
+name = "borrow-or-share"
+version = "=0.2.4"
+allow = ["MIT-0"]
+[bans]
+multiple-versions = "warn"
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

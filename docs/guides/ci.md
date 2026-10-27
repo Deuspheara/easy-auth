@@ -26,6 +26,9 @@ also forces current workspace source/tests to rebuild on subsequent runs.
 The key binds runner OS/architecture, exact hosted image identity, `rustc -vV`,
 installed OpenSSL/CMake/pkg-config/GCC/G++/libc development versions, Cargo.lock,
 all Cargo manifests, workspace Cargo configuration and pinned SAML inventory/patches.
+The dependency hash is captured once in the early environment step, before build
+and scanner trees exist, and reused for both restore and post-job save. The post
+action does not traverse the generated workspace to re-evaluate source inputs.
 Each commit has a distinct immutable save key; fallback is limited to the same
 complete environment/dependency prefix. Cargo still validates dependency/build
 fingerprints. Missing image data or failed metadata commands disable the cache
@@ -73,3 +76,9 @@ cache was saved. Cold Clippy took 110 seconds; cargo-audit installation took 178
 seconds and cargo-deny installation took 121 seconds. These are this run's observed
 cold durations; runner variability prevents treating earlier durations as a controlled
 comparison. A later successful restore and complete verification remain required.
+
+During integration verification, CI40569341561 passed every verification step but
+failed while the cache post-action re-evaluated its recursive `hashFiles` expression.
+The early source-input snapshot retains the same patterns and cache segregation;
+no verification command or cache permission is relaxed. This corrects cache-key
+evaluation timing; the log does not identify a particular unreadable path.

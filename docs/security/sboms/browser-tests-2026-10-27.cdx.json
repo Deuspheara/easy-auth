@@ -1,0 +1,212 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:0ba0ba62-3bcc-4494-a84e-6a9e0554d1f3",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-27T04:23:53+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "manufacturer": {
+            "name": "Aqua Security Software Ltd."
+          },
+          "group": "aquasecurity",
+          "name": "trivy",
+          "version": "0.76.1"
+        }
+      ]
+    },
+    "component": {
+      "bom-ref": "531c43b0-34fc-4657-8ace-17868e11c875",
+      "type": "application",
+      "name": "/source",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "fafb0eb4-1a83-4ee0-a059-6f873bb9a3e4",
+      "type": "application",
+      "name": "package-lock.json",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "lang-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/jose@6.2.13",
+      "type": "library",
+      "name": "jose",
+      "version": "6.2.13",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/jose@6.2.13",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "jose@6.2.13"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/oauth4webapi@3.8.8",
+      "type": "library",
+      "name": "oauth4webapi",
+      "version": "3.8.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/oauth4webapi@3.8.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "oauth4webapi@3.8.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/openid-client@6.8.8",
+      "type": "library",
+      "name": "openid-client",
+      "version": "6.8.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/openid-client@6.8.8",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "openid-client@6.8.8"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/playwright-core@1.64.1",
+      "type": "library",
+      "name": "playwright-core",
+      "version": "1.64.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:npm/playwright-core@1.64.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "playwright-core@1.64.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/playwright@1.64.1",
+      "type": "library",
+      "name": "playwright",
+      "version": "1.64.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:npm/playwright@1.64.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "playwright@1.64.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "531c43b0-34fc-4657-8ace-17868e11c875",
+      "dependsOn": [
+        "fafb0eb4-1a83-4ee0-a059-6f873bb9a3e4"
+      ]
+    },
+    {
+      "ref": "fafb0eb4-1a83-4ee0-a059-6f873bb9a3e4",
+      "dependsOn": [
+        "pkg:npm/openid-client@6.8.8",
+        "pkg:npm/playwright@1.64.1"
+      ]
+    },
+    {
+      "ref": "pkg:npm/jose@6.2.13",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/oauth4webapi@3.8.8",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/openid-client@6.8.8",
+      "dependsOn": [
+        "pkg:npm/jose@6.2.13",
+        "pkg:npm/oauth4webapi@3.8.8"
+      ]
+    },
+    {
+      "ref": "pkg:npm/playwright-core@1.64.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/playwright@1.64.1",
+      "dependsOn": [
+        "pkg:npm/playwright-core@1.64.1"
+      ]
+    }
+  ],
+  "vulnerabilities": []
+}

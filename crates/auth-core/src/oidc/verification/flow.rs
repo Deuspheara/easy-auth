@@ -83,7 +83,14 @@ impl OidcTokenVerifier {
         } else {
             self.documents.keys_from_discovery(&discovery, None).await?
         };
-        let claims = match work::attempt(&token, observed.clone(), lease.clone()).await? {
+        let claims = match work::attempt_for_profile(
+            &token,
+            observed.clone(),
+            lease.clone(),
+            self.policy.is_apple(),
+        )
+        .await?
+        {
             Attempt::Claims(claims) => claims,
             Attempt::UnknownKey => {
                 let current = self
@@ -92,7 +99,14 @@ impl OidcTokenVerifier {
                     .await?;
                 // Retain the operation lease through the final authority read;
                 // the native retry owns a separate cancellation-safe reference.
-                match work::attempt(&token, current, lease.clone()).await? {
+                match work::attempt_for_profile(
+                    &token,
+                    current,
+                    lease.clone(),
+                    self.policy.is_apple(),
+                )
+                .await?
+                {
                     Attempt::Claims(claims) => claims,
                     Attempt::UnknownKey => return Err(Error::Unauthorized),
                 }

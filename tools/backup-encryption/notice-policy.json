@@ -1,0 +1,215 @@
+{
+  "modules": [
+    {
+      "module": "filippo.io/age",
+      "version": "v1.3.2",
+      "module_sum": "h1:r6RSZLFSMm6rzKepZ7ZAYkKCu14f3/Me8c7uKYh7C8c=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "c5d65279d02955c0fc2294ae417c3add650d228f4f5c82bd6d531fc26c89cd96",
+          "bytes": 1516
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "filippo.io/edwards25519",
+      "version": "v1.2.0",
+      "module_sum": "h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067",
+          "bytes": 1479
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "filippo.io/hpke",
+      "version": "v0.4.0",
+      "module_sum": "h1:p575VVQ6ted4pL+it6M00V/f2qTZITO0zgmdKCkd5+A=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "filippo.io/nistec",
+      "version": "v0.0.4",
+      "module_sum": "h1:F14ZHT5htWlMnQVPndX9ro9arf56cBhQxq4LnDI491s=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/crypto",
+      "version": "v0.56.0",
+      "module_sum": "h1:GUh5Ii4J5jtcseSMiRqr1jXCNHoxjeV9Fmekc2oLy6Y=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/mod",
+      "version": "v0.42.0",
+      "module_sum": "h1:ICeL3t2L30ljSPHHxDnR4fqVcBt/zR2zJAb9juavmQg=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/sync",
+      "version": "v0.24.0",
+      "module_sum": "h1:iqiDrGoDgyuvAKrhLQthUEzU/R378N78gXbBjxed7oA=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/sys",
+      "version": "v0.47.0",
+      "module_sum": "h1:o7XGOvZQCADBQQ4Y7VNq2dRWQR7JmOUW8Kxx4ZsNgWs=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/telemetry",
+      "version": "v0.0.0-20261010193011-f71dc92da45e",
+      "module_sum": "h1:P6NGsugec4oASJ+yKMNgTndeo0h2CbixZLvQIe9h5R4=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/term",
+      "version": "v0.45.0",
+      "module_sum": "h1:NwWyBmoJCbfTHpxrWoZ9C6/VxOf7ic219I8xZZFdrf0=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/tools",
+      "version": "v0.52.0",
+      "module_sum": "h1:ryxg4U63oaUYk7uOLTF37n43f4qgtGvqV4Ioit1BaEs=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    },
+    {
+      "module": "golang.org/x/vuln",
+      "version": "v1.9.0",
+      "module_sum": "h1:12VaqnI9kJfqwRoPptxoqsUhQtdfrSbdksT7X/KY/sc=",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+          "bytes": 1453
+        },
+        {
+          "name": "PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+          "bytes": 1303
+        }
+      ],
+      "license": "BSD-3-Clause"
+    }
+  ],
+  "go_version": "go1.27.3",
+  "go_notices": [
+    {
+      "name": "LICENSE",
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "bytes": 1453
+    },
+    {
+      "name": "PATENTS",
+      "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc",
+      "bytes": 1303
+    }
+  ],
+  "legal_approval": false,
+  "go_license": "BSD-3-Clause"
+}

@@ -1,0 +1,74 @@
+# Disposable loopback development only. Use an explicit, unique Compose project.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: ${EASY_AUTH_LOCAL_DB_PASSWORD:?generate a disposable URL-safe database password}
+      POSTGRES_DB: auth
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth -d auth"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "127.0.0.1:${EASY_AUTH_MAIL_HTTP_PORT:-8026}:8025"
+      - "127.0.0.1:${EASY_AUTH_HTTP_PORT:-58418}:8081"
+  app:
+    image: ${EASY_AUTH_IMAGE:-easy-auth-local:development}
+    pull_policy: never
+    # Keep the application's strict development-SMTP loopback policy unchanged.
+    network_mode: "service:mailpit"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    environment:
+      AUTH_DEVELOPMENT: "true"
+      AUTH_REALM_ID: ${EASY_AUTH_LOCAL_REALM_ID:?required}
+      AUTH_PUBLIC_URL: "http://127.0.0.1:${EASY_AUTH_HTTP_PORT:-58418}"
+      AUTH_BIND: "127.0.0.1:8080"
+      DATABASE_URL: ${EASY_AUTH_LOCAL_DATABASE_URL:?use the generated private local settings}
+      SMTP_HOST: "127.0.0.1"
+      SMTP_PORT: "1025"
+      SMTP_FROM: "auth@example.test"
+      AUTH_PASSWORD_BLOCKLIST_FILE: "/run/easy-auth/development-passwords.txt"
+    volumes:
+      - type: bind
+        source: ../../docs/examples/password-blocklist-development.txt
+        target: /run/easy-auth/development-passwords.txt
+        read_only: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: 512m
+  proxy:
+    # Reuse the maintained nginx runtime; this mount selects local HTTP only.
+    image: ${EASY_AUTH_PROXY_IMAGE:-easy-auth-local-proxy:development}
+    pull_policy: never
+    network_mode: "service:mailpit"
+    depends_on:
+      app:
+        condition: service_started
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    mem_limit: 64m
+volumes:
+  postgres_data:

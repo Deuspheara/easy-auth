@@ -1,5 +1,95 @@
 # Protocol dependency assessment
 
+AUTH-36's independent standards-client acceptance pins test-only
+[openid-client 6.8.8](https://github.com/panva/openid-client/tree/v6.8.8), with locked
+jose 6.2.13 and oauth4webapi 3.8.8 (all MIT) in the existing shared browser toolchain.
+Exact registry archive integrities are in `tests/browser/passkeys/package-lock.json`;
+installation uses `npm ci --ignore-scripts`. The 2026-10-27 whole-browser npm audit
+reports zero known findings, not independent security approval or unknown-risk
+clearance. The dependency introduces no Rust runtime, native library, custom
+cryptographic primitive, shipping asset, lockfile/advisory exemption or weaker
+assertion.
+
+The RP uses the upstream discovery, S256/state/nonce and code-grant implementation.
+Its explicit [JWS validation option](https://github.com/panva/openid-client/blob/v6.8.8/docs/functions/enableNonRepudiationChecks.md)
+requires JWKS signature verification as well as normal HTTPS/claim checks. The
+fixture-only Fetch adapter passes original bytes through the same explicit private
+certificate/address trust boundary, with no cookie authority, insecure request or
+production override. Existing normal signing producers, original Node/Rust cases,
+clock/propagation intervals and SAML waiver limits remain unchanged. This strengthens
+bounded independent RP evidence; the outbound OIDC hard release gate, independent
+review, real provider/OS and production acceptance remain separate.
+
+AUTH-49 retention reuses the locked SQLx/PostgreSQL, Tokio, UUID and async-trait
+boundaries. It adds no dependency/version, cryptographic implementation, verifier,
+license rule or advisory exception. Fresh statement snapshots and FK-lock behavior
+follow the primary PostgreSQL references in
+[ADR0050](../architecture/adr/0050-bounded-realm-retention.md). Default and all-feature
+workspace/security qualification remains required; dependency reuse alone does
+not establish its safety or clear existing release gates.
+
+AUTH-49's offline backup commands use unchanged upstream age1.3.2 with an explicit
+build-only Go module selecting x/crypto0.56.0, checksum-pinned Go1.27.3 and pinned
+govulncheck1.9.0. This adds no authentication runtime dependency, crypto producer
+or application-policy exemption. Exact source/version/checksum, read-only locks,
+source/binary scan inventories, imported-package rejection and BSD-style notice
+hashes are recorded by `scripts/prepare_backup_tool.py`. The unimported OpenPGP
+module advisory remains visible; scans are not independent assurance. Primary
+contracts, the fixed SSH dependency findings, installed CMS issue, native archive
+profile and quarantine limits are recorded in
+[ADR0048](../architecture/adr/0048-encrypted-backup-quarantine.md).
+
+The [2026-10-26 supply-chain checkpoint](../security/supply-chain-review-2026-10-26.md)
+records current source-license inventories, selected versus resolver-only graphs,
+standard source/image SBOM coverage and actual native/copyright provenance.
+Its separately pinned/audited SBOM tool adds no authentication runtime dependency;
+the exact tooling-only MIT-0 decision leaves the root application policy unchanged.
+Release prerequisites, residual advisories and independent approval remain open.
+
+AUTH-26's optional protected Apple custody/worker reuses locked
+josekit0.10.3/OpenSSL0.10.81 for internal fixed `dir` + `A256GCM` storage envelopes
+and existing protected ES256 client secrets. This adds no inbound JWE trust,
+custom AEAD/signature implementation, package/version, license rule or advisory
+exception; Cargo.lock is unchanged. Native-library/parser copies are not claimed
+zeroized beyond owned wrappers. The concrete revocation transport reuses locked
+reqwest0.13.5/rustls0.23.46 with existing pinned address, hostname/certificate,
+resource, redirect/proxy/retry controls. Dependency reuse still requires current
+compiled-graph advisory and all-feature license checks. The explicit profile and
+[primary Apple contract](../architecture/adr/0045-apple-grant-custody-and-revocation.md)
+remain separate from real provider/OS acceptance and independent security review.
+Owned browser/PG/TLS fixtures establish only their recorded implementation scope.
+
+AUTH-25's optional linking boundary reuses existing Google/Apple/OAuth/JOSE and
+PostgreSQL primitives; no dependency/version or custom cryptographic primitive is
+introduced. Fixed Google `select_account` is a documented account-choice request,
+not a fresh-event claim; the explicitly selected session-age profile still rejects
+missing signed authentication time. Apple retains its own nonce/code contract,
+without an invented prompt or PKCE fallback. Explicit local ownership and purpose
+binding replace email-based linking; [ADR0044](../architecture/adr/0044-explicit-social-identity-linking.md)
+records primary references and the retained real-provider/lifecycle gates.
+
+AUTH-24's optional Apple component reuses pinned josekit0.10.3/OpenSSL0.10.81:
+established P-256 key import/ES256 compact JWS for fixed client secrets and the
+existing RS256 verification worker for Apple identity tokens. No dependency or
+lockfile version changes, custom cryptographic primitive or generic provider
+framework. Native signing jobs retain bounded capacity through cancellation;
+operator PEM/output buffers zeroize but dependency copies are not claimed erased.
+Apple metadata observed2026-10-25 advertises client_secret_post/RS256, not S256 or
+response-issuer support. The explicit dedicated-return/signed-nonce profile is
+separate from unchanged Google/generic requirements. The Apple REST index now
+links its client-secret guidance to the shared AccountOrganizationalDataSharing
+page; identity guidance's algorithm wording conflicts with current discovery, so
+no algorithm alias/fallback is inferred. Exact primary links and profile decisions
+are in [ADR0043](../architecture/adr/0043-apple-code-flow.md).
+Owned signing/PG fixtures establish component behavior, not actual Apple console,
+OS, provider rotation or lifecycle qualification. Existing license/advisory/native
+risks, outbound release gate and SAML waiver limits remain unchanged.
+The explicit Axum `apple-web` transport adds no dependency or version. Owned
+Chromium acceptance reuses existing Playwright/TLS/PG lifetime helpers and the
+unchanged maintained JOSE producer. It observes a real cross-site form POST and
+same-origin final commit; interception of Apple authorization remains offline
+fixture evidence, not registered-provider or OS acceptance.
+
 The reference presentation in [ADR0042](../architecture/adr/0042-reference-account-ui.md)
 uses native browser modules/WebAuthn and fixed included HTML/CSS. The presentation
 now pins Basecoat CSS 1.1.0 and optional Motion mini 14.6.0, prepared with
@@ -360,3 +450,25 @@ existing digest implementation and the previously used published RFC7636 vector;
 no custom signature or XML fixture is introduced. The code component does not
 establish an outbound JWT/signing dependency decision, conformance or independent
 approval. AUTH-39 and M07 still require their own actual evidence.
+
+
+## AUTH-26 protected Apple storage envelope (in progress,2026-10-25)
+
+The optional core `apple-grants` storage foundation reuses locked josekit0.10.3 /
+OpenSSL `dir` + `A256GCM` compact envelopes. No new package/version, algorithm
+implementation, trust root, license or advisory exception is introduced. This is
+an internal at-rest format, separate from the inbound signature-only profile
+recorded above; inbound JWE authentication remains unsupported. Pinned source
+inspection confirms exact header selection occurs before decryption/compression.
+Every extra/compression/alternate-profile member is rejected, including validly
+encrypted negative fixtures. Associated realm/source/client/identity/grant UUIDs
+are authenticated; no raw provider subject/email is added to clear metadata.
+
+Trusted explicit storage keys are bounded and distinct from ES256 signing keys.
+Unknown IDs do not trigger key-by-trial/current-key fallback. Owned raw key/plaintext
+buffers zeroize, but native/parser internal copies are not claimed erased. Tests
+exercise rotation/retirement, tag/context tampering, bounds/redaction and native
+work retaining its capacity after async waiter cancellation. This foundation is
+not yet a captured grant ledger, revocation worker, ordinary activation or real
+Apple acceptance. [ADR0045](../architecture/adr/0045-apple-grant-custody-and-revocation.md)
+records the remaining integration, persistence, retry and operational requirements.

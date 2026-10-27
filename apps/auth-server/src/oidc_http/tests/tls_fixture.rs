@@ -96,7 +96,7 @@ impl Fixture {
                     if path == "/age" {
                         tokio::time::sleep(Duration::from_millis(1100)).await;
                     }
-                    if path == "/stall" {
+                    if path == "/stall" || path == "/revoke/stall" {
                         tokio::time::sleep(Duration::from_secs(1)).await;
                     }
                     // Rejections deliberately close early; BrokenPipe here is an
@@ -132,6 +132,10 @@ impl Fixture {
 }
 
 fn reply(path: &str) -> (String, Vec<u8>) {
+    #[cfg(feature = "apple-grants")]
+    if path.starts_with("/revoke/") {
+        return super::revocation_reply::reply(path);
+    }
     let (status,extra,body)=match path {
         "/invalid-grant"=>("400 Bad Request",String::new(),br#"{"error":"invalid_grant"}"#.to_vec()),
         "/invalid-client"=>("401 Unauthorized",String::new(),br#"{"error":"invalid_client"}"#.to_vec()),

@@ -64,10 +64,10 @@ export const features = [
   {
     name: "Apple",
     mark: "◦",
-    status: "Planned",
+    status: "Component",
     description:
-      "A planned provider adapter. No implemented Apple sign-in is advertised.",
-    href: "/docs/features/",
+      "Experimental code/web flow, explicit linking and protected grant revocation. Real Apple acceptance and ordinary activation remain gated.",
+    href: "/docs/guides/apple-setup/",
     featured: false,
   },
   {
@@ -75,7 +75,7 @@ export const features = [
     mark: "→",
     status: "Not released",
     description:
-      "Client-registration groundwork exists; a complete interoperable authorization server is not available.",
+      "Signed issuance, native refresh and introspection components have bounded owned-client evidence. Feature-complete release remains gated.",
     href: "/docs/features/",
     featured: false,
   },

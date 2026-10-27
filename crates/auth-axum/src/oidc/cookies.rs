@@ -18,7 +18,34 @@ pub(super) const ACCOUNT_DELETION_COOKIES: Cookies = Cookies {
         "__Host-auth-oidc-delete-pkce",
     ],
 };
+#[cfg(feature = "social-linking-web")]
+pub(super) const GOOGLE_LINK_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-google-link-browser",
+        "__Host-auth-google-link-state",
+        "__Host-auth-google-link-nonce",
+        "__Host-auth-google-link-pkce",
+    ],
+};
+#[cfg(feature = "social-linking-web")]
+pub(super) const APPLE_LINK_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-apple-link-browser",
+        "__Host-auth-apple-link-state",
+        "__Host-auth-apple-link-nonce",
+        "__Host-auth-apple-link-pkce",
+    ],
+};
 const COOKIE_SECONDS: u32 = 300;
+#[cfg(feature = "apple-web")]
+pub(super) const APPLE_SIGN_IN_COOKIES: Cookies = Cookies {
+    names: [
+        "__Host-auth-apple-signin-browser",
+        "__Host-auth-apple-signin-state",
+        "__Host-auth-apple-signin-nonce",
+        "__Host-auth-apple-signin-pkce",
+    ],
+};
 #[cfg(feature = "google-web")]
 pub(super) const GOOGLE_SIGN_IN_COOKIES: Cookies = Cookies {
     names: [
@@ -57,7 +84,7 @@ pub(super) struct Cookies {
 }
 
 impl Cookies {
-    #[cfg(feature = "oidc-web")]
+    #[cfg(any(feature = "oidc-web", feature = "apple-web"))]
     pub fn state_hint(&self, headers: &HeaderMap) -> Result<Option<Secret>> {
         read_optional_cookie(headers, self.names[1])
     }

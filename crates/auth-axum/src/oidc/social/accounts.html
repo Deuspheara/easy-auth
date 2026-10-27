@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Linked accounts</title><!-- reference-style --><script src="/social/accounts.js" defer></script></head>
+<body><a class="skip" href="#main">Skip to content</a><main id="main" tabindex="-1"><h1>Linked accounts</h1>
+<p id="status" role="status" class="alert">Loading your current account…</p><p id="owner"></p>
+<p>Linking requires fresh authentication to this account and proof from the provider. Matching email addresses never merge accounts. Passkey requirements remain in force.</p>
+<section id="actions" hidden><h2>Link a provider</h2><p>Choose the provider account deliberately. Your current local session will be retained.</p>
+<button class="btn" type="button" data-link="google">Link Google account</button>
+<button class="btn" type="button" data-link="apple">Link Apple account</button>
+<h2>Linked identities</h2><ul id="providers"></ul><button id="more" class="btn" type="button" hidden>Load more identities</button>
+<p>Unlink requires fresh authentication through a method you retain. You cannot unlink the source of your current session. Unlinking here does not revoke remote Apple grants.</p>
+<h2>Cancel a pending link</h2><button class="btn" type="button" data-cancel="google">Cancel current Google link</button><button class="btn" type="button" data-cancel="apple">Cancel current Apple link</button></section>
+<p><a href="/">Check sign-in and authentication methods</a></p><noscript>JavaScript is required for account management.</noscript>
+</main></body></html>

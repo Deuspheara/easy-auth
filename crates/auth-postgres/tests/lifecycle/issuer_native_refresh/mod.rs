@@ -3,6 +3,7 @@ mod configuration;
 mod consent;
 mod consumers;
 mod families;
+mod incident;
 mod isolation;
 mod ordering;
 mod upgrade;

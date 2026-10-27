@@ -144,6 +144,11 @@ pub trait Repository: Send + Sync {
 }
 #[async_trait]
 pub trait EmailDelivery: Send + Sync {
+    /// Implement this hook when selecting social linking. The default preserves
+    /// existing adapters and leaves durable retry work, never false delivery success.
+    async fn providers_changed(&self, _email: &str) -> Result<()> {
+        Err(crate::Error::Unavailable)
+    }
     async fn passkey_recovery_completed(&self, email: &str) -> Result<()>;
     async fn passkey_recovery_started(&self, email: &str) -> Result<()>;
     async fn passkey_recovery_cancelled(&self, email: &str) -> Result<()>;

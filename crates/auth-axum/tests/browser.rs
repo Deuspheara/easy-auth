@@ -8,6 +8,8 @@ mod boundary;
 mod contract;
 #[path = "browser/email.rs"]
 mod email;
+#[path = "browser/observability/mod.rs"]
+mod observability;
 #[path = "browser/passwords.rs"]
 mod passwords;
 #[path = "browser/providers.rs"]
@@ -48,6 +50,10 @@ mod oidc_web;
 #[path = "browser/google_web/mod.rs"]
 mod google_web;
 
+#[cfg(feature = "apple-web")]
+#[path = "browser/apple_web/mod.rs"]
+mod apple_web;
+
 #[cfg(feature = "saml-web")]
 #[path = "browser/saml/mod.rs"]
 mod saml;
@@ -67,3 +73,14 @@ mod issuer_native_consent;
 #[cfg(feature = "issuer-native-web")]
 #[path = "browser/issuer_native_web/mod.rs"]
 mod issuer_native_web;
+
+#[cfg(feature = "apple-web")]
+#[path = "../../../tests/support/apple/provider.rs"]
+mod apple_provider;
+#[cfg(feature = "google-web")]
+#[path = "../../../tests/support/google/provider.rs"]
+mod google_provider;
+
+#[cfg(feature = "social-linking-web")]
+#[path = "browser/social/mod.rs"]
+mod social;

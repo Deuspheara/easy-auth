@@ -1,5 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
+const {selectTheme} = require('./theme.cjs');
 
 function luminance(color) {
   if (/^okl(?:ab|ch)\(/.test(color)) {
@@ -43,10 +44,7 @@ async function presentation(page, origin) {
   await page.locator('#email').focus();
   const results = [];
   for (const scheme of ['light', 'dark']) {
-    await page.emulateMedia({colorScheme: scheme});
-    await page.waitForFunction(dark => document.getElementById('theme').getAttribute('aria-label') === (dark ? 'Use light theme' : 'Use dark theme'), scheme === 'dark');
-    // Vega transitions control colors during theme changes; measure the settled theme.
-    await page.evaluate(() => Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {}))));
+    await selectTheme(page, scheme);
     for (const width of [320, 390, 768, 1024, 1280, 1440]) {
       await page.setViewportSize({width, height: 1000});
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'document reflow');

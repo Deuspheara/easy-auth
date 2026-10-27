@@ -1,4 +1,6 @@
-use crate::{deadlines::Deadline, locking::fresh_session, unavailable};
+use crate::deadlines::Deadline;
+#[cfg(not(feature = "oidc-linking"))]
+use crate::{locking::fresh_session, unavailable};
 use auth_core::{Error, OAuthConnection, OAuthPurpose, Result};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
@@ -29,24 +31,44 @@ pub(super) async fn lock(
             deadline: None,
         }),
         OAuthPurpose::Link { user, session } => {
-            // No email mutation here and no email lock acquired afterward.
-            sqlx::query_scalar::<_, Uuid>(
-                "SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE",
-            )
-            .bind(realm)
-            .bind(user)
-            .fetch_optional(&mut **tx)
-            .await
-            .map_err(unavailable)?
-            .ok_or(Error::Unauthorized)?;
-            let session = fresh_session(tx, realm, *user, *session).await?;
-            let deadline = Deadline::fresh_session(tx, realm, *user, session).await?;
-            Ok(Owner {
-                purpose: "link",
-                user: Some(*user),
-                session: Some(session),
-                deadline: Some(deadline),
-            })
+            #[cfg(feature = "oidc-linking")]
+            {
+                // This source-aware path locks current provider policy before
+                // email/owner/session and preserves the original fresh cap.
+                let snapshot =
+                    crate::sessions::FreshSessionSnapshot::load(&mut **tx, realm, *session).await?;
+                let caller = snapshot.lock(tx).await?;
+                if caller.user != *user {
+                    return Err(Error::Unauthorized);
+                }
+                Ok(Owner {
+                    purpose: "link",
+                    user: Some(*user),
+                    session: Some(caller.session),
+                    deadline: Some(caller.deadline),
+                })
+            }
+            #[cfg(not(feature = "oidc-linking"))]
+            {
+                // No email mutation here and no email lock acquired afterward.
+                sqlx::query_scalar::<_, Uuid>(
+                    "SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE",
+                )
+                .bind(realm)
+                .bind(user)
+                .fetch_optional(&mut **tx)
+                .await
+                .map_err(unavailable)?
+                .ok_or(Error::Unauthorized)?;
+                let session = fresh_session(tx, realm, *user, *session).await?;
+                let deadline = Deadline::fresh_session(tx, realm, *user, session).await?;
+                Ok(Owner {
+                    purpose: "link",
+                    user: Some(*user),
+                    session: Some(session),
+                    deadline: Some(deadline),
+                })
+            }
         }
         OAuthPurpose::DeleteProviderAccount { user, session } => {
             #[cfg(feature = "oidc-identities")]

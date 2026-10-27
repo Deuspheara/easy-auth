@@ -40,3 +40,8 @@ cargo run --locked --release -p easy-auth-core --example password_cost
 ```
 
 The benchmark uses synthetic inputs and prints no passwords/hashes. On the development macOS arm64 host (Rust 1.95.0), five release samples at 64 MiB/three passes: hash 85–91 ms; verify 85–92 ms. The initial 19 MiB/two-pass floor measured 13–14 ms, motivating the stronger profile. These are local observations, not service throughput or deployment guarantees; remeasure under representative concurrency before production.
+
+The [owned concurrent authentication workload](authentication-performance.md)
+provides separate session/PostgreSQL and Argon2 measurements, complete outcome
+accounting and process-memory observations in disposable databases. It retains
+the existing parameters and reports capacity refusals separately from success.

@@ -18,6 +18,7 @@ mod passkeys;
 mod password;
 mod ports;
 mod providers;
+mod retention;
 #[cfg(feature = "saml-requests")]
 mod saml;
 mod secret;
@@ -70,6 +71,10 @@ pub use providers::{
     LINKED_PROVIDER_PAGE_SIZE, LinkedProvider, LinkedProviderCursor, LinkedProviderPage,
     ProviderKind,
 };
+pub use retention::{
+    RETENTION_BATCH_LIMIT, RetentionBatch, RetentionCategory, RetentionHorizon, RetentionPolicy,
+    RetentionReport, RetentionRepository, RetentionStep, run_retention,
+};
 #[cfg(feature = "saml-requests")]
 pub use saml::{
     MAX_SAML_PENDING_PER_CONNECTION, SAML_REQUEST_LIFETIME_SECONDS, SamlBrowserProof,
@@ -90,6 +95,14 @@ pub use saml::{
 pub use secret::{Secret, Verifier};
 pub use sessions::{SessionInfo, SessionPage};
 
+#[cfg(feature = "apple")]
+pub use oidc::{
+    AppleAuthorization, AppleAuthorizationCompletion, AppleAuthorizationOutcome,
+    AppleAuthorizationRequest, AppleAuthorizationResponse, AppleAuthorizationStart,
+    AppleClientSecret, AppleClientSecretSigner, AppleClientType, AppleCodeExchange,
+    AppleInitialProfile, AppleNonceEncoding,
+};
+
 #[cfg(feature = "google")]
 pub use oidc::{
     GoogleAccountDeletionAuthorization, GoogleAuthorization, GoogleAuthorizationCompletion,
@@ -97,12 +110,18 @@ pub use oidc::{
     GoogleCodeExchange, GoogleSessionAgeCodeExchange,
 };
 
+#[cfg(all(feature = "apple", feature = "oidc-linking"))]
+pub use oidc::AppleIdentityLinkAuthorization;
+#[cfg(all(feature = "google", feature = "oidc-linking"))]
+pub use oidc::GoogleIdentityLinkAuthorization;
 #[cfg(feature = "oidc-identities")]
 pub use oidc::{
     MAX_OIDC_DELETION_AUTH_AGE_SECONDS, OidcAccountDeletion, OidcAccountDeletionRepository,
     OidcDisplayNameClaim, OidcIdentityPolicy, OidcIdentityRepository, OidcJitPolicy,
     OidcMappedIdentity, OidcSignIn,
 };
+#[cfg(feature = "oidc-linking")]
+pub use oidc::{OidcIdentityLinkRepository, OidcIdentityLinking};
 
 #[cfg(feature = "oidc-verification")]
 pub use oidc::{
@@ -193,3 +212,20 @@ pub use oidc::{
 
 #[cfg(feature = "oidc-client")]
 pub use oidc::{OidcClientCredential, OidcClientCredentials, OidcClientIdentity, OidcClientTokens};
+
+#[cfg(feature = "apple-grants")]
+pub use oidc::{AppleGrantBinding, AppleGrantEnvelope, AppleGrantKey, AppleGrantVault};
+
+#[cfg(feature = "apple-grants")]
+pub use oidc::{
+    AppleGrantAuthorization, AppleGrantAuthorizationCompletion, AppleGrantCapture,
+    AppleGrantLinking, AppleGrantRepository, AppleGrantSignIn, AppleMappedGrant,
+    AppleVerifiedGrant,
+};
+
+#[cfg(feature = "apple-grants")]
+pub use oidc::{
+    AppleGrantRevocationJob, AppleGrantRevocationRepository, AppleGrantRevoker,
+    AppleRevocationConfirmation, AppleRevocationFailure, AppleRevocationHttp,
+    AppleRevocationOutcome, AppleRevocationRequest, AppleRevocationResponse,
+};

@@ -61,7 +61,13 @@ audit counts, contact policy, provenance and absent pending signup/contact rows.
 Presentation checks loaded local Inter, OS theme defaults, measured light/dark
 text/control contrast, 320/390/768/1024/1280/1440px reflow, 320px/200% text and
 forced-color borders. The actual account view also checks both themes at 320/1440
-and 320px/200% text. Compact account assertions cover the 660px column, shared header, genuine initials,
+and 320px/200% text. Theme measurements wait for the actual theme-control update
+and all running/pending native animations to finish within the existing test
+timeout. A parent's inherited color transition can start a child transition after
+the initial animation batch finishes. The shared `theme.cjs` selection keeps both
+anonymous and account measurements independent of optional screenshot capture;
+the original text/badge 4.5:1 and input-boundary 3:1 thresholds remain unchanged.
+Compact account assertions cover the 660px column, shared header, genuine initials,
 long-email truncation with complete profile text, unknown versus verified key count
 and contextual current-session versus dedicated bulk-session actions.
 Optional `EASY_AUTH_UI_SCREENSHOT_DIR` saves desktop/mobile sign-in and owned-account

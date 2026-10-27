@@ -53,6 +53,11 @@ fn malformed_settings_identify_the_field_without_reflecting_the_value() {
             "private-marker",
             "SMTP_FROM must be a valid mailbox",
         ),
+        (
+            "AUTH_DATABASE_MIGRATIONS",
+            "private-marker",
+            "AUTH_DATABASE_MIGRATIONS must be run or verify",
+        ),
     ] {
         let mut command = command();
         command.env(name, value);
@@ -70,6 +75,7 @@ fn non_unicode_settings_cannot_select_defaults_or_disable_credentials() {
         "AUTH_BIND",
         "AUTH_REALM_ID",
         "DATABASE_URL",
+        "AUTH_DATABASE_MIGRATIONS",
         "SMTP_HOST",
         "SMTP_PORT",
         "SMTP_FROM",
@@ -88,6 +94,20 @@ fn absent_settings_retain_defaults_and_missing_requirements_are_named() {
     let mut missing_realm = command();
     missing_realm.env_remove("AUTH_REALM_ID");
     assert_configuration_error(missing_realm, "AUTH_REALM_ID is required");
+}
+
+#[test]
+fn schema_selection_is_explicit_and_never_falls_back_from_invalid_values() {
+    for value in ["", " run", "RUN", "false", "verify "] {
+        let mut command = command();
+        command.env("AUTH_DATABASE_MIGRATIONS", value);
+        assert_configuration_error(command, "AUTH_DATABASE_MIGRATIONS must be run or verify");
+    }
+    for value in ["run", "verify"] {
+        let mut command = command();
+        command.env("AUTH_DATABASE_MIGRATIONS", value);
+        assert_configuration_error(command, "DATABASE_URL is required");
+    }
 }
 
 #[test]

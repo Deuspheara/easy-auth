@@ -1,3 +1,6 @@
+#[cfg(feature = "apple-grants")]
+mod capture;
+
 use super::super::input::{OidcIdToken, optional};
 use crate::{Error, MAX_OIDC_DOCUMENT_BYTES, Result};
 use serde::Deserialize;
@@ -52,7 +55,11 @@ impl OidcTokenResponse {
             body: self.body,
         })
     }
-    pub(super) fn id_token(self) -> Result<OidcIdToken> {
+    pub(in crate::oidc) fn id_token(self) -> Result<OidcIdToken> {
+        let mut wire = self.success()?;
+        OidcIdToken::parse(std::mem::take(&mut wire.id_token))
+    }
+    fn success(self) -> Result<Success> {
         let response = self.json()?;
         if matches!(response.status, 400 | 401) {
             #[derive(Deserialize)]
@@ -72,7 +79,7 @@ impl OidcTokenResponse {
         if response.status != 200 {
             return Err(Error::Unavailable);
         }
-        let mut wire: Success =
+        let wire: Success =
             serde_json::from_slice(&response.body).map_err(|_| Error::Unavailable)?;
         if wire.error.is_some()
             || !wire.token_type.eq_ignore_ascii_case("Bearer")
@@ -81,7 +88,7 @@ impl OidcTokenResponse {
         {
             return Err(Error::Unavailable);
         }
-        OidcIdToken::parse(std::mem::take(&mut wire.id_token))
+        Ok(wire)
     }
 }
 pub(in crate::oidc) struct TokenResponseJson {

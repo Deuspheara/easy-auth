@@ -1,6 +1,8 @@
 mod boundary;
 mod config;
 mod cookies;
+mod headers;
+mod observation;
 
 pub(crate) use boundary::boundary;
 pub use config::BrowserConfig;
@@ -10,11 +12,11 @@ pub use config::BrowserConfig;
     feature = "issuer-consent-web"
 ))]
 pub(crate) use cookies::read_optional_cookie;
-#[cfg(any(feature = "oidc-web", feature = "saml-web"))]
+#[cfg(any(feature = "oidc-web", feature = "saml-web", feature = "apple-web"))]
 pub(crate) use cookies::require_anonymous;
 pub(crate) use cookies::{clear_auth_cookies, read_cookie};
 
-#[cfg(feature = "saml-web")]
+#[cfg(any(feature = "saml-web", feature = "apple-web"))]
 pub(crate) use boundary::post_delivery_boundary;
 #[cfg(any(feature = "saml-web", feature = "issuer-consent-web"))]
 pub(crate) use cookies::read_optional_cookie_value;

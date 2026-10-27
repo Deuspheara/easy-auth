@@ -3,6 +3,7 @@ const {captureScreen} = require('./capture.cjs');
 const assert = require('node:assert/strict');
 const {settingsSearch} = require('./refinement.cjs');
 const {contrast} = require('./presentation.cjs');
+const {selectTheme} = require('./theme.cjs');
 const {withAuthenticator} = require('../passkeys/browser.cjs');
 const {accountLayout} = require('./account-layout.cjs');
 
@@ -33,7 +34,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
         const path = require('node:path');
         await page.evaluate(() => document.fonts.ready);
         for (const scheme of ['light', 'dark']) {
-          await page.emulateMedia({colorScheme: scheme});
+          await selectTheme(page, scheme);
         const colors = await page.evaluate(() => {
           const heading = document.querySelector('#current-session h3');
           const badge = heading.querySelector('.badge');
@@ -119,7 +120,7 @@ async function passkeyFlow(browser, origin, mail, guard) {
       assert.equal(await page.locator('#status').textContent(), 'Signed in with a passkey.', 'confirmed feedback remains inline');
       await page.evaluate(() => document.fonts.ready);
       for (const scheme of ['light', 'dark']) {
-        await page.emulateMedia({colorScheme: scheme});
+        await selectTheme(page, scheme);
         const colors = await page.evaluate(() => {
           const heading = document.querySelector('#current-session h3');
           const badge = heading.querySelector('.badge');

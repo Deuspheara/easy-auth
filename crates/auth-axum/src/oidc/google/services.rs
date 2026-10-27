@@ -15,6 +15,11 @@ pub struct GoogleWebServices {
     pub(super) deletion: Arc<OidcAccountDeletion>,
 }
 impl GoogleWebServices {
+    #[cfg(feature = "social-linking-web")]
+    pub(in crate::oidc) fn policy(&self) -> &OidcIdentityPolicy {
+        &self.policy
+    }
+
     pub fn new(
         policy: OidcIdentityPolicy,
         transactions: Arc<OAuthTransactions>,

@@ -1,0 +1,9 @@
+{
+  "name": "cargo-cyclonedx",
+  "version": "0.5.9",
+  "archive_url": "https://static.crates.io/crates/cargo-cyclonedx/cargo-cyclonedx-0.5.9.crate",
+  "archive_sha256": "5d162f67705f0f5038759d73bf546a083bf30e8677c2e944b416bca48d9d69a8",
+  "lock_sha256": "907a775251bc3504de1df6c38830a2453ddbb1feef56b4bb9aa2a890a723abea",
+  "license": "Apache-2.0",
+  "scope": "Unchanged official SBOM generator source; separately patched and audited tooling lock. No application runtime dependency."
+}

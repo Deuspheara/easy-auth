@@ -76,7 +76,9 @@ async fn callback_claim_first_serializes_disable_without_holding_locks_for_netwo
     };
     wait_for_sql(
         &pool,
-        "SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2 FOR UPDATE%",
+        // Shared source-aware authorization also checks the original email
+        // snapshot. Observe that actual owner lock without omitting the predicate.
+        "%SELECT id FROM auth_users WHERE realm_id=$1 AND id=$2%FOR UPDATE%",
     )
     .await;
     let disabling = {

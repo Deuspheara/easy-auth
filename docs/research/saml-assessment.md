@@ -1,5 +1,7 @@
 # SAML verifier assessment — AUTH-3
 
+Historical assessment, retained with its original failures and evidence. Subsequent selection uses the maintained patched saml-rs dependency in [ADR0027](../architecture/adr/0027-maintained-saml-dependency.md); current opt-in activation follows [ADR0032](../architecture/adr/0032-saml-maintainer-directed-activation.md). The maintainer waiver supplies no independent review or approval. “No verifier selected” and “current” below describe the dated assessment, not today’s implementation.
+
 Assessment date: 2026-10-18. **No production verifier is selected. SAML remains a hard release blocker.** This is source and dependency research, not an independent security audit. No SAML runtime dependency or ACS is introduced by this assessment.
 
 ## Current selection checkpoint — 2026-10-20

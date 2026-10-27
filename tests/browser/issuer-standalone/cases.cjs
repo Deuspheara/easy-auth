@@ -79,6 +79,10 @@ async function run(browser,origin,fixture,actor,mail,listener) {
     const nativeComplete=await fixture.command('complete',{callback:actual.href});
     assert.equal(nativeComplete.verified,true);assert.equal(nativeComplete.native,true);assert.equal(nativeComplete.posts,1);
     const rotated=await fixture.command('refresh');assert.equal(rotated.rotated,true);assert.equal(rotated.posts,1);
+    stage='third-party-standards-client';
+    const standards=await fixture.createStandardsClient();
+    await standards.verify(consent);
+    await standards.rejectWrongState(consent);
     stage='privacy-logout';
     await page.goto(origin+'/');
     assert.equal(await page.evaluate(async ()=>(await fetch('/v1/session')).status),200);
@@ -87,10 +91,11 @@ async function run(browser,origin,fixture,actor,mail,listener) {
     assert.equal(await page.evaluate(async ()=>(await fetch('/v1/session')).status),401);
     const afterLogout=await fixture.command('refresh');assert.equal(afterLogout.invalid_grant,true);assert.equal(afterLogout.posts,1);
     stage='ordinary-key-rollover';
-    const rolloverFacts=await rollover.run({origin,fixture,mail,page,post,consent,plan});
+    const rolloverFacts=await rollover.run({origin,fixture,mail,page,post,consent,plan,standards});
     assert.equal(errors,0);
     return {smtp_signin:true,node_production_token:true,code_replay_rejected:true,access_is_not_local_session:true,
-      sdk_verified:true,bound_denial_without_post:true,native_sdk_verified:true,native_rotated:true,logout_blocks_refresh:true,browser_privacy:true,logout:true,...rolloverFacts};
+      sdk_verified:true,bound_denial_without_post:true,native_sdk_verified:true,native_rotated:true,logout_blocks_refresh:true,browser_privacy:true,logout:true,
+      standards_rp_verified:true,standards_rp_wrong_state_no_post:true,...rolloverFacts};
   } catch(error) {error.caseName=stage;throw error;} finally {actualCallback=null;await context.close();}
 }
 module.exports={run};

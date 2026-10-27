@@ -18,7 +18,8 @@ jobs:
         ports: ["5432:5432"]
         options: --health-cmd "pg_isready -U auth -d auth" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
-      DATABASE_URL: postgres://auth:ci-only-password@localhost:5432/auth
+      # Owned persistence probes intentionally require a literal loopback host.
+      DATABASE_URL: postgres://auth:ci-only-password@127.0.0.1:5432/auth
       CARGO_INCREMENTAL: '0'
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +32,9 @@ jobs:
           sudo apt-get install -y libssl-dev pkg-config cmake
       - name: Identify dependency cache environment
         id: cache-environment
+        env:
+          # Freeze source inputs before generated build trees exist; post-save reuses it.
+          DEPENDENCY_INPUT_HASH: ${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}
         run: |
           python3 - <<'PYTHON'
           import hashlib, os, subprocess
@@ -46,6 +50,7 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a") as output:
               if metadata is not None:
                   print("available=true", file=output)
+                  print("dependency-hash=" + os.environ["DEPENDENCY_INPUT_HASH"], file=output)
                   print("fingerprint=" + hashlib.sha256(metadata.encode()).hexdigest(), file=output)
               else:
                   print("available=false", file=output)
@@ -62,12 +67,21 @@ jobs:
             target/debug/build
             target/debug/deps
             ${{ runner.temp }}/easy-auth-security-tools
-          key: rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}-${{ github.sha }}
+          key: rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ steps.cache-environment.outputs.dependency-hash }}-${{ github.sha }}
           restore-keys: |
-            rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ hashFiles('Cargo.lock', '**/Cargo.toml', '.cargo/**', 'third-party/saml-rs-source.json', 'tests/provider/saml/rust-policy/patches/*.patch') }}-
+            rust-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-environment.outputs.fingerprint }}-${{ steps.cache-environment.outputs.dependency-hash }}-
       - run: python3 scripts/check_saml_source.py
       - run: python3 -m unittest scripts.test_saml_source
+      - name: Verify default container build-context exclusion
+        run: python3 scripts/check_container_build_context.py
+      - run: python3 -m unittest scripts.test_local_container_environment
+      - run: python3 -m unittest scripts.test_supply_chain
+      - name: Verify bounded benchmark accounting without load or provider credentials
+        run: |
+          python3 -m unittest scripts.test_authentication_benchmark scripts.test_authentication_http_benchmark
+          cargo test --locked -p easy-auth-server --example authentication_benchmark
       - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --workspace --all-targets -- -D warnings
       - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - run: cargo test --locked --workspace
       - run: cargo test --locked --workspace --all-features
@@ -116,6 +130,8 @@ jobs:
         run: cargo test --locked -p easy-auth-core --features oidc-verification
       - name: Verify Google without optional local identity mapping
         run: cargo test --locked -p easy-auth-core --features google
+      - name: Verify Apple without optional local identity mapping
+        run: cargo test --locked -p easy-auth-core --features apple
       - name: Verify gated SAML requests without a cryptographic provider
         run: |
           cargo test --locked -p easy-auth-core --features saml-requests saml::
@@ -134,6 +150,8 @@ jobs:
           cargo test --locked -p easy-auth-postgres --features saml-identities --test lifecycle saml::
       - name: Verify Google PostgreSQL integration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oidc::google
+      - name: Verify Apple PostgreSQL integration without Google or passkeys
+        run: cargo test --locked -p easy-auth-postgres --features apple --test lifecycle oidc::apple
       - name: Verify stable native OAuth registration without passkeys
         run: cargo test --locked -p easy-auth-postgres --features google --test lifecycle oauth::desktop
       - name: Verify Google desktop transport without local identity mapping
@@ -151,6 +169,20 @@ jobs:
       - name: Verify gated SAML HTTP without unrelated providers
         run: |
           cargo test --locked -p easy-auth-axum --features saml-web --test browser saml::
+      - name: Verify isolated Apple web HTTP boundaries
+        run: cargo test --locked -p easy-auth-axum --features apple-web --test browser apple_web
+      - name: Verify social linking without unrelated protocol features
+        run: |
+          cargo test --locked -p easy-auth-core --features google,apple,oidc-linking --lib oidc::
+          cargo test --locked -p easy-auth-postgres --features google,apple,oidc-linking --test lifecycle oidc::linking::
+          cargo test --locked -p easy-auth-axum --features social-linking-web --test browser social::
+      - name: Verify protected Apple grants with isolated feature selection
+        run: |
+          cargo test --locked -p easy-auth-core --features apple-grants --lib oidc::
+          cargo test --locked -p easy-auth-postgres --features apple-grants --test lifecycle oidc::apple::
+          cargo test --locked -p easy-auth-axum --features apple-grants-web --test browser apple_web::
+          cargo test --locked -p easy-auth-axum --features apple-grants-web,social-linking-web --test browser social::
+          cargo test --locked -p easy-auth-server --features apple-grants --lib oidc_http::
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -176,6 +208,7 @@ jobs:
           node tests/browser/issuer-native/run.cjs
       - name: Verify actual standalone and embedded issuer client parity
         run: |
+          node --test tests/browser/issuer-standalone/standards/fetch.test.cjs
           cargo build --locked -p easy-auth-server --features issuer-web,oidc-client --bin easy-auth --example issuer-client-acceptance
           node tests/browser/issuer-standalone/run.cjs
       - run: node tests/browser/oidc/deletion-client.cjs
@@ -187,6 +220,62 @@ jobs:
         run: |
           cargo build --locked -p easy-auth-axum --features google-web --example google-web-browser
           node tests/browser/google-web/run.cjs
+      - name: Verify owned Apple HTTPS form-post browser flow
+        run: |
+          cargo build --locked -p easy-auth-axum --features apple-web --example apple-web-browser
+          node tests/browser/apple-web/run.cjs
+      - name: Verify owned social linking and separate feature-disabled source control
+        run: |
+          cargo build --locked -p easy-auth-axum --features google-web --example social-source-probe
+          cp target/debug/examples/social-source-probe "$RUNNER_TEMP/easy-auth-social-source-probe"
+          cargo build --locked -p easy-auth-axum --features social-linking-web --example social-web-browser
+          node tests/browser/social/run.cjs
+        env:
+          EASY_AUTH_SOCIAL_SOURCE_PROBE: ${{ runner.temp }}/easy-auth-social-source-probe
+          EASY_AUTH_SOCIAL_WEB_TEST_REPORT: ${{ runner.temp }}/social-browser-${{ github.sha }}.json
+      - name: Verify captured Apple browser lifecycle and feature-disabled account erasure
+        run: |
+          cargo build --locked -p easy-auth-axum --no-default-features --example apple-grant-erasure-probe
+          cp target/debug/examples/apple-grant-erasure-probe "$RUNNER_TEMP/easy-auth-apple-erasure-probe"
+          cargo build --locked -p easy-auth-axum --features social-linking-web,apple-grants-web --example apple-grants-browser
+          node tests/browser/apple-grants/run.cjs
+        env:
+          EASY_AUTH_APPLE_GRANT_ERASURE_PROBE: ${{ runner.temp }}/easy-auth-apple-erasure-probe
+          EASY_AUTH_APPLE_GRANTS_TEST_REPORT: ${{ runner.temp }}/apple-grants-browser-${{ github.sha }}.json
+      - name: Verify both lifecycle receipts identify this checkout
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib, json, os
+          from pathlib import Path
+          profiles = [
+              ("social-browser", 13, "social-web-browser", "easy-auth-social-source-probe"),
+              ("apple-grants-browser", 9, "apple-grants-browser", "easy-auth-apple-erasure-probe"),
+          ]
+          for name, count, fixture, probe in profiles:
+              report = json.loads((Path(os.environ["RUNNER_TEMP"]) / f"{name}-{os.environ['GITHUB_SHA']}.json").read_text())
+              assert report["source_base_revision"] == os.environ["GITHUB_SHA"]
+              assert len(report["cases"]) == count
+              assert all(case["status"] == "passed" for case in report["cases"])
+              cleanup = report["cleanup"]
+              assert cleanup["stopped"] and cleanup["database_removed"]
+              assert not cleanup["emergency_cleanup"] and not cleanup["diagnostic"]
+              assert report["private_tls_files_removed"]
+              for field, binary in [
+                  ("fixture_binary_sha256", Path("target/debug/examples") / fixture),
+                  ("feature_disabled_probe_binary_sha256", Path(os.environ["RUNNER_TEMP"]) / probe),
+              ]:
+                  assert report[field] == hashlib.sha256(binary.read_bytes()).hexdigest()
+          PYTHON
+      - name: Retain sanitized social and Apple lifecycle receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-apple-lifecycle-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/social-browser-${{ github.sha }}.json
+            ${{ runner.temp }}/apple-grants-browser-${{ github.sha }}.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Verify owned SAML HTTPS POST browser flow
         run: |
           cargo build --locked -p easy-auth-axum --features saml-web --example saml-web-browser
@@ -238,6 +327,70 @@ jobs:
           node --experimental-vm-modules tests/browser/reference-ui/inventory-pagination.cjs
           node tests/browser/reference-ui/run.cjs
       - run: cargo build --locked -p easy-auth-server --bin easy-auth
+      - name: Verify separate database administration and runtime roles
+        run: |
+          python3 -m unittest discover -s scripts -p test_operational_recovery.py -v
+          python3 scripts/smoke_database_roles.py
+        env:
+          EASY_AUTH_DATABASE_ROLE_REPORT: ${{ runner.temp }}/database-roles-${{ github.sha }}.json
+      - name: Retain sanitized database role evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-roles-${{ github.sha }}
+          path: ${{ runner.temp }}/database-roles-${{ github.sha }}.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Prepare pinned offline backup encryption commands
+        run: |
+          python3 -m unittest discover -s scripts -p test_backup_tool.py -v
+          python3 scripts/prepare_backup_tool.py --destination "$RUNNER_TEMP/easy-auth-backup-tool"
+      - name: Verify encrypted backups and quarantined restoration
+        run: |
+          python3 -m unittest discover -s scripts -p test_encrypted_archives.py -v
+          python3 -m unittest discover -s scripts -p test_backup_archive_cli.py -v
+          python3 scripts/smoke_encrypted_backup.py
+        env:
+          EASY_AUTH_BACKUP_TOOL_DIRECTORY: ${{ runner.temp }}/easy-auth-backup-tool
+          EASY_AUTH_ENCRYPTED_BACKUP_REPORT: ${{ runner.temp }}/encrypted-backup-${{ github.sha }}.json
+      - name: Retain sanitized encrypted backup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-backup-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/encrypted-backup-${{ github.sha }}.json
+            ${{ runner.temp }}/easy-auth-backup-tool/receipt.json
+            ${{ runner.temp }}/easy-auth-backup-tool/logs/*audit*.log
+          if-no-files-found: error
+          retention-days: 14
+      - name: Prepare immutable migration and software upgrade fixtures
+        run: |
+          if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+            git fetch --no-tags --unshallow origin
+          fi
+          python3 -m unittest discover -s scripts -p test_upgrade_source.py -v
+          python3 -m unittest discover -s scripts -p test_upgrade_probe.py -v
+          python3 scripts/prepare_upgrade_fixture.py --destination "$RUNNER_TEMP/easy-auth-upgrade-fixture"
+          python3 scripts/prepare_upgrade_fixture.py --profile schema39 --destination "$RUNNER_TEMP/easy-auth-upgrade-prior"
+      - name: Verify failed migration recovery and owned replica replacement
+        run: python3 scripts/smoke_upgrade_recovery.py
+        env:
+          EASY_AUTH_UPGRADE_FIXTURE_DIRECTORY: ${{ runner.temp }}/easy-auth-upgrade-fixture
+          EASY_AUTH_UPGRADE_PRIOR_DIRECTORY: ${{ runner.temp }}/easy-auth-upgrade-prior
+          EASY_AUTH_BACKUP_TOOL_DIRECTORY: ${{ runner.temp }}/easy-auth-backup-tool
+          EASY_AUTH_UPGRADE_REPORT: ${{ runner.temp }}/upgrade-recovery-${{ github.sha }}.json
+      - name: Retain sanitized migration upgrade evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-upgrade-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/upgrade-recovery-${{ github.sha }}.json
+            ${{ runner.temp }}/easy-auth-upgrade-fixture/receipt.json
+            ${{ runner.temp }}/easy-auth-upgrade-prior/receipt.json
+          if-no-files-found: error
+          retention-days: 14
       - run: python3 scripts/smoke_recovery_notice.py
         env:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
@@ -245,6 +398,74 @@ jobs:
       - run: python3 scripts/audit.py
       - run: cargo install cargo-deny --locked --root "$RUNNER_TEMP/easy-auth-security-tools"
       - run: cargo deny --all-features check
+      - name: Build and check independent Rust and TypeScript client examples
+        run: |
+          cargo fmt --manifest-path examples/clients/rust/Cargo.toml -- --check
+          CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target" cargo test --locked --manifest-path examples/clients/rust/Cargo.toml
+          CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target" cargo clippy --locked --manifest-path examples/clients/rust/Cargo.toml --all-targets -- -D warnings
+          CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target" cargo build --locked --manifest-path examples/clients/rust/Cargo.toml
+          cargo audit --file examples/clients/rust/Cargo.lock
+          cargo deny --manifest-path examples/clients/rust/Cargo.toml --all-features --config deny.toml check
+          npm ci --ignore-scripts --prefix website
+          website/node_modules/.bin/tsc examples/clients/browser.ts --strict --target ES2022 --module ES2022 --lib ES2022,DOM --outDir target/client-example
+      - name: Build default container examples from committed public source
+        run: |
+          container_source="$RUNNER_TEMP/easy-auth-default-container-source"
+          mkdir "$container_source"
+          git archive HEAD | tar -x -C "$container_source"
+          docker build --tag easy-auth-default:ci "$container_source"
+          docker build --file "$container_source/deploy/saml/proxy.Dockerfile" --tag easy-auth-default-proxy:ci "$container_source"
+      - name: Verify owned default containers, independent clients and isolated backup
+        run: python3 scripts/smoke_container_examples.py
+        env:
+          EASY_AUTH_IMAGE: easy-auth-default:ci
+          EASY_AUTH_PROXY_IMAGE: easy-auth-default-proxy:ci
+          EASY_AUTH_CONTAINER_TEST_REPORT: ${{ runner.temp }}/default-container-${{ github.sha }}.json
+      - name: Assess default container images without advisory suppression
+        run: |
+          PYTHONPATH=scripts python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+          from saml_release.advisories import assess
+          report = assess("easy-auth-default:ci", "easy-auth-default-proxy:ci", Path("target/default-container-advisories"))
+          print(json.dumps({name: value["severity_counts"] for name, value in report["images"].items()}))
+          if not all(value["high_critical_gate_passed"] for value in report["images"].values()):
+              raise SystemExit("default image high/critical advisory gate failed")
+          PYTHON
+      - name: Record source dependency and license inventory
+        run: python3 scripts/record_supply_chain.py --output target/supply-chain-source.json
+      - name: Build audited pinned source SBOM generator
+        run: python3 scripts/prepare_sbom_tool.py --destination "$RUNNER_TEMP/easy-auth-sbom-tool"
+      - name: Verify source and exact default-image SBOM coverage
+        run: |
+          python3 scripts/record_supply_chain_sboms.py \
+            --tool-directory "$RUNNER_TEMP/easy-auth-sbom-tool" \
+            --output target/supply-chain-sboms \
+            --image-report default=target/default-container-advisories/auth.json \
+            --image-report default-proxy=target/default-container-advisories/proxy.json
+      - name: Retain sanitized source and default-image SBOM evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-${{ github.sha }}
+          path: |
+            target/supply-chain-source.json
+            target/supply-chain-sboms/summary.json
+            target/supply-chain-sboms/*.cdx.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Retain sanitized default container evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: default-container-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/default-container-${{ github.sha }}.json
+            target/default-container-advisories/summary.json
+            target/default-container-advisories/auth.json
+            target/default-container-advisories/proxy.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Retain only dependency build outputs in the cache
         if: github.event_name == 'push' && steps.cache-environment.outputs.available == 'true'
         run: cargo clean -p easy-auth-core -p easy-auth-postgres -p easy-auth-axum -p easy-auth-server
@@ -275,6 +496,11 @@ jobs:
           EASY_AUTH_SMOKE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
       - name: Assess all image advisory severities and gate high or critical findings
         run: python3 scripts/scan_saml_release.py --image easy-auth-saml-release:ci --proxy-image easy-auth-saml-proxy:ci
+      - name: Verify exact opt-in image SBOM package coverage
+        run: |
+          python3 scripts/record_image_sboms.py --output target/saml-image-sboms \
+            --image-report saml=target/saml-release-advisories/auth.json \
+            --image-report saml-proxy=target/saml-release-advisories/proxy.json
       - name: Retain exact-source release review evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -286,6 +512,8 @@ jobs:
             target/saml-release-advisories/auth.json
             target/saml-release-advisories/proxy.json
             target/saml-release-advisories/summary.json
+            target/saml-image-sboms/summary.json
+            target/saml-image-sboms/*.cdx.json
           retention-days: 14
   secrets:
     runs-on: ubuntu-latest

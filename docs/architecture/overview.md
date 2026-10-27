@@ -1,5 +1,53 @@
 # Architecture
 
+Explicit trusted retention composes one core policy/port with PostgreSQL lifecycle
+maintenance and a one-shot executable/library adapter. Candidate locking and a
+second Read Committed statement preserve current expiry/references; independent
+bounded commits avoid retaining child locks into parent operations. Existing Apple
+maintenance is shared without requiring a provider worker. No HTTP administration,
+implicit scheduler, credential/key reset or default audit-deletion policy is added.
+Local implementation qualification is recorded; see [retention](../guides/retention.md)
+and [ADR0050](adr/0050-bounded-realm-retention.md).
+
+Schema administration is a separate server command/library composition over the
+existing PostgreSQL adapter. Configured runtime can explicitly verify complete
+embedded SQLx history without DDL using separately provisioned runtime credentials.
+Default automatic migration remains compatible; failed verification never selects
+that path. No HTTP administration route or role-provisioning policy is introduced.
+See [ADR0047](adr/0047-schema-administration-and-runtime-verification.md) and the
+[database role procedure](../guides/database-roles.md).
+
+Explicit experimental Axum `social-linking-web` now composes matching existing
+Google/Apple transports with owner/session-bound link confirmation and retained-
+method local unlink. Separate provider builders expose no link mutation. Apple
+cross-site delivery remains cookie/storage-free; a state-only same-origin hint
+selects presentation and confers no authority. See the
+[social guide](../guides/social-linking.md) and [ADR0044](adr/0044-explicit-social-identity-linking.md).
+
+Optional core/PostgreSQL `oidc-linking` now extends existing provider modules with
+explicit purpose-bound linking and fresh retained-method unlink. Its mapped proof
+and original session are separate from public inventory metadata. Current source,
+owner, policy, uniqueness and original caps remain authoritative; identity/audit/
+verified-contact notice commit atomically with no session, contact or policy upgrade.
+An explicit-linked marker permits OIDC on existing mailbox accounts while retaining
+passkey requirements and rejecting accidental JIT-policy conversion. Unlink revokes
+and detaches removed-source sessions without breaking audit history, and installs
+the existing scoped cooldown against old callbacks. Provider-grant revocation and
+ordinary activation stay gated. [ADR0044](adr/0044-explicit-social-identity-linking.md)
+records this boundary and its remaining web/acceptance requirements.
+
+The optional core/PostgreSQL `apple` component now supplies protected ES256 client
+secrets, explicit web/native code redemption, a dedicated nonce-bound Apple RS256
+profile and shared sign-in preparation/completion. It reuses the existing opaque
+OAuth/identity/session and realm-scoped PostgreSQL boundaries. Initial consent
+names remain unsigned presentation; email never links accounts. Ordinary Apple
+startup, native OS adapter, registered-provider qualification and grant lifecycle
+remain gated. Explicit Axum `apple-web` composition now provides a non-authoritative
+cross-site form handoff and deliberate same-origin verified completion, preserving
+Lax cookies and preventing ambient account replacement. Owned HTTPS Chromium/PG
+evidence is separate from registered Apple acceptance. [ADR0043](adr/0043-apple-code-flow.md) and the
+[Apple guide](../guides/apple-setup.md) record exact scope and remaining gates.
+
 The optional server `issuer-web` composition now uses the same configured factory
 for executable and embedded delivery. Explicit HTTPS/key settings must match the
 current enabled persisted signing key; startup neither provisions nor enables

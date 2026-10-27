@@ -1,4 +1,192 @@
+Explicit Axum Apple capture extends owning `apple/authorization.rs` and
+`social/apple_authorization.rs` with closed concrete service selection; completion
+orchestration lives in named completion modules after separate extraction. Default
+builders keep discard behavior. The longer dual-path completion functions keep
+original intent/proof, verified result classification and matching core commit
+visible together as function-size exceptions; no HTTP policy/SQL/crypto or generic
+provider abstraction is added. Apple fixture construction was extracted separately
+before extension. Selected HTTP suites separate lifecycle, atomic faults and worker
+composition, reusing the maintained signing producer. New modules stay below300
+lines. Owned grant-browser fixtures separate shared lifetime, concrete composition,
+protected worker port, aggregate observations and fixture-only controls. A separate
+capture/linking-disabled probe separates bounded owned input, ordinary repository
+erasure and internal ciphertext comparison. Browser cases reuse existing journey
+and producer modules. Migration tests preserve real existing web/native sessions
+across the additive schema. Longer trusted constructors and ordered browser/
+migration cases retain actual setup, original controls and cleanup together as
+function-size exceptions; no unrelated cleanup is deferred.
+
 # Code organization
+
+Owned issuer `standards/` separates the third-party RP operation from its Fetch
+transport and input-boundary tests. The Fetch adapter retains raw response bytes,
+abort lifetime and bounded owned HTTPS I/O; the older Node assertion client owns
+JSON/primitive observations. Neither duplicates production authentication policy
+or becomes a generic transport framework. Existing case/rollover modules compose
+only the added checks and retain all original ordering/assertions. New modules
+stay below 100 lines and functions below 50; no runtime API, SQL or signing producer
+moves into tests, and no unrelated cleanup is bundled.
+
+Browser security headers and the unchanged CSP assertion live in `browser/headers`;
+they were extracted separately before telemetry changes. Private `observation`
+owns only a generated request ID, monotonic lifetime and original subscriber. It
+accepts no request metadata. The boundary keeps Origin/timeout/response composition
+visible together. HTTP tests separate event capture, untrusted-input privacy,
+observed database lock/rollback and controlled KDF overload/cancellation. Longer
+ordered pressure scenarios keep worker ownership, cancellation, permit retention
+and recovery controls visible together; no public introspection hook or weaker
+hash policy is added. New modules stay below 200 lines.
+
+The owned authentication benchmark stays in the server's examples: bounded load
+measurement, existing password-service calls and session fixtures/transactions
+have named modules. Its Python runner separates resource ownership/builds,
+single-child RSS observation and receipt validation, reusing the existing exclusive
+service lifetime. It adds no application policy, public proof constructor, SQL
+implementation, runtime dependency or monitoring endpoint. The longer load runner
+keeps worker launch, shared start and complete result collection together; the
+fixture's ordered proof setup keeps synthetic capability ownership explicit.
+
+The same benchmark folder owns a separate actual-HTTP workflow: fixed socket I/O,
+closed-loop accounting, genuine SMTP/credential journeys, single-child daemon RSS,
+log cross-checks and owned lifetime composition stay in named modules. Frozen
+build policy was extracted separately before adding the executable selection.
+The longer ordered repetition keeps daemon shutdown, private-log checks and
+database cleanup together; no runtime auth/SQL policy, public hook or dependency
+is introduced. Handwritten modules remain below 200 lines.
+
+Website `scripts/search/` owns pinned asset-format validation, staged file output
+and the narrow Starlight writer adapter in separate modules. Tests separate bundle
+faults, real filesystem/readback/cleanup and hook preservation/native indexing;
+shared ordinary HTML setup is test-only. The bounded lifetime diagnostic compares
+independent samples without becoming a build retry. Astro configuration remains
+composition; no auth policy, provider producer, generic plugin or dependency patch
+moves into the website. New modules and functions remain below the review triggers.
+
+Incident recovery qualification extends the native lifecycle suite in a named
+`incident/` module, reusing maintained signing, account and native-consumer fixtures.
+The physical-copy helper owns only SQLx test databases, connection lifetimes,
+server-backend observation and cleanup after scenario panics. The longer ordered
+scenario is a deliberate test-function size exception: it keeps the before-incident
+controls, live reductions, snapshot revival, independently checked family/key
+reductions and unaffected-realm controls visible in chronological order. No public
+proof constructor, production SQL, migration or generic recovery framework is added.
+
+Realm maintenance owns the existing Apple grant expiry/lease/terminal cleanup in
+PostgreSQL `maintenance/apple.rs`. It was moved without byte changes before behavior
+work; its public compatibility helper remains `apple-grants` gated, while default
+realm maintenance can reuse the private lifecycle without activating a worker.
+Provider revocation claim/ack/network policy stays in its owning feature.
+
+Core `retention/` owns validated operator horizons, the finite category order and
+the repository/use-case boundary. PostgreSQL `maintenance/` separates transaction/
+cancellation lifetime, closed candidate eligibility, parent-reference guards and
+the shared Apple lifecycle. SQL identifiers come only from the closed category
+match; ages/realm/tuple selections are parameters. The two-statement candidate/
+delete transaction remains visible; no generic plugin/query configuration is added.
+Server retention composition and finite environment parsing are named modules;
+binary entry files only dispatch/compose. Tests separate proof categories, leases,
+replay/admission, audit/session retention, genuine elapsed issuer graphs, cancellation,
+rollback, actual query plans and schema migration. Existing genuine SAML/OIDC/
+native cases add maintenance before unchanged rejection assertions.
+
+New modules remain under300lines. The closed28-category match and ordered Apple
+three-stage transaction are cohesive function-size exceptions: keeping their full
+selection/atomic order visible supports security review. Longer ordered integration
+scenarios retain original capabilities, waits, retained controls and final facts
+together; no production internals were made public for tests. Bounded local retention
+qualification is recorded in ADR0050; no unrelated cleanup is deferred.
+
+Apple grant capture extends `oidc/apple/grants/` with explicit authorization,
+opaque verified/mapped/capture types and repository use cases. Shared response
+projection, redemption and callback admission were extracted in separate tested
+commits. The response-owned capture projection holds unverified credentials only
+until signed proof passes. Protection stays in core; PostgreSQL completion/link
+transactions call a concrete optional capture hook under existing locks and caps.
+`oauth/identities/apple/` owns ciphertext insertion, trusted vault composition and
+row/version-based rotation. Migration0038 preserves jobs across ordinary unlink/
+deletion without depending on an optional worker.
+
+Core tests use existing actual signers. PostgreSQL cases separate lifecycle,
+atomic faults, schema, observed deadlines/source/concurrency and rotation;
+maintained producers load once. New modules stay below300 lines. Longer ordered
+fixtures/scenarios retain setup, actual waits, negative/positive controls and
+cleanup as size-review exceptions. No SQL/policy/proof constructor/registry or
+new dependency moves into HTTP. Core `grants/revocation/` separates protected jobs, request/response, ports and
+worker orchestration; PostgreSQL `apple/revocation/` separates claims, locked
+completion, maintenance and port delegation. Server transport shares protected
+form construction with an explicit private response profile; ordinary OIDC JSON
+assertions stay unchanged. New tests separate actual lease recovery, observed
+waits, binding/configuration, lifecycle and owned TLS responses. Explicit HTTP/browser
+integration now has owned qualification; real-provider gates remain open. No unrelated cleanup is deferred.
+
+Explicit Axum social management owns concrete matching services, thin provider
+handlers, closed wire types, original-owner/cookie binding, unlink delegation,
+composition, contract and fixed pages/controllers under `oidc/social/`. Existing
+provider route groups were extracted in a separate regression-tested commit.
+Private trusted selection metadata changes presentation only. Apple state-only
+return selection remains separate from cookie-free cross-site delivery and final
+authority. No SQL, account policy, provider framework or proof constructor moves
+into HTTP.
+
+Unchanged signing producers load once at the HTTP suite root, extracted separately.
+New feature suites separate lifecycle, binding, presentation/composition and actual
+audit/source faults. Owned browser modules separate process/composition, reused
+maintained authorization producers, ordinary mail delivery, journey observations
+and cases. New implementation/test modules remain below300 lines; longer ordered
+fixture constructors and browser cases retain coherent setup, negative/positive
+observations and cleanup as function-size exceptions. No unrelated cleanup or new
+dependency is introduced.
+
+Optional identity linking extends core `oidc/identities/linking.rs` and the owning
+Google/Apple authorization modules. Default operations still reject another
+purpose. PostgreSQL `oauth/identities/linking/` owns completion, retained-factor
+unlink and verified-contact notice enqueue; current source/session authorization
+and subject/cooldown helpers remain shared. Pure account-method eligibility lives
+in core; local credential mutation retains the existing local freshness validator.
+Audit kinds carry finite UUID metadata, not provider claims.
+
+Subject/owner lookup, Apple registered completion and test-producer module graphs
+were extracted in separate regression-tested commits before extension. Test modules
+separate lifecycle, binding, account policy, retained-factor races, atomic faults,
+observed deadlines and migration/privacy constraints. A producer is loaded only
+once per suite; no Clippy suppression, public proof constructor, SQL in HTTP,
+generic provider framework or new dependency is introduced. New implementation/test
+modules remain below300 lines. Longer ordered transactions/producer/scenarios keep
+lock order, original caps, mutations, rollback and valid/negative controls visible
+together as reviewed function-size exceptions. Migration constraints are explicit
+data, preserving published migrations. No unrelated cleanup is deferred.
+
+The explicit Axum Apple adapter extends `oidc/apple/`: trusted web services,
+routing, closed wire types, delivery escaping, thin completion/cancel handlers,
+fixed pages/script and selected contract each own one purpose. Existing cookie,
+Origin and post-delivery boundaries are reused; no SQL or identity policy moves
+into HTTP. The read-only core client-kind getter permits rejecting native
+registration before web composition, without a public proof constructor.
+
+Unchanged maintained Apple test signing moved separately into `tests/support/apple/`
+before HTTP/browser reuse. Named HTTP suites separate delivery, boundary, binding,
+completion, atomicity and contract. Owned example modules separate lifetime,
+composition and public-input signed producer; browser modules separate runner,
+journey observation, loopback fixture I/O and ordered cases. Modules stay below300
+lines. Longer ordered fixture constructors/producer/scenarios retain setup,
+actual observations, negative and valid controls together as reviewed function-size
+exceptions. No structural refactor is mixed into behavior, new dependency or
+unrelated cleanup deferred.
+
+Apple's optional core feature lives in `oidc/apple/`: protected key import,
+fixed client-secret issuance, nonce encoding, code exchange, authorization inputs,
+callback decoding, unsigned profile and orchestration each own one responsibility.
+The existing verifier retains signature workers, typed claims and opaque proof
+construction. Only an explicit private Apple profile admits signed text email
+flags/native nonce encoding; generic/Google behavior stays closed. No public proof
+constructor, SQL policy in handlers, new crate or provider framework is added.
+PostgreSQL adds no implementation or migration: its Apple feature composes existing
+ports. Named core/PG Apple suites own the new scenarios; provider fixtures use the
+maintained JOSE producer. New modules remain below200 lines. Longer ordered tests
+keep setup, actual waits, negative assertions and valid controls together as reviewed
+function-size exceptions. The slightly longer key/service constructors and
+sign-in completion keep explicit policy validation, bounded native work and the
+one-use consume/cancel decision visible together; no unrelated cleanup is deferred.
 
 The initial Basecoat integration extracted `theme.js` (existing preference projection) and
 `presentation-motion.js` (optional interpolation/owned cancellation). The fixed

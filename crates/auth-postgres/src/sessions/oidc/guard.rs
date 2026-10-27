@@ -13,6 +13,16 @@ pub(in crate::sessions) struct LockedSource {
 }
 
 impl LockedSource {
+    #[cfg(feature = "oidc-linking")]
+    pub(in crate::sessions) async fn explicitly_linked(
+        &self,
+        tx: &mut Transaction<'_, Postgres>,
+        realm: Uuid,
+        owner: Uuid,
+    ) -> Result<bool> {
+        sqlx::query_scalar("SELECT explicitly_linked FROM auth_oidc_identities WHERE realm_id=$1 AND id=$2 AND user_id=$3")
+            .bind(realm).bind(self.identity).bind(owner).fetch_optional(&mut **tx).await.map_err(unavailable)?.ok_or(Error::Unauthorized)
+    }
     pub(in crate::sessions) async fn lock(
         tx: &mut Transaction<'_, Postgres>,
         realm: Uuid,
@@ -92,9 +102,30 @@ impl LockedSource {
         current: Verifier,
     ) -> Result<Uuid> {
         self.recheck(tx, realm, current).await?;
+        let policy: String = sqlx::query_scalar(
+            "SELECT authentication_policy FROM auth_users WHERE realm_id=$1 AND id=$2",
+        )
+        .bind(realm)
+        .bind(owner)
+        .fetch_optional(&mut **tx)
+        .await
+        .map_err(unavailable)?
+        .ok_or(Error::Unauthorized)?;
+        let policy = auth_core::AuthenticationPolicy::try_from(policy.as_str())?;
+        #[cfg(feature = "oidc-linking")]
+        let linked = if policy == auth_core::AuthenticationPolicy::Mailbox {
+            self.explicitly_linked(tx, realm, owner).await?
+        } else {
+            false
+        };
+        #[cfg(not(feature = "oidc-linking"))]
+        let linked = false;
+        if !policy.permits_session_method("oidc", linked) {
+            return Err(Error::Unauthorized);
+        }
         sqlx::query_scalar(r#"
             SELECT s.id FROM auth_sessions s JOIN auth_users u ON u.realm_id=s.realm_id AND u.id=s.user_id
-            WHERE s.realm_id=$1 AND s.user_id=$2 AND s.token_hash=$3 AND u.authentication_policy='provider_required'
+            WHERE s.realm_id=$1 AND s.user_id=$2 AND s.token_hash=$3
               AND s.authentication_method='oidc' AND s.revoked_at IS NULL
               AND s.expires_at>clock_timestamp() AND s.last_seen_at>clock_timestamp()-interval '30 minutes'
               AND isfinite(s.authenticated_at) AND s.authenticated_at>clock_timestamp()-interval '5 minutes'
