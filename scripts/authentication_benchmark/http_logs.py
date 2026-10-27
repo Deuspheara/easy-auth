@@ -11,13 +11,16 @@ def summarize(data, private_values, result):
         raise ValueError('daemon output contained a private fixture value')
     text = re.sub(r'\x1b\[[0-9;]*m', '', data.decode())
     statuses = Counter()
+    diagnostics = Counter()
     identifiers = set()
     for line in text.splitlines():
         if 'http_request_cancelled' in line:
             raise ValueError('unexpected socket cancellation observation')
         if 'http_request_completed' not in line:
-            if line and not line.endswith('auth_server_started'):
+            message = line.rsplit(': ', 1)[-1]
+            if message not in ('auth_server_started', 'development_http_and_smtp_enabled'):
                 raise ValueError('unexpected daemon diagnostic')
+            diagnostics[message] += 1
             continue
         fields = {}
         for field in shlex.split(line.split('http_request_completed', 1)[1]):
@@ -39,8 +42,11 @@ def summarize(data, private_values, result):
     expected.update(str(status) for status in result['daemon']['readiness_statuses'])
     for report in result['reports']:
         expected.update({status: value['count'] for status, value in report['outcomes'].items()})
+    if diagnostics != {'auth_server_started': 1, 'development_http_and_smtp_enabled': 1}:
+        raise ValueError('missing or duplicate owned startup diagnostic')
     if statuses != expected:
         raise ValueError('daemon and observed request accounting differ')
     return {'sha256': hashlib.sha256(data).hexdigest(), 'events': sum(statuses.values()),
             'status_counts': dict(statuses), 'unique_generated_request_ids': len(identifiers),
+            'startup_diagnostics': dict(diagnostics),
             'private_value_scan': 'pass'}

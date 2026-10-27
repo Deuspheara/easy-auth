@@ -25,6 +25,7 @@ def logs():
     lines = [f'INFO http_request_completed request_id={uuid.uuid4()} status={status} '
              'duration_micros=1 completion="response"'
              for status, count in counts.items() for _ in range(count)]
+    lines += ['INFO fixture: auth_server_started', 'WARN fixture: development_http_and_smtp_enabled']
     return result, lines
 
 
@@ -67,12 +68,13 @@ class HttpEvidenceTests(unittest.TestCase):
     def test_actual_log_counts_ids_and_private_canaries_are_checked(self):
         result, lines = logs()
         report = summarize('\n'.join(lines).encode(), [b'private-canary'], result)
-        self.assertEqual(report['events'], len(lines))
-        self.assertEqual(report['unique_generated_request_ids'], len(lines))
+        self.assertEqual(report['events'], len(lines) - 2)
+        self.assertEqual(report['unique_generated_request_ids'], len(lines) - 2)
         for changed in (lines[:-1], lines + [lines[0]],
                         [lines[0].replace('response', 'timed_out'), *lines[1:]],
                         [lines[0] + ' raw_token=unexpected', *lines[1:]],
                         [*lines, 'unexpected diagnostic'],
+                        [*lines, lines[-1]],
                         [*lines, 'private-canary']):
             with self.assertRaises(ValueError):
                 summarize('\n'.join(changed).encode(), [b'private-canary'], result)
