@@ -1,11 +1,11 @@
 # Optional mailbox and account policy
 
-AUTH-53's identity/storage boundary supports users without email. Optional
+The identity/storage boundary supports users without email. Optional
 [core/PostgreSQL passkey signup](passkey-signup.md) now requires verified assertion
 before account/session creation, now with explicit experimental HTTP and native
 Chromium resident signup/login. [Contact attachment](email-attachment.md) has
 core/PostgreSQL and experimental HTTP tests, plus native Chromium platform/USB
-signup-to-SMTP confirmation evidence. Ordinary passkey composition stays disabled. AUTH-20's stronger-account lifecycle/recovery remains a release gate.
+signup-to-SMTP confirmation evidence. Ordinary passkey composition stays disabled. Stronger-account lifecycle/recovery remains a release gate.
 
 ## User contract
 
@@ -41,7 +41,7 @@ Email/password login, password enrollment/reset and the current mailbox-based
 email-change/deletion operations reject stronger accounts, including existing
 proofs issued before a policy change. These checks run in the final transaction,
 after relevant locks. Rejecting mail-only lifecycle operations does not complete
-stronger-account deletion/recovery; AUTH-20 must implement those workflows.
+stronger-account deletion/recovery; those workflows have separate acceptance requirements.
 
 Authenticated sensitive actions without email have separate durable budgets:
 10 per realm/user and 40 per realm/source per fixed ten-minute window. Existing

@@ -52,7 +52,7 @@ completion retry or weaker fallback. Recheck owner/view before logout and requir
 the actual refreshed owner to match before reading inventory. Existing core/SQL
 freshness and credential restrictions remain authoritative.
 
-The subsequent owner refinement uses a 660px overview, a shared brand/theme header
+The account layout uses a 660px overview, a shared brand/theme header
 and native navigation rows. Keep recovery under Security and separate current-session
 sign-out from full session management. Preserve the exact all-session semantics of
 bulk revocation. Show key counts only after a successful explicit inventory read;
@@ -68,17 +68,16 @@ replaced by the next operation. No location/device inference is added.
 
 ## Style and accessibility boundary
 
-The maintainer's revised visual direction follows the
+The presentation follows the
 [authentication design contract](../../design/reference-ui.md): compact centered
 sign-in and flat account settings, semantic tokens, locally bundled Inter and
-equal OS-driven light/dark themes. The owner-approved supplied-design composition
+equal OS-driven light/dark themes. The layout
 uses a 400px anonymous authentication/reset column and a 660px account/recovery
 column, with focused password, registration and help URLs. The closed
 view selector is presentation only, bounded by selected capabilities. The inbox
 state follows an actual email-start response and explicit resend uses the original
 in-memory input and unchanged API limits. Direct inbox navigation returns to sign-in.
-Normal page navigation retains existing cancellation and password clearing. The earlier aurora candidate was rejected and
-is superseded; it is not a visual acceptance baseline.
+Normal page navigation retains existing cancellation and password clearing.
 
 Permit only the exact combined Basecoat/token/layout stylesheets' SHA-256 hash in CSP. Keep default-src
 none, same-origin scripts/connect/forms, base denial and frame denial. Explicitly
@@ -129,8 +128,7 @@ not prove fresh authentication. Cancellation remains explicit in labelled native
 disclosures; consent and consequences remain beside each decision. Readiness,
 expiry and completion remain server-authoritative, without polling or retries.
 
-The supplied design's prototype adapter, invented response flags and broader
-CSP suggestions were not adopted. Only application layout, accessibility and
+Application layout, accessibility and
 strict-CSP exceptions augment Vega: local Inter, responsive text wrapping, 44px
 action targets, visible forced-color focus, stronger input boundaries, native
 modal geometry and a native checkbox indicator instead of blocked data images.

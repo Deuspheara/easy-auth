@@ -39,7 +39,7 @@ compatibility, inline-key or alternative-algorithm fallback.
 
 [ADR 0027](0027-maintained-saml-dependency.md) supersedes the unresolved ownership
 choice: easy-auth now maintains and distributes the existing patched source in
-this repository. The project owner's acceptance covers maintenance, not security
+this repository. This decision establishes maintenance responsibility, not security
 approval. Upstream merging is no longer a prerequisite. The original three
 qualification patches, source pin, AWS-LC-only selection and all production
 security gates are retained. ADR 0027 also records ordinary producer maintenance

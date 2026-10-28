@@ -4,9 +4,10 @@ The core/PostgreSQL `oidc-identities` features add local provider identity resol
 after the [transaction-bound verifier](oidc-verification.md). They enable no HTTP
 route by themselves. The separate [opt-in Axum browser boundary](oidc-web.md) now
 provides shared sign-in/callback routes and trusted server configuration, with owned
-two-mode public-flow acceptance. AUTH-30's backend boundary has
-passed local and hosted acceptance; provider linking/unlinking is AUTH-25 and
-stronger-account recovery gates remain open.
+two-mode public-flow acceptance. The backend boundary has
+passed local and hosted acceptance. Provider linking/unlinking uses a separate
+[experimental social composition](social-linking.md); stronger-account recovery
+gates remain open.
 [ADR 0016](../architecture/adr/0016-oidc-identity-mapping.md) records policy.
 
 ## Trusted setup
@@ -79,10 +80,10 @@ Logout can dispose of an owned bearer even if its provider source is disabled.
 
 Provider-required users do not acquire mailbox/password, passkey sign-in or saved-code
 passkey recovery fallback, even if trusted storage later has verified contact. Public provider contact attachment and policy transition remain unimplemented.
-AUTH-55 provides a separate optional
-[provider deletion use case and HTTP boundary](oidc-account-deletion.md), with
-component and owned Keycloak-to-HTTP evidence. AUTH-56 owns supported embedded
-and standalone OIDC web composition and depends on that lifecycle boundary.
+A separate optional
+[provider deletion use case and HTTP boundary](oidc-account-deletion.md) has
+component and owned Keycloak-to-HTTP evidence. Supported embedded and standalone
+OIDC web composition depends on that lifecycle boundary.
 Ordinary provider activation and complete first-release lifecycle remain
 separate gates. Applications must not fabricate contact or weaken policy to work around
 an unavailable lifecycle operation.
@@ -156,7 +157,7 @@ verified proof. Prefer the PostgreSQL startup operation, which compares the enti
 stored definition/policy and enable state under locks. Never expose these administrative
 APIs, revisions, provider credentials or JIT selection as browser authority.
 
-This Rust startup/persistence API is used by AUTH-56's shared configured application
+This Rust startup/persistence API is used by the shared configured application
 factory. [OIDC web settings, routes and owned two-mode public-flow evidence](oidc-web.md)
 are implemented under [ADR 0018](../architecture/adr/0018-oidc-web-composition.md),
 with explicit private-TLS/source-copy limits and final hosted/release gates.

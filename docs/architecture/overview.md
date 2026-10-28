@@ -1,5 +1,10 @@
 # Architecture
 
+This document describes component boundaries and incremental implementation records.
+Use the [README capability summary](../../README.md#what-it-provides) and the owning
+integration guides for current availability; older staged descriptions retain
+their original scope where later decisions supersede them.
+
 Explicit trusted retention composes one core policy/port with PostgreSQL lifecycle
 maintenance and a one-shot executable/library adapter. Candidate locking and a
 second Read Committed statement preserve current expiry/references; independent
@@ -78,7 +83,7 @@ Earlier source-disabled stage descriptions below are superseded only as to
 activation policy; their assurance gaps remain unverified, not independently approved.
 
 
-Project name: easy-auth (selected by the project owner). Rust stable, Tokio, Axum, SQLx/PostgreSQL. One binary and PostgreSQL; SMTP is a configurable delivery dependency. No mandatory JavaScript runtime or cache.
+easy-auth uses Rust stable, Tokio, Axum and SQLx/PostgreSQL. One binary and PostgreSQL; SMTP is a configurable delivery dependency. No mandatory JavaScript runtime or cache.
 
 The first workspace has auth-core (use cases, repository/email ports and domain DTOs), auth-postgres (SQL transactions/migrations), auth-axum (HTTP/cookie boundary) and auth-server (composition/config). Protocol modules are added only as implemented; no empty protocol crates. An SDK is introduced with a real remote use case. Domain authorization remains in the consuming application.
 

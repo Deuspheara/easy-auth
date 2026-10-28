@@ -1,6 +1,6 @@
 ## Problem and resulting behavior
 
-Huly issue:
+Related public issue (if applicable):
 
 ## Validation
 

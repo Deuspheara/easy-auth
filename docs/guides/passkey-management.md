@@ -1,6 +1,6 @@
 # Experimental passkey management
 
-AUTH-20 is in progress. Optional core/PostgreSQL and explicit experimental HTTP
+Optional core/PostgreSQL and explicit experimental HTTP
 management provide bounded inventory, rename and removal. A separate explicit
 experimental saved-code recovery flow includes delayed claims, cancellation,
 replacement registration/assertion and reference pages, described below.
@@ -52,7 +52,7 @@ implementations must report unavailable delivery honestly. The real SMTP adapter
 implements it. No raw credential, label, recovery secret or sign-in link enters a
 notice. Email-free users have no fabricated notification address or implied email
 recovery; the saved-code flow's email-free notification limits remain explicit
-AUTH-20 review requirements.
+recovery review requirements.
 
 Migration 0012 adds management versions and bounded target/audit/notice schema.
 Existing key encodings, metadata, owner IDs and session provenance are preserved;

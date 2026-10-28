@@ -116,5 +116,5 @@ with the unchanged ordinary fixture signer. Genuine OIDC/SAML provider cases reu
 existing normal producers and show original auth_time, no cookie-idle extension,
 current-policy/source denial and post-disable credential cleanup. These are bounded
 owned tests, not independent certification, a security audit or production approval.
-SDK/standalone standards-client parity remains AUTH-41; SAML ADR0032 waived
-independent review rather than performing it.
+SDK/standalone standards-client parity has separate acceptance requirements.
+SAML ADR0032 waived independent review rather than performing it.

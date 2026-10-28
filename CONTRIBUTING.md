@@ -1,18 +1,80 @@
 # Contributing
 
-Read README.md, AGENTS.md, architecture ADRs and the threat model. Huly AUTH is the development tracker; public GitHub proposals may be triaged into Huly by maintainers. Work on one scoped issue with acceptance tests. No credentials or private workspace data in issues, code, fixtures or logs.
+Documentation fixes, bug reports, reproducible test cases and focused code changes
+are welcome. Original contributions are licensed under MIT OR Apache-2.0.
 
-Maintainability is required for acceptance. Follow the [clean-code rules in AGENTS.md](AGENTS.md#maintainability-and-clean-code) and the [code organization guide](docs/architecture/code-organization.md). Keep entry files thin, organize implementation and tests by responsibility, use narrow visibility, and separate structural refactors from behavior changes. Files around 300 lines or functions around 50 lines require a responsibility review and either a cohesive split or a concrete justification. These thresholds are review prompts, not a reason to compress code or obscure security invariants.
+## Start a contribution
 
-Use Rust 1.95 and Docker. Start development services with docker compose up -d --wait, load .env.example, then cargo fmt --all -- --check; cargo clippy --workspace --all-targets -- -D warnings; cargo test --workspace. Database tests create isolated test databases and require the development/CI DB role to have CREATEDB; production runtime roles should not.
+Use [GitHub issues](https://github.com/Deuspheara/easy-auth/issues) for public bugs
+and proposals. Describe the problem, expected behavior, relevant versions and a
+minimal reproduction. Discuss substantial changes before implementing them.
+Public contributors do not need access to the maintainers' internal tracker.
 
-Also run strict Clippy with `--all-features`, then test default and all features
-sequentially. Do not overlap separate Cargo test runs against the same PostgreSQL
-server: SQLx derives fixture database names from test paths, so feature variants
-can reset each other's databases. Optional passkey tests need OpenSSL development
-libraries and pkg-config, including the test-only software authenticator. Audit
-all workspace features with `python3 scripts/audit.py` and `cargo deny --all-features check`.
+Keep each pull request focused on one problem. Explain the resulting behavior,
+link the relevant public issue when available, and record validation and remaining
+limitations. Never include credentials, private workspace data or personal account
+details in issues, fixtures, screenshots or logs. Use the [security policy](SECURITY.md)
+for vulnerabilities and follow the [code of conduct](CODE_OF_CONDUCT.md).
 
-Schema changes require new migrations. Authentication/protocol changes need negative, replay, tenant and concurrency tests plus documentation. No custom cryptography or XML signature validation. Keep protocol-specific checks visible and avoid speculative abstractions. A release needs the full-lockfile/compiled-graph audit in scripts/audit.py, cargo deny, secret scans and conformance evidence.
+## Set up locally
 
-Original contributions are dual MIT OR Apache-2.0. Confirm third-party license compatibility and preserve attribution before introducing code/assets. Follow CODE_OF_CONDUCT.md; use SECURITY.md for vulnerabilities.
+Follow the [README quick start](README.md#quick-start) with Rust 1.95 and Docker
+Compose. Database tests create isolated PostgreSQL databases; the development/CI
+role needs `CREATEDB`. Production runtime roles should not have that privilege.
+Optional passkey tests also require OpenSSL development libraries and `pkg-config`,
+including for the test-only software authenticator.
+
+## Code and documentation
+
+Read the [architecture overview](docs/architecture/overview.md), relevant
+[architecture decisions](docs/README.md#architecture-and-design), and
+[threat model](docs/security/threat-model.md). The [code organization guide](docs/architecture/code-organization.md)
+and [agent instructions](AGENTS.md) describe the implementation boundaries.
+
+- Keep entry files thin and group implementation and tests by domain responsibility.
+- Use narrow visibility and keep HTTP handling, core policy and PostgreSQL transactions separate.
+- Separate structural refactors from behavior changes. Files near 300 lines or functions near 50 lines need a responsibility review, a cohesive split or a concrete justification.
+- Preserve transaction boundaries, lock ordering, authorization and realm isolation.
+- Add migrations for schema changes; do not edit published migrations.
+- Cover changed authentication behavior with negative, replay, concurrency and tenant-isolation tests. Update affected contracts and guides.
+- Reuse reviewed protocol implementations. Do not introduce custom cryptography or XML signature verification.
+
+Write public documentation around current behavior, setup, limitations and technical
+rationale. Keep personal requests, individual design approvals and private tracker
+content out of it. Historical test records must retain their dates, source scope
+and assurance limits; passing local tests does not establish an audit or production readiness.
+Preserve third-party attribution and check license compatibility for new code or assets.
+
+## Validate a change
+
+With the development environment loaded, run:
+
+```sh
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+python3 scripts/audit.py
+cargo deny --all-features check
+```
+
+Run default and all-feature test suites sequentially. SQLx derives fixture database
+names from test paths, so overlapping feature variants can reset one another's
+databases. The repository defaults to four test workers to fit SQLx's shared
+20-connection budget; overrides must leave room for lock gates, concurrent actions
+and observers. Individual scenarios still exercise concurrency.
+
+Database tests must run against real PostgreSQL. Record exact failures or unavailable
+services rather than treating skipped checks as passes. Run the relevant browser
+or provider suites for affected features, and preserve negative coverage when moving tests.
+With the application running, `python3 scripts/smoke.py` exercises the local flow.
+CI also runs source secret scanning and dependency/license checks; see the
+[CI guide](docs/guides/ci.md).
+
+For website changes, follow [website/README.md](website/README.md). The website
+publishes allowlisted guides from committed Git objects, so an uncommitted guide
+edit is not included in a normal site preview.
+
+Review the changed file tree, naming, visibility and responsibility boundaries
+alongside test results. Document justified size exceptions and deferred cleanup.

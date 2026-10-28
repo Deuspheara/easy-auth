@@ -83,8 +83,8 @@ fallback and selected provider deletion. Google uses its existing owned transpor
 this is not manual real-Google registration acceptance. Existing recovery cases
 remain a separate full regression suite. No physical-device, accessibility audit,
 independent SAML review, protocol certification or production-readiness claim.
-The owner approved the rendered design and verification journey on 2026-10-25.
-That visual decision is separate from the automated verification recorded here.
+Local visual inspection of the rendered design and verification journey was
+recorded on 2026-10-25, separately from the automated verification above.
 
 
 The Motion module probes real Axum CSP through completion, overlapping effects,
@@ -102,4 +102,4 @@ and masks nonempty password and recovery-code fields. Capture names are fixed;
 no proof URL, browser state or secret is included in the manifest or filename.
 Recovery captures cover verification, preparation, masked offline-code saving,
 confirmation, waiting, server-authorized replacement and completion. These are
-local review artifacts, not owner approval or configured-provider coverage.
+local review artifacts, not design acceptance or configured-provider coverage.

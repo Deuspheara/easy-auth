@@ -66,7 +66,7 @@ credential is changed. Real provider/browser/native interoperability remains
 subsequent acceptance work; normal server composition activates no provider flow.
 
 
-The AUTH-29 document primitive `refresh_jwks(&observed)` supports the future
+The document primitive `refresh_jwks(&observed)` supports the future
 verifier's unknown-key path. Supply the prior `OidcJwksDocument`, not a URL or key
 ID. An already completed newer fresh snapshot is reused; otherwise a forced attempt
 requires the fixed 30-second refresh budget and ordinary one-second miss interval.
@@ -81,5 +81,5 @@ Trusted startup can call `OidcDocuments::validate_configuration(&connection,
 egress metadata policy, performs no DNS/HTTP/database I/O and establishes no current
 enable/revision or identity authority. The actual document constructor still
 validates its inputs, and every operation retains existing current-source, address,
-cache and deadline checks. AUTH-56's server factory uses this metadata check before
+cache and deadline checks. The server factory uses this metadata check before
 its stable identity-policy loader; no development root/address override is added.

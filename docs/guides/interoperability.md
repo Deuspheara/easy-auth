@@ -9,11 +9,11 @@
 | Embedded vs standalone | Same Auth use cases/router; compiled custom protected-route example | Fresh contributor walkthrough pending | Implemented shared composition |
 | Passkey registration | Real PostgreSQL attack/concurrency/rollback corpus; experimental HTTP boundary/contract; eight real Chromium virtual-authenticator cases | No real-device evidence | Experimental opt-in only; ordinary composition disabled |
 | Passkey sign-in and modal discoverability | Real signed protocol/database corpus, experimental HTTP contract and native Chromium platform/USB assertions, resident discovery, signed context/backup/counter checks | No real-device evidence | Explicit experimental composition; ordinary activation gated |
-| Stronger-account management and recovery | Core/PostgreSQL and experimental HTTP inventory, versioned rename and proven-last-key removal; recovery unfinished | Real registration/assertion controls and native platform/USB management with real SMTP notices; physical devices and other browsers pending | AUTH-20 remains In Progress; ordinary activation blocked |
-| Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated through AUTH-20 |
+| Stronger-account management and recovery | Core/PostgreSQL and experimental HTTP inventory, versioned rename and proven-last-key removal; recovery unfinished | Real registration/assertion controls and native platform/USB management with real SMTP notices; physical devices and other browsers pending | Stronger-account acceptance incomplete; ordinary activation blocked |
+| Verified contact attachment | 15 PostgreSQL binding/race/rollback/expiry/migration tests, 3 captured-mail HTTP cases and 2 native platform/USB signup-to-real-SMTP confirmation cases | No real-device or other-browser evidence | Experimental signup composition only; ordinary activation gated on stronger-account acceptance |
 | Email-free passkey signup | Two-stage core/PG proof and concurrency/rollback/expiry corpus; strict opt-in HTTP; 11 Chromium anonymous resident platform/USB signup cases plus later bound/discoverable login | No real-device evidence | Experimental; full stronger-account lifecycle/recovery unfinished |
-| Google web/native | Offline RS256/claims and real PostgreSQL one-use, source, native process/socket and HTTPS browser regressions | [Public metadata/TLS preflight](../../tests/provider/google/README.md); no registered-client or actual OS browser sign-in evidence | Experimental components; ordinary activation, genuine freshness and lifecycle remain gated in AUTH-23 |
-| Apple web/native | None yet | None | M04 required; unavailable |
+| Google web/native | Offline RS256/claims and real PostgreSQL one-use, source, native process/socket and HTTPS browser regressions | [Registered Desktop IPv4/IPv6 manual runs](../../tests/provider/google/README.md) on macOS; browser version unrecorded; broader provider/browser coverage incomplete | Experimental components; ordinary activation, genuine freshness and lifecycle remain gated |
+| Apple web/native | None yet | None | Planned; unavailable |
 | Enterprise OIDC verification/code exchange, JIT and provider deletion | Signature/claim/refresh corpus, real PostgreSQL identity/realm/disable/deadline tests and 23 backend, 6 HTTP-deletion and 18 configured two-mode public-flow Keycloak/browser cases; shared production HTTPS sources with explicit private fixture root/address mapping | No production-provider, native app or independent audit evidence | Optional shared browser configuration/sign-in/deletion plus backend boundaries have owned acceptance; dated checks are in the [verification history](../security/verification.md). Linking and broader first-release gates remain open |
 | SAML SP | None yet | None | M06 hard validator/security blocker; unavailable |
 | Outbound OIDC issuer | None yet | None | M07 release blocker; unavailable |
@@ -101,7 +101,7 @@ address and independent-browser rejection, and subsequent bound/discoverable log
 All268 source hashes match immutable producer c13d7de; the binary hash is recorded.
 No seeded sessions, key metadata mutation or capturing mail adapter is used. Its
 owned DB and three messages are removed. This resolves the earlier attachment
-checkpoint; physical devices, other browsers and AUTH-20 recovery remain open.
+checkpoint; physical devices, other browsers and stronger-account recovery remain open.
 See the [reproduction guide](../../tests/browser/passkeys/attachment/README.md).
 
 After enrollment's final-write deadline correction, both suites were rebuilt and
@@ -163,8 +163,7 @@ Final counts require the surviving mailbox user/session, six audits with four
 provider facts deidentified, one deletion/cooldown and no provider identity/session
 authority. This is backend acceptance, not a supported public HTTP deletion flow,
 production-provider acceptance or SMTP provider-contact evidence. The opt-in HTTP/browser boundary now has separate component/client checks and
-six real provider-to-HTTP cases, recorded below. Ordinary composition is
-AUTH-56. No independent review or ordinary activation claim follows.
+six real provider-to-HTTP cases, recorded below. Ordinary composition is described in the [OIDC browser guide](oidc-web.md). No independent review or ordinary activation claim follows.
 
 
 ## AUTH-55 actual HTTP provider deletion — 2026-10-20

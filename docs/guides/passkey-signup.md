@@ -6,7 +6,7 @@ experimental Axum composition now exposes this flow, with real Chromium platform
 roaming virtual-authenticator signup and subsequent account-bound/discoverable login.
 Verified contact attachment now has shared-core/PostgreSQL and experimental HTTP
 implementation with database and captured-mail tests, plus native Chromium
-platform/USB signup-to-SMTP confirmation evidence. AUTH-20's stronger-account
+platform/USB signup-to-SMTP confirmation evidence. Stronger-account
 management/recovery remains required before ordinary standalone/server activation. No real-device or
 production claim.
 

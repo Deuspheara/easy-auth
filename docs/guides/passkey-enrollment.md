@@ -1,6 +1,6 @@
 # Passkey enrollment implementation boundary
 
-AUTH-18 is complete. The optional core/PostgreSQL enrollment path persists
+The optional core/PostgreSQL enrollment path persists
 and verifies registration ceremonies. An explicit experimental HTTP composition
 and Chromium virtual-authenticator tests are implemented; normal embedded/server
 composition does not enable it. Experimental [passkey sign-in](passkey-authentication.md)
@@ -123,7 +123,7 @@ an actual cross-origin POST and another browser missing the binding cookie.
 Each case has a successful registration control; aggregate credentials and audit
 facts must match, pending state must be empty, and the disposable database must be
 removed. This establishes that specific virtual-browser boundary, not real-device,
-Safari/Firefox or recovery interoperability. AUTH-19 extends the suite with native
+Safari/Firefox or recovery interoperability. The sign-in suite extends this coverage with native
 assertions and modal resident discovery, documented in the sign-in guide.
 
 The `passkey-enrollment` Axum feature exports an explicitly named experimental

@@ -30,7 +30,7 @@ check pending-only start, missing-proof cancellation refusal, successful bound
 cancellation and spent cancellation refusal without changing trust or authority.
 This is outgoing delivery acceptance; inbound XML/signature assurance and wider
 provider interoperability retain their separate evidence and limits. See the
-[AUTH-33 verification record](../security/saml-request-delivery-verification.md).
+[request-delivery verification record](../security/saml-request-delivery-verification.md).
 
 The opt-in core/PostgreSQL `saml-requests` feature implements outgoing registration,
 metadata, request persistence, cancellation and response preparation. It selects
@@ -218,7 +218,7 @@ resolution/JIT provisioning and source-bound session commit. The separate gated
 Axum components below supply sign-in and purpose-bound confirmed deletion, with
 bounded actual Keycloak/Chromium acceptance. Broader profiles and independent
 approval remain open. Pending AuthnRequest uniqueness and staged replay hashes do not replace that ledger.
-These integrations remain under AUTH-32/34/35 and must retain realm/owner isolation,
+These integrations must retain realm/owner isolation,
 one-use original caps and all existing account-policy invariants.
 
 Dependency adoption and XML/signature/backend review must identify the actual
