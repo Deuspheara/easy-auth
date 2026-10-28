@@ -64,8 +64,8 @@ removal, so this historical identifier is instead bound to the exact owned key b
 the locked mutation transaction. User/actor/session ownership foreign keys remain.
 Subject erasure clears the target with all other attribution. The optional
 management boundary also queues a fixed non-secret notice to a verified contact;
-email-free users have no fabricated contact. Recovery and ordinary activation
-remain unfinished AUTH-20 work.
+email-free users have no fabricated contact. Recovery acceptance and ordinary
+activation remain incomplete.
 
 Migration `0013_passkey_recovery_setup.sql` adds the closed recovery-configuration
 fact without new audit columns. Actor ownership is required; `session_id` and
@@ -89,7 +89,7 @@ browser verifier, recipient or arbitrary recovery context enters audit.
 
 Audit access is privileged database access today. Scope operator queries to an authorized realm, select only necessary fields and page by `id` with a fixed limit; do not expose unrestricted SQL through an application route. Request status logs remain redacted and contain no event payload. Failure-attempt auditing, exports, read authorization/retention and monitoring are later operational work.
 
-Provider linking/unlinking remains unavailable until AUTH-25 implements its verified flow. It must prove both current-account control and a separately verified new identity, bind the transaction to its purpose/realm/connection/browser, reject already-owned identities and never merge by email. Its successful audit event must commit with the actual link, using a reviewed schema extension. `identity_linked` and arbitrary event kinds are rejected by the current database. See [ADR 0007](../architecture/adr/0007-safe-audit-and-linking.md).
+Provider linking/unlinking remains unavailable pending a verified flow. It must prove both current-account control and a separately verified new identity, bind the transaction to its purpose/realm/connection/browser, reject already-owned identities and never merge by email. Its successful audit event must commit with the actual link, using a reviewed schema extension. `identity_linked` and arbitrary event kinds are rejected by the current database. See [ADR 0007](../architecture/adr/0007-safe-audit-and-linking.md).
 
 
 Migration `0015_passkey_recovery_replacement.sql` adds `passkey_recovered` without

@@ -6,9 +6,9 @@ After migration 0004, existing sessions still verify normally but cannot authori
 
 These mailbox-policy operations reject email-free and passkey-required accounts,
 even with a fresh passkey session or proofs issued before a policy change. This
-prevents a weaker lifecycle path while AUTH-20's stronger-account operations remain
-unfinished. Optional contact attachment is a separate AUTH-53 workflow, still
-pending; see the [optional-mailbox guide](optional-mailbox.md).
+prevents a weaker lifecycle path while stronger-account operations remain
+unfinished. Optional contact attachment is a separate experimental workflow; see the
+[attachment guide](email-attachment.md) and [optional-mailbox model](optional-mailbox.md).
 
 ## Change email
 

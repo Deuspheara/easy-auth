@@ -1,6 +1,6 @@
 # Experimental Google code verification
 
-AUTH-23 adds the opt-in core `google` feature and `GoogleCodeExchange`. This is a
+The opt-in core `google` feature provides `GoogleCodeExchange`. This is a
 code/identity-proof component, not supported Google web/native activation. A
 separate optional server `google-desktop` feature supplies owned loopback delivery.
 An explicitly selected eligible-client session-age profile also supplies signed
@@ -292,7 +292,7 @@ CARGO_INCREMENTAL=0 cargo test --locked -p easy-auth-server --features google-de
 
 These fixtures do not call Google or validate registered clients, provider TLS,
 OS default-browser launch, mobile return, genuine Google freshness or usable
-provider-required deletion. Those remain AUTH-23 activation/acceptance gates.
+provider-required deletion. Those remain activation/acceptance gates.
 
 ## Experimental HTTPS browser composition
 
@@ -369,7 +369,7 @@ final-audit deadline waits. Token/JWKS
 responses remain controlled offline actual-signature fixtures, not real Google or
 system-browser interoperability. See the [verification history](../security/verification.md).
 
-Before ordinary activation, AUTH-23 still needs reviewed standalone Google
+Before ordinary activation, the integration still needs reviewed standalone Google
 configuration/activation, the remaining native platform/browser and registered
 web/negative/cancellation matrix beyond the recorded macOS/Helium loopback results, and a
 usable genuinely fresh provider-required deletion path. This component does not

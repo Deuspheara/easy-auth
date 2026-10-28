@@ -1,6 +1,9 @@
 # Initial execution evidence — 2026-10-18
 
 This is alpha implementation evidence, not an independent security audit or a production release.
+Entries preserve dated checkpoints, source revisions and observed results. Older
+feature/status statements describe those checkpoints; consult the [current capability
+summary](../../README.md#what-it-provides) and owning guides for current availability.
 
 ## AUTH-19 experimental sign-in checkpoint — 2026-10-19
 
@@ -4046,7 +4049,7 @@ unrelated cleanup is deferred.
 
 Actual registered Google sign-in, OS/browser handoff, genuine eligible-client
 freshness/deletion, broader native persistence/lifecycle, ordinary activation and
-independent review remain open. Owner client availability is not established; no
+independent review remain open. A registered test client was not available at this checkpoint; no
 Cloud app, provider settings, account, credential manager or system security setting
 was changed. AUTH-23 remains In Progress. New publication needs its own exact-head
 hosted result; the two earlier successes cannot substitute for it.
@@ -4061,8 +4064,8 @@ Publication still requires the complete staged scan to pass.
 
 ## AUTH-23 registered Google native sign-in — 2026-10-20
 
-The owner supplied a locally downloaded Google Desktop registration and completed
-the real OS-browser sign-in/consent. The owner identified the browser as Helium;
+The manual test used a registered Google Desktop client and completed
+real OS-browser sign-in/consent. The browser was reported as Helium;
 its version was not recorded. The host reports macOS 27.2, build 26B5086k.
 The [sanitized live record](../../tests/provider/google/results/2026-10-20/registered-native-signin.json)
 identifies source revision `ebac3d63cad8cfba7defab6c748ec4ed26296264` and the fixed
@@ -4077,7 +4080,7 @@ local session committed, validated and revoked. Scoped facts were one user, one
 identity, one revoked session, two audits and zero pending operations. The tool
 reported owned database removal; an independent query against the same documented
 loopback PostgreSQL server found zero `easy_auth_google_probe_` databases.
-The owner separately reported sign-in completed. No credential, client/account
+Manual confirmation also reported completed sign-in. No credential, client/account
 identifier, authorization URL, wire response, code or token is published.
 
 This is one registered Desktop, IPv4, `client_secret_post`, base-profile successful
@@ -4090,7 +4093,7 @@ are unchanged and retain their narrower claims. AUTH-23 remains In Progress.
 
 ## AUTH-23 registered Google IPv6 native sign-in — 2026-10-20
 
-After the owner explicitly selected the IPv6 test and completed sign-in in Helium,
+The IPv6 test completed sign-in in the reported Helium browser;
 the same fixed producer passed through the literal `::1` callback. The
 [separate IPv6 record](../../tests/provider/google/results/2026-10-20/registered-native-signin-ipv6.json)
 retains the finite successful result and provenance. Runtime overlays, reused-source

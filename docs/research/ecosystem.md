@@ -20,7 +20,7 @@ The snapshot timestamps establish recent commits, not ongoing maintenance, respo
 
 [Better Auth's June 2026 security update](https://better-auth.com/blog/security-update-june-2026) records OAuth code-redemption and plugin fixes. [Kanidm release notes](https://github.com/kanidm/kanidm/releases) include an origin-matching correction in the WebAuthn ecosystem. These illustrate the need for negative tests, timely dependency updates and coordinated disclosure. A comprehensive advisory/version mapping for all seven projects remains an M00 review task: no absence-of-vulnerabilities claim is made for the smaller projects. Measure resolved dependency graphs and binary/RSS under the same feature set before making footprint comparisons; manifest breadth is only a qualitative proxy.
 
-## Why exist; reuse; contribute; deserve adoption; smallest value
+## Product scope and reuse strategy
 
 1. RustAuth and Better Auth RS already solve much of embedded authentication. Our proposed distinction is a deliberately small PostgreSQL-first product with an independent versioned contract, one shared embedded/service use-case layer, tenant-scoped verifier storage, and immediate server-side revocation. This is a hypothesis to prove through a working integration, not a novel-protocol claim.
 2. Reuse webauthn-rs, openidconnect/oauth2, RustCrypto Argon2/SHA-256, SQLx, Axum, lettre and established XML signature engines. Reuse ideas and test strategies; no upstream authentication implementation is copied. RustAuth/lucid-auth compatibility is neither promised nor needed.

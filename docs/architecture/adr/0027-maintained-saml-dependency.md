@@ -6,9 +6,9 @@ approval remains pending under [ADR 0021](0021-saml-verification-and-approval.md
 ## Decision
 
 The easy-auth project owns maintenance and source distribution of its patched
-`saml-rs` dependency. The project owner explicitly selected this approach rather
-than waiting for upstream patch acceptance. This accepts maintenance responsibility;
-it does not assert an independent audit or authorize production activation.
+`saml-rs` dependency. The distribution strategy does not depend on upstream patch
+acceptance. This establishes maintenance responsibility; it does not assert an
+independent audit or authorize production activation.
 
 Continue distributing the source at `third-party/saml-rs` in this repository.
 No separate repository, registry publication, pull request or upstream/reviewer

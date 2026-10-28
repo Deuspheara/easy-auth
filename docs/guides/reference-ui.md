@@ -115,7 +115,7 @@ font, semantic tokens and Basecoat native controls. Optional Motion provides bri
 view/supporting entrances; reduced motion, forced colors or module failure retain
 the static usable presentation. See the [asset and state record](../design/reference-ui-modernization.md).
 See the [authentication design contract](../design/reference-ui.md) for the
-adaptation and the recorded owner approval.
+layout and accessibility requirements.
 
 ## Verification and limits
 
@@ -130,7 +130,7 @@ temporary theme, empty browser storage and no external request or page error.
 Light/dark layouts pass measured contrast and 320/390/768/1024/1280/1440px reflow;
 both sign-in and account views pass 320px/200% text. Local Inter loading is checked.
 Anonymous and authenticated light/dark mobile/desktop layouts were inspected
-locally. The owner approved the rendered design and verification journey on 2026-10-25.
+locally on 2026-10-25. This visual inspection is separate from automated flow verification.
 Contrast and reflow targets follow [WCAG text contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
 and [reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html). Those targets
 are not a completed accessibility audit or assistive-device certification.

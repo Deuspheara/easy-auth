@@ -1,6 +1,6 @@
 # Password recovery
 
-The opt-in password service supports browser-bound recovery. Enable the AUTH-12 password policy/corpus first; disabled password configuration returns 503 for valid reset operations. This flow changes an existing password only. It neither creates an account nor enrolls a password for an email-only account.
+The opt-in password service supports browser-bound recovery. Enable the [password policy and corpus](passwords.md) first; disabled password configuration returns 503 for valid reset operations. This flow changes an existing password only. It neither creates an account nor enrolls a password for an email-only account.
 
 1. POST `/v1/password/reset/start` with `{email}` and the exact configured Origin. The server returns generic 202 and sets an HttpOnly reset-binding cookie. Every normalized email follows the same mail path; a reset request never revokes sessions or changes credentials.
 2. Open the reset email in that browser within ten minutes. The trusted configured origin supplies `/reset#token=…`. The page removes the fragment before submitting it. GET never consumes the proof; no token is accepted in a query parameter. Cross-device completion is intentionally unsupported.

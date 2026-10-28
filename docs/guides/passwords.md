@@ -24,7 +24,7 @@ Two blocking KDF workers per shared PasswordService limit working memory to appr
 
 Enrollment locks the realm/user and revalidates the live session and five-minute freshness with database time after locking. Credential uniqueness, old-session revocation, replacement-session insertion and a bounded audit event commit together. Parallel enrollment has one winner. Login verifies outside a transaction, then locks the user and rechecks the exact credential hash before issuing a session and audit event. Future credential updates must use this same user lock. Changing credentials through direct database writes is unsupported. Unknown accounts run a dummy hash with the same parameters; this mitigates the major timing difference, without promising perfectly equal network latency.
 
-Email magic links remain a supported alternative sign-in method. Password enrollment does not increase assurance or disable mailbox sign-in. [Password recovery](password-recovery.md) is implemented separately in AUTH-13. Authenticated password change, session-management APIs and stronger-factor recovery policies remain unfinished. No production readiness is claimed.
+Email magic links remain a supported alternative sign-in method. Password enrollment does not increase assurance or disable mailbox sign-in. [Password recovery](password-recovery.md) and [session-management APIs](sessions.md) are available separately. Authenticated password change and stronger-factor recovery policies remain unfinished. No production readiness is claimed.
 
 ## Reproduce
 

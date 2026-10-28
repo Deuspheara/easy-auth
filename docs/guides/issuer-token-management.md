@@ -1,6 +1,6 @@
 # Optional access revocation and introspection
 
-This is the access-lifecycle and native consent-library work of AUTH-40. Native
+This guide covers access-token lifecycle and native consent-library operations. Native
 family issuance/rotation/revocation are available as library operations; native wire and bounded owned browser acceptance are available through the
 [explicit native profile](issuer-native.md), including optional authenticated native
 consumers. SDK/standalone interoperability and production acceptance remain separate.

@@ -4,7 +4,7 @@ An email-free `passkey_required` account can attach a verified contact address.
 This preserves its opaque ID, credentials and stronger authentication policy.
 Core/PostgreSQL and experimental HTTP tests pass. A separate native Chromium
 platform/USB suite now proves signup through real SMTP confirmation and later login. Ordinary server activation and stronger-account
-management/recovery remain gated through AUTH-20.
+management/recovery remain separately gated.
 
 ## Composition and HTTP
 

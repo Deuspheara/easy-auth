@@ -53,8 +53,8 @@ key separation plus missing/failed-metadata cold fallback. No application Rust,
 protocol policy, migrations, assertion fixtures or tests change for this work.
 The first hosted run must establish cold verification and successful save; a later
 natural run must establish warm restore and all checks before reporting a measured
-improvement. AUTH-58 remains open until that evidence exists. No SAML or outbound
-issuer release/independent-review requirement is cleared by caching.
+improvement. Cache-performance acceptance remains open until that evidence exists.
+No SAML or outbound issuer release/independent-review requirement is cleared by caching.
 
 A real same-host restored-tool-root check also passed: copied only the existing
 cargo-audit/cargo-deny executables and Cargo's two installed-package metadata files

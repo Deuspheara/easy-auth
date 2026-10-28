@@ -1,6 +1,6 @@
 # Reference UI implementation and verification
 
-The reference client uses Basecoat 1.1.0 Vega with the owner's approved compact,
+The reference client uses Basecoat 1.1.0 Vega with a compact,
 open account composition. The current visual contract is
 [reference-ui.md](reference-ui.md); [ADR0042](../architecture/adr/0042-reference-account-ui.md)
 records the behavior and security boundary. Earlier visual candidates are superseded.
@@ -104,9 +104,8 @@ Native dialog geometry and focus restoration stay application/browser-owned.
 Password/code clearing, stale-result rejection, current-owner checks, credential
 versions, native WebAuthn and server proofs remain in existing feature controllers.
 The visual adaptation changes no backend API, schema, verifier or recovery policy.
-The branch's earlier read-only linked-provider inventory is documented in ADR0041.
-The supplied design's
-prototype transport, invented response flags and broader CSP were not imported.
+The read-only linked-provider inventory is documented in ADR0041.
+Presentation uses the existing transport and response contracts under the same CSP.
 
 ## Reproducible verification
 

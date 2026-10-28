@@ -1,6 +1,6 @@
 # Experimental OAuth transaction boundary
 
-AUTH-22 implements optional core/PostgreSQL state handling under
+The optional transaction component implements core/PostgreSQL state handling under
 `oauth-transactions`. It has no HTTP routes, browser client, provider exchange,
 token verification, identity linking or session issuance. Normal server/router
 composition is unchanged. See [ADR 0013](../architecture/adr/0013-oauth-state-transactions.md)
@@ -39,8 +39,8 @@ boundary below does not activate a native callback transport.
 
 ## Explicit desktop return metadata
 
-AUTH-23 adds `OAuthRedirect` and `OAuthConnection::with_redirect` under the existing
-`oauth-transactions` feature. `OAuthConnection::new` and `OAuthRedirect::https`
+Desktop return metadata uses `OAuthRedirect` and `OAuthConnection::with_redirect`
+under the existing `oauth-transactions` feature. `OAuthConnection::new` and `OAuthRedirect::https`
 retain the HTTPS-only contract. A desktop embedding may deliberately create a
 typed return URI after binding its own listener:
 
@@ -68,8 +68,8 @@ retains disable and atomically invalidates old pending work. Stable identity-pol
 loading keeps its current-revision checks; metadata never grants authentication.
 No migration, new HTTP route or server setting is added. Ordinary OIDC web startup
 and routing remain HTTPS-only. Google exchange, an actual native listener/client,
-mobile return mechanisms and the manual provider matrix remain AUTH-23 work; this
-primitive is not Google or native-system-browser interoperability evidence.
+mobile return mechanisms and the manual provider matrix have separate acceptance
+requirements; this primitive is not Google or native-system-browser interoperability evidence.
 
 ## Purpose and completion authority
 
@@ -81,7 +81,7 @@ to attach an identity or downgrade an account. Future linking must prove the new
 provider identity and revalidate original authority/policy at its final commit.
 Matching email addresses never select or merge local accounts.
 
-AUTH-55 adds `OAuthPurpose::DeleteProviderAccount { user, session }` as preparation
+Provider deletion uses `OAuthPurpose::DeleteProviderAccount { user, session }` as preparation
 for a distinct provider deletion flow. PostgreSQL requires `oidc-identities` and
 the exact active provider-required owner/session/source/configuration revision.
 It rejects without that feature. The initiating session may have old or unknown

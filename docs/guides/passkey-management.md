@@ -1,6 +1,6 @@
 # Experimental passkey management
 
-AUTH-20 is in progress. Optional core/PostgreSQL and explicit experimental HTTP
+Optional core/PostgreSQL and explicit experimental HTTP
 management provide bounded inventory, rename and removal. All-keys-lost recovery,
 stronger-policy activation and ordinary server enablement remain incomplete.
 Those and required physical-device/browser evidence remain acceptance gates.
@@ -48,7 +48,7 @@ leased/retry queue. `EmailDelivery::passkeys_changed` is a required delivery por
 implementations must report unavailable delivery honestly. The real SMTP adapter
 implements it. No raw credential, label, recovery secret or sign-in link enters a
 notice. Email-free users have no fabricated notification address or implied email
-recovery; recovery notification limits remain explicit unfinished AUTH-20 work.
+recovery; recovery notification limits remain explicit unfinished work.
 
 Migration 0012 adds management versions and bounded target/audit/notice schema.
 Existing key encodings, metadata, owner IDs and session provenance are preserved;

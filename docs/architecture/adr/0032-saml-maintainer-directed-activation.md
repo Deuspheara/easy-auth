@@ -4,8 +4,8 @@ Date: 2026-10-23. Status: accepted maintainer release-policy decision.
 
 ## Decision and assurance status
 
-The project maintainer explicitly directed activation without obtaining the
-previously required independent review. Supersede the mandatory independent-review
+An explicit maintainer release-policy waiver permits activation without completing
+the previously required independent review. Supersede the mandatory independent-review
 prerequisite and unconditional startup/proxy lock in ADR0021, ADR0029 and ADR0031.
 This is a maintainer waiver, **not completed independent review, an audit,
 certification, general protocol compliance or a finding that all risks are closed**.
@@ -42,8 +42,8 @@ rows (27 distinct CVEs). Those observations belong to the recorded images and
 scanner database, not future rebuilds. Rebuilds need their own scan/provenance.
 Parser/C14N/reference review sufficiency, native/advisory applicability, selective
 schema validation and unmeasured CPU/RSS/duration/availability remain documented
-assurance limits. Native timeouts cannot kill a blocked verification task. The
-maintainer chose to proceed without the independent assessment of these residuals;
+assurance limits. Native timeouts cannot kill a blocked verification task.
+Independent assessment of these residuals was waived as an activation prerequisite;
 this does not establish that they are harmless or independently accepted.
 
 ## Verification and delivery
@@ -59,4 +59,5 @@ adversarial XML/crypto, fuzz, stress or signature-concurrency experiments.
 Record current test/CI results with the new source. Never transfer earlier
 source-disabled receipts to enabled behavior. The unsent independent-review packet
 remains available for a future review; lack of that review is disclosed rather
-than relabeled as success. No PR, registry publication or human/upstream contact.
+than relabeled as success. This decision does not establish registry publication
+or upstream acceptance.

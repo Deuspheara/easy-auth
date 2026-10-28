@@ -1,6 +1,6 @@
 # Experimental passkey sign-in
 
-AUTH-19 provides optional account-bound and resident-credential sign-in through the
+The optional passkey component provides account-bound and resident-credential sign-in through the
 shared core, PostgreSQL and an explicit Axum router. Ordinary embedded/server
 composition remains disabled while stronger-account management/recovery policy and
 passkey-first enrollment are unfinished. This is alpha functionality, not an audited
@@ -92,11 +92,12 @@ PostgreSQL, bounded to 1 MiB; there are at most three pending ceremonies per bro
 with separate start/finish budgets of 20/browser and 40/source per ten minutes.
 
 Session method provenance records real email/password/passkey proof and preserves
-unknown historical methods and rotation time/method. AUTH-53's initial account
-policy now rejects weak-method sessions and mailbox/password fallback for
+unknown historical methods and rotation time/method. Account
+policy rejects weak-method sessions and mailbox/password fallback for
 passkey-required users; fresh passkey session controls also work without email.
-Normal activation remains gated; email-free bootstrap and mailbox attachment are
-still AUTH-53 work, with full management/recovery in AUTH-20. See the
+Normal activation remains gated. Experimental [email-free signup](passkey-signup.md)
+and [mailbox attachment](email-attachment.md) have separate guides; full
+stronger-account lifecycle/recovery acceptance remains incomplete. See the
 [optional-mailbox guide](optional-mailbox.md).
 Other browsers, real devices/provider-backed passkeys and operational retention
 remain release work. See the [source review](../research/passkey-authentication.md)

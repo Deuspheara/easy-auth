@@ -17,7 +17,7 @@ values. Earlier versions ignored arguments; scripts must now invoke the server
 without arguments to start it. There are no command-line credential options.
 
 With no arguments, the existing environment-based startup runs. The binary does
-not automatically load `.env`. Follow the [local setup](../../README.md#run-locally)
+not automatically load `.env`. Follow the [local setup](../../README.md#quick-start)
 to start PostgreSQL and Mailpit, copy `.env.example`, and export its settings before
 starting the binary. That file contains development-only credentials. Use a
 disposable mailbox in Mailpit and open the sign-in link in the requesting browser.

@@ -6,8 +6,9 @@ an explicit opt-in Axum HTTP/browser boundary. The combined
 [OIDC web composition](oidc-web.md) also supplies trusted server settings and a
 shared callback with public sign-in; default composition remains unchanged.
 The implementation has component and owned Keycloak-to-HTTP acceptance evidence.
-AUTH-56 records owned two-mode public-flow acceptance with final hosted verification
-and broader release gates still explicit. [ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
+The configured browser integration records owned two-mode public-flow acceptance;
+final hosted verification and broader release gates remain explicit.
+[ADR 0017](../architecture/adr/0017-provider-account-deletion.md)
 records the transaction and experimental transport.
 
 ## Prepare a separate provider proof
@@ -90,10 +91,11 @@ completion. Preserve the account and fail closed; do not weaken policy, re-enabl
 a connection implicitly or fabricate a mailbox. No provider vault deletion,
 upstream grant revocation, application business-data erasure or total erasure from
 backups/mailboxes is promised. Deletion notices temporarily retain their established
-recipient under the existing queue policy. AUTH-26 owns Apple grant revocation;
-AUTH-25 owns link/unlink and last-credential mutation. Ordinary OIDC web composition
-is AUTH-56. None of these boundaries establishes production readiness, independent
-review, certified assurance or complete provider lifecycle activation.
+recipient under the existing queue policy. Apple grant revocation, provider
+linking/unlinking and last-credential mutation are separate lifecycle work.
+Ordinary OIDC web composition is described in [the browser guide](oidc-web.md).
+None of these boundaries establishes production readiness, independent review,
+certified assurance or complete provider lifecycle activation.
 
 ## Explicit experimental HTTP composition
 
@@ -105,7 +107,7 @@ services)`. The Auth realm must match and the configured redirect must be exactl
 `<HTTPS browser origin>/oidc/account-delete/callback`. HTTP loopback development
 origins are deliberately insufficient for this OAuth callback. There is one trusted
 connection per router; no request selects an owner, realm, connection or redirect.
-This legacy constructor leaves default routers unchanged. AUTH-56's separate
+This legacy constructor leaves default routers unchanged. The separate
 [combined composition](oidc-web.md) uses the same deletion use case with its common
 `/oidc/callback`, trusted server settings and owned public-login acceptance.
 

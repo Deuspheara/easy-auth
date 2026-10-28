@@ -139,7 +139,7 @@ its own first fetch within the unchanged budget. The test preserves actual provi
 cache headers, scopes and client configuration;
 controlled proxy faults are labeled separately from provider-signed claims. It
 requires normal owned resource cleanup and creates no local user/session/contact.
-The separate optional [AUTH-30 identity boundary](oidc-identities.md) now implements
+The separate optional [identity boundary](oidc-identities.md) now implements
 mapping/JIT/session persistence. This historical verifier report does not establish
 acceptance of that newer boundary; its provider evidence is tracked separately.
 
